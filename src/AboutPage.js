@@ -5,7 +5,6 @@ export default class AboutPage extends Component {
     render() {
         return  (
         <div className="aboutpage" >
-            <h3>About Nemo</h3>
             
             <div>Before he was an adorable fish, Nemo ('fish' and 'nobody' in Latin) was an enigmatic polymath who wandered in exile in the ocean depths. Oh, and he had a well-stocked library and a long memory ('avenger' in Greek). Nemo is also a play on 'mnemonic' and Mnemosyne, the goddess of memory.</div>
              

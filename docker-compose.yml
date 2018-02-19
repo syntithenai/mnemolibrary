@@ -1,13 +1,5 @@
 version: '2'
 services:
-  db:
-    image: mysql/mysql-server:5.5
-    volumes:
-      - "./mysql:/var/lib/mysql"
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: remember
-    
   nemo:
     build: .
     image: syntithenai/nemo
@@ -15,11 +7,8 @@ services:
     volumes:
       - "./:/usr/src/app/"
     environment:
-      #VIRTUAL_HOST: syntithenai.com
+      VIRTUAL_HOST: mnemolibrary.com
       #LETSENCRYPT_HOST: syntithenai.com
       #LETSENCRYPT_EMAIL: stever@syntithenai.com
-      DB_HOST: db
-      MYSQL_ROOT_PASSWORD: remember
-      DB_DATABASE: nemo
     ports:
       - "80:3000"

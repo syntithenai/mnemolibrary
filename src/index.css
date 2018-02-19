@@ -22,3 +22,14 @@ body {
 iframe {
     width: 100%;
 }
+
+
+.question .card-title {
+    color: blue;
+    background-color: lightblue;
+    width: 100%;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding: 1rem;
+    border: 1px solid black;
+}

@@ -16,11 +16,11 @@ import 'whatwg-fetch'
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
+import Utils from './Utils';
+    
 export default class AppLayout extends Component {
 
   constructor(props) {
-      console.log('APP CONSTRUCT')
       super(props);
       this.state = {
           title : "Mnemos Library",
@@ -29,6 +29,7 @@ export default class AppLayout extends Component {
           indexedQuestions: [],
           topics: [],
           tags: [],
+          relatedTags: [],
           users: {'default':{
               'seenIntro': false, 
               'questions':{'seen':{},'success':{},'fail':{},'skip':{},'block':{}}
@@ -51,16 +52,15 @@ export default class AppLayout extends Component {
       this.getQuestionsByTopic = this.getQuestionsByTopic.bind(this);
   };
   
+
+
   componentDidMount() {
-      console.log('APP DID MOUNT')
       let that = this;
       // load mnemonics and collate tags, topics
       fetch('/mnemonics.json')
       .then(function(response) {
-          console.log(['fetched',response])
         return response.json()
       }).then(function(json) {
-        console.log(['parsed json',json])
         that.createIndexes(json);
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
@@ -69,8 +69,9 @@ export default class AppLayout extends Component {
   }
   
   createIndexes(json) {
-      var quizzes = {}
-        var tags = {}
+        var quizzes = {};
+        var tags = {};
+        var relatedTags = {};
         // collate quizzes and tags
         let indexedQuestions= {};
         for (var questionKey in json['questions']) {
@@ -92,7 +93,16 @@ export default class AppLayout extends Component {
                 if (! (Array.isArray(tags[tag]))) {
                     tags[tag] = []
                 }
+                if (! (Array.isArray(relatedTags[tag]))) {
+                    relatedTags[tag] = {}
+                }
                 tags[tag].push(id);
+                tagList.forEach(function(relatedTag) {
+                    if (relatedTag != tag) {
+                        relatedTags[tag][relatedTag]=true;
+                    }
+                });
+                
             }
             indexedQuestions[id]=questionKey;
         }
@@ -100,12 +110,11 @@ export default class AppLayout extends Component {
         for (let tag in tags) {
             words.push({text:tag, value: tags[tag].length});
         }
-    console.log(['SETSTATE',indexedQuestions]);
-        this.setState({'questions':json['questions'], 'indexedQuestions':indexedQuestions,'topics':quizzes,'words':words,'tags':tags});
+        this.setState({'questions':json['questions'], 'indexedQuestions':indexedQuestions,'topics':quizzes,'words':words,'tags':tags,'relatedTags':relatedTags});
   };
   
   setCurrentPage(page) {
-      this.setState({'currentPage': page});
+      this.setState({'currentPage': page,title: Navigation.pageTitles[page]});
   };  
     
   isCurrentPage(page) {
@@ -117,7 +126,6 @@ export default class AppLayout extends Component {
   // question must not be blocked
   getNextQuestion() {
     if (this.state.indexedQuestions) {
-        //console.log(['INDE',this.state.questions[this.state.indexedQuestions,this.state.currentQuiz[0]]]);
         return this.state.questions[this.state.indexedQuestions[this.state.currentQuiz[0]]];
     }
   };
@@ -125,7 +133,6 @@ export default class AppLayout extends Component {
   // handle user click on Remember, Forgot, Skip, Ban
   // update user questions history and remove question from current Quiz
   handleQuestionResponse(question,response) {
-      //console.log(['HANDLE QR',question,response,parseInt(question.ID)]);
       let questions = this.state.users['default'].questions;
       const id = parseInt(question.ID);
       const time = new Date().getTime();
@@ -173,20 +180,19 @@ export default class AppLayout extends Component {
   
   // SET QUIZ
   setQuiz(title,questionIds) {
-      this.setState({'currentPage':'home','currentQuiz':questionIds,'title': title});
+      this.setState({'currentPage':'home','currentQuiz':questionIds,'title': Utils.snakeToCamel(title)});
   };
 
   setQuizFromQuestion(question) {
-      //this.setQuiz();
-      this.setQuiz(question.interogative + ' ' + question.question,[question.ID])
+      this.setQuiz('Mnemos Library',[question.ID])
   };
   setQuizFromTopic(topic) {
       const questions = this.getQuestionsByTopic(topic);
       this.setQuiz(topic,questions);
   };
   setQuizFromTag(tag) {
-      const questions = this.getQuestionsByTag(tag);
-      this.setQuiz('Tag - '+tag,questions);
+      const questions = this.getQuestionsByTag(tag.text);
+      this.setQuiz('Tag - '+tag.text,questions);
   };
 
     
@@ -201,14 +207,16 @@ export default class AppLayout extends Component {
     const showIntro = this.isCurrentPage('intro'); // && user.hasSeenIntro 
     return (
         <div className="Mnemo">
-            <Navigation setCurrentPage={this.setCurrentPage}/>
+            <Navigation setCurrentPage={this.setCurrentPage} title={this.state.title} />
+            <div className='page-title'><h4>{this.state.title}</h4></div>
+
             {homeShowQuestion && <SingleQuestion question={question} handleQuestionResponse={this.handleQuestionResponse}/> 
             }
             {homeShowList && <TopicsPage topics={topics} setQuiz={this.setQuizFromTopic}/>
             }
             {this.isCurrentPage('topics') && <TopicsPage topics={topics} setQuiz={this.setQuizFromTopic} />
             }
-            {this.isCurrentPage('tags') && <TagsPage tags={tags} setQuiz={this.setQuizFromTag} />
+            {this.isCurrentPage('tags') && <TagsPage tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
             }
             {this.isCurrentPage('search') && <SearchPage questions={questions} setQuiz={this.setQuizFromQuestion} />
             }

@@ -36,15 +36,9 @@ export default class SingleQuestion extends Component {
     };
     
     render() {
-        //console.log(['que',this.props]);
         if (this.props.question) {
-          //let key = this.props.question.ID;
           let question = this.props.question;
-          //let mnemonic_id = "mnemonic_" + key;
-          //let answer_id = "answer_" + key;
-          //let mnemonic_hash = "#mnemonic_" + key;
           let header = question.interogative + ' ' + question.question;
-          //let interogative = question.interogative;
           let image =   question.image ?  question.image : '/clear.gif';
           let link = question.link + '?printable=yes';
           let showAnswerButton = !this.isVisible('answer') && question.answer;
@@ -78,7 +72,7 @@ export default class SingleQuestion extends Component {
                 </div>}
                 <div className="card-block">
                     {!this.isVisible('moreinfo') && <img className="" src={image} alt={header}  style={{width:"70%"}} /> }
-                    {this.isVisible('moreinfo') && <iframe src={link} style={{width:"98%", height: "1200px"}}/> }
+                    {this.isVisible('moreinfo') && <iframe src={link} style={{width:"98%", height: "1200px", border: "0px"}}/> }
             
                 </div>
                 
@@ -95,29 +89,3 @@ export default class SingleQuestion extends Component {
     };
 }
 
-
-
-
-
-
-
-
-            //<div className="question card" key={key} >
-                //<div className='card-block'>
-                    //<img className="card-img-top" src={image} alt={header} width="400px"/>
-                     //<ul className="list-group list-group-flush">
-                        //<li className="list-group-item">
-                            //<a className='btn' >Mnemonic</a>
-                            //<div className='mnemonic' >{question.mnemonic}</div>
-                        //</li>
-                        //<li className="list-group-item">
-                            //<a className='btn' >Answer</a>
-                            //<div className='answer' >{question.answer}</div>
-                        //</li>
-                        //<li className="list-group-item">
-                            //<a className='btn' >More Info</a>
-                            //<div className='moreinfo' >{question.moreinfo}</div>
-                        //</li>
-                    //</ul>
-                //</div>
-            //</div>
