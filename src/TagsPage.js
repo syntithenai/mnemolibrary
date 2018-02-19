@@ -23,19 +23,15 @@ export default class TagsPage extends Component {
         let tags = [];
         let that = this;
         if (title.length > 0) {
-            //console.log(['FUKTER TAGS',title]);
             let that = this;        
             Object.keys(this.props.tags).forEach(function(tagKey) {
                 let tag = that.props.tags[tagKey].text;
-                //console.log(['FUKTER TAGS r',tag]);
                 if (tag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
-                    console.log(['FUKTER TAGS match',tag]);
                     tags.push(that.props.tags[tagKey]);
                 }
                 // check related
                 Object.keys(that.props.relatedTags[tag]).forEach(function(tag) {
                     if (tag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
-                        console.log(['REL FUKTER TAGS match',tag]);
                         tags.push(that.props.tags[tagKey]);
                     }    
                 });

@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 
 // icons
 import Check from 'react-icons/lib/fa/check';
-import Times from 'react-icons/lib/fa/times-circle';
 import ArrowRight from 'react-icons/lib/fa/arrow-right';
+import ArrowLeft from 'react-icons/lib/fa/arrow-left';
 import Trash from 'react-icons/lib/fa/trash';
 import Info from 'react-icons/lib/fa/info';
 
@@ -42,13 +42,16 @@ export default class SingleQuestion extends Component {
           let image =   question.image ?  question.image : '/clear.gif';
           let link = question.link + '?printable=yes';
           let showAnswerButton = !this.isVisible('answer') && question.answer;
+          let showRecallButton = this.props.user.questions.seen.hasOwnProperty(question.ID);
           return (
             <div className="card question container" >
                 <div className="row buttons" >
-                    <button className="col-4 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="hidden-md-up"> Remembered</span></button>
-                    <button className="col-3 btn btn-outline btn-warning" onClick={() => this.handleQuestionResponse(question,'fail')} ><Times size={25} /><span className="hidden-sm-down" > Forgot</span></button>
+                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="hidden-sm-down" > Prev </span></button>
                     <div className='col-1'>&nbsp;</div>
-                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'skip')}><ArrowRight size={25} /><span className="hidden-sm-down"> Skip</span></button>
+                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="hidden-sm-down"> Next</span></button>
+                    <div className='col-1'>&nbsp;</div>
+                    {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="hidden-md-up"> Recall</span></button>}
+                    <div className='col-1'>&nbsp;</div>
                     <button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="hidden-sm-down"> Ban</span></button>
                     
                 </div>
