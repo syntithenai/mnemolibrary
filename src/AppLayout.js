@@ -259,11 +259,8 @@ export default class AppLayout extends Component {
         <div className="Mnemo">
             <Navigation setCurrentPage={this.setCurrentPage} startReview={this.startReview} title={this.state.title} />
             <div className='page-title'><h4>{this.state.title}</h4></div>
-
-            {homeShowQuestion && <SingleQuestion question={question} user={user}  handleQuestionResponse={this.handleQuestionResponse}/> 
-            }
-            {homeShowList && <FindQuestions setCurrentPage={this.setCurrentPage} />
-            }
+            {homeShowQuestion && <SingleQuestion question={question} user={user}  handleQuestionResponse={this.handleQuestionResponse}/> }
+            {homeShowList && <FindQuestions setCurrentPage={this.setCurrentPage} />}
             {this.isCurrentPage('topics') && <TopicsPage topics={topics} setQuiz={this.setQuizFromTopic} />
             }
             {this.isCurrentPage('tags') && <TagsPage tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
