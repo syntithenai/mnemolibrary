@@ -14,6 +14,7 @@ https://fontawesome.com/icons?d=gallery&q=search&m=free
 
 https://medium.appbase.io/how-to-implement-authentication-for-your-react-app-cf09eef3bb0b
 
+https://www.robinwieruch.de/conditional-rendering-react/
 
 --
 

@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 
 // icons
 import Check from 'react-icons/lib/fa/check';
-import Times from 'react-icons/lib/fa/times-circle';
 import ArrowRight from 'react-icons/lib/fa/arrow-right';
+import ArrowLeft from 'react-icons/lib/fa/arrow-left';
 import Trash from 'react-icons/lib/fa/trash';
 import Info from 'react-icons/lib/fa/info';
 
@@ -36,25 +36,22 @@ export default class SingleQuestion extends Component {
     };
     
     render() {
-        //console.log(['que',this.props]);
         if (this.props.question) {
-          //let key = this.props.question.ID;
           let question = this.props.question;
-          //let mnemonic_id = "mnemonic_" + key;
-          //let answer_id = "answer_" + key;
-          //let mnemonic_hash = "#mnemonic_" + key;
           let header = question.interogative + ' ' + question.question;
-          //let interogative = question.interogative;
           let image =   question.image ?  question.image : '/clear.gif';
           let link = question.link + '?printable=yes';
           let showAnswerButton = !this.isVisible('answer') && question.answer;
+          let showRecallButton = this.props.user.questions.seen.hasOwnProperty(question.ID);
           return (
             <div className="card question container" >
                 <div className="row buttons" >
-                    <button className="col-4 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="hidden-md-up"> Remembered</span></button>
-                    <button className="col-3 btn btn-outline btn-warning" onClick={() => this.handleQuestionResponse(question,'fail')} ><Times size={25} /><span className="hidden-sm-down" > Forgot</span></button>
+                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="hidden-sm-down" > Prev </span></button>
                     <div className='col-1'>&nbsp;</div>
-                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'skip')}><ArrowRight size={25} /><span className="hidden-sm-down"> Skip</span></button>
+                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="hidden-sm-down"> Next</span></button>
+                    <div className='col-1'>&nbsp;</div>
+                    {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="hidden-md-up"> Recall</span></button>}
+                    <div className='col-1'>&nbsp;</div>
                     <button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="hidden-sm-down"> Ban</span></button>
                     
                 </div>
@@ -78,7 +75,7 @@ export default class SingleQuestion extends Component {
                 </div>}
                 <div className="card-block">
                     {!this.isVisible('moreinfo') && <img className="" src={image} alt={header}  style={{width:"70%"}} /> }
-                    {this.isVisible('moreinfo') && <iframe src={link} style={{width:"98%", height: "1200px"}}/> }
+                    {this.isVisible('moreinfo') && <iframe src={link} style={{width:"98%", height: "1200px", border: "0px"}}/> }
             
                 </div>
                 
@@ -95,29 +92,3 @@ export default class SingleQuestion extends Component {
     };
 }
 
-
-
-
-
-
-
-
-            //<div className="question card" key={key} >
-                //<div className='card-block'>
-                    //<img className="card-img-top" src={image} alt={header} width="400px"/>
-                     //<ul className="list-group list-group-flush">
-                        //<li className="list-group-item">
-                            //<a className='btn' >Mnemonic</a>
-                            //<div className='mnemonic' >{question.mnemonic}</div>
-                        //</li>
-                        //<li className="list-group-item">
-                            //<a className='btn' >Answer</a>
-                            //<div className='answer' >{question.answer}</div>
-                        //</li>
-                        //<li className="list-group-item">
-                            //<a className='btn' >More Info</a>
-                            //<div className='moreinfo' >{question.moreinfo}</div>
-                        //</li>
-                    //</ul>
-                //</div>
-            //</div>
