@@ -5,7 +5,11 @@ export default class AboutPage extends Component {
     render() {
         return  (
         <div className="aboutpage" >
-            
+        
+            <nav className='nav' style={{float:'right'}}>
+                <button class='btn btn-info' onClick={() => this.props.setCurrentPage('intro')}>Getting Started</button>
+                <button class='btn btn-info' onClick={() => this.props.setCurrentPage('termsofuse')}>Terms Of Use</button>
+            </nav>
             <div>Before he was an adorable fish, Nemo ('fish' and 'nobody' in Latin) was an enigmatic polymath who wandered in exile in the ocean depths. Oh, and he had a well-stocked library and a long memory ('avenger' in Greek). Nemo is also a play on 'mnemonic' and Mnemosyne, the goddess of memory.</div>
              
             <div>If you're like us, you wish you had a better memory. Whether you need to pass a test, impress your friends, or dread the dark descent into dementia, you too may have googled 'better memory'. You may have discovered the power of staggered recall and mnemonics.</div>

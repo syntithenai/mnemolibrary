@@ -24,9 +24,8 @@
    "interogative": "what is",
    "question": "Marshall Plan",
    "mnemonic": "[Marshalled] free trade against communism",
-   "answer": "",
-   "link": "https://en.wikipedia.org/wiki/Marshall_Plan"
- },
+   "answer": ""
+   },
  {
    "ID": 3,
    "score": 10,
@@ -193,8 +192,7 @@
    "interogative": "",
    "question": "What is the French national motto?",
    "mnemonic": "Take a LEaF out of the French book [libe, equal, frat]",
-   "answer": "Liberty, Equality, Fraternity",
-   "link": "https://en.wikipedia.org/wiki/Libert%C3%A9,_%C3%A9galit%C3%A9,_fraternit%C3%A9"
+   "answer": "Liberty, Equality, Fraternity"
  },
  {
    "ID": 16,
@@ -219,8 +217,7 @@
    "interogative": "",
    "question": "What split the British Liberal Party in 1886?",
    "mnemonic": "Couldn't rule themselves in own land, let alone home rule in Ireland",
-   "answer": "Home Rule in Ireland",
-   "link": "https://en.wikipedia.org/wiki/Liberal_Unionist_Party"
+   "answer": "Home Rule in Ireland"
  },
  {
    "ID": 18,
