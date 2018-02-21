@@ -13,7 +13,7 @@ export default class QuizCarousel extends Component {
             'currentQuestion':this.props.question ? this.props.question : 0,
             'quizComplete': false,
             'showList':false,
-            'successButton': true
+            'successButton': false
         };
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.currentQuestion = this.currentQuestion.bind(this);
@@ -87,7 +87,10 @@ export default class QuizCarousel extends Component {
     
     currentQuestion() {
         let question=null;
-        question = this.props.questions[this.props.indexedQuestions[this.state.currentQuiz[this.state.currentQuestion]]];
+        if (this.state.currentQuestion !== null && Array.isArray(this.state.currentQuiz) && this.props.indexedQuestions && this.props.questions) {
+            question = this.props.questions[this.props.indexedQuestions[this.state.currentQuiz[this.state.currentQuestion]]];
+        
+        }
         return question;
     };
     
@@ -109,9 +112,11 @@ export default class QuizCarousel extends Component {
     };
     
     setQuizQuestion(question) {
-        console.log(['setQuizQuestion',question]);
-        let index = this.state.currentQuiz.indexOf(question.ID);
-        this.setState({'showList':false,'currentQuestion':index});
+        if (Utils.isObject(question) && question.ID > 0) {
+            console.log(['setQuizQuestion',question]);
+            let index = this.state.currentQuiz.indexOf(question.ID);
+            this.setState({'showList':false,'currentQuestion':index});
+        }
     };
     
     render() {

@@ -71,7 +71,7 @@ export default class AppLayout extends Component {
   componentDidMount() {
       let that = this;
       // load mnemonics and collate tags, topics
-      fetch('/mnemonics.json')
+      fetch('/mnemonics2.json')
       .then(function(response) {
         return response.json()
       }).then(function(json) {
