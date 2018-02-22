@@ -21,7 +21,6 @@ export default class TagsPage extends Component {
     
     filterTags(title) {
         let tags = [];
-        let that = this;
         if (title.length > 0) {
             let that = this;        
             Object.keys(this.props.tags).forEach(function(tagKey) {

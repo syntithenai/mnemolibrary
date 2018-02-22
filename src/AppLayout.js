@@ -93,11 +93,9 @@ export default class AppLayout extends Component {
             var id = question.ID
             var quizList = question.quiz.split(',');
             var tagList = question.tags.split(',')
-            //console.log(["COLLATE",id,quizList,tagList]);
             for (var quizKey in quizList) {
                 var quiz = quizList[quizKey];
                 if (! (Array.isArray(quizzes[quiz]))) {
-                    console.log('setup quiz ' + quiz);
                     quizzes[quiz] = []
                 }
                 quizzes[quiz].push(id);
@@ -161,7 +159,17 @@ export default class AppLayout extends Component {
       return this.state.topics[topic];
   }; 
 
-
+  getQuestionsForReview() {
+      
+  };
+  
+  getTopicsForReview() {
+      
+  };
+  
+  getTagsForReview() {
+      
+  };
   
   // SET QUIZ
   setQuiz(title,questionIds) {
@@ -229,15 +237,6 @@ export default class AppLayout extends Component {
             {this.isCurrentPage('termsofuse') && <TermsOfUse/>
             }
         </div>
-    
     );
   }
 }
-//{homeShowQuestion && <SingleQuestion question={question} user={user}  handleQuestionResponse={this.handleQuestionResponse}/> }
-      //}
-                  
-//{this.isCurrentPage('review') && <ReviewPage questions={this.state.questions}  user={user} setQuiz={this.setQuizFromQuestion} handleQuestionResponse={this.handleQuestionResponse} setCurrentPage={this.setCurrentPage} />
-            //}
-
-//const question = (this.state.currentQuiz.length > 0) ? this.state.questions[this.state.currentQuiz[this.state.currentQuestion]] : null;
-    

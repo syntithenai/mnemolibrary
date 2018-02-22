@@ -7,8 +7,8 @@ export default class AboutPage extends Component {
         <div className="aboutpage" >
         
             <nav className='nav' style={{float:'right'}}>
-                <button class='btn btn-info' onClick={() => this.props.setCurrentPage('intro')}>Getting Started</button>
-                <button class='btn btn-info' onClick={() => this.props.setCurrentPage('termsofuse')}>Terms Of Use</button>
+                <button className='btn btn-info' onClick={() => this.props.setCurrentPage('intro')}>Getting Started</button>
+                <button className='btn btn-info' onClick={() => this.props.setCurrentPage('termsofuse')}>Terms Of Use</button>
             </nav>
             <div>Before he was an adorable fish, Nemo ('fish' and 'nobody' in Latin) was an enigmatic polymath who wandered in exile in the ocean depths. Oh, and he had a well-stocked library and a long memory ('avenger' in Greek). Nemo is also a play on 'mnemonic' and Mnemosyne, the goddess of memory.</div>
              
