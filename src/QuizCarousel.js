@@ -13,12 +13,14 @@ export default class QuizCarousel extends Component {
             'currentQuestion':this.props.question ? this.props.question : 0,
             'quizComplete': false,
             'showList':false,
-            'successButton': false
+            'successButton': (this.props.successButton ? true : false),
+            'success' : []
         };
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.currentQuestion = this.currentQuestion.bind(this);
         this.getQuestions = this.getQuestions.bind(this);
         this.setQuizQuestion = this.setQuizQuestion.bind(this);
+        this.finishQuiz = this.finishQuiz.bind(this);
     };
     
     
@@ -33,36 +35,42 @@ export default class QuizCarousel extends Component {
       if (response === "list") {
          this.setState({'showList':true});  
       } else if (response === "success") {
-          if (this.state.currentQuestion === this.state.currentQuiz.length - 1) {
-              this.setState({'quizComplete':true});
-            }  else {
-                this.setState({'currentQuestion':this.state.currentQuestion + 1});
-            }
           questions.seen[id] = time;
           questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           questions.success[id] = time;              
           questions.successTally[id] = questions.successTally.hasOwnProperty(id) ? questions.successTally[id] + 1 : 0;
+          if (this.state.currentQuestion === this.state.currentQuiz.length - 1) {
+              this.finishQuiz();
+            }  else {
+                // local collate success ids for finishQuiz function
+                const time = new Date().getTime();
+                let success = this.state.success;
+                if (!success.includes(this.state.currentQuestion)) {
+                    success.push(this.state.currentQuestion);
+                }
+                this.setState({ 'success': success, 'currentQuestion':this.state.currentQuestion + 1});
+            }
           
 
       } else if (response === "previous") {
+          questions.seen[id] = time;
+          questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           let currentId =this.state.currentQuestion - 1;
           if (this.state.currentQuestion > 0 && this.state.currentQuiz.length > 0) {
               this.setState({'currentQuestion':currentId});
           }
-          questions.seen[id] = time;
-          questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           
       } else if (response === "next") {
+          questions.seen[id] = time;
+          questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           if (this.state.currentQuiz.length > 0) {
             if (this.state.currentQuestion === this.state.currentQuiz.length - 1) {
-              this.setState({'quizComplete':true});
+              this.finishQuiz();
             }  else {
                this.setState({'currentQuestion':this.state.currentQuestion + 1});
             }
               
           } 
-          questions.seen[id] = time;
-          questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           
       } else if (response === "block") {
           // flag as blocked
@@ -72,7 +80,7 @@ export default class QuizCarousel extends Component {
           // quiz complete ?
           if (this.state.currentQuiz.length > 0) {
             if (this.state.currentQuestion === this.state.currentQuiz.length - 1) {
-              this.setState({'quizComplete':true});
+              this.finishQuiz();
             }  else {
                 // move forward one question and strip blocked questions from currentQuiz 
                 let currentQuestion = this.state.currentQuestion;
@@ -95,9 +103,9 @@ export default class QuizCarousel extends Component {
     };
     
     // allow injection of quizComplete
-    quizComplete() {
-        if (this.props.quizComplete) {
-            return this.props.quizComplete();
+    finishQuiz() {
+        if (this.props.finishQuiz) {
+            this.props.finishQuiz(this.state.questions,this.state.success);
         }
     };
     
@@ -125,22 +133,18 @@ export default class QuizCarousel extends Component {
         const question = this.currentQuestion();
         
         if (Array.isArray(questions) && questions.length > 0 && Utils.isObject(question)) {
-            if (this.state.quizComplete) {
-                // quiz complete
-                content = (<div><b>You added {questions.length} questions to your knowledge base.</b> <FindQuestions setCurrentPage={this.props.setCurrentPage} /></div>)
-            } else {
-                if (this.state.showList) {
-                    let listQuestions = this.getQuestions(this.state.currentQuiz);
-                    let label='Start' ;
-                    if (this.state.currentQuestion > 0) {
-                        label='Continue' ;
-                    }
-                    content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList questions={listQuestions} setQuiz={this.setQuizQuestion}  ></QuestionList></div>);
-                } else {
-                    // single question
-                    content = (<SingleQuestion question={question} user={this.props.user} successButton={this.state.successButton} handleQuestionResponse={this.handleQuestionResponse}/> )
+            if (this.state.showList) {
+                let listQuestions = this.getQuestions(this.state.currentQuiz);
+                let label='Start' ;
+                if (this.state.currentQuestion > 0) {
+                    label='Continue' ;
                 }
+                content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList questions={listQuestions} setQuiz={this.setQuizQuestion}  ></QuestionList></div>);
+            } else {
+                // single question
+                content = (<SingleQuestion question={question} user={this.props.user} successButton={this.state.successButton} handleQuestionResponse={this.handleQuestionResponse}/> )
             }
+        
         } else {
             // no matching questions
             content = (<div><FindQuestions setCurrentPage={this.props.setCurrentPage} /></div>)

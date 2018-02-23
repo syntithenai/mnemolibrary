@@ -1,28 +1,18 @@
 import React, { Component } from 'react';
 
-import SingleQuestion from './SingleQuestion';
 import FindQuestions from './FindQuestions';
+import QuizCarousel from './QuizCarousel';
 
 export default class ReviewPage extends Component {
     
-    constructor(props) {
-        super(props);
-        //let questions=[]
-        //Object.keys(this.props.user.questions.seen).forEach(function(e) {
-            //questions.push(e);
-        //});
-        //this.state = {'currentQuiz':questions,'currentQuestion':0}  ;
-        
-    };
-    
     render() {
-        if (this.state.currentQuiz.length > 0) {
-           let question = this.state.questions[this.state.currentQuiz[this.state.currentQuestion]] ;
+        let questions = this.props.getQuestionsForReview();
+        console.log(['REVIEW',questions]);
+        if (questions.length > 0) {
             return (
             <div>
-                <SingleQuestion question={this.props.question} user={this.props.user}  handleQuestionResponse={this.props.handleQuestionResponse}/> 
+                <QuizCarousel questions={this.props.questions} currentQuiz={questions} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true}/>
             </div>
-
             )
         } else {
             return (

@@ -39,13 +39,19 @@ export default class SingleQuestion extends Component {
     render() {
         if (this.props.question) {
           let question = this.props.question;
-          let header = question.interogative + ' ' + question.question;
+          let header = (question.interogative ? question.interogative + ' ' : '') + (question.prefix ? question.prefix + ' ': '')  + question.question+ ' ' +( question.postfix ? question.postfix : '');
           let image =   question.image ?  question.image : '/clear.gif';
           let link = '';
           let target=false;
           if (question.link && question.link.length > 0) {
              if (question.link.indexOf('wikipedia.org') > 0) {
-                 link = question.link + '?printable=yes';
+                 let parts = question.link.split('#');
+                 if (parts.length>1) {
+                    link = parts.slice(0,-1) + '?printable=yes#' + parts.slice(-1);
+                 } else {
+                     link = question.link  + '?printable=yes'
+                 }
+                 
              } else {
                  link = question.link;
              }
@@ -90,7 +96,6 @@ export default class SingleQuestion extends Component {
                     <div className='card-text'><b>Answer</b> <span>{question.answer}</span></div>
                 </div>}
                 <div className="card-block">
-                    {!this.isVisible('moreinfo') && <img className="" src={image} alt={header}  style={{width:"70%"}} /> }
                     {(this.isVisible('moreinfo') && !target) && <iframe src={link} style={{width:"98%", height: "1200px", border: "0px"}}/> }
             
                 </div>
@@ -108,3 +113,5 @@ export default class SingleQuestion extends Component {
     };
 }
 
+//{!this.isVisible('moreinfo') && <img className="" src={image} alt={header}  style={{width:"70%"}} /> }
+                    

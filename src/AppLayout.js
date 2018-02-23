@@ -8,6 +8,7 @@ import TermsOfUse from './TermsOfUse';
 import IntroPage from './IntroPage';
 //import ReviewPage from './ReviewPage';
 import CreatePage from './CreatePage';
+import ReviewPage from './ReviewPage';
 import TagsPage from './TagsPage';
 import TopicsPage from './TopicsPage';
 import SearchPage from './SearchPage';
@@ -29,7 +30,8 @@ export default class AppLayout extends Component {
           'seenIntro': false, 
           'questions':{'seen':{},'success':{},'seenTally':{},'successTally':{},'block':{}},
           'topics':{},
-          'tags':{}
+          'tags':{},
+          'review':[]
         }};
         let users = null;
       let userString = localStorage.getItem('users');
@@ -39,6 +41,7 @@ export default class AppLayout extends Component {
       }
       this.state = {
           title : "Mnemos Library",
+          message: null,
           currentPage: "home",
           currentQuestion: 0,
           questions: [],
@@ -48,7 +51,8 @@ export default class AppLayout extends Component {
           relatedTags: [],
           users: users ? users : defaultUsers,
           currentQuiz: [],
-          reviewQuestions: {}
+          reviewQuestions: {},
+          tagFilter : null
       }
       // make 'this' available in setCurrentPage function
       this.setCurrentPage = this.setCurrentPage.bind(this);
@@ -64,6 +68,14 @@ export default class AppLayout extends Component {
       this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
       this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
       this.getQuestionsByTopic = this.getQuestionsByTopic.bind(this);
+      
+      this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
+      this.getTopicsForReview = this.getTopicsForReview.bind(this);
+      this.getTagsForReview = this.getTagsForReview.bind(this);
+      
+       this.finishTopic = this.finishTopic.bind(this);
+       this.finishReview = this.finishReview.bind(this);
+       this.clearTagFilter = this.clearTagFilter.bind(this);
   };
   
 
@@ -71,7 +83,7 @@ export default class AppLayout extends Component {
   componentDidMount() {
       let that = this;
       // load mnemonics and collate tags, topics
-      fetch('/mnemonics2.json')
+      fetch('/mnemonics.json')
       .then(function(response) {
         return response.json()
       }).then(function(json) {
@@ -86,34 +98,50 @@ export default class AppLayout extends Component {
         var quizzes = {};
         var tags = {};
         var relatedTags = {};
+        var tagTopics = {};
+        var topicTags = {};
         // collate quizzes and tags
         let indexedQuestions= {};
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
             var id = question.ID
-            var quizList = question.quiz.split(',');
             var tagList = question.tags.split(',')
-            for (var quizKey in quizList) {
-                var quiz = quizList[quizKey];
-                if (! (Array.isArray(quizzes[quiz]))) {
-                    quizzes[quiz] = []
-                }
-                quizzes[quiz].push(id);
+            var quiz = question.quiz;
+            if (! (Array.isArray(quizzes[quiz]))) {
+                quizzes[quiz] = []
             }
+            quizzes[quiz].push(id);
+        
             for (var tagKey in tagList) {
-                var tag = tagList[tagKey];
-                if (! (Array.isArray(tags[tag]))) {
-                    tags[tag] = []
-                }
-                if (! (Array.isArray(relatedTags[tag]))) {
-                    relatedTags[tag] = {}
-                }
-                tags[tag].push(id);
-                tagList.forEach(function(relatedTag) {
-                    if (relatedTag !== tag) {
-                        relatedTags[tag][relatedTag]=true;
+                
+                var tag = tagList[tagKey].trim().toLowerCase();
+                if (tag.length > 0) {
+                    if (! (Array.isArray(tags[tag]))) {
+                        tags[tag] = []
                     }
-                });
+                    if (! (Array.isArray(relatedTags[tag]))) {
+                        relatedTags[tag] = {}
+                    }
+                    if (!(Array.isArray(tagTopics[tag]))) {
+                        tagTopics[tag] = []
+                    }
+                    if (! (Array.isArray(topicTags[quiz]))) {
+                        topicTags[quiz] = []
+                    }
+                    tags[tag].push(id);
+                    if (!tagTopics[tag].includes(quiz)) {
+                        tagTopics[tag].push(quiz)
+                    }
+                    if (!topicTags[quiz].includes(tag)) {
+                        topicTags[quiz].push(tag)
+                    }
+                    tagList.forEach(function(relatedTag) {
+                        if (relatedTag !== tag) {
+                            relatedTags[tag][relatedTag]=true;
+                        }
+                    });
+                    
+                }
                 
             }
             indexedQuestions[id]=questionKey;
@@ -122,11 +150,11 @@ export default class AppLayout extends Component {
         for (let tag in tags) {
             words.push({text:tag, value: tags[tag].length});
         }
-        this.setState({'questions':json['questions'], 'indexedQuestions':indexedQuestions,'topics':quizzes,'words':words,'tags':tags,'relatedTags':relatedTags});
+        this.setState({'questions':json['questions'], 'indexedQuestions':indexedQuestions,'topics':quizzes,'words':words,'tags':tags,'relatedTags':relatedTags,'topicTags':topicTags,'tagTopics':tagTopics});
   };
   
   setCurrentPage(page) {
-      this.setState({'currentPage': page,title: Navigation.pageTitles[page]});
+      this.setState({'message':null,'currentPage': page,title: Navigation.pageTitles[page]});
   };  
     
   isCurrentPage(page) {
@@ -159,8 +187,45 @@ export default class AppLayout extends Component {
       return this.state.topics[topic];
   }; 
 
+
+   // return seen questionIds sorted by 'review status'
   getQuestionsForReview() {
-      
+    let questions=[];  
+    for (var questionId in this.state.users.default.questions.seen) {
+        if (!this.state.users.default.questions.block.hasOwnProperty(questionId)) {
+            const seenTally = this.state.users.default.questions.seenTally[questionId];
+            const successTally = this.state.users.default.questions.successTally.hasOwnProperty('questionId') ? this.state.users.default.questions.successTally[questionId] : 0;
+            const seen = this.state.users.default.questions.seen[questionId];
+            const success = this.state.users.default.questions.success.hasOwnProperty('questionId') ? this.state.users.default.questions.success[questionId] : 0;
+            if (seenTally > 0) {
+              const time = new Date().getTime();
+              var timeDiff = 0;
+              if (success > 0) {
+                  timeDiff = seen - success;
+              } else {
+                  timeDiff = time - seen;
+              }
+              const orderBy = (successTally + (timeDiff)* 0.00000001)/seenTally;
+              const question = {'orderBy':orderBy,'questionId':questionId};
+              questions.push(question);
+            }
+ 
+        }
+    }
+    questions.sort(function(a,b) {
+        if (a.orderBy === b.orderBy) {
+            return 0;
+        } else if (a.orderBy > b.orderBy) {
+            return 1;
+        } else {
+            return -1;
+        }
+    });
+    let questionIds = [];
+    questions.forEach(function(question) {
+        questionIds.push(question.questionId);
+    });
+    return questionIds;
   };
   
   getTopicsForReview() {
@@ -175,14 +240,19 @@ export default class AppLayout extends Component {
   setQuiz(title,questionIds) {
       let newIds = [];
       let that = this;
+      console.log(questionIds);
       questionIds.forEach(function(questionId) {
+          console.log(questionId,questionIds[questionId]);
+          console.log(that.state.users.default.questions.block);
           if (!that.state.users.default.questions.block.hasOwnProperty(questionId)) newIds.push(questionId);
       });
+      console.log({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
       this.setState({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
   };
 
   setQuizFromQuestion(question) {
-      this.setQuiz('Mnemos Library',[question.ID])
+      console.log(['SQFQ',question,question.ID]);
+      this.setQuizFromTopic(question.quiz)
   };
   setQuizFromTopic(topic) {
       const questions = this.getQuestionsByTopic(topic);
@@ -194,13 +264,19 @@ export default class AppLayout extends Component {
       this.updateProgress(user);
   };
   setQuizFromTag(tag) {
-      const questions = this.getQuestionsByTag(tag.text);
-      //questions.filter(e => !this.state.users.default.questions.blocked.hasOwnProperty(e));
-      this.setQuiz('Tag - '+tag.text,questions);
-      const time = new Date().getTime();
-      let user = this.state.users.default;
-      user.tags[tag] = time;
-      this.updateProgress(user);
+      //const questions = this.getQuestionsByTag(tag.text);
+      ////questions.filter(e => !this.state.users.default.questions.blocked.hasOwnProperty(e));
+      //this.setQuiz('Tag - '+tag.text,questions);
+      //const time = new Date().getTime();
+      //let user = this.state.users.default;
+      //user.tags[tag] = time;
+      //this.updateProgress(user);
+      this.setCurrentPage('topics');
+      this.setState({'tagFilter':tag.text});
+  };
+  
+  clearTagFilter() {
+      this.setState({'tagFilter':null});
   };
 
   updateProgress(user) {
@@ -208,6 +284,22 @@ export default class AppLayout extends Component {
         this.setState(users);
         localStorage.setItem('users',JSON.stringify(users));
     };
+    
+   // FINISH QUIZ CAROUSEL
+   finishTopic(questions,success) {
+       alert('finish topic');
+       // TODO quick review list ?
+       this.setCurrentPage('home');
+       this.setState({'message':'You added '+questions.length+' questions to your knowledge base.'}) 
+   }; 
+   
+   finishReview(questions,success) {
+       alert('finish review');
+       this.setCurrentPage('review');
+       this.setState({'message':'Review complete. You recalled '+success.length+' out of '+questions.length+' questions.'}) 
+       
+   };
+    
     
   render() {
     const user = this.state.users.default;
@@ -218,16 +310,17 @@ export default class AppLayout extends Component {
         <div className="Mnemo">
             <Navigation setCurrentPage={this.setCurrentPage}  title={this.state.title} />
             <div className='page-title'><h4>{this.state.title}</h4></div>
+            {this.state.message && <div className='page-message' >{this.state.message}</div>}
+            {this.isCurrentPage('home') && <QuizCarousel questions={this.state.questions} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={user}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} successButton={false} finishQuiz={this.finishTopic} /> }
             
-            {this.isCurrentPage('home') && <QuizCarousel questions={this.state.questions} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={user}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} successButton={true}/> }
-            
-            {this.isCurrentPage('topics') && <TopicsPage topics={topics} setQuiz={this.setQuizFromTopic} />
+            {this.isCurrentPage('topics') && <TopicsPage topics={topics} user={user} topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage = {this.setCurrentPage}/>
             }
             {this.isCurrentPage('tags') && <TagsPage tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
             }
             {this.isCurrentPage('search') && <SearchPage questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
             }
-            
+            {this.isCurrentPage('review') && <ReviewPage getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}/>
+            }
             {this.isCurrentPage('create') && <CreatePage/>
             }
             {this.isCurrentPage('about') && <AboutPage setCurrentPage={this.setCurrentPage} />

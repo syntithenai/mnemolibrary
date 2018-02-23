@@ -22,19 +22,13 @@ export default class Navigation extends Component {
                 <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('search')}>Search</a>
-              </li>
-              <li className="nav-item">
                 <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('review')} >Review</a>
               </li>
               <li className="nav-item">
                 <a className="nav-link"  href="#" onClick={() => this.props.setCurrentPage('create')}>Create</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#" onClick={() => this.props.setCurrentPage('about')}>About</a>
+                <a className="nav-link" href="#" onClick={() => this.props.setCurrentPage('about')}>Help</a>
                 
               </li>
             </ul>
