@@ -7,6 +7,8 @@ import ArrowLeft from 'react-icons/lib/fa/arrow-left';
 import Trash from 'react-icons/lib/fa/trash';
 import Info from 'react-icons/lib/fa/info';
 import Ellipsis from 'react-icons/lib/fa/ellipsis-v';
+import ThumbsUp from 'react-icons/lib/fa/thumbs-up';
+import ThumbsDown from 'react-icons/lib/fa/thumbs-down';
 
 export default class SingleQuestion extends Component {
     
@@ -40,7 +42,7 @@ export default class SingleQuestion extends Component {
         if (this.props.question) {
           let question = this.props.question;
           let header = (question.interogative ? question.interogative + ' ' : '') + (question.prefix ? question.prefix + ' ': '')  + question.question+ ' ' +( question.postfix ? question.postfix : '');
-          let image =   question.image ?  question.image : '/clear.gif';
+          //let image =   question.image ?  question.image : '/clear.gif';
           let link = '';
           let target=false;
           if (question.link && question.link.length > 0) {
@@ -71,12 +73,13 @@ export default class SingleQuestion extends Component {
                     <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="hidden-sm-down"> Next</span></button>
                     {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="hidden-md-up"> Recall</span></button>}
                     <div className='col-1'>&nbsp;</div>
-                    <button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="hidden-sm-down"> Ban</span></button>
+                    {showRecallButton && <button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="hidden-sm-down"> Discard</span></button>}
                     
                 </div>
                 <div className="card-block">
                     <h4 className="card-title">{header}</h4>
-                    <form className="form" style={{float: 'left'}} >
+                    <div className="row form" >
+                      <div className="col-sm-8" >
                         {!this.isVisible('mnemonic') && <button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><Info size={26} style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Mnemonic</button>
                         }&nbsp;
                         {showAnswerButton && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Answer</button>
@@ -85,8 +88,14 @@ export default class SingleQuestion extends Component {
                         }
                         {(!this.isVisible('moreinfo') && target) && <a  className='btn btn-primary' target={target} href={link}><Info size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;More Info</a>
                         }
-                        &nbsp;
-                    </form>
+                    </div>
+                    {this.isVisible('mnemonic') && <div className='col-sm-4 like_dislike' style={{float: 'right'}}>
+                        <a  className='btn btn-primary'  onClick={() => this.props.like(question.ID)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-success"/>&nbsp;Like&nbsp;<span className="badge badge-pill badge-info"  >{question.score}</span></a>
+                        
+                        &nbsp;<a  className='btn btn-primary' onClick={() => this.props.dislike(question.ID)} ><ThumbsDown size={26}  style={{float: 'left'}} className="badge badge-pill badge-danger"/>&nbsp;Dislike</a>
+                    </div> }
+                    &nbsp;
+                    </div>
                 </div>
                 {this.isVisible('mnemonic') && <div className="card-block">
                     <div className='card-text'><b>Mnemonic Type</b> <span>{question.mnemonic_technique}</span></div>

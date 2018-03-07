@@ -16,10 +16,10 @@ export default class Navigation extends Component {
           <div className="collapse navbar-collapse" id="navbarCollapse">
             <ul className="navbar-nav mr-auto" data-toggle="collapse" data-target="#navbarCollapse" >
               <li className="nav-item active" >
-                <a className="nav-link"  href="#"  onClick={() => this.props.setCurrentPage('home')}>Learn</a>
+                <a className="nav-link"  href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</a>
+                <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Search</a>
               </li>
               <li className="nav-item">
                 <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('review')} >Review</a>

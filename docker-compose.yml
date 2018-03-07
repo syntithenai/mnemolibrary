@@ -5,7 +5,7 @@ services:
     image: syntithenai/nemo
     restart: always
     volumes:
-      - "./:/usr/src/app/"
+      - "/home/stever/projects/mnemolibrary:/usr/src/app/"
     environment:
       VIRTUAL_HOST: mnemolibrary.com
       #LETSENCRYPT_HOST: syntithenai.com

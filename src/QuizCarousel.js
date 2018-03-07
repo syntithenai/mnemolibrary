@@ -13,7 +13,7 @@ export default class QuizCarousel extends Component {
             'currentQuestion':this.props.question ? this.props.question : 0,
             'quizComplete': false,
             'showList':false,
-            'successButton': (this.props.successButton ? true : false),
+            'isReview': (this.props.isReview ? true : false),
             'success' : []
         };
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
@@ -24,36 +24,42 @@ export default class QuizCarousel extends Component {
     };
     
     
+  isQuizFinished(quiz) {
+      if (this.props.isReview) {
+          return this.state.success.length === this.state.currentQuiz.length;
+      } else {
+          return this.state.currentQuestion === this.state.currentQuiz.length - 1;
+      }
+      
+  };  
       
   // handle user click on Remember, Forgot, Skip, Ban
   // update user questions history and remove question from current Quiz
   handleQuestionResponse(question,response) {
       let user = this.props.user;
       let questions = user.questions;
-      const id = parseInt(question.ID);
+      this.props.setMessage('');
+      const id = parseInt(question.ID,10);
       const time = new Date().getTime();
       if (response === "list") {
          this.setState({'showList':true});  
       } else if (response === "success") {
-          questions.seen[id] = time;
+          if (!questions.seen.hasOwnProperty(id)) questions.seen[id] = time;
           questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
-          questions.success[id] = time;              
-          questions.successTally[id] = questions.successTally.hasOwnProperty(id) ? questions.successTally[id] + 1 : 0;
-          if (this.state.currentQuestion === this.state.currentQuiz.length - 1) {
-              this.finishQuiz();
+          questions.review[id].push(time);
+          if (this.isQuizFinished()) {
+              this.finishQuiz(this.state.questions,this.state.success);
             }  else {
                 // local collate success ids for finishQuiz function
-                const time = new Date().getTime();
+                //const time = new Date().getTime();
                 let success = this.state.success;
                 if (!success.includes(this.state.currentQuestion)) {
                     success.push(this.state.currentQuestion);
                 }
                 this.setState({ 'success': success, 'currentQuestion':this.state.currentQuestion + 1});
             }
-          
-
       } else if (response === "previous") {
-          questions.seen[id] = time;
+          if (!questions.seen.hasOwnProperty(id)) questions.seen[id] = time;
           questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           let currentId =this.state.currentQuestion - 1;
           if (this.state.currentQuestion > 0 && this.state.currentQuiz.length > 0) {
@@ -61,10 +67,10 @@ export default class QuizCarousel extends Component {
           }
           
       } else if (response === "next") {
-          questions.seen[id] = time;
+          if (!questions.seen.hasOwnProperty(id)) questions.seen[id] = time;
           questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           if (this.state.currentQuiz.length > 0) {
-            if (this.state.currentQuestion === this.state.currentQuiz.length - 1) {
+            if (this.isQuizFinished()) {
               this.finishQuiz();
             }  else {
                this.setState({'currentQuestion':this.state.currentQuestion + 1});
@@ -79,7 +85,7 @@ export default class QuizCarousel extends Component {
           }
           // quiz complete ?
           if (this.state.currentQuiz.length > 0) {
-            if (this.state.currentQuestion === this.state.currentQuiz.length - 1) {
+            if (this.isQuizFinished()) {
               this.finishQuiz();
             }  else {
                 // move forward one question and strip blocked questions from currentQuiz 
@@ -102,12 +108,18 @@ export default class QuizCarousel extends Component {
         return question;
     };
     
-    // allow injection of quizComplete
-    finishQuiz() {
-        if (this.props.finishQuiz) {
+       // FINISH QUIZ CAROUSEL
+   finishQuiz(questions,success) {
+       console.log('finish quiz');
+        // inject override
+       if (this.props.finishQuiz) {
             this.props.finishQuiz(this.state.questions,this.state.success);
+        } else {
+           this.setCurrentPage('home');
+           this.props.setMessage('You added '+questions.length+' questions to your knowledge base.') ;
         }
-    };
+   }; 
+   
     
     getQuestions(questionIds) {
         let questions=[];
@@ -128,7 +140,13 @@ export default class QuizCarousel extends Component {
     };
     
     render() {
-        const questions = this.state.currentQuiz;
+        let questions = this.state.currentQuiz;
+        if (Array.isArray(questions) && questions.length > 0) {
+            
+        } else if (this.props.discoverQuestions) {
+            questions = this.props.discoverQuestions();
+        }
+        
         let content = '';
         const question = this.currentQuestion();
         
@@ -142,7 +160,7 @@ export default class QuizCarousel extends Component {
                 content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList questions={listQuestions} setQuiz={this.setQuizQuestion}  ></QuestionList></div>);
             } else {
                 // single question
-                content = (<SingleQuestion question={question} user={this.props.user} successButton={this.state.successButton} handleQuestionResponse={this.handleQuestionResponse}/> )
+                content = (<SingleQuestion question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} dislike={this.props.dislike}/> )
             }
         
         } else {
