@@ -1,0 +1,21 @@
+ID,score,mnemonic_technique,tags,quiz,access,interogative,question,mnemonic,answer,link,image
+1,10,homonym,history,nemo_topics_test1,public,who is,"Martineau, Harriet",Drank [martinis] with boys' society,,https://en.wikipedia.org/wiki/Harriet_Martineau,https://en.wikipedia.org/wiki/File:Harriet_Martineau_by_Richard_Evans.jpg
+2,10,alliteration,history,nemo_topics_test1,public,what is,Marshall Plan,[Marshalled] free trade against communism,,https://en.wikipedia.org/wiki/Marshall_Plan,https://en.wikipedia.org/wiki/File:Great_Seal_of_the_United_States_(obverse).svg
+3,10,association,history,nemo_topics_test1,public,who is,"Marshall, Alfred",[Marshalled] the power of the market,,https://en.wikipedia.org/wiki/Alfred_Marshall,
+4,10,other,religion,nemo_topics_test1,public,what is,Marrano,[Marred] their faith by conversion? [No!],,https://en.wikipedia.org/wiki/Marrano,
+5,10,rhyme,"religion,history",nemo_topics_test1,public,who were the,Maronites,Returned to [Mary] during the Crusades,,https://en.wikipedia.org/wiki/Maronites,
+6,10,homonym,religion,nemo_topics_test1,public,who is,"Mark, St",Left his [mark] on the pyramids,,https://en.wikipedia.org/wiki/Mark_the_Evangelist,
+7,10,alliteration,economics,nemo_topics_test2,public,what is,marginal utility,More utility if marginally available,,https://en.wikipedia.org/wiki/Marginal_utility,
+8,10,association,economics,nemo_topics_test2,public,what is,marginal efficiency of capital,A better investment than interest,,https://en.wikipedia.org/wiki/Marginal_efficiency_of_capital,
+9,10,other,economics,nemo_topics_test2,public,what is,marginal cost pricing,Good for those on the (labour force) margin,,https://en.wikipedia.org/wiki/Marginal_cost,
+10,10,rhyme,events,nemo_topics_test2,public,what is,Mardi Gras,Butter makes skin shiny for festival,,https://en.wikipedia.org/wiki/Mardi_Gras,
+11,10,other,"religion,philosophy",nemo_topics_test2,public,who is,"Marcuse, Herbert",The FBI will [mark yas] if influenced by him,,https://en.wikipedia.org/wiki/Herbert_Marcuse,
+12,10,rhyme,philosophy,nemo_topics_test2,public,what is,Manu,[Man you] all came from in India,,https://en.wikipedia.org/wiki/Manu_(Hinduism),
+13,10,homonym,"history,people",nemo_test1,public,,How did Mao Tsedong's career begin?,"In Beijing no mere peasant, his life was much more pleasant",Librarian,https://en.wikipedia.org/wiki/Mao_Zedong,https://en.wikipedia.org/wiki/File:Mao_Zedong_portrait.jpg
+14,10,alliteration,"history,politics",nemo_test1,public,,Why did the International Working Men's Association become divided?,"Eye to eye they couldn't see, First International was anarchy",Mikhail Bakunin,https://en.wikipedia.org/wiki/Mikhail_Bakunin,
+15,10,association,politics,nemo_test1,public,,What is the French national motto?,"Take a LEaF out of the French book [libe, equal, frat]","Liberty, Equality, Fraternity","https://en.wikipedia.org/wiki/Libert%C3%A9,_%C3%A9galit%C3%A9,_fraternit%C3%A9",
+16,10,other,history,nemo_test1,public,,In what Eon did life appear on Earth?,"In hellish Hadean there was strife, but also the beginnings of life ",Hadean,https://en.wikipedia.org/wiki/Hadean,
+17,10,homonym,"history,politics",nemo_test1,public,,What split the British Liberal Party in 1886?,"Couldn't rule themselves in own land, let alone home rule in Ireland",Home Rule in Ireland,https://en.wikipedia.org/wiki/Liberal_Unionist_Party,
+18,10,alliteration,"science,biology",nemo_test1,public,,When did the Irish Free State gain independence?,"In 6 years Britain released her, after uprising in '16 Easter",1922,https://en.wikipedia.org/wiki/Irish_Free_State,
+19,10,other,"science,biology",nemo_test1,public,,In what order of genus did homo sapiens evolve?,Many HEs came down from trees,"habilis, erectus, sapien",https://en.wikipedia.org/wiki/Human_evolution,https://en.wikipedia.org/wiki/File:Human_evolution_chart-en.svg
+20,10,rhyme,history,nemo_test1,public,,Where did Gilgamesh and Abraham live respectively?,Ur Abraham... Gilgamesh lived in Uruk,"Ur, Uruk",https://en.wikipedia.org/wiki/Epic_of_Gilgamesh,

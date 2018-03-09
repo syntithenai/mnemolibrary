@@ -1,14 +1,29 @@
 version: '2'
 services:
+  mongo-express:
+    image: mongo-express
+    depends_on: ['mongo']
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: steve
+      ME_CONFIG_BASICAUTH_PASSWORD: pojpoj72
+  mongo:
+    image: mongo
+    volumes:
+      - "/home/stever/projects/mnemolibrary_db:/data/db"
   nemo:
     build: .
     image: syntithenai/nemo
     restart: always
     volumes:
       - "/home/stever/projects/mnemolibrary:/usr/src/app/"
-    environment:
-      VIRTUAL_HOST: mnemolibrary.com
+    #environment:
+      #VIRTUAL_HOST: mnemolibrary.com
       #LETSENCRYPT_HOST: syntithenai.com
       #LETSENCRYPT_EMAIL: stever@syntithenai.com
     ports:
       - "80:3000"
+      #- "3000:3000"
+      - "5000:5000"
+      
