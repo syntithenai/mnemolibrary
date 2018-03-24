@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  padding-top: 6rem;
+  padding-top: 7rem;
   padding-left: 1rem;
 }
 .aboutpage div {
@@ -35,8 +35,16 @@ iframe {
     padding: 1rem;
     border: 1px solid black;
 }
-
-.warning-message {
-  color: red;
-  font-size: 1.5em;   
+.root {
+  text-align: center;
 }
+.form-group .row input {
+    float: right;
+}
+.navbar {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+

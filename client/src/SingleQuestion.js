@@ -63,7 +63,7 @@ export default class SingleQuestion extends Component {
           }
           
           let showAnswerButton = !this.isVisible('answer') && question.answer;
-          let showRecallButton = this.props.user.questions.seen.hasOwnProperty(question.ID) && this.props.successButton;
+          let showRecallButton = this.props.successButton ;//this.props.user.questions.seen.hasOwnProperty(question.ID) && 
           return (
             <div className="card question container" >
                 <div className="row buttons justify-content-between" >
@@ -89,10 +89,9 @@ export default class SingleQuestion extends Component {
                         {(!this.isVisible('moreinfo') && target) && <a  className='btn btn-primary' target={target} href={link}><Info size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;More Info</a>
                         }
                     </div>
-                    {this.isVisible('mnemonic') && <div className='col-sm-4 like_dislike' style={{float: 'right'}}>
-                        <a  className='btn btn-primary'  onClick={() => this.props.like(question.ID)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-success"/>&nbsp;Like&nbsp;<span className="badge badge-pill badge-info"  >{question.score}</span></a>
-                        
-                        &nbsp;<a  className='btn btn-primary' onClick={() => this.props.dislike(question.ID)} ><ThumbsDown size={26}  style={{float: 'left'}} className="badge badge-pill badge-danger"/>&nbsp;Dislike</a>
+                    {this.isVisible('mnemonic') && this.props.isLoggedIn() && <div className='col-sm-4 like_dislike' style={{float: 'right'}}>
+                        <a  className='btn btn-primary'  onClick={() => this.props.like(question.ID)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Like&nbsp;<span className="badge badge-pill badge-info"  >{question.score}</span></a>
+                       
                     </div> }
                     &nbsp;
                     </div>

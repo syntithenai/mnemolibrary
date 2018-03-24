@@ -65,7 +65,7 @@ export default class ReviewPage extends Component {
         if (questions.length > 0) {
             return (
             <div>
-                <QuizCarousel questions={this.props.questions} currentQuiz={questions} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} dislike={this.props.dislike}/>
+                <QuizCarousel questions={this.props.questions} currentQuiz={questions} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} />
             </div>
             )
         } else {

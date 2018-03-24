@@ -3,6 +3,7 @@ services:
   mongo-express:
     image: mongo-express
     depends_on: ['mongo']
+    restart: always
     ports:
       - "8081:8081"
     environment:
@@ -10,11 +11,13 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: pojpoj72
   mongo:
     image: mongo
+    restart: always
     volumes:
       - "/home/stever/projects/mnemolibrary_db:/data/db"
   nemo:
     build: .
     image: syntithenai/nemo
+    depends_on: ['mongo']
     restart: always
     volumes:
       - "/home/stever/projects/mnemolibrary:/usr/src/app/"
@@ -24,6 +27,8 @@ services:
       #LETSENCRYPT_EMAIL: stever@syntithenai.com
     ports:
       - "80:3000"
-      #- "3000:3000"
+      # oauth only - external use
+      - "4000:4000"
       - "5000:5000"
+
       

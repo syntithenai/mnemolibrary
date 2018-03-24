@@ -21,6 +21,7 @@ export default class QuizCarousel extends Component {
         this.getQuestions = this.getQuestions.bind(this);
         this.setQuizQuestion = this.setQuizQuestion.bind(this);
         this.finishQuiz = this.finishQuiz.bind(this);
+        this.logStatus = this.logStatus.bind(this);
     };
     
     
@@ -33,10 +34,27 @@ export default class QuizCarousel extends Component {
       
   };  
       
+  logStatus(status,question) {
+      if (this.props.user) {
+          if (!question) question = this.props.questions[this.props.indexedQuestions[this.state.currentQuestion]]._id;
+          let that = this;
+           // central storage
+             fetch('/api/'+status, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({'user':this.props.user._id,'question':question})
+            }).catch(function(err) {
+                that.setState({'message':'Not Saved'});
+            });
+        }
+  };    
+      
   // handle user click on Remember, Forgot, Skip, Ban
   // update user questions history and remove question from current Quiz
   handleQuestionResponse(question,response) {
-      let user = this.props.user;
+      let user = this.props.progress;
       let questions = user.questions;
       this.props.setMessage('');
       const id = parseInt(question.ID,10);
@@ -44,9 +62,11 @@ export default class QuizCarousel extends Component {
       if (response === "list") {
          this.setState({'showList':true});  
       } else if (response === "success") {
-          if (!questions.seen.hasOwnProperty(id)) questions.seen[id] = time;
+          //if (!questions.seen.hasOwnProperty(id)) 
+          questions.seen[id] = time;
+          this.logStatus('seen',id);
           questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
-          questions.review[id].push(time);
+          //questions.review[id].push(time);
           if (this.isQuizFinished()) {
               this.finishQuiz(this.state.questions,this.state.success);
             }  else {
@@ -57,9 +77,12 @@ export default class QuizCarousel extends Component {
                     success.push(this.state.currentQuestion);
                 }
                 this.setState({ 'success': success, 'currentQuestion':this.state.currentQuestion + 1});
+                this.logStatus('success',id);
             }
       } else if (response === "previous") {
-          if (!questions.seen.hasOwnProperty(id)) questions.seen[id] = time;
+          //if (!questions.seen.hasOwnProperty(id)) 
+          questions.seen[id] = time;
+           this.logStatus('seen',id);
           questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           let currentId =this.state.currentQuestion - 1;
           if (this.state.currentQuestion > 0 && this.state.currentQuiz.length > 0) {
@@ -67,7 +90,9 @@ export default class QuizCarousel extends Component {
           }
           
       } else if (response === "next") {
-          if (!questions.seen.hasOwnProperty(id)) questions.seen[id] = time;
+          //if (!questions.seen.hasOwnProperty(id)) 
+          questions.seen[id] = time;
+          this.logStatus('seen',id);
           questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           if (this.state.currentQuiz.length > 0) {
             if (this.isQuizFinished()) {
@@ -82,6 +107,7 @@ export default class QuizCarousel extends Component {
           // flag as blocked
           if (id > 0) { 
               questions.block[id] = time;
+               this.logStatus('block',id);
           }
           // quiz complete ?
           if (this.state.currentQuiz.length > 0) {
@@ -109,14 +135,14 @@ export default class QuizCarousel extends Component {
     };
     
        // FINISH QUIZ CAROUSEL
-   finishQuiz(questions,success) {
-       console.log('finish quiz');
+   finishQuiz() {
+       console.log(['finish quiz',this.props.finishQuiz]);
         // inject override
        if (this.props.finishQuiz) {
             this.props.finishQuiz(this.state.questions,this.state.success);
         } else {
-           this.setCurrentPage('home');
-           this.props.setMessage('You added '+questions.length+' questions to your knowledge base.') ;
+           this.props.setCurrentPage('home');
+           this.props.setMessage('You added '+((this.state.questions && this.state.questions.length)?this.state.questions.length:'')+' questions to your knowledge base.') ;
         }
    }; 
    
@@ -160,7 +186,7 @@ export default class QuizCarousel extends Component {
                 content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList questions={listQuestions} setQuiz={this.setQuizQuestion}  ></QuestionList></div>);
             } else {
                 // single question
-                content = (<SingleQuestion question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} dislike={this.props.dislike}/> )
+                content = (<SingleQuestion question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn}/> )
             }
         
         } else {

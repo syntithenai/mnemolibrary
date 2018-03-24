@@ -1,5 +1,54 @@
+# Mnemos Library
+
+Mnemos library is a web application that ties mnemonics to collections of questions to help you learn.
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
+It is deployed using Docker compose for a suite of containers running
+- mongodb
+- nodejs (with two server processes/ports - internal and public)
+- mongo-express for developers to manipulate the databse
+
+The login system is provided using an Open Auth server based on https://github.com/oauthjs/node-oauth2-server and the excellent v3 example https://github.com/slavab89/oauth2-server-example-mongodb for using mongodb as a back end.
+
+
+# TODO
+- refresh on access token timeout
+- trial authenticate
+
+# LINKS
+
+MAIL
+https://www.npmjs.com/package/nodemailer-direct-transport
+https://github.com/namshi/docker-smtp
+
+https://github.com/janl/mustache.js
+
+OAUTH
+https://tools.ietf.org/html/rfc6749#section-2
+
+
+server library
+https://github.com/slavab89/oauth2-server-example-mongodb
+
+https://www.npmjs.com/package/express-oauth-server
+
+
+?? prebuilt server using server library express-oauth-server => https://www.npmjs.com/package/flows-gateway
+
+
+
+https://github.com/mulesoft/js-client-oauth2 - replace GoogleLogin
+
+# problem installing mongoose -> require not found
+FIX npm install -g npm-install-peers
+
+TO SUPPORT ACCOUNT LINKING - google actions and alexa
+https://github.com/oauthjs/express-oauth-server/blob/master/examples/mongodb/model.js
+
+https://www.npmjs.com/package/react-google-login-component
+
+https://gorangajic.github.io/react-icons/fa.html
 
 https://github.com/mevdschee/php-crud-api/blob/master/examples/client_auth.php
 
