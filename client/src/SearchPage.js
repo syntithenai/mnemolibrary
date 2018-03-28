@@ -38,12 +38,12 @@ export default class SearchPage extends Component {
       // load mnemonics and collate tags, topics
       fetch('/api/questions?search='+filters.titleFilter+'&technique='+filters.techniqueFilter.toLowerCase())
       .then(function(response) {
-          console.log(['got response', response])
+        //  console.log(['got response', response])
         return response.json()
         }).then(function(json) {
-          console.log(['set state', json])
+          //console.log(['set state', json])
           if (json.questions) {
-              console.log(['set state', json])
+            //  console.log(['set state', json])
             that.setState({'questions':json.questions});
           }
       }).catch(function(ex) {

@@ -58,7 +58,7 @@ export default class GoogleLogin extends Component {
     }
     
 	renderSignIn() {
-        console.log('redner signin');
+        //console.log('redner signin');
 		gapi.signin2.render('google-signin', {
 			'scope': 'profile email',// https://www.googleapis.com/auth/drive.file',
             'width': 200,
@@ -70,7 +70,7 @@ export default class GoogleLogin extends Component {
 	}
 
 	handleAuthClick() {
-		console.log('handle auth click');
+		//console.log('handle auth click');
         this.authApiLoaded = true;
 		this.GoogleAuth = gapi.auth2.getAuthInstance();
 		this.GoogleAuth.isSignedIn.listen(this.updateSigninStatus);
@@ -78,22 +78,22 @@ export default class GoogleLogin extends Component {
 	}
     
     updateSigninStatus() {
-		console.log('update signin status');
+		//console.log('update signin status');
 		var user = this.GoogleAuth.currentUser.get();
 		//$scope.$apply(function() {
 			if (user) {
-				console.log(['update signin status have user reuire scope -',this.requiredScope]);
+			//	console.log(['update signin status have user reuire scope -',this.requiredScope]);
 				this.loggedIn = user.hasGrantedScopes(this.requiredScope);
 				if (this.loggedIn) {
-					console.log('update signin status do loging',user);
+				//	console.log('update signin status do loging',user);
 					this.loginToWebsite().then(function(user) {
 						////$rootScope.$broadcast('sessionId',sessionId);
-                        console.log('LOGGED IN',user);
+                  //      console.log('LOGGED IN',user);
                         //this.props.login();
 					});
 				}
 			} else {
-				console.log(['update signin NOT LOGGED IN']);
+				//console.log(['update signin NOT LOGGED IN']);
 				this.loggedIn = false;
 			}
 		//});
@@ -105,14 +105,14 @@ export default class GoogleLogin extends Component {
 	}
 	
 	loginToWebsite(token) {
-        console.log(['login to website',token]);
+        //console.log(['login to website',token]);
 		let p = new Promise((resolve, reject) => {
             //var now = new Date().getTime();
             // limit refresh to once per minute
             //if (this.lastLoggedIn > 0 && (now - this.lastLoggedIn) < 60000) {
                 //stashGoogleAuth();
                 var googleUser = this.GoogleAuth.currentUser.get();
-                console.log(['do LOGINTWEB',googleUser]);
+          //      console.log(['do LOGINTWEB',googleUser]);
                 // gather user info and post to website
                 if (googleUser  && googleUser['Zi'] && googleUser['Zi']['access_token']) {
                     this.accessTokenExpires = (new Date().getTime() / 1000) + parseInt(googleUser['Zi']['expires_in'],10);
@@ -148,7 +148,9 @@ export default class GoogleLogin extends Component {
                     var profile = googleUser.getBasicProfile();
                     //xhr.send('idtoken=' + id_token + '&name=' + profile.getName() +  '&image=' + profile.getImageUrl() + '&email=' + profile.getEmail() );  // 
                     //console.log(['LW started']);
-                    this.props.onSuccess({idtoken:id_token,name:profile.getName(),image:profile.getImageUrl() ,email: profile.getEmail() });
+                    var props = {idtoken:id_token,name:profile.getName(),image:profile.getImageUrl() ,email: profile.getEmail() };
+             //       console.log(['g login success',props]);
+                    this.props.onSuccess(props);
                         
                 }
             //} else {
@@ -167,13 +169,13 @@ export default class GoogleLogin extends Component {
     
     requireExtraScope(extraScope) {
 		let p = new Promise((resolve, reject) => {
-            console.log(['GAUTH',extraScope,this.GoogleAuth]);
+           // console.log(['GAUTH',extraScope,this.GoogleAuth]);
             var googleUser =  this.GoogleAuth.currentUser.get();
             if (googleUser) {
                 window.timeout(function() {
                     if (!googleUser.hasGrantedScopes(extraScope)) {
                         googleUser.grant({'scope' : extraScope,'ux_mode':'popup'}).then(function(resp) {
-                            console.log(['granted',resp]);
+             //               console.log(['granted',resp]);
                             resolve(resp.Zi);
                         });
                     } else {
@@ -189,35 +191,35 @@ export default class GoogleLogin extends Component {
 
 	isAccessTokenExpired() {
 		var now = new Date().getTime() / 1000;
-		console.log(['ATR ?',this.accessTokenExpires,now]);
+		//console.log(['ATR ?',this.accessTokenExpires,now]);
 		return (now > this.accessTokenExpires) ? true : false;
 	}
 	
 	renewAccessToken()  {
-		console.log(['renew access token']);
+		//console.log(['renew access token']);
 		let p = new Promise((resolve, reject) => {
             if (this.authApiLoaded) {
-                console.log(['renew auth api loaded']);
+          //      console.log(['renew auth api loaded']);
                 this.GoogleAuth = gapi.auth2.getAuthInstance();
                 if (this.isAccessTokenExpired()) {
-                    console.log(['tken is expired']);
+         //           console.log(['tken is expired']);
                     var googleUser =  this.GoogleAuth.currentUser.get();
                     if (googleUser) {
-                        console.log(['have user',googleUser]);
+           //             console.log(['have user',googleUser]);
                         googleUser.reloadAuthResponse().then(function(auth) {
-                            console.log(['reladed access token now logintoweb',auth]);
+             //               console.log(['reladed access token now logintoweb',auth]);
                             this.loginToWebsite().then(function() {
                                 this.stashGoogleAuth(googleUser['Zi']['access_token']);
                                 resolve(googleUser['Zi']['access_token']);
                             });
                         });
                     } else {
-                        console.log(['renew update signin']);
+               //         console.log(['renew update signin']);
                         this.updateSigninStatus();
                         resolve('NOTOKEN');
                     }
                 } else {
-                    console.log(['use current token',this.accessToken]);
+                 //   console.log(['use current token',this.accessToken]);
                     //loginToWebsite().then(function() {
                         resolve(this.accessToken);
                     //});
@@ -247,14 +249,14 @@ export default class GoogleLogin extends Component {
 	//}
 	
 	googleSignOut() {
-		console.log('sign ut');
+	//	console.log('sign ut');
 		this.GoogleAuth.disconnect();
 	}
 	
 
 
 	onPickerApiLoad() {
-		console.log('picker api loaded');
+	//	console.log('picker api loaded');
         this.pickerApiLoaded = true;
       }
 
@@ -284,7 +286,7 @@ export default class GoogleLogin extends Component {
 
 // GPICKER
 	pickerCallback(data) {
-		console.log(['picker callback']);
+	//	console.log(['picker callback']);
 		//if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
 			//for (key in data[google.picker.Response.DOCUMENTS]) {
 				//var doc = JSON.parse(JSON.stringify(data[google.picker.Response.DOCUMENTS][key]));

@@ -26,14 +26,14 @@ export default class TopicsPage extends Component {
     };
     
     clearTagFilter() {
-        console.log('CLEAR FILTER');
+        //console.log('CLEAR FILTER');
         //this.props.clearTagFilter();
         this.setState({'tagFilter':null});
         this.filterQuizzes(this.state.titleFilter);
     };
     
     filterQuizzes(title) {
-        console.log(' FILTER TOPICS '+title);
+        //console.log(' FILTER TOPICS '+title);
         let topics = {};
         //if (title.length > 0) {
         let that = this;        

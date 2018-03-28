@@ -18,8 +18,8 @@ export default class ProfilePage extends Component {
                 password2:this.props.user.password2?this.props.user.password:'',
             }
         }
-        console.log(['constr',this.state]);
-        
+       // console.log(['constr',this.state]);
+        this.isAdmin = this.isAdmin.bind(this);
     };
     
     saveUser(e) {
@@ -57,6 +57,15 @@ export default class ProfilePage extends Component {
         return true;
     };
     
+    isAdmin() {
+        if (this.state.user && 
+        (this.state.user.username==="stever@syntithenai.com" 
+            || this.state.user.username==="syntithenai@gmail.com" 
+            || this.state.user.username==="TrevorRyan123@gmail.com")) {
+            return true;
+        }
+        return false;
+    };              
     
     render() { //req,vars/
         return (
@@ -68,6 +77,11 @@ export default class ProfilePage extends Component {
                       <a  href='#' onClick={() => this.props.logout()} className='btn btn-info ' style={{'float':'right'}}>
                        Logout
                       </a>
+                      {this.isAdmin() && 
+                      <a  href='#' onClick={() => this.props.import()} className='btn btn-info ' style={{'float':'right'}}>
+                       Import
+                      </a>
+                     }
                 <div className='col-12 warning-message'>{this.state.warning_message}</div>
                    
                         <label htmlFor="name" className='row'>Name </label><input autoComplete="false" id="name" type='text' name='name' onChange={this.change} value={this.state.user.name} />

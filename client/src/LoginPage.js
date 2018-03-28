@@ -47,7 +47,7 @@ export default class LoginPage extends Component {
     recoverPassword(e) {
         let that = this;
         e.preventDefault();
-        console.log(['recover',this.state.email]);
+       // console.log(['recover',this.state.email]);
         fetch('/login/recover', {
           method: 'POST',
           headers: {
@@ -62,7 +62,7 @@ export default class LoginPage extends Component {
         }).then(this.checkStatus)
       .then(this.parseJSON)
       .then(function(data) {
-       console.log(['recover request with JSON response', data])
+       //console.log(['recover request with JSON response', data])
         that.setState(data); 
       }).catch(function(error) {
         console.log(['request failed', error])
@@ -80,9 +80,25 @@ export default class LoginPage extends Component {
       return response.json()
     }
     
-    googleLogin(response,aa) {
-        console.log(['GL',response,aa]);
-        this.props.login(response);
+    googleLogin(user) {
+      //  console.log(['glogin ',user]);
+        fetch('/login/googlesignin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.name
+          })
+        }).then(this.checkStatus)
+      .then(this.parseJSON)
+      .then(function(data) {
+        //    console.log(['gsignin request with JSON response', data])
+           if (data.code && data.code.length > 0) {
+              window.location='/?code='+data.code;
+           }
+        });
     };
     
     submitSignIn(e) {
@@ -90,7 +106,7 @@ export default class LoginPage extends Component {
         e.preventDefault();
         this.setState({'warning_message':''});
        
-        console.log(this.state);
+        //console.log(this.state);
        fetch('/login/signin', {
           method: 'POST',
           headers: {
@@ -103,14 +119,19 @@ export default class LoginPage extends Component {
         }).then(this.checkStatus)
       .then(this.parseJSON)
       .then(function(data) {
-       console.log(['signin request with JSON response', data])
-        if (data._id && data._id.length > 0) {
-            console.log(['login at signin',data]);
+       //console.log(['signin request with JSON response', data])
+       
+       if (data.code && data.code.length > 0) {
+          window.location='/?code='+data.code;
+       } else if (data._id && data._id.length > 0) {
+         //   console.log(['login at signin',data]);
+            that.setState(data); 
             that.props.login(data);
+            
         }
-        that.setState(data); 
+        
       }).catch(function(error) {
-        console.log(['request failed', error])
+        //console.log(['request failed', error])
       });
     };
     
@@ -133,7 +154,7 @@ export default class LoginPage extends Component {
         .then(this.checkStatus)
       .then(this.parseJSON)
       .then(function(data) {
-        console.log(['signup  request with JSON response', data])
+       // console.log(['signup  request with JSON response', data])
         if (data._id && data._id.length > 0) {
             that.setState({justSignedUp: true, warning_message:data.warning_message});            
         }

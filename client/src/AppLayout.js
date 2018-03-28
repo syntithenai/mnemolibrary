@@ -35,7 +35,7 @@ export default class AppLayout extends Component {
       super(props);
       let defaultUsers={'default':{
           'seenIntro': false, 
-          'questions':{'seen':{},'seenTally':{},'successTally':{},'block':{},'likes':{}},
+          'questions':{'seen':{},'success':{},'seenTally':{},'successTally':{},'successRate':{},'timeScore':{},'block':{},'likes':{}},
           'topics':{},
           'tags':{},
         //  'review':[]
@@ -74,7 +74,6 @@ export default class AppLayout extends Component {
       this.setQuizFromTag = this.setQuizFromTag.bind(this);
       this.updateProgress = this.updateProgress.bind(this);
       this.componentDidMount = this.componentDidMount.bind(this);
-      this.createIndexes = this.createIndexes.bind(this);
       
       this.getTagsByTitle = this.getTagsByTitle.bind(this);
       this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
@@ -94,7 +93,6 @@ export default class AppLayout extends Component {
        this.clearTagFilter = this.clearTagFilter.bind(this);
        this.setMessage = this.setMessage.bind(this);
        this.setQuizFromDiscovery = this.setQuizFromDiscovery.bind(this);
-       this.discoverQuestions = this.discoverQuestions.bind(this);
        
        this.login = this.login.bind(this);
        this.loginByToken = this.loginByToken.bind(this);
@@ -104,7 +102,8 @@ export default class AppLayout extends Component {
        
        this.like = this.like.bind(this);
        this.import = this.import.bind(this);
- 
+        this.discoverQuestions = this.discoverQuestions.bind(this);
+        
         // listen to messages from child iframe
         //window.addEventListener('message', function(e) {
         //// check message origin
@@ -122,15 +121,14 @@ export default class AppLayout extends Component {
           this.loginByToken(window.location.search.slice(6));
       }
       let that = this;
-      
-      // load mnemonics and collate tags, topics
-      fetch('/api/discover')
+      // load tags and quizzes and indexes
+      fetch('/api/lookups')
       .then(function(response) {
-        console.log(['got response', response])
+        //console.log(['got response', response])
         return response.json()
       }).then(function(json) {
-        console.log(['create indexes', json])
-        that.createIndexes(json);
+        //console.log(['create indexes', json])
+        that.setState(json);
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })
@@ -141,8 +139,8 @@ export default class AppLayout extends Component {
       var that = this;
       state.user = user;
       //state.currentPage = 'home';
-      console.log('login at root');
-        console.log(user);
+      //console.log('login at root');
+        //console.log(user);
         var params={
             username: user.email ? user.email : user.username,
             password: user.password,
@@ -156,15 +154,25 @@ export default class AppLayout extends Component {
             'Content-Type': 'application/x-www-form-urlencoded',
             //Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
           },
-          
           body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
         }).then(function(response) {
             return response.json();
             
         }).then(function(res) {
-            console.log(['ddtoken response',res]);
+          //  console.log(['ddtoken response',res]);
             state.token = res;
-            that.setState(state);
+            // load progress
+            fetch('/api/progress')
+              .then(function(response) {
+            //    console.log(['got response', response])
+                return response.json()
+              }).then(function(json) {
+              //  console.log(['set progress', json])
+                that.setState(state);
+                that.updateProgress(json);
+              }).catch(function(ex) {
+                console.log(['parsing failed', ex])
+              })
         })
         .catch(function(err) {
             console.log(['ERR',err]);
@@ -234,70 +242,13 @@ export default class AppLayout extends Component {
        console.log(['save quesgtions',data]);
    } 
   
-  createIndexes(json) {
-        var quizzes = {};
-        var tags = {};
-        var relatedTags = {};
-        var tagTopics = {};
-        var topicTags = {};
-        // collate quizzes and tags
-        let indexedQuestions= {};
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question.ID
-            var tagList = question.tags.split(',')
-            var quiz = question.quiz;
-            if (! (Array.isArray(quizzes[quiz]))) {
-                quizzes[quiz] = []
-            }
-            quizzes[quiz].push(id);
-            var collateRelated = function(tag) {
-              return function(relatedTag) {
-                    if (relatedTag !== tag) {
-                        relatedTags[tag][relatedTag]=true;
-                    }
-                };   
-            }
-        
-            for (var tagKey in tagList) {
-                
-                var tag = tagList[tagKey].trim().toLowerCase();
-                if (tag.length > 0) {
-                    if (! (Array.isArray(tags[tag]))) {
-                        tags[tag] = []
-                    }
-                    if (! (Array.isArray(relatedTags[tag]))) {
-                        relatedTags[tag] = {}
-                    }
-                    if (!(Array.isArray(tagTopics[tag]))) {
-                        tagTopics[tag] = []
-                    }
-                    if (! (Array.isArray(topicTags[quiz]))) {
-                        topicTags[quiz] = []
-                    }
-                    tags[tag].push(id);
-                    if (!tagTopics[tag].includes(quiz)) {
-                        tagTopics[tag].push(quiz)
-                    }
-                    if (!topicTags[quiz].includes(tag)) {
-                        topicTags[quiz].push(tag)
-                    }
-                    tagList.forEach(collateRelated(tag));
-                    
-                }
-                
-            }
-            indexedQuestions[id]=questionKey;
-        }
-        let words = [];
-        for (let tag in tags) {
-            words.push({text:tag, value: tags[tag].length});
-        }
-        this.setState({'questions':json['questions'], 'indexedQuestions':indexedQuestions,'topics':quizzes,'words':words,'tags':tags,'relatedTags':relatedTags,'topicTags':topicTags,'tagTopics':tagTopics});
-  };
-  
   setCurrentPage(page) {
       this.setState({'message':null,'currentPage': page,title: Navigation.pageTitles[page]});
+  };  
+ 
+  
+  setCurrentQuiz(quiz) {
+      this.setState({'currentQuiz':quiz});
   };  
     
   isCurrentPage(page) {
@@ -326,13 +277,13 @@ export default class AppLayout extends Component {
 
   like(questionId) {
      let user = this.state.users.default;
-     console.log(['like',questionId,this.state,user]); 
+    //console.log(['like',questionId,this.state,user]); 
      if (!user.questions.likes) user.questions.likes = {};
      if (questionId in user.questions.likes) {
-         console.log('already voted');
+        // console.log('already voted');
      } else {
          user.questions.likes[questionId] = 1;
-         console.log(['setstate',user]); 
+      //   console.log(['setstate',user]); 
          this.setState({'users':{'default':user}});
          let questions = this.state.questions;
          questions[this.state.indexedQuestions[questionId]].score = parseInt(questions[this.state.indexedQuestions[questionId]].score,10) + 1; 
@@ -343,7 +294,7 @@ export default class AppLayout extends Component {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({'user':this.state.user._id,'question':this.state.indexedQuestions[questionId]})
+          body: JSON.stringify({'user':this.state.user._id,'question':questionId})
         }).catch(function(err) {
             this.setState({'warning_message':'Not Saved'});
         });
@@ -378,18 +329,41 @@ export default class AppLayout extends Component {
       let that = this;
       console.log(questionIds);
       questionIds.forEach(function(questionId) {
-          console.log(questionId,questionIds[questionId]);
-          console.log(that.state.users.default.questions.block);
+       //   console.log(questionId,questionIds[questionId]);
+        //  console.log(that.state.users.default.questions.block);
           if (!that.state.users.default.questions.block.hasOwnProperty(questionId)) newIds.push(questionId);
       });
-      console.log({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
+      //console.log({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
       this.setState({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
   };
 
-  discoverQuestions() {
+       
+   discoverQuestions() {
       console.log(['discover questions']);
+      let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
-  };
+      // load initial questions
+      fetch('/api/discover?user='+(this.state.user != null ? this.state.user._id : ''))
+      .then(function(response) {
+        console.log(['got response', response])
+        return response.json()
+      }).then(function(json) {
+        console.log(['create indexes', json])
+        let currentQuiz = [];
+      let indexedQuestions= {};
+        for (var questionKey in json['questions']) {
+            const question = json['questions'][questionKey]
+            var id = question._id;
+            currentQuiz.push(id);
+            indexedQuestions[id]=questionKey;
+        }
+        that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover'});
+        console.log(['set state done', that.state])
+      }).catch(function(ex) {
+        console.log(['parsing failed', ex])
+      })
+  }; 
+  
   setQuizFromDiscovery() {
       console.log(['Setquiz discovery']);
       this.setCurrentPage('home')
@@ -397,19 +371,70 @@ export default class AppLayout extends Component {
       
   };
   setQuizFromQuestion(question) {
-      console.log(['SQFQ',question,question.ID]);
+      //console.log(['SQFQ',question,question._id]);
       this.setQuizFromTopic(question.quiz)
   };
   setQuizFromTopic(topic) {
-      const questions = this.getQuestionsByTopic(topic);
-      //questions.filter(e => !this.state.users.default.questions.blocked.hasOwnProperty(e));
-      this.setQuiz(topic,questions);
-      // ensure topic key exists
-      let user = this.state.users.default;
-      user.topics[topic] = new Date().getTime();
-      this.updateProgress(user);
+       console.log(['set quiz from topic']);
+      let that = this;
+      //this.setState({'currentQuiz':'1,2,3,4,5'});
+      // load initial questions
+      fetch('/api/questions?topic='+topic )
+      .then(function(response) {
+        console.log(['got response', response])
+        return response.json()
+      }).then(function(json) {
+        console.log(['create indexes', json])
+        let currentQuiz = [];
+        let indexedQuestions= {};
+        for (var questionKey in json['questions']) {
+            const question = json['questions'][questionKey]
+            var id = question._id;
+            currentQuiz.push(id);
+            indexedQuestions[id]=questionKey;
+        }
+        that.setCurrentPage('home');
+        that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  Utils.snakeToCamel(topic)});
+        console.log(['set state done', that.state])
+      }).catch(function(ex) {
+        console.log(['parsing failed', ex])
+      })
+      
+      
+      //const questions = this.getQuestionsByTopic(topic);
+      ////questions.filter(e => !this.state.users.default.questions.blocked.hasOwnProperty(e));
+      //this.setQuiz(topic,questions);
+      //// ensure topic key exists
+      //let user = this.state.users.default;
+      //user.topics[topic] = new Date().getTime();
+      //this.updateProgress(user);
   };
   setQuizFromTag(tag) {
+     console.log(['set quiz form tag',tag]);
+      let that = this;
+      //this.setState({'currentQuiz':'1,2,3,4,5'});
+      // load initial questions
+      fetch('/api/questions?tag='+tag.text )
+      .then(function(response) {
+        console.log(['got response', response])
+        return response.json()
+      }).then(function(json) {
+        console.log(['create indexes', json])
+        let currentQuiz = [];
+        let indexedQuestions= {};
+        for (var questionKey in json['questions']) {
+            const question = json['questions'][questionKey]
+            var id = question._id;
+            currentQuiz.push(id);
+            indexedQuestions[id]=questionKey;
+        }
+        that.setCurrentPage('home');
+        that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Tag '+ Utils.snakeToCamel(tag.text),'tagFilter':tag.text});
+        console.log(['set state done', that.state])
+         //that.setState({});
+      }).catch(function(ex) {
+        console.log(['parsing failed', ex])
+      })
       //const questions = this.getQuestionsByTag(tag.text);
       ////questions.filter(e => !this.state.users.default.questions.blocked.hasOwnProperty(e));
       //this.setQuiz('Tag - '+tag.text,questions);
@@ -417,8 +442,7 @@ export default class AppLayout extends Component {
       //let user = this.state.users.default;
       //user.tags[tag] = time;
       //this.updateProgress(user);
-      this.setCurrentPage('topics');
-      this.setState({'tagFilter':tag.text});
+     
   };
   
   clearTagFilter() {
@@ -440,11 +464,11 @@ export default class AppLayout extends Component {
     const showLogin = this.isCurrentPage('login') && !this.isLoggedIn();
     return (
         <div className="mnemo">
-            <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} import={this.import} />
+            <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
             <div className='page-title'><h4>{this.state.title}</h4></div>
             {this.state.message && <div className='page-message' >{this.state.message}</div>}
             
-            {this.isCurrentPage('home') && <QuizCarousel discoverQuestions={this.discoverQuestions} questions={this.state.questions} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} /> }
+            {this.isCurrentPage('home') && <QuizCarousel questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz}  /> }
             
             {this.isCurrentPage('topics') && <TopicsPage topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage}/>
             }
@@ -452,7 +476,7 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('search') && <SearchPage questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
             }
-            {this.isCurrentPage('review') && <ReviewPage getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} />
+            {this.isCurrentPage('review') && <ReviewPage getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
             }
             {this.isCurrentPage('create') && <CreatePage saveQuestion={this.saveQuestion}  />
             }
@@ -462,7 +486,7 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('termsofuse') && <TermsOfUse/>
             }
-            {showProfile && <ProfilePage saveUser={this.saveUser} user={this.state.user} logout={this.logout}/>
+            {showProfile && <ProfilePage saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
             }
             {(showLogin) && <LoginPage token={this.state.token} login={this.login}/>
             }<br/>

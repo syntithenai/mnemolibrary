@@ -9,9 +9,16 @@ body {
     padding-bottom: 1em;
 }
 .question .buttons {
-    background-color: lightgrey;
+    background-color: #8a2be245;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
+}
+.question,.tags {
+    background-color: lightblue !important;;
+}
+.question .mnemonic h4 {
+    color :  red;
+    font-size: 1.2em;
 }
 .question .buttons button {  }
 
@@ -33,7 +40,7 @@ iframe {
     margin-left: 0px;
     margin-right: 0px;
     padding: 1rem;
-    border: 1px solid black;
+    sborder: 1px solid black;
 }
 
 .warning-message {

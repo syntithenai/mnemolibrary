@@ -3,13 +3,13 @@ import 'whatwg-fetch'
 
 export default class Navigation extends Component {
 
-    constructor(props) {
-        super(props);
-        this.isAdmin = this.isAdmin.bind(this);
-    };
+    //constructor(props) {
+        //super(props);
+        //this.isAdmin = this.isAdmin.bind(this);
+    //};
     
     authorize() {
-        console.log(['AUTHORIZE'])
+     //   console.log(['AUTHORIZE'])
         //fetch('/oauth/token',{method: 'POST',headers: {
     //'Content-Type': 'application/x-www-form-urlencoded'
   //}})
@@ -17,7 +17,7 @@ export default class Navigation extends Component {
     'Content-Type': 'application/x-www-form-urlencoded'
   }})
       .then(function(response) {
-        console.log(['got response', response.text()])
+       // console.log(['got response', response.text()])
       //  return response.json()
       })
       //.then(function(json) {
@@ -30,15 +30,7 @@ export default class Navigation extends Component {
  
     };
     
-    isAdmin() {
-        if (this.props.user && 
-        (this.props.user.username=="stever@syntithenai.com" 
-            || this.props.user.username=="syntithenai@gmail.com" 
-            || this.props.user.username=="TrevorRyan123@gmail.com")) {
-            return true;
-        }
-        return false;
-    };
+
     
     import(e) {
         this.props.import();
@@ -69,11 +61,7 @@ export default class Navigation extends Component {
               <li className="nav-item">
                 <a className="nav-link"  href="#" onClick={() => this.props.setCurrentPage('create')}>Create</a>
               </li>}
-              {this.isAdmin() && 
-              <li className="nav-item">
-                <a className="nav-link"  href="#" onClick={() => this.import()}>Import</a>
-              </li>}
-              
+            
               <li className="nav-item">
                 <a className="nav-link" href="#" onClick={() => this.props.setCurrentPage('about')}>Help</a>
                 

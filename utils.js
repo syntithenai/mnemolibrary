@@ -52,7 +52,7 @@ module.exports = {
         let indexedQuestions= {};
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
-            var id = question.ID
+            var id = question._id;
             var tagList = question.tags.split(',')
             var quiz = question.quiz;
             if (! (Array.isArray(quizzes[quiz]))) {

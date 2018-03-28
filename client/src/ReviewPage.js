@@ -2,54 +2,43 @@ import React, { Component } from 'react';
 
 import FindQuestions from './FindQuestions';
 import QuizCarousel from './QuizCarousel';
+import 'whatwg-fetch'
 
 export default class ReviewPage extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            questions : [],
+            indexedQuestions : [],
+            currentQuiz : []
+        }
         this.finishReview = this.finishReview.bind(this);
+        this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
+        
     };
 
+   componentDidMount() {
+    this.getQuestionsForReview();
+   }
+        
    
    // return seen questionIds sorted by 'review status'
   getQuestionsForReview() {
-    let user = this.props.user;
-    let questions=[];  
-    for (var questionId in user.questions.seen) {
-        if (!user.questions.block.hasOwnProperty(questionId)) {
-            const seenTally = user.questions.seenTally[questionId];
-            const successTally = user.questions.successTally.hasOwnProperty('questionId') ? user.questions.successTally[questionId] : 0;
-            const seen = user.questions.seen[questionId];
-            const success = user.questions.success.hasOwnProperty('questionId') ? user.questions.success[questionId] : 0;
-            if (seenTally > 0) {
-              const time = new Date().getTime();
-              var timeDiff = 0;
-              if (success > 0) {
-                  timeDiff = seen - success;
-              } else {
-                  timeDiff = time - seen;
-              }
-              const orderBy = (successTally + (timeDiff)* 0.00000001)/seenTally;
-              const question = {'orderBy':orderBy,'questionId':questionId};
-              questions.push(question);
-            }
- 
-        }
-    }
-    questions.sort(function(a,b) {
-        if (a.orderBy === b.orderBy) {
-            return 0;
-        } else if (a.orderBy > b.orderBy) {
-            return 1;
-        } else {
-            return -1;
-        }
-    });
-    let questionIds = [];
-    questions.forEach(function(question) {
-        questionIds.push(question.questionId);
-    });
-    return questionIds;
+      let that = this;
+      //console.log('get q for review');
+      if (this.props.user) {
+        fetch('/api/review?user='+this.props.user._id)
+          .then(function(response) {
+            //console.log(['got response', response])
+            return response.json()
+          }).then(function(json) {
+            //console.log(['create indexes', json])
+            that.setState(json);
+          }).catch(function(ex) {
+            console.log(['parsing failed', ex])
+          })
+      }
   };
     
     finishReview(questions,success) {
@@ -60,20 +49,23 @@ export default class ReviewPage extends Component {
    };
     
     render() {
-        let questions = this.getQuestionsForReview();
-        console.log(['REVIEW',questions]);
-        if (questions.length > 0) {
-            return (
-            <div>
-                <QuizCarousel questions={this.props.questions} currentQuiz={questions} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} />
-            </div>
-            )
-        } else {
-            return (
-            <div><b>No questions seen yet. </b><FindQuestions setCurrentPage={this.props.setCurrentPage} /></div>
-            )
-        }
-        
-
-        }
+       // console.log(['REVIEW',this.state.questions]);
+       if (this.props.user) {
+            if (this.state.questions.length > 0) {
+                return (
+                <div>
+                    <QuizCarousel questions={this.state.questions} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz} />
+                </div>
+                )
+            } else {
+                return (
+                <div><b>No questions seen yet. </b><FindQuestions setCurrentPage={this.props.setCurrentPage} /></div>
+                )
+            }
+      } else {
+        return (
+            <div><b><button onClick={() => this.props.setCurrentPage('login')} className='btn btn-info'>Login</button> to track your progress</b></div>
+        );
+      }
+    }
 };

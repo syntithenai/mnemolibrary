@@ -47,6 +47,7 @@ export default class TagsPage extends Component {
         const rotate = word => 0; //word.value % 360;
         const wordCloudWidth = window.innerWidth * 0.9;
         const wordCloudHeight = window.innerHeight * 0.5;
+        console.log(this.state.tags);
         
         return (
         <div>

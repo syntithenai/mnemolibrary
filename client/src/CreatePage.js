@@ -27,7 +27,7 @@ export default class CreatePage extends Component {
             showHelp:false
         }
         
-        console.log(['constr',this.state]);
+       // console.log(['constr',this.state]);
         
     };
     

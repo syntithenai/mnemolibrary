@@ -21,6 +21,7 @@ var fetch = require('node-fetch');
 
 const db = require('../../oauth/database');
 const User = db.User;
+db.connect();
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -28,26 +29,27 @@ router.use(bodyParser.urlencoded({ extended: true }));
 
 //,'authorization_code','client_credentials','refresh_token'
 router.get('/confirm',function(req,res) {
+    let params = req.query;
      //let request = oauthserver.Request(req);
     //let response = oauthserver.Response(res);
     //return oauth.authenticate(request, response, options)
       //.then(function(token) {
-        console.log(['APPROVE USER',req.query]); //,token,req.query,req]);    
-          User.findOne({ token:req.query.code})
+      //  console.log(['APPROVE USER',params]); //,token,params,req]);    
+          User.findOne({ token:params.code})
             .then(function(user)  {
                 if (user != null) {
-                    console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
+                    //console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
                     var userId = user._id;
                     //const user = new User({name:user2.name,username:user2.username,_id:user2._id,password:user2.tmp_password, token: null});
-                    console.log(['res2',userId]);  
-                      //res.send('registration '+req.query.code );
+                   // console.log(['res2',userId]);  
+                      //res.send('registration '+params.code );
                       //console.log(user);  
                   //console.log(user._id);  
                   
                   user.password = user.tmp_password;
                   user.token = undefined;
                   user.tmp_password = undefined;
-                  console.log(['KKK',user]); 
+               //   console.log(['KKK',user]); 
                   user.save().then(function() {
                       console.log(['approved']);
                        var params={
@@ -57,7 +59,7 @@ router.get('/confirm',function(req,res) {
                             'client_id':config.clientId,
                             'client_secret':config.clientSecret
                       };
-                      fetch('http://'+req.headers.host+'/oauth/token', {
+                      fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -67,7 +69,7 @@ router.get('/confirm',function(req,res) {
                         }).then(function(response) {
                             return response.json();
                         }).then(function(token) {
-                            console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
+                     //       console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
                             res.redirect(config.successUrl + '?code='+token.access_token);
                         });
                   }).catch(function(e) {
@@ -96,24 +98,26 @@ router.get('/confirm',function(req,res) {
 
 
 router.get('/recover',function(req,res) {
-        console.log(['RECOVER USER',req.query]); //,token,req.query,req]);    
-          User.findOne({ token:req.query.code})
+        let params = req.query;
+     //   console.log(['RECOVER USER',params]); //,token,params,req]);    
+          User.findOne({ token:params.code})
             .then(function(user)  {
+             //   console.log(['found',user]);
                 if (user != null) {
-                    console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
+            //        console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
                     var userId = user._id;
                     //const user = new User({name:user2.name,username:user2.username,_id:user2._id,password:user2.tmp_password, token: null});
-                    console.log(['res2',userId]);  
-                      //res.send('registration '+req.query.code );
+               //     console.log(['res2',userId]);  
+                      //res.send('registration '+params.code );
                       //console.log(user);  
                   //console.log(user._id);  
                   
                   user.password = user.tmp_password;
                   user.token = undefined;
                   user.tmp_password = undefined;
-                  console.log(['KKK',user]); 
+        //          console.log(['KKK',user]); 
                   user.save().then(function() {
-                      console.log(['approved']);
+                  //    console.log(['approved']);
                        var params={
                             username: user.username,
                             password: user.password,
@@ -121,7 +125,7 @@ router.get('/recover',function(req,res) {
                             'client_id':config.clientId,
                             'client_secret':config.clientSecret
                       };
-                      fetch('http://'+req.headers.host+'/oauth/token', {
+                      fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -131,7 +135,7 @@ router.get('/recover',function(req,res) {
                         }).then(function(response) {
                             return response.json();
                         }).then(function(token) {
-                            console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
+                    //        console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
                             res.redirect(config.successUrl + '?code='+token.access_token);
                         });
                   }).catch(function(e) {
