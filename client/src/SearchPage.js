@@ -85,6 +85,9 @@ export default class SearchPage extends Component {
 
         return (
         <div>
+                <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</a>
+                  <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</a>
+              
                 <form className="form-inline" onSubmit={(e) => e.preventDefault()}>
                   <DebounceInput className="form-control" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter} placeholder="Search" aria-label="Search" debounceTimeout={300} />
                   <select className="form-control" value={this.state.techniqueFilter}  onChange={this.setTechniqueFilter} ><option></option><option>Rhyme</option><option>Association</option><option>Homonym</option><option>Acronym</option><option>Alliteration</option><option>Association</option></select>

@@ -17,41 +17,207 @@ MongoClient.connect(config.databaseConnection, (err, client) => {
 
 
 router.post('/import', (req, res) => {
-
+    console.log(['import']);
     let that = this;
     let url = config.masterSpreadsheet;
     // load mnemonics and collate tags, topics
     var request = get(url, function(err,response) {
+        if (err) {
+            console.log(['e',err]);
+            return;
+        }
+        //console.log(['response',response]);
         Papa.parse(response, {
             'header': true, 
             'complete': function(data) {
+                 //console.log(['parse',data]);
                 const toImport = {'questions':data.data};
                 let json = utils.createIndexes(toImport);
-                //console.log(['parsed',data,data.errors,json]);
+               // console.log(['parsed',data,data.errors,json]);
+                
                 for (collection in json) {
-                    //console.log(['save collection',collection,Array.isArray(json[collection]),json[collection]]);
+                  //  console.log(['save collection',collection,Array.isArray(json[collection]),json[collection]]);
                     if (Array.isArray(json[collection])) {
-                      //  console.log('IMPORT AS ARRAY');
-                        db.collection(collection).insertMany(json[collection]);   
+                        console.log(['IMPORT AS ARRAY',collection]);
+                        if (collection=="words") {
+                            console.log(json[collection]);
+                        }
+                       let ids=[];
+                       for (var a in json[collection]) {
+                        if (json[collection][a] && json[collection][a].hasOwnProperty('_id')) {
+                            let id = json[collection][a]._id;   
+                            ids.push(id);
+                            delete json[collection][a]._id;   
+                        
+                            db.collection(collection).update({_id:ObjectId(id)},{$set:json[collection][a]},{upsert:true}).then(function() {
+                                console.log(['done array update']);
+                            }).catch(function(e) {
+                                console.log(['array update err',e]);
+                            });
+                        }
+                        // cleanup
+                        db.collection(collection).find({_id:{$nin:ids}}).toArray().then(function(results) {
+                            console.log('DELETE THESE');
+                            console.log(results);
+                            if (Array.isArray(results)) {
+                                results.forEach(function(toDelete) {
+                                    db.collection(collection).deleteOne({_id:toDelete._id}).then(function(ok) {
+                                        console.log('deleted');
+                                    }).catch(function(e) {
+                                        console.log(['err',e]);
+                                    });
+                                });
+                            }
+                        });
+                    }   
+                       //let bulk = db.collection(collection).initializeOrderedBulkOp();
+                        //for (var a in json[collection]) {
+                            //let find={}
+                            //if (json[collection][a] && json[collection][a].hasOwnProperty('_id')) {
+                                //find._id = json[collection][a]._id;
+                            //}
+                            //bulk.find(find).upsert().updateOne({
+                              //$set: json[collection][a],
+                            //});
+                        //}
+                        //let result = bulk.execute().then(function() {
+                            //console.log(['bulk',JSON.stringify(result,undefined,2)]);
+                        //});
+                        
+
+                        
+                       //var ops = []
+                        //for (var a in json[collection]) {
+                            //let id = json[collection][a]._id;
+                            //console.log(id);
+                            //delete json[collection][a]._id;
+                            //let op = {
+                                //updateOne: {
+                                    //filter: { _id: new ObjectId(id) },
+                                    //update: {
+                                        //$set: json[collection][a],
+                                        //$setOnInsert: json[collection][a]
+                                    //},
+                                    //upsert: true
+                                //}
+                            //};
+                            //ops.push(op)
+                           //// console.log(['op',JSON.stringify(op)]);
+                        //}
+                        //console.log(['ops',ops.length]);
+                        //let sbulk = db.collections(collection).bulkWrite(ops, function(err,bulk) {
+                            //console.log(['done bulk',err,bulk]);
+                        //});
+                        //console.log(['done bulk',sbulk]);
+                        //.then(function(bulk) {
+                            //console.log(['done bulk',bulk]);
+                        //}).catch(function(e) {
+                            //console.log(['err',e]);
+                        //});
+                       
+                        ////console.log([json[collection]]);
+                        //for (var a in json[collection]) {
+                            //if (json[collection][a] && json[collection][a].hasOwnProperty('_id')) {
+                                //let id = json[collection][a]._id;
+                                //console.log([id,json[collection][a]]);
+                                //var backup = JSON.stringify(json[collection][a]);
+                                //db.collection(collection).findOne({_id:id}).then(function (question) {
+                                    //console.log(['found',id,json[collection][a],backup]);
+                                    //if (question) {
+                                        //console.log(['found so update', backup,question]);
+                                        //if (json[collection][a]) {
+                                            //db.collection(collection).update({_id:question._id},{$set:JSON.parse(backup)});   
+                                        //}
+                                        
+                                    //} else {
+                                        //console.log(['insert res',a,json[collection][a]]);
+                                        //if (json[collection][a]) {
+                                            //db.collection(collection).insert(json[collection][a]).then(function(res) {
+                                                    //console.log(['insert res',res]);
+                                            //}).catch(function(err) {
+                                                //console.log(['insert err',err]);
+                                            //});  
+                                        //}
+                                    //}
+                                //}).catch(function(err) {
+                                    //console.log(['find err',err]);
+                                //});  
+                            //} else  {
+                                //console.log(['no id',json[collection][a]]);
+                            //}
+                        //}
+                            
+                            //if (json[collection][a].hasOwnProperty('_id')) {
+                                //let id = json[collection][a]._id;
+                                //console.log([id,json[collection][a]]);
+                                //db.collection(collection).findOne({_id:id}).then(function (question) {
+                                    //if (question) {
+                                        //console.log(['found',question.id,question]);
+                                    
+                                        ////delete json[collection][a]._id;
+                                        //console.log('update');
+                                        //db.collection(collection).update({_id:question._id},{$set:json[collection][a]});   
+                                    //} else {
+                                        //console.log(['insert',json[collection][a]]);
+                                        ////delete json[collection][a]._id;
+                                        //db.collection(collection).insert(json[collection][a]).then(function(res) {
+                                                //console.log(['insert res',res]);
+                                        //}).catch(function(err) {
+                                            //console.log(['update res',err]);
+                                        //});   
+                                    //}
+                                    
+                                //}).catch(function(err) {
+                                            //console.log(['find err',err]);
+                                        //});   ;  
+                            //}
+                        
                     } else {
                         //console.log('IMPORT AS SINGLE');
-                        db.collection(collection).insert(json[collection]);   
+                        db.collection(collection).update({_id:json[collection]._id},json[collection],{upsert:true});   
                     }
                 }
                   
-                db.collection('questions').dropIndex();
-                db.collection('questions').createIndex({
-                    question: "text"
-                    //,
-                    //interrogative: "text",
-                    //mnemonic: "text",
-                    //answer: "text"
-                }); 
+                //db.collection('questions').dropIndex();
+                //db.collection('questions').createIndex({
+                    //question: "text"
+                    ////,
+                    ////interrogative: "text",
+                    ////mnemonic: "text",
+                    ////answer: "text"
+                //});  
                 res.send({'message':'Import complete'});
             }
-        })
+        }) 
     })  
 })
+//  bulk ops 
+//var ops = []
+                        //for (var a in json[collection]) {
+                            //let id = json[collection][a]._id;
+                            //console.log(id);
+                            ////delete json[collection][a]._id;
+                            //ops.push(
+                                //{
+                                    //updateOne: {
+                                        //filter: { _id: id },
+                                        //update: {
+                                            //$set: json[collection][a],
+                                            //$setOnInsert: json[collection][a]
+                                        //},
+                                        //upsert: true
+                                    //}
+                                //}
+                            //)
+
+                        //}
+                        //console.log(['ops',ops.length]);
+                        //db.collections(collection).bulkWrite(ops, { ordered: false }).then(function(bulk) {
+                            //console.log(['done bulk',bulk]);
+                        //}).catch(function(e) {
+                            //console.log(['err',e]);
+                        //});
+
 // UPDATE ROUTINE ??
   //for (collection in json) {
                     //console.log(['save collection',collection,Array.isArray(json[collection]),json[collection]]);
@@ -138,24 +304,28 @@ router.get('/discover', (req, res) => {
    console.log('discoer');
     let orderBy = req.query.orderBy ? req.query.orderBy : 'successRate';
     let sortFilter={};
+    let limit = 5;
     sortFilter[orderBy]=-1;
     let user = req.query.user ? req.query.user : null;
     console.log(['disco',orderBy]);
     db.collection('progress').findOne({user:user}).then(function(progress) {
          if (progress && progress.seen) {
-            let notThese = Object.keys(progress.seen);
+            let notThese = [];
+            for (var seenId in progress.seen) {
+                notThese.push(ObjectId(seenId));
+            };
             console.log(['disco NOTHTES',notThese]);
             db.collection('questions').find({'_id': {$nin: notThese}})
             //db.collection('questions').aggregate({$match:{$nin:notThese}})
-            .sort(sortFilter).limit(20).toArray().then(function( questions) {
-                console.log(['disco GOT',questions]);    
+            .sort(sortFilter).limit(limit).toArray().then(function( questions) {
+                console.log(['user res',questions ? questions.length : 0]);    
                 res.send({questions:questions});
             })
         } else {
             console.log(['no user']);    
             // NO USER, SHOW BY POPULAR
-             db.collection('questions').find({}).sort(sortFilter).limit(20).toArray().then(function(results) {
-                 console.log(['no user res',results]);    
+             db.collection('questions').find({}).sort(sortFilter).limit(limit).toArray().then(function(results) {
+                 console.log(['no user res',results ? results.length : 0]);    
                 res.send({'questions':results});
             })
         }
@@ -212,6 +382,7 @@ router.get('/discover', (req, res) => {
 
 
 router.get('/review', (req, res) => {
+    let limit=10;
     if (req.query.user && req.query.user.length > 0) {
         db.collection('progress').findOne({user:req.query.user}).then(function(progress) {
             let questions=[];
@@ -242,21 +413,22 @@ router.get('/review', (req, res) => {
                     }
                 });
                // console.log(['REVIEW',questions]);
-                questions = questions.slice(0,30);
-                let questionIds = [];
-               // let questionKeys = [];
-                let indexedQuestions = {};
-                let i = 0;
+                questions = questions.slice(0,limit);
+               // let questionIds = [];
+                let questionKeys = [];
+                //let indexedQuestions = {};
+                //let i = 0;
                 questions.forEach(function(question) {
-                    questionIds.push(question.questionId);
-                   // questionKeys.push(ObjectId(question.questionId));
-                    indexedQuestions[question.questionId] = i;
-                    i++;
+                //    questionIds.push(question.questionId);
+                    questionKeys.push(ObjectId(question.questionId));
+                //    indexedQuestions[question.questionId] = i;
+                //    i++;
                 });
                 //console.log(['REVIEW',questionKeys]);
-                db.collection('questions').find({_id:{$in:questionIds}}).toArray(function(err,results) {
-                   // console.log(['q',err,results]);
-                    res.send({'currentQuiz':questionIds,'questions':results,indexedQuestions:indexedQuestions});
+                db.collection('questions').find({_id:{$in:questionKeys}}).toArray(function(err,results) {
+                    //console.log(['q',err,results]);
+                    //res.send({'currentQuestion':'0','currentQuiz':questionIds,'questions':results,indexedQuestions:indexedQuestions});
+                    res.send({'questions':results});
                 })
             } else {
                 res.send('Invalid request, no user progress');
@@ -321,7 +493,7 @@ router.get('/questions', (req, res) => {
 router.post('/like', (req, res) => {
    // console.log(['like']);
     if (req.body.user && req.body.user.length > 0 && req.body.question && String(req.body.question).length > 0 ) {
-        console.log(['ok']);
+      //  console.log(['ok']);
         let user = req.body.user;
         let question = req.body.question;
         db.collection('question').findOne({'_id':ObjectId(question)}).then(function(theQuestion) {
@@ -386,9 +558,9 @@ router.post('/block', (req, res) => {
 })
 
 function updateQuestionTallies(user,question,tallySuccess=false) {
-    console.log(['update tallies for question',question]);
+    //console.log(['update tallies for question',question]);
     db.collection('questions').findOne({_id:ObjectId(question)}).then(function(result) {
-            console.log(['update res',result]);
+         //   console.log(['update res',result]);
             if (result && result._id) {
                 //// get success tstamp and seen tstamp for calculations
                 //db.collection('seen').find({question:question}).toArray(function( seenResult) {
@@ -402,9 +574,9 @@ function updateQuestionTallies(user,question,tallySuccess=false) {
                           //if (tallySuccess) 
                           data.successTally = successTally;
                           data.successRate = data.seenTally > 0 ? successTally/data.seenTally : 0;
-                          console.log(['save question',data]);
+                          //console.log(['save question',data]);
                           db.collection('questions').update({_id: question},{$set:data}).then(function(qres) {
-                                console.log(['saved question',qres]);
+                               // console.log(['saved question',qres]);
                           });
                          
                    //});
@@ -430,7 +602,7 @@ function updateQuestionTallies(user,question,tallySuccess=false) {
 
 
 function updateUserTallies(user,question,tallySuccess=false) {
-    console.log(['update user tallies',user,question,tallySuccess]);
+  //  console.log(['update user tallies',user,question,tallySuccess]);
      // update user progress stats
   db.collection('progress').findOne({user:user}).then(function(progress) {
       //console.log(['update user tallies prog',progress]);
@@ -475,17 +647,17 @@ function updateUserTallies(user,question,tallySuccess=false) {
               if (tallySuccess) progress.successTally[question] = successTally;
               progress.timeScore[question] = (successTally + timeDiff* 0.00000001)/progress.seenTally[question] ;
               progress.successRate[question] = successTally/progress.seenTally[question];
-              console.log(['save progress',progress,timeDiff]);
+             // console.log(['save progress',progress,timeDiff]);
              if (insert) {
                  db.collection("progress").insert(progress).then(function() {
-                    console.log(['progress inserted',progress]);  
+                   // console.log(['progress inserted',progress]);  
                     updateUserQuestionProgress(user,question,progress);
                  }).catch(function(e) {
                     console.log(['err',e]);
                 });
             } else {
                 db.collection("progress").update({user:user},{$set:progress}).then(function() {
-                    console.log(['progress updated',progress]); 
+                    //console.log(['progress updated',progress]); 
                     updateUserQuestionProgress(user,question,progress);
                  }).catch(function(e) {
                     console.log(['err',e]);

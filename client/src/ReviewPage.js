@@ -8,58 +8,49 @@ export default class ReviewPage extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            questions : [],
-            indexedQuestions : [],
-            currentQuiz : []
-        }
+        //this.state = {
+            //questions : this.props.questions,
+            //indexedQuestions : this.props.indexedQuestions,
+            //currentQuiz : this.props.currentQuiz
+        //}
         this.finishReview = this.finishReview.bind(this);
         this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
         
     };
 
    componentDidMount() {
-    this.getQuestionsForReview();
+  //  this.getQuestionsForReview();
    }
         
    
    // return seen questionIds sorted by 'review status'
   getQuestionsForReview() {
-      let that = this;
-      //console.log('get q for review');
-      if (this.props.user) {
-        fetch('/api/review?user='+this.props.user._id)
-          .then(function(response) {
-            //console.log(['got response', response])
-            return response.json()
-          }).then(function(json) {
-            //console.log(['create indexes', json])
-            that.setState(json);
-          }).catch(function(ex) {
-            console.log(['parsing failed', ex])
-          })
-      }
+      console.log('getQuestionsForReview');
+     this.props.getQuestionsForReview();
   };
     
     finishReview(questions,success) {
        console.log('finish review');
+       this.getQuestionsForReview();
        //this.setCurrentPage('review');
-       this.props.setMessage('Review complete. You recalled '+success.length+' out of '+questions.length+' questions.'); 
+       //this.props.setMessage('Review complete. You recalled '+success.length+' out of '+questions.length+' questions.'); 
        
    };
     
     render() {
-       // console.log(['REVIEW',this.state.questions]);
+        //console.log(['REVIEW',this.props.user]);
        if (this.props.user) {
-            if (this.state.questions.length > 0) {
+            //console.log(['REVIEW USER',this.props.questions]);
+            if (this.props.questions.length > 0) {
+               //  console.log(['REVIEW questions']);
                 return (
                 <div>
-                    <QuizCarousel questions={this.state.questions} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz} />
+                    <QuizCarousel setCurrentQuestion={this.props.setCurrentQuestion} discoverQuestions={this.props.discoverQuestions}  questions={this.props.questions} currentQuiz={this.props.currentQuiz} currentQuestion={this.props.currentQuestion} finishQuiz={this.finishReview} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz} />
                 </div>
                 )
             } else {
                 return (
-                <div><b>No questions seen yet. </b><FindQuestions setCurrentPage={this.props.setCurrentPage} /></div>
+                <div><b>No questions seen yet. </b><FindQuestions  discoverQuestions={this.props.discoverQuestions} setCurrentPage={this.props.setCurrentPage} /></div>
                 )
             }
       } else {

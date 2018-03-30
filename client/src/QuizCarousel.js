@@ -11,8 +11,8 @@ export default class QuizCarousel extends Component {
         this.state={
             //'indexedQuestions':this.props.indexedQuestions,
             //'questions':this.props.questions,
-            //'currentQuiz':this.props.currentQuiz  ,
-            'currentQuestion':0,
+            //'currentQuiz':this.props.currentQuiz,
+            //'currentQuestion':this.props.currentQuestion,
             'quizComplete': false,
             'showList':false,
             'isReview': (this.props.isReview ? true : false),
@@ -29,18 +29,15 @@ export default class QuizCarousel extends Component {
     
     componentDidMount() {
        // console.log(['QUIZ CAR DID MOUNT',this.state.currentQuiz,this.props.questions]);
-       
-            
+              
     };
     
-   
-
     
   isQuizFinished(quiz) {
       if (this.props.isReview) {
           return this.state.success.length === this.props.currentQuiz.length;
       } else {
-          return this.state.currentQuestion === this.props.currentQuiz.length - 1;
+          return this.props.currentQuestion === this.props.currentQuiz.length - 1;
       }
       
   };  
@@ -48,7 +45,7 @@ export default class QuizCarousel extends Component {
   logStatus(status,question) {
      // console.log(['log status',status,question]);
       if (this.props.user) {
-          if (!question) question = this.props.questions[this.props.indexedQuestions[this.state.currentQuestion]]._id;
+          if (!question) question = this.props.questions[this.props.indexedQuestions[this.props.currentQuestion]]._id;
           let that = this;
            // central storage
              fetch('/api/'+status, {
@@ -82,17 +79,18 @@ export default class QuizCarousel extends Component {
           //questions.review[id].push(time);
           if (this.isQuizFinished()) {
                this.logStatus('success',id);
-              this.finishQuiz(this.state.questions,this.state.success);
+              this.finishQuiz(this.props.questions,this.state.success);
             }  else {
                 // local collate success ids for finishQuiz function
                 const time = new Date().getTime();
                 let success = this.state.success;
-                if (!success.includes(this.state.currentQuestion)) {
-                    success.push(this.state.currentQuestion);
+                if (!success.includes(this.props.currentQuestion)) {
+                    success.push(this.props.currentQuestion);
                 }
                 questions.success[id]=time;
                 questions.successTally[id] = questions.successTally.hasOwnProperty(id) ? questions.successTally[id] + 1 : 1;
-                this.setState({ 'success': success, 'currentQuestion':this.state.currentQuestion + 1});
+                this.setState({ 'success': success});
+                this.props.setCurrentQuestion(this.state.currentQuestion + 1);
                 this.logStatus('success',id);
             }
       } else if (response === "previous") {
@@ -100,9 +98,9 @@ export default class QuizCarousel extends Component {
           questions.seen[id] = time;
           questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           this.logStatus('seen',id);
-          let currentId =this.state.currentQuestion - 1;
-          if (this.state.currentQuestion > 0 && this.props.currentQuiz.length > 0) {
-              this.setState({'currentQuestion':currentId});
+          let currentId =this.props.currentQuestion - 1;
+          if (this.props.currentQuestion > 0 && this.props.currentQuiz.length > 0) {
+              this.props.setCurrentQuestion(currentId);
           }
           
       } else if (response === "next") {
@@ -114,7 +112,8 @@ export default class QuizCarousel extends Component {
             if (this.isQuizFinished()) {
               this.finishQuiz();
             }  else {
-               this.setState({'currentQuestion':this.state.currentQuestion + 1});
+                this.props.setCurrentQuestion(this.props.currentQuestion + 1);
+               //this.setState({'currentQuestion':this.state.currentQuestion + 1});
             }
               
           } 
@@ -137,7 +136,7 @@ export default class QuizCarousel extends Component {
                 let currentQuestion = this.state.currentQuestion;
                 let currentQuiz = this.props.currentQuiz;
                 currentQuiz.splice(currentQuestion,1);
-                this.setState({'currentQuestion':this.state.currentQuestion + 1});
+                this.props.setCurrentQuestion(this.props.currentQuestion + 1);
                 this.props.setCurrentQuiz(currentQuiz);
             }
           }
@@ -148,8 +147,8 @@ export default class QuizCarousel extends Component {
     currentQuestion() {
         console.log(['currentQuestion',this.state]);
         let question=null;
-        if (this.state.currentQuestion !== null && Array.isArray(this.props.currentQuiz) && this.props.indexedQuestions && this.props.questions) {
-            question = this.props.questions[this.props.indexedQuestions[this.props.currentQuiz[this.state.currentQuestion]]];
+        if (this.props.currentQuestion !== null && Array.isArray(this.props.currentQuiz) && this.props.indexedQuestions && this.props.questions) {
+            question = this.props.questions[this.props.indexedQuestions[this.props.currentQuiz[this.props.currentQuestion]]];
         
         }
         return question;
@@ -161,14 +160,16 @@ export default class QuizCarousel extends Component {
         // inject override
        if (this.props.finishQuiz) {
             this.props.finishQuiz(this.props.questions,this.state.success);
-        } else {
-           this.props.setCurrentPage('home');
-           this.props.setMessage('You added '+((this.props.questions && this.props.questions.length)?this.props.questions.length:'')+' questions to your knowledge base.') ;
-        }
+        } 
+        //else {
+           //this.props.setCurrentPage('home');
+           //this.props.setMessage('You added '+((this.props.questions && this.props.questions.length)?this.props.questions.length:'')+' questions to your knowledge base.') ;
+        //}
    }; 
    
     
     getQuestions(questionIds) {
+        console.log(['get ques',questionIds]);
         let questions=[];
         let that = this;
         questionIds.forEach(function(questionId) {
@@ -179,11 +180,13 @@ export default class QuizCarousel extends Component {
     };
     
     setQuizQuestion(question) {
-      //  console.log(['set quiz ques',question]);
+        console.log(['set quiz ques',question,this.props.currentQuiz]);
         if (Utils.isObject(question) && question._id && question._id.length > 0) {
-        //    console.log(['setQuizQuestion',question]);
+            console.log(['setQuizQuestion',question]);
             let index = this.props.currentQuiz.indexOf(question._id);
-            this.setState({'showList':false,'currentQuestion':index});
+            console.log(['index',index]);
+            this.setState({'showList':false});
+            this.props.setCurrentQuestion(index);
         }
     };
     
@@ -216,7 +219,7 @@ export default class QuizCarousel extends Component {
             //console.log(['ren',question,questions]);
            // content = (<div>{JSON.stringify(question)} - {questions} </div>)
             // no matching questions
-            content = (<div><FindQuestions setCurrentPage={this.props.setCurrentPage} /></div>)
+            content = (<div><FindQuestions discoverQuestions={this.props.discoverQuestions} setCurrentPage={this.props.setCurrentPage} /></div>)
         }
                 
         return (

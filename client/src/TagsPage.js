@@ -51,6 +51,9 @@ export default class TagsPage extends Component {
         
         return (
         <div>
+                <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</a>
+                  <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</a>
+              
                 <form className="form">
                   <input className="form-control col-sm-8" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter}  placeholder="Search" aria-label="Search" />
                 </form>

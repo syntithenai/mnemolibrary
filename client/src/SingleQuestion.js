@@ -13,7 +13,7 @@ import Ban from 'react-icons/lib/fa/ban';
 import ExternalLink from 'react-icons/lib/fa/external-link';
 import ConnectDevelop from 'react-icons/lib/fa/connectdevelop';
 
-
+import Utils from './Utils';
 
 //import ThumbsDown from 'react-icons/lib/fa/thumbs-down';
 
@@ -48,7 +48,7 @@ export default class SingleQuestion extends Component {
     render() {
         if (this.props.question) {
           let question = this.props.question;
-          let header = (question.interogative ? question.interogative + ' ' : '') + (question.prefix ? question.prefix + ' ': '')  + question.question+ ' ' +( question.postfix ? question.postfix : '');
+          let header = Utils.getQuestionTitle(question);
           //let image =   question.image ?  question.image : '/clear.gif';
           let link = '';
           let target=false;
@@ -70,7 +70,13 @@ export default class SingleQuestion extends Component {
           }
           
           let tags = question.tags.split(",").map((tag, key) => {
-              return <button className="col-2 btn btn-outline btn-primary" onClick={() => this.blockDiscoveryTag(tag)} ><Ban size={25} /><span className="hidden-sm-down" >{tag}</span></button>
+              
+              return <button className="col-2 btn btn-outline btn-primary" key={key} onClick={() => this.blockDiscoveryTag(tag)} ><Ban size={28} className="badge badge-pill badge-info" /><span className="hidden-sm-down" >&nbsp;{tag}</span></button>
+            })
+        
+        let tagsClean = question.tags.split(",").map((tag, key) => {
+              
+              return <button className="col-2 btn btn-outline btn-primary" key={key}  ><span className="hidden-sm-down" >&nbsp;{tag}</span></button>
             })
           
           
@@ -113,10 +119,14 @@ export default class SingleQuestion extends Component {
                     &nbsp;
                     </div>
                 </div>
-                  <div className="row buttons tags" >
+                {!showRecallButton && <div className="row buttons tags" >
+                  <b>&nbsp;&nbsp;Tags&nbsp;&nbsp;&nbsp;</b>
                    {tags}
-                </div>
-
+                </div>}
+                {showRecallButton && <div className="row buttons tags" >
+                  <b>&nbsp;&nbsp;Tags&nbsp;&nbsp;&nbsp;</b>
+                   {tagsClean}
+                </div>}
                 <br/>
                 {this.isVisible('answer') && question.answer && <div className="card-block answer">
                     <div className='card-text'><b>Answer</b> <span>{question.answer}</span></div>
@@ -132,7 +142,7 @@ export default class SingleQuestion extends Component {
             
                 </div>
                 <div className="card-block">
-                    {(this.isVisible('image') && question.image) && <img alt='image' src={question.image} style={{width:"98%", height: "1200px", border: "0px"}}/> }
+                    {(this.isVisible('image') && question.image) && <img alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/> }
             
                 </div>
                 

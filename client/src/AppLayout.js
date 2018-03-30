@@ -103,6 +103,9 @@ export default class AppLayout extends Component {
        this.like = this.like.bind(this);
        this.import = this.import.bind(this);
         this.discoverQuestions = this.discoverQuestions.bind(this);
+        this.finishQuiz = this.finishQuiz.bind(this);
+        this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
+        this.setCurrentQuestion = this.setCurrentQuestion.bind(this);
         
         // listen to messages from child iframe
         //window.addEventListener('message', function(e) {
@@ -243,13 +246,19 @@ export default class AppLayout extends Component {
    } 
   
   setCurrentPage(page) {
+      if (page==="review") {
+          this.getQuestionsForReview();
+      }
       this.setState({'message':null,'currentPage': page,title: Navigation.pageTitles[page]});
   };  
  
-  
   setCurrentQuiz(quiz) {
       this.setState({'currentQuiz':quiz});
   };  
+
+    setCurrentQuestion(id) {
+        this.setState({currentQuestion:id});
+    };
     
   isCurrentPage(page) {
       return (this.state.currentPage === page);
@@ -322,7 +331,6 @@ export default class AppLayout extends Component {
         });
   };
 
-
   // SET QUIZ
   setQuiz(title,questionIds) {
       let newIds = [];
@@ -337,6 +345,40 @@ export default class AppLayout extends Component {
       this.setState({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
   };
 
+    
+    finishQuiz() {
+        console.log('root finish quiz');
+        this.discoverQuestions();
+    };
+    
+     getQuestionsForReview() {
+         console.log('getQuestionsForReview');
+      let that = this;
+      //console.log('get q for review');
+      if (this.state.user) {
+        fetch('/api/review?user='+this.state.user._id)
+          .then(function(response) {
+            //console.log(['got response', response])
+            return response.json()
+          }).then(function(json) {
+            //console.log(['create indexes', json])
+            console.log(['create indexes', json])
+            let currentQuiz = [];
+            let indexedQuestions= {};
+            for (var questionKey in json['questions']) {
+                const question = json['questions'][questionKey]
+                var id = question._id;
+                currentQuiz.push(id);
+                indexedQuestions[id]=questionKey;
+            }
+            that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover'});
+            console.log(['set state done', that.state])
+          }).catch(function(ex) {
+            console.log(['parsing failed', ex])
+          })
+      }
+  };
+    
        
    discoverQuestions() {
       console.log(['discover questions']);
@@ -350,7 +392,7 @@ export default class AppLayout extends Component {
       }).then(function(json) {
         console.log(['create indexes', json])
         let currentQuiz = [];
-      let indexedQuestions= {};
+        let indexedQuestions= {};
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
             var id = question._id;
@@ -393,8 +435,7 @@ export default class AppLayout extends Component {
             currentQuiz.push(id);
             indexedQuestions[id]=questionKey;
         }
-        that.setCurrentPage('home');
-        that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  Utils.snakeToCamel(topic)});
+        that.setState({currentPage:"home",'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  Utils.snakeToCamel(topic)});
         console.log(['set state done', that.state])
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
@@ -468,15 +509,15 @@ export default class AppLayout extends Component {
             <div className='page-title'><h4>{this.state.title}</h4></div>
             {this.state.message && <div className='page-message' >{this.state.message}</div>}
             
-            {this.isCurrentPage('home') && <QuizCarousel questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz}  /> }
+            {this.isCurrentPage('home') && <QuizCarousel setCurrentQuestion={this.setCurrentQuestion} finishQuiz={this.finishQuiz}  discoverQuestions={this.discoverQuestions}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz}  /> }
             
             {this.isCurrentPage('topics') && <TopicsPage topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage}/>
             }
-            {this.isCurrentPage('tags') && <TagsPage tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
+            {this.isCurrentPage('tags') && <TagsPage  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
             }
-            {this.isCurrentPage('search') && <SearchPage questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
+            {this.isCurrentPage('search') && <SearchPage setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
             }
-            {this.isCurrentPage('review') && <ReviewPage getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
+            {this.isCurrentPage('review') && <ReviewPage  setCurrentQuestion={this.setCurrentQuestion} discoverQuestions={this.discoverQuestions}  getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} currentQuestion={this.state.currentQuestion} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
             }
             {this.isCurrentPage('create') && <CreatePage saveQuestion={this.saveQuestion}  />
             }

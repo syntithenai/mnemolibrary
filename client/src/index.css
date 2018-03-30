@@ -14,7 +14,10 @@ body {
     padding-bottom: 0.5em;
 }
 .question,.tags {
-    background-color: lightblue !important;;
+    background-color: lightblue !important;
+}
+.question,.tags .btn {
+   text-align:left !important;
 }
 .question .mnemonic h4 {
     color :  red;

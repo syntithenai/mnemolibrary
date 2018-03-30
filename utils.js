@@ -2,7 +2,7 @@ const mustache = require('mustache');
 const nodemailer = require('nodemailer');
 const template= require('./template');
 const config=require('./config');
-
+var ObjectId = require('mongodb').ObjectID;
 
 module.exports = {
   sendMail : function(from,to,subject,html) {
@@ -52,7 +52,8 @@ module.exports = {
         let indexedQuestions= {};
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
-            var id = question._id;
+            var id = question._id ? question._id :  new ObjectId();
+            question._id = id;
             var tagList = question.tags.split(',')
             var quiz = question.quiz;
             if (! (Array.isArray(quizzes[quiz]))) {
@@ -96,7 +97,7 @@ module.exports = {
         }
         let words = [];
         for (let tag in tags) {
-            words.push({text:tag, value: tags[tag].length});
+            words.push({_id: new ObjectId(),text:tag, value: tags[tag].length});
         }
         return {'questions':json['questions'], 'indexedQuestions':indexedQuestions,'topics':quizzes,'words':words,'tags':tags,'relatedTags':relatedTags,'topicTags':topicTags,'tagTopics':tagTopics};
   }
