@@ -18,6 +18,9 @@ The login system is provided using an Open Auth server based on https://github.c
 
 # LINKS
 
+# swipe react
+https://github.com/dogfessional/react-swipeable
+
 MAIL
 https://www.npmjs.com/package/nodemailer-direct-transport
 https://github.com/namshi/docker-smtp

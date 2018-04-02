@@ -34,149 +34,141 @@ router.post('/import', (req, res) => {
                 const toImport = {'questions':data.data};
                 let json = utils.createIndexes(toImport);
                // console.log(['parsed',data,data.errors,json]);
-                
+                       
                 for (collection in json) {
-                  //  console.log(['save collection',collection,Array.isArray(json[collection]),json[collection]]);
+                    //console.log(['save collection',collection,Array.isArray(json[collection]),json[collection]]);
                     if (Array.isArray(json[collection])) {
-                        console.log(['IMPORT AS ARRAY',collection]);
-                        if (collection=="words") {
-                            console.log(json[collection]);
-                        }
-                       let ids=[];
+                        console.log(['IMPORT AS ARRAY '+collection ]);
+                        //if (collection=="words") {
+                            //console.log(json[collection]);
+                        //}
+                       let promises=[];
+                       let questionPromises=[];
                        for (var a in json[collection]) {
-                        if (json[collection][a] && json[collection][a].hasOwnProperty('_id')) {
-                            let id = json[collection][a]._id;   
-                            ids.push(id);
-                            delete json[collection][a]._id;   
-                        
-                            db.collection(collection).update({_id:ObjectId(id)},{$set:json[collection][a]},{upsert:true}).then(function() {
-                                console.log(['done array update']);
-                            }).catch(function(e) {
-                                console.log(['array update err',e]);
-                            });
+                         //  console.log([a]); //,json[collection][a]]);
+                            if (json[collection][a] && json[collection][a].hasOwnProperty('_id')) {
+                                let id = json[collection][a]._id;  
+                                let record =  json[collection][a];
+                                if (collection === "questions") {
+                                    record.successRate = Math.random()/100; // randomisation to get started
+                          
+                                }
+                                // remove and restore id to allow update
+                                delete record._id;
+                                let thePromise = new Promise(function(resolve,reject) {
+                                        db.collection(collection).update({_id:ObjectId(id)},{$set:record},{upsert:true}).then(function(resy) {
+                                            let newRecord={_id:id,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
+                                            resolve(newRecord);
+                                            
+                                        }).catch(function(e) {
+                                            console.log(['array update err',e]);
+                                            reject();
+                                        });
+                                        
+                                    })   
+                                if (collection === "questions") {
+                                    questionPromises.push(thePromise);
+                                } else {
+                                    promises.push(thePromise);
+                                }
+                                
+                            }
                         }
-                        // cleanup
-                        db.collection(collection).find({_id:{$nin:ids}}).toArray().then(function(results) {
-                            console.log('DELETE THESE');
-                            console.log(results);
-                            if (Array.isArray(results)) {
-                                results.forEach(function(toDelete) {
-                                    db.collection(collection).deleteOne({_id:toDelete._id}).then(function(ok) {
-                                        console.log('deleted');
-                                    }).catch(function(e) {
-                                        console.log(['err',e]);
+                       // console.log(['STARTED UPDATES',promises,questionPromises]);
+                        // cleanup 
+                            // TODO warning problem here if ever loading multiple sheets
+                        let b = function (collection) {
+                            if (promises.length > 0) {
+                                console.log('othr promises' + collection);
+                                Promise.all(promises).then((dresults) => {
+                                    let ids = [];
+                                    dresults.forEach(function(result) {
+                                        ids.push(result._id);
+                                    });
+                                    
+                                    console.log(['del ids',collection,ids]);
+                                    db.collection(collection).find({_id:{$nin:ids}}).toArray().then(function(dresults) {
+                                        console.log('DELETE THESE');
+                                        console.log(dresults);
+                                        if (Array.isArray(dresults)) {
+                                            dresults.forEach(function(toDelete) {
+                                                db.collection(collection).deleteOne({_id:toDelete._id}).then(function(ok) {
+                                                    console.log('deleted');
+                                                }).catch(function(e) {
+                                                    console.log(['err',e ]);
+                                                });
+                                            });
+                                        }
                                     });
                                 });
                             }
-                        });
-                    }   
-                       //let bulk = db.collection(collection).initializeOrderedBulkOp();
-                        //for (var a in json[collection]) {
-                            //let find={}
-                            //if (json[collection][a] && json[collection][a].hasOwnProperty('_id')) {
-                                //find._id = json[collection][a]._id;
-                            //}
-                            //bulk.find(find).upsert().updateOne({
-                              //$set: json[collection][a],
-                            //});
-                        //}
-                        //let result = bulk.execute().then(function() {
-                            //console.log(['bulk',JSON.stringify(result,undefined,2)]);
-                        //});
+                        }
+                        b(collection);
                         
 
-                        
-                       //var ops = []
-                        //for (var a in json[collection]) {
-                            //let id = json[collection][a]._id;
-                            //console.log(id);
-                            //delete json[collection][a]._id;
-                            //let op = {
-                                //updateOne: {
-                                    //filter: { _id: new ObjectId(id) },
-                                    //update: {
-                                        //$set: json[collection][a],
-                                        //$setOnInsert: json[collection][a]
-                                    //},
-                                    //upsert: true
-                                //}
-                            //};
-                            //ops.push(op)
-                           //// console.log(['op',JSON.stringify(op)]);
-                        //}
-                        //console.log(['ops',ops.length]);
-                        //let sbulk = db.collections(collection).bulkWrite(ops, function(err,bulk) {
-                            //console.log(['done bulk',err,bulk]);
-                        //});
-                        //console.log(['done bulk',sbulk]);
-                        //.then(function(bulk) {
-                            //console.log(['done bulk',bulk]);
-                        //}).catch(function(e) {
-                            //console.log(['err',e]);
-                        //});
-                       
-                        ////console.log([json[collection]]);
-                        //for (var a in json[collection]) {
-                            //if (json[collection][a] && json[collection][a].hasOwnProperty('_id')) {
-                                //let id = json[collection][a]._id;
-                                //console.log([id,json[collection][a]]);
-                                //var backup = JSON.stringify(json[collection][a]);
-                                //db.collection(collection).findOne({_id:id}).then(function (question) {
-                                    //console.log(['found',id,json[collection][a],backup]);
-                                    //if (question) {
-                                        //console.log(['found so update', backup,question]);
-                                        //if (json[collection][a]) {
-                                            //db.collection(collection).update({_id:question._id},{$set:JSON.parse(backup)});   
-                                        //}
-                                        
-                                    //} else {
-                                        //console.log(['insert res',a,json[collection][a]]);
-                                        //if (json[collection][a]) {
-                                            //db.collection(collection).insert(json[collection][a]).then(function(res) {
-                                                    //console.log(['insert res',res]);
-                                            //}).catch(function(err) {
-                                                //console.log(['insert err',err]);
-                                            //});  
-                                        //}
+                        // question promises - delete and download
+                        if (questionPromises.length > 0) {
+                             Promise.all(questionPromises)
+                              .then((results) => {
+                          //      console.log("All prom done", results);
+                                let ids = [];
+                                results.forEach(function(result) {
+                                    ids.push(result._id);
+                                });
+                                 // cleanup 
+                                // TODO warning problem here if ever loading multiple sheets
+                                //db.collection(collection).find({_id:{$nin:ids}}).toArray().then(function(dresults) {
+                                    //console.log('DELETE THESE');
+                                    //console.log(dresults);
+                                    //if (Array.isArray(dresults)) {
+                                        //dresults.forEach(function(toDelete) {
+                                            //db.collection(collection).deleteOne({_id:toDelete._id}).then(function(ok) {
+                                                //console.log('deleted');
+                                            //}).catch(function(e) {
+                                                //console.log(['err',e ]);
+                                            //});
+                                        //});
                                     //}
-                                //}).catch(function(err) {
-                                    //console.log(['find err',err]);
-                                //});  
-                            //} else  {
-                                //console.log(['no id',json[collection][a]]);
-                            //}
-                        //}
-                            
-                            //if (json[collection][a].hasOwnProperty('_id')) {
-                                //let id = json[collection][a]._id;
-                                //console.log([id,json[collection][a]]);
-                                //db.collection(collection).findOne({_id:id}).then(function (question) {
-                                    //if (question) {
-                                        //console.log(['found',question.id,question]);
-                                    
-                                        ////delete json[collection][a]._id;
-                                        //console.log('update');
-                                        //db.collection(collection).update({_id:question._id},{$set:json[collection][a]});   
-                                    //} else {
-                                        //console.log(['insert',json[collection][a]]);
-                                        ////delete json[collection][a]._id;
-                                        //db.collection(collection).insert(json[collection][a]).then(function(res) {
-                                                //console.log(['insert res',res]);
-                                        //}).catch(function(err) {
-                                            //console.log(['update res',err]);
-                                        //});   
-                                    //}
-                                    
-                                //}).catch(function(err) {
-                                            //console.log(['find err',err]);
-                                        //});   ;  
-                            //}
+                                //});
+
+                                
+                                //res.set({"Content-Disposition":"attachment; filename=questions2.csv"});
+                                let unparsed = Papa.unparse(results,{quotes: true});
+                                //unparsed='sssss';
+                            //    console.log('papa');
+                               // console.log(csvQuestions);
+                              //  console.log(unparsed);
+                                res.send(unparsed);
+                              })
+                              .catch((e) => {
+                                  console.log(e);
+                                  // Handle errors here
+                              });   
+                        }
+                      
+
+                    
+                      
+                  
                         
                     } else {
-                        //console.log('IMPORT AS SINGLE');
-                        db.collection(collection).update({_id:json[collection]._id},json[collection],{upsert:true});   
+                        console.log('IMPORT AS SINGLE'+collection);
+                        db.collection(collection).update({_id:json[collection]._id},json[collection],{upsert:true}).then(function(res) {
+                                if (res.result && res.result.upserted && Array.isArray(res.result.upserted) && res.result.upserted.length > 0) {
+                                //    console.log(['done array update',res.result.upserted[0]._id]);
+                                    //csvQuestions.push({_id:res.result.upserted[0]._id}.assign(json[collection]));
+                                    //let data = json[collection];
+                                    //data._id = res.result.upserted[0]._id;
+                                    //let thePromise = new Promise((resolve) => {resolve(data)});
+                                    //allPromises.push(thePromise);
+                                }
+                                
+                            }).catch(function(e) {
+                                console.log(['obj update err',e]);
+                            });;   
                     }
                 }
+                
                   
                 //db.collection('questions').dropIndex();
                 //db.collection('questions').createIndex({
@@ -186,7 +178,9 @@ router.post('/import', (req, res) => {
                     ////mnemonic: "text",
                     ////answer: "text"
                 //});  
-                res.send({'message':'Import complete'});
+               
+                
+                //res.send({'message':'Import complete'});
             }
         }) 
     })  
@@ -266,17 +260,27 @@ router.get('/lookups', (req, res) => {
                 db.collection('topicTags').findOne().then(function(topicTags) {
                     db.collection('relatedTags').findOne().then(function(relatedTags) {
                         db.collection('words').find().toArray().then(function(words) {
-                            delete tags._id;
-                            delete topics._id;
-                            delete tagTopics._id;
-                            delete topicTags._id;
-                            delete relatedTags._id;
+                            if (tags) delete tags._id;
+                            if (topics) delete topics._id;
+                            if (tagTopics) delete tagTopics._id;
+                            if (topicTags) delete topicTags._id;
+                            if (relatedTags) delete relatedTags._id;
                             res.send({tags:tags,topics:topics,tagTopics:tagTopics,topicTags:topicTags,relatedTags:relatedTags,words:words});
+                        }).catch(function(e) {
+                            console.log(e);
                         });
-                    })
-                })
-            })
-        })
+                    }).catch(function(e) {
+                        console.log(e);
+                    });
+                }).catch(function(e) {
+                    console.log(e);
+                });
+            }).catch(function(e) {
+                console.log(e);
+            });
+        }).catch(function(e) {
+            console.log(e);
+        });
     }).catch(function(e) {
         console.log(e);
         res.send({});
@@ -286,18 +290,18 @@ router.get('/lookups', (req, res) => {
 
 
 
-router.get('/progress', (req, res) => {
-    if (req.query.user && req.query.user.length > 0) {
-        db.collection('progress').findOne({user:req.query.user}).then(function(progress) {
-            res.send(progress);
-        }).catch(function(e) {
-            console.log(e);
-            res.send({});
-        });
-    } else {
-        res.send({});
-    }
-})
+//router.get('/progress', (req, res) => {
+    //if (req.query.user && req.query.user.length > 0) {
+        //db.collection('progress').findOne({user:req.query.user}).then(function(progress) {
+            //res.send(progress);
+        //}).catch(function(e) {
+            //console.log(e);
+            //res.send({});
+        //});
+    //} else {
+        //res.send({});
+    //}
+//})
 
 
 router.get('/discover', (req, res) => {
@@ -305,26 +309,37 @@ router.get('/discover', (req, res) => {
     let orderBy = req.query.orderBy ? req.query.orderBy : 'successRate';
     let sortFilter={};
     let limit = 5;
+    let criteria = [];
+    if (req.query.user) {
+        criteria.push({$or:[{access:{$eq:req.query.user}},{access :{$eq:'public'}}]})
+    } else {
+        criteria.push({access :{$eq:'public'}});
+    }
     sortFilter[orderBy]=-1;
     let user = req.query.user ? req.query.user : null;
-    console.log(['disco',orderBy]);
+    console.log(['discover',orderBy]);
     db.collection('progress').findOne({user:user}).then(function(progress) {
          if (progress && progress.seen) {
             let notThese = [];
             for (var seenId in progress.seen) {
                 notThese.push(ObjectId(seenId));
             };
+            for (var seenId in progress.block) {
+                notThese.push(ObjectId(seenId));
+            };
             console.log(['disco NOTHTES',notThese]);
-            db.collection('questions').find({'_id': {$nin: notThese}})
+            criteria.push({'_id': {$nin: notThese}});
+            console.log(['disco criteria',criteria]);
+            db.collection('questions').find({$and:criteria})
             //db.collection('questions').aggregate({$match:{$nin:notThese}})
             .sort(sortFilter).limit(limit).toArray().then(function( questions) {
-                console.log(['user res',questions ? questions.length : 0]);    
+                console.log(['user res',questions ? questions.length : 0,questions]);    
                 res.send({questions:questions});
             })
         } else {
             console.log(['no user']);    
             // NO USER, SHOW BY POPULAR
-             db.collection('questions').find({}).sort(sortFilter).limit(limit).toArray().then(function(results) {
+             db.collection('questions').find({$and:criteria}).sort(sortFilter).limit(limit).toArray().then(function(results) {
                  console.log(['no user res',results ? results.length : 0]);    
                 res.send({'questions':results});
             })
@@ -451,35 +466,53 @@ router.get('/questions', (req, res) => {
         skip = req.query.skip;
     }
     // tags and topics
-   // console.log(['questions request',req.query.search,req.query.technique]);
+    let criteria=[];
+    //if (req.query.user) {
+        //criteria.push({$or:[{access:{$eq:req.query.user}},{access:{$eq:'public'}}]})
+    //} else {
+        //criteria.push({access :{$eq:'public'}});
+    //}
+    console.log(['questions request',req.query.search,req.query.technique]);
     if (req.query.search && req.query.search.length > 0) {
         // SEARCH BY technique and text query
+        criteria.push({$text: {$search: req.query.search}});
+        criteria.push({'mnemonic_technique': {$eq:req.query.technique}});
+        console.log(criteria);
         if (req.query.technique && req.query.technique.length > 0) {
-            db.collection('questions').find({$text: {$search: req.query.search}, 'mnemonic_technique': req.query.technique}).limit(limit).skip(skip).project({score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).toArray(function(err, results) {
+            db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).project({score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).toArray(function(err, results) {
               res.send({'questions':results});
             })
         // SEARCH BY text query
         } else {
-            db.collection('questions').find({$text: {$search: req.query.search}}).project({score: {$meta: "textScore"}}).limit(limit).skip(skip).sort({score:{$meta:"textScore"}}).toArray(function(err, results) {
+            criteria.push({$text: {$search: req.query.search}});
+            db.collection('questions').find({$and:criteria}).project({score: {$meta: "textScore"}}).limit(limit).skip(skip).sort({score:{$meta:"textScore"}}).toArray(function(err, results) {
               res.send({'questions':results});
             })
         }
     } else {
         // SEARCH BY technique
         if (req.query.technique && req.query.technique.length > 0) {
-            db.collection('questions').find({'mnemonic_technique': req.query.technique}).limit(limit).skip(skip).project({score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).toArray(function(err, results) {
+            criteria.push({'mnemonic_technique': {$eq:req.query.technique}});
+            db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).project({score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).toArray(function(err, results) {
               res.send({'questions':results});
             })
         // SEARCH BY topic
         } else  if (req.query.topic && req.query.topic.length > 0) {
-            db.collection('questions').find({'quiz': req.query.topic}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
+            criteria.push({'quiz': req.query.topic});
+            db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
               res.send({'questions':results});
             })
         // SEARCH BY tag
         } else if (req.query.tag && req.query.tag.length > 0) {
-            db.collection('questions').find({'tags': {$regex:req.query.tag}}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
-              res.send({'questions':results});
-            })
+            if (req.query.tag) { 
+                let tag = req.query.tag.trim().toLowerCase(); 
+                criteria.push({'tags': {$regex:tag}});
+                console.log(['search by tag',criteria,tag]);
+                db.collection('questions').find({'tags': {$regex:tag}}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
+                    console.log(['search by tag res',results]);
+                  res.send({'questions':results});
+                })
+            }
         } else {
             res.send({'questions':[]});
         //db.collection('questions').find({}).sort({question:1}).toArray(function(err, results) {
@@ -505,14 +538,22 @@ router.post('/like', (req, res) => {
        //             console.log(['like found existing so ignore']);
                     res.send({});
                 } else {
-                    // create a vote
+                    // create a votet
          //           console.log(['like vote']);
                     db.collection('likes').insert({'user':user,question:question}).then(function(inserted) {
            //             console.log(['like inserted']);
                         // collate tally of all likes for this question and save to question.score
                         db.collection('likes').find({question:question}).toArray(function(err, likes) {
-             //               console.log(['col likes',likes]);
-                            db.collection('questions').update({_id: ObjectId(question)},{$set: {score:likes.length}}).then(function() {
+                            console.log(['col likes',likes]);
+                            let newScore=0;
+                            if (likes && likes.length > 0) {
+                                newScore=likes.length;
+                            }
+                            if (question && question.admin_score && parseFloat(question.admin_score) > 0) {
+                                newScore =newScore + parseFloat(question.admin_score)/2;
+                            }
+                            console.log(['like new score',newScore]);
+                            db.collection('questions').update({_id: ObjectId(question)},{$set: {score:newScore}}).then(function() {
                //                 console.log(['like final']);
                                 res.send({message:'Thanks for your like'});
                             });
@@ -647,22 +688,23 @@ function updateUserTallies(user,question,tallySuccess=false) {
               if (tallySuccess) progress.successTally[question] = successTally;
               progress.timeScore[question] = (successTally + timeDiff* 0.00000001)/progress.seenTally[question] ;
               progress.successRate[question] = successTally/progress.seenTally[question];
-             // console.log(['save progress',progress,timeDiff]);
-             if (insert) {
-                 db.collection("progress").insert(progress).then(function() {
-                   // console.log(['progress inserted',progress]);  
+              console.log(['save progress',timeDiff]);
+             //if (insert) {
+                 //db.collection("progress").insert(progress).then(function() {
+                    //console.log(['progress inserted']);  
+                    ////updateUserQuestionProgress(user,question,progress);
+                 //}).catch(function(e) {
+                    //console.log(['err',e]);
+                //});
+            //} else {
+                ////console.log(['refuse progress updated',progress._id,progress]); 
+                //db.collection("progress").replaceOne({_id:progress._id},progress).then(function(resp) {
+                    //console.log(['progress updated',resp.result]); 
                     updateUserQuestionProgress(user,question,progress);
-                 }).catch(function(e) {
-                    console.log(['err',e]);
-                });
-            } else {
-                db.collection("progress").update({user:user},{$set:progress}).then(function() {
-                    //console.log(['progress updated',progress]); 
-                    updateUserQuestionProgress(user,question,progress);
-                 }).catch(function(e) {
-                    console.log(['err',e]);
-                });
-            }
+                 //}).catch(function(e) {
+                    //console.log(['err',e]);
+                //});
+            //}
              
         });
     });
@@ -682,6 +724,8 @@ function updateUserQuestionProgress(user,question,fullProgress) {
         let progress = {question:question,user:user};
         progress.successRate = fullProgress.successRate[question];
         progress.timeScore = fullProgress.timeScore[question];
+        progress.successTally = fullProgress.successTally[question];
+        progress.seenTally = fullProgress.seenTally[question];
          if (!foundprogress) {
         //     console.log(['progress insert',progress]);  
              db.collection("userquestionprogress").insert(progress).then(function() {
@@ -741,19 +785,19 @@ router.post('/seen', (req, res) => {
 
 
 router.post('/success', (req, res) => {
-    //console.log(['success']);
+    console.log(['success']);
     if (req.body.user && req.body.user.length > 0 && req.body.question && String(req.body.question).length > 0 ) {
         let user = req.body.user;
         let question = req.body.question;
-      //  console.log(['success']);
+        console.log(['success']);
         db.collection('successes').findOne({user:user,question:question}).then(function(result) {
-        //    console.log(['found success',result]);
+            console.log(['found success',result]);
             if (result && result._id) {
-          //      console.log(['success update']);
+                console.log(['success update']);
                 let ts = new Date().getTime();
                 db.collection('successes').update({_id:ObjectId(result._id)},{$set:{timestamp: ts}}).then(function() {
                     updateQuestionTallies(user,question,true);
-            //        console.log(['updated']);
+                    console.log(['updated']);
                     res.send({message:'OK update'});
 
                 }).catch(function(e) {
@@ -762,7 +806,7 @@ router.post('/success', (req, res) => {
                 });
                 
             } else {
-              //  console.log(['success insert']);
+                console.log(['success insert']);
                 let ts = new Date().getTime();
                 db.collection('successes').insert({user:user,question:question,timestamp:ts}).then(function(inserted) {
                     updateQuestionTallies(user,question,true);
@@ -776,4 +820,104 @@ router.post('/success', (req, res) => {
 
 
 module.exports = router;
+     //let bulk = db.collection(collection).initializeOrderedBulkOp();
+                        //for (var a in json[collection]) {
+                            //let find={}
+                            //if (json[collection][a] && json[collection][a].hasOwnProperty('_id')) {
+                                //find._id = json[collection][a]._id;
+                            //}
+                            //bulk.find(find).upsert().updateOne({
+                              //$set: json[collection][a],
+                            //});
+                        //}
+                        //let result = bulk.execute().then(function() {
+                            //console.log(['bulk',JSON.stringify(result,undefined,2)]);
+                        //});
+                        
 
+                        
+                       //var ops = []
+                        //for (var a in json[collection]) {
+                            //let id = json[collection][a]._id;
+                            //console.log(id);
+                            //delete json[collection][a]._id;
+                            //let op = {
+                                //updateOne: {
+                                    //filter: { _id: new ObjectId(id) },
+                                    //update: {
+                                        //$set: json[collection][a],
+                                        //$setOnInsert: json[collection][a]
+                                    //},
+                                    //upsert: true
+                                //}
+                            //};
+                            //ops.push(op)
+                           //// console.log(['op',JSON.stringify(op)]);
+                        //}
+                        //console.log(['ops',ops.length]);
+                        //let sbulk = db.collections(collection).bulkWrite(ops, function(err,bulk) {
+                            //console.log(['done bulk',err,bulk]);
+                        //});
+                        //console.log(['done bulk',sbulk]);
+                        //.then(function(bulk) {
+                            //console.log(['done bulk',bulk]);
+                        //}).catch(function(e) {
+                            //console.log(['err',e]);
+                        //});
+                       
+                        ////console.log([json[collection]]);
+                        //for (var a in json[collection]) {
+                            //if (json[collection][a] && json[collection][a].hasOwnProperty('_id')) {
+                                //let id = json[collection][a]._id;
+                                //console.log([id,json[collection][a]]);
+                                //var backup = JSON.stringify(json[collection][a]);
+                                //db.collection(collection).findOne({_id:id}).then(function (question) {
+                                    //console.log(['found',id,json[collection][a],backup]);
+                                    //if (question) {
+                                        //console.log(['found so update', backup,question]);
+                                        //if (json[collection][a]) {
+                                            //db.collection(collection).update({_id:question._id},{$set:JSON.parse(backup)});   
+                                        //}
+                                        
+                                    //} else {
+                                        //console.log(['insert res',a,json[collection][a]]);
+                                        //if (json[collection][a]) {
+                                            //db.collection(collection).insert(json[collection][a]).then(function(res) {
+                                                    //console.log(['insert res',res]);
+                                            //}).catch(function(err) {
+                                                //console.log(['insert err',err]);
+                                            //});  
+                                        //} 
+                                    //}
+                                //}).catch(function(err) {
+                                    //console.log(['find err',err]);
+                                //});  
+                            //} else  {
+                                //console.log(['no id',json[collection][a]]);
+                            //}
+                        //}
+                            
+                            //if (json[collection][a].hasOwnProperty('_id')) {
+                                //let id = json[collection][a]._id;
+                                //console.log([id,json[collection][a]]);
+                                //db.collection(collection).findOne({_id:id}).then(function (question) {
+                                    //if (question) {
+                                        //console.log(['found',question.id,question]);
+                                    
+                                        ////delete json[collection][a]._id;
+                                        //console.log('update');
+                                        //db.collection(collection).update({_id:question._id},{$set:json[collection][a]});   
+                                    //} else {
+                                        //console.log(['insert',json[collection][a]]);
+                                        ////delete json[collection][a]._id;
+                                        //db.collection(collection).insert(json[collection][a]).then(function(res) {
+                                                //console.log(['insert res',res]);
+                                        //}).catch(function(err) {
+                                            //console.log(['update res',err]);
+                                        //});   
+                                    //}
+                                    
+                                //}).catch(function(err) {
+                                            //console.log(['find err',err]);
+                                        //});   ;  
+                            //}

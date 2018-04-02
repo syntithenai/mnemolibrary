@@ -13,7 +13,7 @@ export default class QuestionList extends Component {
                   
                   </div>
                 }
-              
+                return '';
             })
             return (
               <div className="questions list-group">

@@ -26,14 +26,15 @@ export default class TopicsPage extends Component {
     };
     
     clearTagFilter() {
-        //console.log('CLEAR FILTER');
+        console.log('CLEAR FILTER');
         //this.props.clearTagFilter();
         this.setState({'tagFilter':null});
         this.filterQuizzes(this.state.titleFilter);
     };
     
     filterQuizzes(title) {
-        //console.log(' FILTER TOPICS '+title);
+        console.log(' FILTER TOPICS '+title);
+        console.log(this.props.topics);
         let topics = {};
         //if (title.length > 0) {
         let that = this;        
@@ -44,9 +45,9 @@ export default class TopicsPage extends Component {
             if (title && title.length > 0 && topic.toLowerCase().indexOf(title.toLowerCase()) === -1) {
                 allowTitle = false;
             }
-            if (that.state.tagFilter && that.state.tagFilter.length > 0 && that.props.topicTags.hasOwnProperty(key) && !that.props.topicTags[key].includes(that.props.tagFilter)) {
-                allowTag = false
-            }
+            //if (that.state.tagFilter && that.state.tagFilter.length > 0 && that.props.topicTags.hasOwnProperty(key) && !that.props.topicTags[key].includes(that.props.tagFilter)) {
+                //allowTag = false
+            //}
             if (allowTitle && allowTag) {
                 topics[key] = that.props.topics[key];
             }
@@ -54,19 +55,19 @@ export default class TopicsPage extends Component {
         //} else {
             //topics = this.props.topics;
         //}
+        console.log(['FILTERED TO ',topics]);
         this.setState({'topics':topics});
     };
-    
+    // {this.state.tagFilter && <button className='btn btn-warning' onClick={this.clearTagFilter}> Tag: {this.state.tagFilter} <FaClose/></button>}
     render() {
         return (
             <div>
                 <form className="form-inline">
                   <input className="form-control" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter}  placeholder="Search" aria-label="Search" />
-                  {this.state.tagFilter && <button className='btn btn-warning' onClick={this.clearTagFilter}> Tag: {this.state.tagFilter} <FaClose/></button>}
+                  
                   <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</a>
                   <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</a>
               
-                  
                 </form>
                 <QuizList quizzes={this.state.topics} setQuiz={this.props.setQuiz} ></QuizList>                
             </div>

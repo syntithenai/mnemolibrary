@@ -52,48 +52,49 @@ module.exports = {
         let indexedQuestions= {};
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
-            var id = question._id ? question._id :  new ObjectId();
-            question._id = id;
-            var tagList = question.tags.split(',')
-            var quiz = question.quiz;
-            if (! (Array.isArray(quizzes[quiz]))) {
-                quizzes[quiz] = []
-            }
-            quizzes[quiz].push(id);
-        
-            for (var tagKey in tagList) {
-                
-                var tag = tagList[tagKey].trim().toLowerCase();
-                if (tag.length > 0) {
-                    if (! (Array.isArray(tags[tag]))) {
-                        tags[tag] = []
-                    }
-                    if (! (Array.isArray(relatedTags[tag]))) {
-                        relatedTags[tag] = {}
-                    }
-                    if (!(Array.isArray(tagTopics[tag]))) {
-                        tagTopics[tag] = []
-                    }
-                    if (! (Array.isArray(topicTags[quiz]))) {
-                        topicTags[quiz] = []
-                    }
-                    tags[tag].push(id);
-                    if (!tagTopics[tag].includes(quiz)) {
-                        tagTopics[tag].push(quiz)
-                    }
-                    if (!topicTags[quiz].includes(tag)) {
-                        topicTags[quiz].push(tag)
-                    }
-                    tagList.forEach(function(relatedTag) {
-                        if (relatedTag !== tag) {
-                            relatedTags[tag][relatedTag]=true;
+            if (question.access=="public") {
+                var id = question._id ? question._id :  new ObjectId();
+                question._id = id;
+                var tagList = question.tags.split(',');
+                var quiz = question.quiz;
+                if (! (Array.isArray(quizzes[quiz]))) {
+                    quizzes[quiz] = []
+                }
+                quizzes[quiz].push(id);        
+                for (var tagKey in tagList) {
+                    
+                    var tag = tagList[tagKey].trim().toLowerCase();
+                    if (tag.length > 0) {
+                        if (! (Array.isArray(tags[tag]))) {
+                            tags[tag] = []
                         }
-                    });
+                        if (! (Array.isArray(relatedTags[tag]))) {
+                            relatedTags[tag] = {}
+                        }
+                        if (!(Array.isArray(tagTopics[tag]))) {
+                            tagTopics[tag] = []
+                        }
+                        if (! (Array.isArray(topicTags[quiz]))) {
+                            topicTags[quiz] = []
+                        }
+                        tags[tag].push(id);
+                        if (!tagTopics[tag].includes(quiz)) {
+                            tagTopics[tag].push(quiz)
+                        }
+                        if (!topicTags[quiz].includes(tag)) {
+                            topicTags[quiz].push(tag)
+                        }
+                        tagList.forEach(function(relatedTag) {
+                            if (relatedTag !== tag) {
+                                relatedTags[tag][relatedTag]=true;
+                            }
+                        });
+                        
+                    }
                     
                 }
-                
+                indexedQuestions[id]=questionKey;
             }
-            indexedQuestions[id]=questionKey;
         }
         let words = [];
         for (let tag in tags) {

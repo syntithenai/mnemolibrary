@@ -257,7 +257,8 @@ export default class AppLayout extends Component {
   };  
 
     setCurrentQuestion(id) {
-        this.setState({currentQuestion:id});
+        console.log(['set current question',id]);
+        this.setState({currentQuestion:parseInt(id)});
     };
     
   isCurrentPage(page) {
@@ -265,7 +266,7 @@ export default class AppLayout extends Component {
   }; 
  
   setMessage(message) {
-      //this.setState({'message':message});
+      this.setState({'message':message});
   };
 
   getTagsByTitle(title) {
@@ -284,6 +285,7 @@ export default class AppLayout extends Component {
       return this.state.topics[topic];
   }; 
 
+  // send an api request to like a question
   like(questionId) {
      let user = this.state.users.default;
     //console.log(['like',questionId,this.state,user]); 
@@ -295,7 +297,11 @@ export default class AppLayout extends Component {
       //   console.log(['setstate',user]); 
          this.setState({'users':{'default':user}});
          let questions = this.state.questions;
-         questions[this.state.indexedQuestions[questionId]].score = parseInt(questions[this.state.indexedQuestions[questionId]].score,10) + 1; 
+         let qScore = 0;
+         if (this.state.indexedQuestions.hasOwnProperty(questionId) && this.state.indexedQuestions[questionId].score) {
+            qScore = questions[this.state.indexedQuestions[questionId]].score;
+         }
+         questions[this.state.indexedQuestions[questionId]].score = parseInt(qScore,10) + 1; 
          this.setState({'questions':questions});
          // central storage
          fetch('/api/like', {
@@ -312,6 +318,7 @@ export default class AppLayout extends Component {
      return false;
   };
 
+  // request api import and dowload results as csv
   import() {
       let that = this;
       fetch('/api/import', {
@@ -321,11 +328,11 @@ export default class AppLayout extends Component {
           },
           body: JSON.stringify({})
         }).then(function(res) {
-            return res.json();  
+            return res.text();
         }).then(function(res) {
-            //console.log('saved user');
-            //console.log(res);
-            that.setState(res);
+            var FileSaver = require('file-saver');
+            var blob = new Blob([res], {type: "text/plain;charset=utf-8"});
+            FileSaver.saveAs(blob, "questions.csv");
         }).catch(function(err) {
             that.setState({'warning_message':'Not Saved'});
         });
@@ -371,7 +378,7 @@ export default class AppLayout extends Component {
                 currentQuiz.push(id);
                 indexedQuestions[id]=questionKey;
             }
-            that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover'});
+            that.setState({'currentQuestion':0,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Review'});
             console.log(['set state done', that.state])
           }).catch(function(ex) {
             console.log(['parsing failed', ex])
@@ -381,11 +388,11 @@ export default class AppLayout extends Component {
     
        
    discoverQuestions() {
-      console.log(['discover questions']);
+      console.log(['discover da questions']);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
-      fetch('/api/discover?user='+(this.state.user != null ? this.state.user._id : ''))
+      fetch('/api/discover?user='+(this.state.user ? this.state.user._id : '') + '&rand='+Math.random())
       .then(function(response) {
         console.log(['got response', response])
         return response.json()
@@ -492,15 +499,15 @@ export default class AppLayout extends Component {
 
   // save modified user to state and localstorage
   updateProgress(user) {
-        let users = {'users':{'default':user}};
-        this.setState(users);
-        localStorage.setItem('users',JSON.stringify(users));
+        //let users = {'users':{'default':user}};
+        //this.setState(users);
+        //localStorage.setItem('users',JSON.stringify(users));
     };
     
   render() {
     const progress = this.state.users.default;
     const topics = this.state.topics;
-    const tags = this.state.words  ? this.state.words : [];
+    const tags = this.state.words;
     const showProfile = this.isCurrentPage('login') && this.isLoggedIn();
     const showLogin = this.isCurrentPage('login') && !this.isLoggedIn();
     return (
@@ -509,7 +516,7 @@ export default class AppLayout extends Component {
             <div className='page-title'><h4>{this.state.title}</h4></div>
             {this.state.message && <div className='page-message' >{this.state.message}</div>}
             
-            {this.isCurrentPage('home') && <QuizCarousel setCurrentQuestion={this.setCurrentQuestion} finishQuiz={this.finishQuiz}  discoverQuestions={this.discoverQuestions}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz}  /> }
+            {this.isCurrentPage('home') && <QuizCarousel setQuizFromTag={this.setQuizFromTag} setCurrentQuestion={this.setCurrentQuestion} finishQuiz={this.finishQuiz}  discoverQuestions={this.discoverQuestions}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz}  /> }
             
             {this.isCurrentPage('topics') && <TopicsPage topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage}/>
             }
@@ -517,7 +524,7 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('search') && <SearchPage setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
             }
-            {this.isCurrentPage('review') && <ReviewPage  setCurrentQuestion={this.setCurrentQuestion} discoverQuestions={this.discoverQuestions}  getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} currentQuestion={this.state.currentQuestion} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
+            {this.isCurrentPage('review') && <ReviewPage setQuizFromTag={this.setQuizFromTag}  setCurrentQuestion={this.setCurrentQuestion} discoverQuestions={this.discoverQuestions}  getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} currentQuestion={this.state.currentQuestion} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
             }
             {this.isCurrentPage('create') && <CreatePage saveQuestion={this.saveQuestion}  />
             }

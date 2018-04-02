@@ -29,39 +29,47 @@ router.get("/",function(req,res) {
 router.get('/me',function(req,res) {
           OAuthAccessToken.findOne({ accessToken:req.query.code})
             .then(function(token)  {
-                if (token != null) {
-                    User.findOne({ _id:token.user}).then(function(user) {
-                        if (user != null) {
-                            var params={
-                                username: user.username,
-                                password: user.password,
-                                'grant_type':'password',
-                                'client_id':config.clientId,
-                                'client_secret':config.clientSecret
-                            };
-                            fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
-                              method: 'POST',
-                              headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                              },
-                              
-                              body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
-                            }).then(function(response) {
-                                return response.json();
-                            }).then(function(token) {
-                                //console.log(['got token',token]);
-                                res.send({user:user,token:token});
-                            })
-                            .catch(function(err) {
-                                console.log(['ERR',err]);
-                            });
-                            
-                        } else {
-                            res.send('no matching user' );
-                        }          
-                    });
+                //console.log(['token',token]);
+                let now = new Date();
+                let expire = new Date(token.accessTokenExpiresAt)
+                if (now >= expire) {
+                    res.send('token expired' );
                 } else {
-                    res.send('no matching token' );
+                    
+                    if (token != null) {
+                        User.findOne({ _id:token.user}).then(function(user) {
+                            if (user != null) {
+                                var params={
+                                    username: user.username,
+                                    password: user.password,
+                                    'grant_type':'password',
+                                    'client_id':config.clientId,
+                                    'client_secret':config.clientSecret
+                                };
+                                fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                  },
+                                  
+                                  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+                                }).then(function(response) {
+                                    return response.json();
+                                }).then(function(token) {
+                                    //console.log(['got token',token]);
+                                    res.send({user:user,token:token});
+                                })
+                                .catch(function(err) {
+                                    console.log(['ERR',err]);
+                                });
+                                
+                            } else {
+                                res.send('no matching user' );
+                            }          
+                        });
+                    } else {
+                        res.send('no matching token' );
+                    }
                 }
             }).catch(function(e) {
                 console.log(['failed',e]);

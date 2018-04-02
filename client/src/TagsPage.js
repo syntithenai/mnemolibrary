@@ -21,21 +21,34 @@ export default class TagsPage extends Component {
     
     filterTags(title) {
         let tags = [];
+        let tagsCollation = {};
         if (title.length > 0) {
-            let that = this;        
-            Object.keys(this.props.tags).forEach(function(tagKey) {
-                let tag = that.props.tags[tagKey].text;
+            let that = this;   
+            console.log(['filter tags',this.props.tags]);     
+            //Object.keys(this.props.tags).forEach(function(tagKey) {
+            for (var w in this.props.tags) {
+                let word = this.props.tags[w];
+                let tag = word.text;
+                //console.log(word);
+                // collate on tag
                 if (tag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
-                    tags.push(that.props.tags[tagKey]);
+                    word.value = word.value*20;
+                    tagsCollation[tag]=word;
                 }
                 // check related
-                Object.keys(that.props.relatedTags[tag]).forEach(function(tag) {
-                    if (tag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
-                        tags.push(that.props.tags[tagKey]);
-                    }    
+                Object.keys(that.props.relatedTags[tag]).forEach(function(reltag) {
+                    
+                    //if (reltag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
+                    //    tagsCollation[reltag.trim().toLowerCase()]={text:reltag.trim().toLowerCase(),value:word.value /30};
+                    //}    
                 });
                    
-            });
+            };
+            console.log(['TAGS collation',tagsCollation]);
+            for (var theTag in tagsCollation) {
+                tags.push(tagsCollation[theTag]);
+            }
+            console.log(['TAGS',tags]);
         } else {
             tags = this.props.tags;
         }
@@ -43,7 +56,7 @@ export default class TagsPage extends Component {
     };
     
     render() {
-        const fontSizeMapper = word => 2* Math.log2(word.value) * 5;
+        const fontSizeMapper = word => 2* Math.log2(word.value+10) * 2;
         const rotate = word => 0; //word.value % 360;
         const wordCloudWidth = window.innerWidth * 0.9;
         const wordCloudHeight = window.innerHeight * 0.5;

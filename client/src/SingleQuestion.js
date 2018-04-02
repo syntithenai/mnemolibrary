@@ -10,6 +10,7 @@ import Ellipsis from 'react-icons/lib/fa/ellipsis-v';
 import ThumbsUp from 'react-icons/lib/fa/thumbs-up';
 import Image from 'react-icons/lib/fa/image';
 import Ban from 'react-icons/lib/fa/ban';
+import Search from 'react-icons/lib/fa/search';
 import ExternalLink from 'react-icons/lib/fa/external-link';
 import ConnectDevelop from 'react-icons/lib/fa/connectdevelop';
 
@@ -63,6 +64,7 @@ export default class SingleQuestion extends Component {
                  
              } else {
                  link = question.link;
+                 target='_new';
              }
           } else {
               link = 'https://www.google.com.au/search?q='+header;
@@ -70,13 +72,13 @@ export default class SingleQuestion extends Component {
           }
           
           let tags = question.tags.split(",").map((tag, key) => {
-              
-              return <button className="col-2 btn btn-outline btn-primary" key={key} onClick={() => this.blockDiscoveryTag(tag)} ><Ban size={28} className="badge badge-pill badge-info" /><span className="hidden-sm-down" >&nbsp;{tag}</span></button>
+              tag=tag.trim().toLowerCase();
+              return <button className="btn btn-outline btn-primary" key={key}  ><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTag({text:tag})} style={{float:'right'}}/><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.blockDiscoveryTag(tag)} /><span className="hidden-sm-down" >&nbsp;{tag}&nbsp;</span></button>
             })
         
         let tagsClean = question.tags.split(",").map((tag, key) => {
               
-              return <button className="col-2 btn btn-outline btn-primary" key={key}  ><span className="hidden-sm-down" >&nbsp;{tag}</span></button>
+              return <button className="btn btn-outline btn-primary" key={key}  ><span className="hidden-sm-down" >{tag}</span></button>
             })
           
           

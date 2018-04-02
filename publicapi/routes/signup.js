@@ -37,48 +37,55 @@ router.get('/confirm',function(req,res) {
       //  console.log(['APPROVE USER',params]); //,token,params,req]);    
           User.findOne({ token:params.code})
             .then(function(user)  {
-                if (user != null) {
-                    //console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
-                    var userId = user._id;
-                    //const user = new User({name:user2.name,username:user2.username,_id:user2._id,password:user2.tmp_password, token: null});
-                   // console.log(['res2',userId]);  
-                      //res.send('registration '+params.code );
-                      //console.log(user);  
-                  //console.log(user._id);  
-                  
-                  user.password = user.tmp_password;
-                  user.token = undefined;
-                  user.tmp_password = undefined;
-               //   console.log(['KKK',user]); 
-                  user.save().then(function() {
-                      console.log(['approved']);
-                       var params={
-                            username: user.username,
-                            password: user.password,
-                            'grant_type':'password',
-                            'client_id':config.clientId,
-                            'client_secret':config.clientSecret
-                      };
-                      fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                          },
-                          
-                          body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(token) {
-                     //       console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
-                            res.redirect(config.successUrl + '?code='+token.access_token);
-                        });
-                  }).catch(function(e) {
-                      console.log(['Failed confirmation',e]);
-                      res.send('failed ' );
-                  });
-                    
+                let now = new Date();
+                let expire = new Date(token.accessTokenExpiresAt)
+                if (now >= expire) {
+                    res.send('token expired try recover password' );
                 } else {
-                    res.send('no matching registration' );
+                    
+                    if (user != null) {
+                        //console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
+                        var userId = user._id;
+                        //const user = new User({name:user2.name,username:user2.username,_id:user2._id,password:user2.tmp_password, token: null});
+                       // console.log(['res2',userId]);  
+                          //res.send('registration '+params.code );
+                          //console.log(user);  
+                      //console.log(user._id);  
+                      
+                      user.password = user.tmp_password;
+                      user.token = undefined;
+                      user.tmp_password = undefined;
+                   //   console.log(['KKK',user]); 
+                      user.save().then(function() {
+                          console.log(['approved']);
+                           var params={
+                                username: user.username,
+                                password: user.password,
+                                'grant_type':'password',
+                                'client_id':config.clientId,
+                                'client_secret':config.clientSecret
+                          };
+                          fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                              },
+                              
+                              body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+                            }).then(function(response) {
+                                return response.json();
+                            }).then(function(token) {
+                         //       console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
+                                res.redirect(config.successUrl + '?code='+token.access_token);
+                            });
+                      }).catch(function(e) {
+                          console.log(['Failed confirmation',e]);
+                          res.send('failed ' );
+                      });
+                        
+                    } else {
+                        res.send('no matching registration' );
+                    }
                 }
             }).catch(function(e) {
                 console.log(['failed',e]);
