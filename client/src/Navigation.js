@@ -57,7 +57,7 @@ export default class Navigation extends Component {
               <li className="nav-item">
                 <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('review')} >Review</a>
               </li>
-              {this.props.isLoggedIn() && 
+              {this.props.isLoggedIn() && false && 
               <li className="nav-item">
                 <a className="nav-link"  href="#" onClick={() => this.props.setCurrentPage('create')}>Create</a>
               </li>}

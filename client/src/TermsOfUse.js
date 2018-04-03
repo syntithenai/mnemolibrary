@@ -7,7 +7,10 @@ export default class TermsOfUse extends Component {
         <div className="termsofuse" >
         
         <h3>Terms of use</h3>
- 
+ <nav className='nav'    >
+                <button className='btn btn-info' onClick={() => this.props.setCurrentPage('help')}>Help</button>
+                <button className='btn btn-info' onClick={() => this.props.setCurrentPage('intro')}>Getting Started</button>
+            </nav> 
 <ol> 
 <li>
 By using our service you agree to be bound by the terms of agreement, which may change from time to time.

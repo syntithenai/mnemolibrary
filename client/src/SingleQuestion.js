@@ -95,31 +95,31 @@ export default class SingleQuestion extends Component {
           return (
             <div className="card question container" >
                 <div className="row buttons justify-content-between" >
-                    <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} /></button>
-                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-sm-none d-md-inline-block" >&nbsp;Prev&nbsp;</span></button>
+                    <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} />&nbsp;</button>
+                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Prev&nbsp;</span></button>
                     <div className='col-1'>&nbsp;</div>
-                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-sm-none d-md-inline-block"> Next</span></button>
-                    {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-sm-none d-md-inline-block"> Recall</span></button>}
+                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block"> Next</span></button>
+                    {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block"> Recall</span></button>}
                     <div className='col-1'>&nbsp;</div>
-                    {<button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-sm-none d-md-inline-block"> Bin</span></button>}
+                    {<button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Bin</span></button>}
                     
                 </div>
                 <div className="">
                     <h4 className="card-title">{header}?</h4>
                     <div className="row form" >
                       <div className="col-sm-8" >
-                        {!this.isVisible('mnemonic') && <button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26} style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Mnemonic</button>
+                        {!this.isVisible('mnemonic') && <button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Mnemonic</span></button>
                         }&nbsp;
-                        {showAnswerButton && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Answer</button>
+                        {showAnswerButton && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
                         }&nbsp;
-                        {(!this.isVisible('image')) && question.image && <button  className='btn btn-primary' onClick={() => this.setVisible('image')}><Image size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Image</button>
+                        {(!this.isVisible('image')) && question.image && <button  className='btn btn-primary' onClick={() => this.setVisible('image')}><Image size={26} />&nbsp;<span className="d-none d-md-inline-block">Image</span></button>
                         }&nbsp;
                         
-                        {(!this.isVisible('moreinfo') && !target) && <button  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;More Info</button>
+                        {(!this.isVisible('moreinfo') && !target) && <button  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
                         }
-                        {(!this.isVisible('moreinfo') && target) && <a  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;More Info</a>
+                        {(!this.isVisible('moreinfo') && target) && <a  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
                         }&nbsp;
-                        {(!this.isVisible('tags')) && <a  className='btn btn-primary' onClick={() => this.setVisible('tags')}><Tags size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Tags</a>
+                        {(!this.isVisible('tags')) && <a  className='btn btn-primary' onClick={() => this.setVisible('tags')}><Tags size={26}  />&nbsp;<span className="d-none d-md-inline-block">Tags</span></a>
                         }
                     </div>
                    
