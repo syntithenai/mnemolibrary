@@ -82,7 +82,10 @@ export default class SearchPage extends Component {
     //};
     
     render() {
-
+         let techniques = this.props.mnemonic_techniques.map((technique, key) => {
+              
+              return <option  key={key} value={technique}  >{technique}</option>
+            })
         return (
         <div>
                 <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</a>
@@ -90,7 +93,7 @@ export default class SearchPage extends Component {
               
                 <form className="form-inline" onSubmit={(e) => e.preventDefault()}>
                   <DebounceInput className="form-control" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter} placeholder="Search" aria-label="Search" debounceTimeout={300} />
-                  <select className="form-control" value={this.state.techniqueFilter}  onChange={this.setTechniqueFilter} ><option></option><option>Rhyme</option><option>Association</option><option>Homonym</option><option>Acronym</option><option>Alliteration</option><option>Association</option></select>
+                  <select className="form-control" value={this.state.techniqueFilter}  onChange={this.setTechniqueFilter} ><option></option>{techniques}</select>
                   <button className="btn btn-outline-success" type="submit" ><Search/></button>
                 </form>
                 <QuestionList questions={this.state.questions} setQuiz={this.props.setQuiz} ></QuestionList>

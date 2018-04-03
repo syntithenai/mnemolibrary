@@ -142,7 +142,7 @@ export default class QuizCarousel extends Component {
             }
           }
       }
-      this.props.updateProgress(user);
+      //this.props.updateProgress(user);
   }; 
     
     currentQuestion() {

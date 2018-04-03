@@ -24,11 +24,11 @@ export default class CreatePage extends Component {
                 link:question.link?question.link:'', 
                 tags:question.tags?question.tags:''
             },
-            showHelp:false
+            showHelp:false,
         }
         
        // console.log(['constr',this.state]);
-        
+    
     };
     
     saveQuestion(e) {
@@ -76,30 +76,40 @@ export default class CreatePage extends Component {
             )
              
         } else {
+            let techniques = this.props.mnemonic_techniques.map((technique, key) => {
+              
+              return <option  key={key} value={technique}  >{technique}</option>
+            })
             return (
-                <div className="row">
+            
+            // TAGS https://www.npmjs.com/package/react-tag-autocomplete
+                <div className="questionform">
                     
-                    <div className="col-12  card">
                         <form method="POST" onSubmit={this.saveUser} className="form-group" autoComplete="false" >
                           <h3 className="card-title">Create A Question</h3>
                           <a  href='#' onClick={() => this.showHelp()} className='btn btn-info ' style={{'float':'right'}}>
                        Help
                       </a>
-                        <div className='col-12 warning-message'>{this.state.warning_message}</div>
-                       
+                      <div className="row" >
+                        <div className='col-12  warning-message'>{this.state.warning_message}</div>
+                         <div className='col-12' ><label htmlFor="topic" className='row'>Topic </label><b>{this.state.question.topic}</b></div>
+                            
+                            
+                        <div className='col-6 col-sm-12'>
                             <label htmlFor="interrogative" className='row'>Interrogative </label><input autoComplete="false" id="interrogative" type='text' name='v' onChange={this.change} value={this.state.question.interrogative} />
                             
                             <label htmlFor="question" className='row'>Question </label><textarea autoComplete="false" id="question" type='text' name='question' onChange={this.change} value={this.state.question.question} ></textarea>
                             
+                            <label htmlFor="answer" className='row'>Answer </label><textarea autoComplete="false" id="answer" type='text' name='answer' onChange={this.change} value={this.state.question.answer} ></textarea>
+                            <label htmlFor="link" className='row'>Link </label><input autoComplete="false" id="link" type='text' name='link' onChange={this.change} value={this.state.question.link} />
+                            
+                        </div><div className='col-6  col-sm-12'>    
                             <label htmlFor="mnemonic" className='row'>Mnemonic </label><textarea autoComplete="false" id="mnemonic" type='text' name='mnemonic' onChange={this.change} value={this.state.question.mnemonic}></textarea>
                             
-                            <label htmlFor="technique" className='row'>Technique </label><select autoComplete="false" id="technique" type='text' name='technique' onChange={this.change} value={this.state.question.technique} ><option/></select>
+                            <label htmlFor="technique" className='row'>Technique </label><select autoComplete="false" id="technique" type='text' name='technique' onChange={this.change} value={this.state.question.technique} ><option/>{techniques}</select>
                             
-                            <label htmlFor="answer" className='row'>Answer </label><textarea autoComplete="false" id="answer" type='text' name='answer' onChange={this.change} value={this.state.question.answer} ></textarea>
                             
-                            <label htmlFor="topic" className='row'>Topic </label><select autoComplete="false" id="topic" type='text' name='topic' onChange={this.change} value={this.state.question.topic} ><option/></select>
                             
-                            <label htmlFor="link" className='row'>Link </label><input autoComplete="false" id="link" type='text' name='link' onChange={this.change} value={this.state.question.link} />
                             
                             <label htmlFor="tags" className='row'>Tags </label><input autoComplete="false" id="tags" type='text' name='tags' onChange={this.change} value={this.state.question.tags} />
                             
@@ -107,10 +117,11 @@ export default class CreatePage extends Component {
                             <br/>
                             <br/>
                             <button  className='btn btn-info'>Save</button>
-                        </form>
-                        <br/>
+                        </div>
                     </div>
-                </div>
+                    </form>
+                    <br/>
+            </div>
             )
             
         }

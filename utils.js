@@ -48,10 +48,12 @@ module.exports = {
         var relatedTags = {};
         var tagTopics = {};
         var topicTags = {};
+        var updatedQuestions = [];
         // collate quizzes and tags
         let indexedQuestions= {};
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
+            question.tags = question.tags ? question.tags.trim().toLowerCase() : '';
             if (question.access=="public") {
                 var id = question._id ? question._id :  new ObjectId();
                 question._id = id;

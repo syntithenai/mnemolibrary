@@ -64,7 +64,9 @@ export default class AppLayout extends Component {
           tagFilter : null,
           response : null,
           user:null,
-          token:null
+          token:null,
+          mnemonic_techniques :	["homonym","association","alliteration","rhyme","acronym","mnemonic major system","visual"],
+          topicCollections:[]
       }
       // make 'this' available in setCurrentPage function
       this.setCurrentPage = this.setCurrentPage.bind(this);
@@ -106,6 +108,7 @@ export default class AppLayout extends Component {
         this.finishQuiz = this.finishQuiz.bind(this);
         this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
         this.setCurrentQuestion = this.setCurrentQuestion.bind(this);
+        this.setCurrentQuiz = this.setCurrentQuiz.bind(this);
         
         // listen to messages from child iframe
         //window.addEventListener('message', function(e) {
@@ -132,6 +135,16 @@ export default class AppLayout extends Component {
       }).then(function(json) {
         //console.log(['create indexes', json])
         that.setState(json);
+      }).catch(function(ex) {
+        console.log(['parsing failed', ex])
+      })
+      fetch('/api/topiccollections')
+      .then(function(response) {
+        //console.log(['got response', response])
+        return response.json()
+      }).then(function(json) {
+        //console.log(['create indexes', json])
+        that.setState({topicCollections:json});
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })
@@ -518,15 +531,15 @@ export default class AppLayout extends Component {
             
             {this.isCurrentPage('home') && <QuizCarousel setQuizFromTag={this.setQuizFromTag} setCurrentQuestion={this.setCurrentQuestion} finishQuiz={this.finishQuiz}  discoverQuestions={this.discoverQuestions}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz}  /> }
             
-            {this.isCurrentPage('topics') && <TopicsPage topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage}/>
+            {this.isCurrentPage('topics') && <TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage}/>
             }
             {this.isCurrentPage('tags') && <TagsPage  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
             }
-            {this.isCurrentPage('search') && <SearchPage setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
+            {this.isCurrentPage('search') && <SearchPage mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
             }
             {this.isCurrentPage('review') && <ReviewPage setQuizFromTag={this.setQuizFromTag}  setCurrentQuestion={this.setCurrentQuestion} discoverQuestions={this.discoverQuestions}  getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} currentQuestion={this.state.currentQuestion} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
             }
-            {this.isCurrentPage('create') && <CreatePage saveQuestion={this.saveQuestion}  />
+            {this.isCurrentPage('create') && <CreatePage mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion}  />
             }
             {this.isCurrentPage('about') && <AboutPage setCurrentPage={this.setCurrentPage} />
             }

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import QuizList from './QuizList';
+import QuizCollection from './QuizCollection';
 import Utils from './Utils';
-import FaClose from 'react-icons/lib/fa/close';
+//import FaClose from 'react-icons/lib/fa/close';
 
 export default class TopicsPage extends Component {
     constructor(props) {
@@ -69,7 +70,8 @@ export default class TopicsPage extends Component {
                   <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</a>
               
                 </form>
-                <QuizList quizzes={this.state.topics} setQuiz={this.props.setQuiz} ></QuizList>                
+                {this.state.titleFilter.length>0 && <QuizList quizzes={this.state.topics} setQuiz={this.props.setQuiz} ></QuizList>}
+                {this.state.titleFilter.length === 0 && <QuizCollection collection={this.props.topicCollections} quizzes={this.state.topics} setQuiz={this.props.setQuiz} ></QuizCollection>}
             </div>
 
         )
