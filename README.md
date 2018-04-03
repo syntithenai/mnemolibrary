@@ -16,6 +16,10 @@ The login system is provided using an Open Auth server based on https://github.c
 - refresh on access token timeout
 - trial authenticate
 
+
+// to insteall npm packages on live sserver (when non starting)
+docker run -v /var/docker/mnemolibrary:/usr/src/app --entrypoint=/bin/bash -it syntithenai/nemo
+
 # LINKS
 
 # swipe react
