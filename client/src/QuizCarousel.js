@@ -89,7 +89,7 @@ export default class QuizCarousel extends Component {
                 //questions.successTally[id] = questions.successTally.hasOwnProperty(id) ? questions.successTally[id] + 1 : 1;
                 //this.setState({ 'success': success});
                 //console.log(['success',this.props.currentQuestion]);
-                this.props.setCurrentQuestion(parseInt(this.props.currentQuestion) + 1);
+                this.props.setCurrentQuestion(parseInt(this.props.currentQuestion,10) + 1);
                 this.logStatus('success',id);
             }
       } else if (response === "previous") {
@@ -134,10 +134,11 @@ export default class QuizCarousel extends Component {
               this.finishQuiz();
             }  else {
                 // move forward one question and strip blocked questions from currentQuiz 
-                let currentQuestion = this.state.currentQuestion;
+                let currentQuestion = this.props.currentQuestion;
+                console.log(['block',currentQuestion]);
                 let currentQuiz = this.props.currentQuiz;
-                currentQuiz.splice(currentQuestion,1);
-                this.props.setCurrentQuestion(this.props.currentQuestion + 1);
+                currentQuiz.splice(parseInt(currentQuestion,10),1);
+               // this.props.setCurrentQuestion(this.props.currentQuestion + 1);
                 this.props.setCurrentQuiz(currentQuiz);
             }
           }
@@ -207,7 +208,7 @@ export default class QuizCarousel extends Component {
             if (this.state.showList) {
                 let listQuestions = this.getQuestions(this.props.currentQuiz);
                 let label='Start' ;
-                if (parseInt(this.props.currentQuestion) > 0) {
+                if (parseInt(this.props.currentQuestion,10) > 0) {
                     label='Continue' ;
                 }
                 content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList questions={listQuestions} setQuiz={this.setQuizQuestion}  ></QuestionList></div>);

@@ -26,6 +26,8 @@ router.post('/import', (req, res) => {
             console.log(['e',err]);
             return;
         }
+        // clear and reimport topicCollections
+        
         //console.log(['response',response]);
         Papa.parse(response, {
             'header': true, 
@@ -415,10 +417,11 @@ router.get('/review', (req, res) => {
      let orderBy = (req.body.orderBy == 'successRate') ? 'successRate' : 'timeScore'
      let orderMeBy = {};
      orderMeBy[orderBy] = 1;          
-     let criteria={user:req.query.user};
-     criteria.block = {$exists:false}
+     let criteria=[];
+     criteria.push({user:req.query.user});
+     criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
      if (req.query.user && req.query.user.length > 0) {
-        db.collection('userquestionprogress').find(criteria).sort(orderMeBy).limit(limit).toArray().then(function(questions) {
+        db.collection('userquestionprogress').find({$and:criteria}).sort(orderMeBy).limit(limit).toArray().then(function(questions) {
             console.log(questions);
             //let questions=[];
             if (questions) {
@@ -523,7 +526,7 @@ router.get('/questions', (req, res) => {
         // SEARCH BY topic
         } else  if (req.query.topic && req.query.topic.length > 0) {
             criteria.push({'quiz': req.query.topic});
-            db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
+            db.collection('questions').find({$and:criteria}).sort({question:1}).toArray(function(err, results) {
               res.send({'questions':results});
             })
         // SEARCH BY tag
@@ -658,93 +661,8 @@ function updateQuestionTallies(user,question,tallySuccess=false) {
         console.log(['update q err',e]);
     });
      
-    //db.collection('seen').find({question:question}).toArray(function(err, seens) {
-        //console.log(['seen found many to q']);
-        //db.collection('successes').find({question:question}).toArray(function(err, successes) {
-            //console.log(['seen found successes']);
-            //// save to seenTally, successScore
-            //let score = successes.length > 0 ? seens.length/successes.length : 0;
-            //db.collection('questions').updateOne({_id: ObjectId(question)},{$set:{seenTally:seens.length,successScore:score}});
-            //console.log(['seen done']);
-            //res.send({});
-        //});
-    //});
+
 }
-
-
-//function updateUserTallies(user,question,tallySuccess=false) {
-  ////  console.log(['update user tallies',user,question,tallySuccess]);
-     //// update user progress stats
-  //db.collection('progress').findOne({user:user}).then(function(progress) {
-      ////console.log(['update user tallies prog',progress]);
-     //let insert=false;
-     //if (progress) {
-         ////update
-     //} else {
-         //// insert
-         //insert=true;
-         //progress = {user:user,'seen':{},'success':{},'seenTally':{},'successTally':{},'successRate':{},'timeScore':{},'block':{},'likes':{}}
-     //}
-     //progress.seen[question]=new Date().getTime();
-     //progress.seenTally[question] = progress.seenTally[question] ? parseInt(progress.seenTally[question],10) : 1;
-     //if (tallySuccess) {
-         //progress.success[question]=new Date().getTime();
-         //progress.successTally[question] = progress.successTally[question] ? parseInt(progress.successTally[question],10) : 1;
-     //}
-     //progress.successRate[question] = progress.seenTally[question] ? progress.successTally[question]/progress.seenTally[question] : 0;
-     
-     //// lookup timestamps for timeScore calculation
-    //db.collection('seen').findOne({question:question,user:user}).then(function( seenResult) {
-       //// console.log(['seenResult',seenResult]);
-        //db.collection('successes').findOne({question:question,user:user}).then(function( successResult) {
-         ////   console.log(['successResult',successResult]);
-             //// update question progress stats
-             //let seen = seenResult ? seenResult.timestamp : 0;
-             //let success = successResult ? successResult.timestamp : 0;
-             //const time = new Date().getTime();
-              //var timeDiff = 0;
-              //if (success > 0) {
-                  //timeDiff = seen - success;
-              //} else {
-                  //timeDiff = time - seen;
-              //}
-              //let data={};
-              //progress.seenTally[question] = progress.seenTally[question]? parseInt(progress.seenTally[question],10) + 1 : 1;
-              //let successTally=0;
-              //if (success > 0) {
-                  //successTally = progress.successTally[question] ? parseInt(progress.successTally[question],10) + 1 : 1 ;
-              //}
-              ////console.log(['tallySuccess',tallySuccess]);
-              //if (tallySuccess) progress.successTally[question] = successTally;
-              //progress.timeScore[question] = (successTally + timeDiff* 0.00000001)/progress.seenTally[question] ;
-              //progress.successRate[question] = successTally/progress.seenTally[question];
-              //console.log(['save progress',timeDiff]);
-             ////if (insert) {
-                 ////db.collection("progress").insert(progress).then(function() {
-                    ////console.log(['progress inserted']);  
-                    //////updateUserQuestionProgress(user,question,progress);
-                 ////}).catch(function(e) {
-                    ////console.log(['err',e]);
-                ////});
-            ////} else {
-                //////console.log(['refuse progress updated',progress._id,progress]); 
-                ////db.collection("progress").replaceOne({_id:progress._id},progress).then(function(resp) {
-                    ////console.log(['progress updated',resp.result]); 
-                    //updateUserQuestionProgress(user,question,progress);
-                 ////}).catch(function(e) {
-                    ////console.log(['err',e]);
-                ////});
-            ////}
-             
-        //});
-    //});
-     
-     
-  //}).catch(function(e) {
-      //console.log(['err',e]);
-  //});
-    
-//}
 
 function updateUserQuestionProgress(user,question,tallySuccess) {
     //return;
@@ -755,6 +673,8 @@ function updateUserQuestionProgress(user,question,tallySuccess) {
         progress.seenTally = progress.seenTally ? parseInt(progress.seenTally,10) + 1 : 1;
         if (tallySuccess) progress.successTally = progress.successTally ? parseInt(progress.successTally,10) + 1 : 1;
         progress.successRate = (parseInt(progress.successTally,10) > 0 && parseInt(progress.seenTally,10) > 0) ? progress.successTally/progress.seenTally : 0;
+        progress.block=0;
+                            
         //db.collection('questions').findOne({_id:ObjectId(question)}).then(function( question) {
             //console.log('looked up q',question);
             //if (question) {
@@ -839,9 +759,6 @@ router.post('/seen', (req, res) => {
            
             
             
-        }).catch(function(e) {
-            console.log(e);
-            res.send('err on find');
         });
     } else {
         res.send({message:'Invalid request'});

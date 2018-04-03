@@ -37,11 +37,11 @@ router.get('/confirm',function(req,res) {
       //  console.log(['APPROVE USER',params]); //,token,params,req]);    
           User.findOne({ token:params.code})
             .then(function(user)  {
-                let now = new Date();
-                let expire = new Date(token.accessTokenExpiresAt)
-                if (now >= expire) {
-                    res.send('token expired try recover password' );
-                } else {
+                //let now = new Date();
+                //let expire = new Date(token.accessTokenExpiresAt)
+                //if (now >= expire) {
+                    //res.send('token expired try recover password' );
+                //} else {
                     
                     if (user != null) {
                         //console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
@@ -86,7 +86,7 @@ router.get('/confirm',function(req,res) {
                     } else {
                         res.send('no matching registration' );
                     }
-                }
+               // }
             }).catch(function(e) {
                 console.log(['failed',e]);
                 res.send('failed');

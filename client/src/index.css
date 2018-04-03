@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  padding-top: 6rem;
+  padding-top: 8rem;
   padding-left: 1rem;
 }
 .aboutpage div {
@@ -49,4 +49,8 @@ iframe {
 .warning-message {
   color: red;
   font-size: 1.5em;   
+}
+
+.navbar .nav-item {
+    font-size: 1.5em;
 }

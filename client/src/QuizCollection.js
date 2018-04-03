@@ -19,7 +19,7 @@ export default class QuizCollection extends Component {
                           </div>  
                       </div>
               }
-              return
+              return '';
               
             })
             //<a onClick={() => this.props.setQuiz()}  href="#"  className="btn btn-info" style={{float:'right'}}  >More</a>

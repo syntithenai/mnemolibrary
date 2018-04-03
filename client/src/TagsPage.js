@@ -32,7 +32,7 @@ export default class TagsPage extends Component {
                 //console.log(word);
                 // collate on tag
                 if (tag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
-                    word.value = word.value*20;
+                    word.value *= 20;
                     tagsCollation[tag]=word;
                 }
                 // check related

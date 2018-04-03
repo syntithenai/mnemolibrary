@@ -9,7 +9,7 @@ export default class TermsOfUse extends Component {
         <h3>Terms of use</h3>
  
 <ol> 
-<li>Agreement to be bound
+<li>
 By using our service you agree to be bound by the terms of agreement, which may change from time to time.
 </li>
 <li>

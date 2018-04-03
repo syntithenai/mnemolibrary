@@ -1,3 +1,4 @@
+/* global gapi */
 import React, { Component } from 'react';
 
 import Navigation from './Navigation';
@@ -221,7 +222,9 @@ export default class AppLayout extends Component {
       state.token = '';
       state.currentPage = 'home';
       this.setState(state);
-      //console.log('logout at root');
+      let GoogleAuth = gapi.auth2.getAuthInstance();
+      GoogleAuth.disconnect();
+    //console.log('logout at root');
       
   };
         
@@ -271,7 +274,7 @@ export default class AppLayout extends Component {
 
     setCurrentQuestion(id) {
         console.log(['set current question',id]);
-        this.setState({currentQuestion:parseInt(id)});
+        this.setState({currentQuestion:parseInt(id,10)});
     };
     
   isCurrentPage(page) {
@@ -434,10 +437,10 @@ export default class AppLayout extends Component {
   };
   setQuizFromQuestion(question) {
       //console.log(['SQFQ',question,question._id]);
-      this.setQuizFromTopic(question.quiz)
+      this.setQuizFromTopic(question.quiz,question._id)
   };
-  setQuizFromTopic(topic) {
-       console.log(['set quiz from topic']);
+  setQuizFromTopic(topic,currentQuestionId=null) {
+       console.log(['set quiz from topic',currentQuestionId]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
@@ -449,13 +452,20 @@ export default class AppLayout extends Component {
         console.log(['create indexes', json])
         let currentQuiz = [];
         let indexedQuestions= {};
+        let currentQuestion=0;
+        let j=0;
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
             var id = question._id;
+            if (currentQuestionId && currentQuestionId===id) {
+                currentQuestion=j;
+                console.log(['ID match',id, j])
+            }
             currentQuiz.push(id);
             indexedQuestions[id]=questionKey;
+            j++;
         }
-        that.setState({currentPage:"home",'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  Utils.snakeToCamel(topic)});
+        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  Utils.snakeToCamel(topic)});
         console.log(['set state done', that.state])
       }).catch(function(ex) {
         console.log(['parsing failed', ex])

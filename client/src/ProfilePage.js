@@ -61,7 +61,8 @@ export default class ProfilePage extends Component {
         if (this.state.user && 
         (this.state.user.username==="stever@syntithenai.com" 
             || this.state.user.username==="syntithenai@gmail.com" 
-            || this.state.user.username==="TrevorRyan123@gmail.com")) {
+            || this.state.user.username==="mnemoslibrary@gmail.com" 
+            || this.state.user.username.toLowerCase()==="trevorryan123@gmail.com")) {
             return true;
         }
         return false;

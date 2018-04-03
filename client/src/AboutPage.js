@@ -6,7 +6,7 @@ export default class AboutPage extends Component {
         return  (
         <div className="aboutpage" >
         
-            <nav className='nav' style={{float:'right'}}>
+            <nav className='nav' >
                 <button className='btn btn-info' onClick={() => this.props.setCurrentPage('intro')}>Getting Started</button>
                 <button className='btn btn-info' onClick={() => this.props.setCurrentPage('termsofuse')}>Terms Of Use</button>
             </nav>

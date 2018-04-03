@@ -79,9 +79,8 @@ export default class LoginPage extends Component {
     parseJSON(response) {
       return response.json()
     }
-    
     googleLogin(user) {
-      //  console.log(['glogin ',user]);
+        console.log(['glogin ',user]);
         fetch('/login/googlesignin', {
           method: 'POST',
           headers: {

@@ -13,7 +13,7 @@ function connect(connectString='') {
   if (connectString.length == 0) {
       connectString = config.databaseConnection + config.database;
   }
-  mongoose.connect(connectString,{useMongoClient: true}).then(() => {
+  mongoose.connect(connectString,{}).then(() => {
     console.log('Mongoose Connected');
   }).catch((err) => {
     console.log(err);
