@@ -79,9 +79,9 @@ export default class SingleQuestion extends Component {
                     </span> 
           let tags = question.tags.split(",").map((tag, key) => {
               tag=tag.trim().toLowerCase();
-              return <button className="btn btn-outline btn-primary" key={key}  ><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTag({text:tag})} style={{float:'right'}}/><<span className="hidden-sm-down" >&nbsp;{tag}&nbsp;</span></button>
+              return <button className="btn btn-outline btn-primary" key={key}  ><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTag({text:tag})} style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{tag}&nbsp;</span></button>
             })
-            //Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.blockDiscoveryTag(tag)} />
+            //<Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.blockDiscoveryTag(tag)} />
         
         let tagsClean = question.tags.split(",").map((tag, key) => {
               
