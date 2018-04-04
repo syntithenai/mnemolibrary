@@ -59,7 +59,18 @@ export default class CreatePage extends Component {
         return false;
     };
     
-    render() { //req,vars/
+    render() {
+        return (
+        <div >
+        
+              Mnemos Library is just getting started and we want your help. <br/>  
+              <b>Coming soon</b> you will be able to add your own questions and mnemonics for better control over your learning.
+              
+        </div>
+        )
+    };
+    
+    erender() { //req,vars/
         if (this.state.showHelp) {
             return (
                 <div className="row">

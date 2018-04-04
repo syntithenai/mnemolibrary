@@ -117,9 +117,9 @@ export default class SingleQuestion extends Component {
                         
                         {(!this.isVisible('moreinfo') && !target) && <button  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
                         }
-                        {(!this.isVisible('moreinfo') && target) && <a  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
+                        {(!this.isVisible('moreinfo') && target) && <button  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
                         }&nbsp;
-                        {(!this.isVisible('tags')) && <a  className='btn btn-primary' onClick={() => this.setVisible('tags')}><Tags size={26}  />&nbsp;<span className="d-none d-md-inline-block">Tags</span></a>
+                        {(!this.isVisible('tags')) && showRecallButton && <button  className='btn btn-primary' onClick={() => this.setVisible('tags')}><Tags size={26}  />&nbsp;<span className="d-none d-md-inline-block">Tags</span></button>
                         }
                     </div>
                    
@@ -136,7 +136,7 @@ export default class SingleQuestion extends Component {
                     
                 </div>}
                  
-                {this.isVisible('tags') && !showRecallButton && <div className="row buttons tags" >
+                {!showRecallButton && <div className="row buttons tags" >
                   <b>&nbsp;&nbsp;Tags&nbsp;&nbsp;&nbsp;</b>
                    {tags}
                 </div>}

@@ -553,7 +553,7 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('about') && <AboutPage setCurrentPage={this.setCurrentPage} />
             }
-            {this.isCurrentPage('intro') && <IntroPage/>
+            {this.isCurrentPage('intro') && <IntroPage setCurrentPage={this.setCurrentPage} />
             }
             {this.isCurrentPage('termsofuse') && <TermsOfUse/>
             }

@@ -193,10 +193,18 @@ router.post('/recover', function(req, res) {
                      var host = hostParts[0];
                         
                        var link = req.protocol + "://"  + host + ':4000/login/recover?code='+item.token;
-                       var mailTemplate =  mustache.render(`<div>Welcome to mnemonic boosted learning. 
-                                  
-                                  <a href="{{link}}" >Confirm your password update</a>
-                                  </div>`,{link:link});
+                       var mailTemplate =  mustache.render(`<div>Hi {{name}}! <br/>
+
+
+To confirm your password recovery of your account with Mnemos Library, please click the link below.<br/>
+
+<a href="{{link}}" >Confirm your password update</a><br/>
+
+If you did not recently request a password recovery for your Mnemo's Library account, please ignore this email.<br/><br/>
+
+Mnemo's Library
+
+                                  </div>`,{link:link,name:item.name});
        //                console.log(mailTemplate);
                                 //res.redir(config.authorizeUrl);
                        utils.sendMail(config.mailFrom,req.body.email,'Update your password on Mnemos Library',
@@ -258,10 +266,21 @@ router.post('/signup', function(req, res) {
                                  var link = req.protocol + "://"  + host + ':4000/login/confirm?code='+token.access_token;
                                 //res.redir(config.authorizeUrl);
                                   utils.sendMail(config.mailFrom,req.body.username,'Confirm your registration with Nemos Library',
-                                  mustache.render(`<div>Welcome to mnemonic boosted learning. Stay up to date ..
+                                  mustache.render(`<div>Hi {{name}}! <br/>
+
+Welcome to Mnemo's Library.<br/>
+
+To confirm your registration, please click the link below.<br/>
+
+<a href="{{link}}" >Confirm registration</a><br/>
+
+If you did not recently register with Mnemo's Library, please ignore this email.<br/><br/>
+
+Mnemo's Library
+
                                   
-                                  <a href="{{link}}" >Confirm your registration</a>
-                                  </div>`,{link:link})
+                                  
+                                  </div>`,{link:link,name:item.name})
                               );
                               item.signup_warning_message = 'Check your email to confirm your sign up.';
                               res.send(item);

@@ -57,7 +57,7 @@ export default class Navigation extends Component {
               <li className="nav-item">
                 <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('review')} >Review</a>
               </li>
-              {this.props.isLoggedIn() && false && 
+              {this.props.isLoggedIn() && 
               <li className="nav-item">
                 <a className="nav-link"  href="#" onClick={() => this.props.setCurrentPage('create')}>Create</a>
               </li>}
@@ -82,4 +82,4 @@ export default class Navigation extends Component {
     };
     
 }
-Navigation.pageTitles= {'home':'Mnemos Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'','about':'About Nemo','info':'Getting Started','login':''}
+Navigation.pageTitles= {'home':'Mnemos Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','about':'About Nemo','info':'Getting Started','login':''}

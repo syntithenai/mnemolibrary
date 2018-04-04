@@ -48,17 +48,21 @@ router.post('/import', (req, res) => {
                        let questionPromises=[];
                        for (var a in json[collection]) {
                          //  console.log([a]); //,json[collection][a]]);
-                            if (json[collection][a] && json[collection][a].hasOwnProperty('_id')) {
-                                let id = json[collection][a]._id;  
+                            if (json[collection][a]) {
                                 let record =  json[collection][a];
                                 if (collection === "questions") {
                                     record.successRate = Math.random()/100; // randomisation to get started
+                                    console.log(['IMPORT',record]);
                           
                                 }
                                 // remove and restore id to allow update
-                                delete record._id;
-                                let thePromise = new Promise(function(resolve,reject) {
+                                let thePromise = null;
+                                if (json[collection][a].hasOwnProperty('_id')&& json[collection][a]._id.length > 0) {
+                                    let id = json[collection][a]._id;  
+                                    delete record._id;
+                                    thePromise = new Promise(function(resolve,reject) {
                                         db.collection(collection).update({_id:ObjectId(id)},{$set:record},{upsert:true}).then(function(resy) {
+                                            // console.log(['UPDATE',resy]);
                                             let newRecord={_id:id,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
                                             resolve(newRecord);
                                             
@@ -68,6 +72,20 @@ router.post('/import', (req, res) => {
                                         });
                                         
                                     })   
+                                } else {
+                                    thePromise = new Promise(function(resolve,reject) {
+                                        db.collection(collection).insert(record).then(function(resy) {
+                                           // console.log(['INSERT',resy]);
+                                            let newRecord={_id:resy.insertedIds[0],admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
+                                            resolve(newRecord);
+                                            
+                                        }).catch(function(e) {
+                                            console.log(['array update err',e]);
+                                            reject();
+                                        });;
+                                    })
+                                }
+                                
                                 if (collection === "questions") {
                                     questionPromises.push(thePromise);
                                 } else {
