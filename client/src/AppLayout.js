@@ -622,7 +622,7 @@ export default class AppLayout extends Component {
             {(showLogin) && <LoginPage token={this.state.token} login={this.login}/>
             }<br/>
             <Footer/>
-            <div className='addsbygoogle'></div>
+           
         </div>
         
     );
