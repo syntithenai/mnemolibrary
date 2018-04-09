@@ -17,6 +17,9 @@ import ProfilePage from './ProfilePage';
 import SearchPage from './SearchPage';
 import QuizCarousel from './QuizCarousel';
 import Footer from './Footer';
+import FindQuestions from './FindQuestions';
+import FAQ from './FAQ';
+
 
 //import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
@@ -50,7 +53,7 @@ export default class AppLayout extends Component {
       this.state = {
           title : "Mnemos Library",
           message: null,
-          currentPage: "home",
+          currentPage: "splash",
           currentQuestion: 0,
           questions: [],
           indexedQuestions: [],
@@ -67,7 +70,8 @@ export default class AppLayout extends Component {
           user:null,
           token:null,
           mnemonic_techniques :	["homonym","association","alliteration","rhyme","acronym","mnemonic major system","visual"],
-          topicCollections:[]
+          topicCollections:[],
+          discoveryBlocks:{tag:[],topic:[],technique:[]}
       }
       // make 'this' available in setCurrentPage function
       this.setCurrentPage = this.setCurrentPage.bind(this);
@@ -110,6 +114,10 @@ export default class AppLayout extends Component {
         this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
         this.setCurrentQuestion = this.setCurrentQuestion.bind(this);
         this.setCurrentQuiz = this.setCurrentQuiz.bind(this);
+        this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
+        this.clearDiscoveryBlock = this.clearDiscoveryBlock.bind(this);
+        this.clearDiscoveryBlocks = this.clearDiscoveryBlocks.bind(this);
+        this.setQuizFromTechnique = this.setQuizFromTechnique.bind(this);
         
         // listen to messages from child iframe
         //window.addEventListener('message', function(e) {
@@ -300,6 +308,35 @@ export default class AppLayout extends Component {
   getQuestionsByTopic(topic) {
       return this.state.topics[topic];
   }; 
+  
+  setDiscoveryBlock(type,id) {
+      this.clearDiscoveryBlock(type,id);
+      let discoveryBlocks = this.state.discoveryBlocks;
+      if (discoveryBlocks.hasOwnProperty(type) && Array.isArray(discoveryBlocks[type])) {
+          discoveryBlocks[type].push(id);
+      }
+      this.setState({'blocks':discoveryBlocks});
+      this.discoverQuestions();
+  };
+  
+  clearDiscoveryBlock(type,id) {
+      let discoveryBlocks = this.state.discoveryBlocks;
+      if (discoveryBlocks.hasOwnProperty(type) && Array.isArray(discoveryBlocks[type])) {
+          discoveryBlocks[type] = discoveryBlocks[type].filter(function(item) { 
+              return item !== id
+          })
+      }
+      this.setState({'blocks':discoveryBlocks});
+      this.discoverQuestions();
+  };
+  
+   clearDiscoveryBlocks() {
+      let discoveryBlocks = {tag:[],topic:[],technique:[]};
+      this.setState({'blocks':discoveryBlocks});
+      this.discoverQuestions();
+  };
+
+  
 
   // send an api request to like a question
   like(questionId) {
@@ -408,7 +445,10 @@ export default class AppLayout extends Component {
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
-      fetch('/api/discover?user='+(this.state.user ? this.state.user._id : '') + '&rand='+Math.random())
+      //?user='+(this.state.user ? this.state.user._id : '') + '&rand='+Math.random()
+      let rand=Math.random()
+      fetch('/api/discover',{ method: "POST",headers: {
+    "Content-Type": "application/json"},body:JSON.stringify({user:(this.state.user ? this.state.user._id : ''),rand:rand,blocks:this.state.discoveryBlocks})})
       .then(function(response) {
         console.log(['got response', response])
         return response.json()
@@ -440,7 +480,7 @@ export default class AppLayout extends Component {
       this.setQuizFromTopic(question.quiz,question._id)
   };
   setQuizFromTopic(topic,currentQuestionId=null) {
-       console.log(['set quiz from topic',currentQuestionId]);
+       console.log(['set quiz from topic',topic,currentQuestionId]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
@@ -465,6 +505,7 @@ export default class AppLayout extends Component {
             indexedQuestions[id]=questionKey;
             j++;
         }
+        console.log(currentQuiz);
         that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  Utils.snakeToCamel(topic)});
         console.log(['set state done', that.state])
       }).catch(function(ex) {
@@ -506,16 +547,34 @@ export default class AppLayout extends Component {
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })
-      //const questions = this.getQuestionsByTag(tag.text);
-      ////questions.filter(e => !this.state.users.default.questions.blocked.hasOwnProperty(e));
-      //this.setQuiz('Tag - '+tag.text,questions);
-      //const time = new Date().getTime();
-      //let user = this.state.users.default;
-      //user.tags[tag] = time;
-      //this.updateProgress(user);
-     
   };
-  
+  setQuizFromTechnique(tag) {
+     let that=this;
+     console.log(['set quiz form tag',tag]);
+      //this.setState({'currentQuiz':'1,2,3,4,5'});
+      // load initial questions
+      fetch('/api/questions?technique='+tag )
+      .then(function(response) {
+        console.log(['got response', response])
+        return response.json()
+      }).then(function(json) {
+        console.log(['create indexes', json])
+        let currentQuiz = [];
+        let indexedQuestions= {};
+        for (var questionKey in json['questions']) {
+            const question = json['questions'][questionKey]
+            var id = question._id;
+            currentQuiz.push(id);
+            indexedQuestions[id]=questionKey;
+        }
+        that.setCurrentPage('home');
+        that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Technique '+ Utils.snakeToCamel(tag)});
+        console.log(['set state done', that.state])
+         //that.setState({});
+      }).catch(function(ex) {
+        console.log(['parsing failed', ex])
+      })
+  };  
   clearTagFilter() {
       this.setState({'tagFilter':null});
   };
@@ -537,9 +596,10 @@ export default class AppLayout extends Component {
         <div className="mnemo">
             <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
             <div className='page-title'><h4>{this.state.title}</h4></div>
-            {this.state.message && <div className='page-message' >{this.state.message}</div>}
+            {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
+            {this.isCurrentPage('splash') && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} /></div>}
             
-            {this.isCurrentPage('home') && <QuizCarousel setQuizFromTag={this.setQuizFromTag} setCurrentQuestion={this.setCurrentQuestion} finishQuiz={this.finishQuiz}  discoverQuestions={this.discoverQuestions}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz}  /> }
+            {this.isCurrentPage('home') && <QuizCarousel setQuizFromTechnique={this.setQuizFromTechnique} setQuizFromTopic={this.setQuizFromTopic} setDiscoveryBlock={this.setDiscoveryBlock} clearDiscoveryBlock={this.clearDiscoveryBlock} blocks={this.state.discoveryBlocks}  setQuizFromTag={this.setQuizFromTag} setCurrentQuestion={this.setCurrentQuestion} finishQuiz={this.finishQuiz}  discoverQuestions={this.discoverQuestions}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz}  /> }
             
             {this.isCurrentPage('topics') && <TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage}/>
             }
@@ -547,7 +607,7 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('search') && <SearchPage mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
             }
-            {this.isCurrentPage('review') && <ReviewPage setQuizFromTag={this.setQuizFromTag}  setCurrentQuestion={this.setCurrentQuestion} discoverQuestions={this.discoverQuestions}  getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} currentQuestion={this.state.currentQuestion} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
+            {this.isCurrentPage('review') && <ReviewPage setQuizFromTechnique={this.setQuizFromTechnique} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromTopic={this.setQuizFromTopic} setDiscoveryBlock={this.setDiscoveryBlock} clearDiscoveryBlock={this.clearDiscoveryBlock} blocks={this.state.discoveryBlocks} setQuizFromTag={this.setQuizFromTag}  setCurrentQuestion={this.setCurrentQuestion} discoverQuestions={this.discoverQuestions}  getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} currentQuestion={this.state.currentQuestion} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
             }
             {this.isCurrentPage('create') && <CreatePage mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion}  />
             }
@@ -555,7 +615,9 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('intro') && <IntroPage setCurrentPage={this.setCurrentPage} />
             }
-            {this.isCurrentPage('termsofuse') && <TermsOfUse/>
+            {this.isCurrentPage('termsofuse') && <TermsOfUse  setCurrentPage={this.setCurrentPage} />
+            }
+            {this.isCurrentPage('faq') && <FAQ  setCurrentPage={this.setCurrentPage} />
             }
             {showProfile && <ProfilePage saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
             }

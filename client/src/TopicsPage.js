@@ -73,7 +73,6 @@ export default class TopicsPage extends Component {
                 {this.state.titleFilter.length>0 && <QuizList quizzes={this.state.topics} setQuiz={this.props.setQuiz} ></QuizList>}
                 {this.state.titleFilter.length === 0 && <QuizCollection collection={this.props.topicCollections} quizzes={this.state.topics} setQuiz={this.props.setQuiz} ></QuizCollection>}
             </div>
-
         )
     }
 };

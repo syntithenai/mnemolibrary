@@ -83,7 +83,7 @@ class App extends Component {
         for (var question in json['questions']) {
             var id = json['questions'][question].ID
             var quizList = json['questions'][question].quiz.split(',');
-            var tagList = json['questions'][question].tags.split(',')
+            var tagList = json['questions'][question].tags; //.split(',')
             //console.log(["COLLATE",id,quizList,tagList]);
             for (var quizKey in quizList) {
                 var quiz = quizList[quizKey];

@@ -5,6 +5,8 @@ var config = require("../config")
 var fetch = require('node-fetch');
 const mustache = require('mustache');
 const crypto = require("crypto"); 
+var faker = require('faker');
+
 const database = require('../oauth/database');
 const User = database.User;
 const OAuthAccessToken = database.OAuthAccessToken;
@@ -80,8 +82,7 @@ router.get('/me',function(req,res) {
 
 
 router.post('/saveuser', function(req, res) {
-    
-    //console.log(req.body);
+    console.log(req.body);
     if (req.body._id && req.body._id.length > 0) {
         if (req.body.password2 != req.body.password)  {
             res.send({warning_message:'Passwords do not match'});
@@ -93,16 +94,35 @@ router.post('/saveuser', function(req, res) {
                   console.log(err);
                   res.send({warning_message:err});
               } else if (item!=null) {
-                  item.name = req.body.name;
-                  // no update email address, item.username = req.body.username;
                   if (req.body.password && req.body.password.trim().length > 0) item.password=req.body.password;
-              //    console.log(['save new item',item]);
-                  db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(xres) {
-                        //res.redir(config.authorizeUrl);
-                      item.warning_message="Saved changes";
-                      res.send(item);
-                  });  
-                  
+                  item.name = req.body.name;
+                  // update avatar only when changed
+                  console.log(['CHECK AVATORA',item.avatar,req.body.avatar]);
+                  if (item.avatar != req.body.avatar) {
+                      db.collection(userModelName).findOne({avatar:{$eq:req.body.avatar}}, function(err, avUser) {
+                          if (avUser!=null) {
+                              console.log('FOUND');
+                              //avUser.;
+                              res.send({warning_message:"Avatar name is already taken, try something different."});
+                          } else {
+                              console.log('SET');
+                              item.avatar = req.body.avatar;
+                              // no update email address, item.username = req.body.username;
+                              //    console.log(['save new item',item]);
+                              db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(xres) {
+                                    //res.redir(config.authorizeUrl);
+                                  item.warning_message="Saved changes";
+                                  res.send(item);
+                              });  
+                          }
+                      });
+                  } else {
+                    db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(xres) {
+                            //res.redir(config.authorizeUrl);
+                          item.warning_message="Saved changes";
+                          res.send(item);
+                      });  
+                  }
               } else {
                   res.send({warning_message:'ERROR: No user found for update'});
               }
@@ -152,6 +172,7 @@ router.post('/googlesignin',function(req,res) {
               } else {
                   var pw = crypto.randomBytes(20).toString('hex');
                   let item={name:req.body.name,username:req.body.email,password:pw};
+                  if (!item.avatar) item.avatar = faker.commerce.productAdjective()+faker.name.firstName()+Math.round(Math.random()*10000000)
                   db.collection(userModelName).insert(item,function(err,result) {
                    sendToken(req,res,item);
                   })
@@ -227,78 +248,101 @@ Mnemo's Library
 
 
 router.post('/signup', function(req, res) {
-    if (req.body.username && req.body.username.length > 0 && req.body.name && req.body.name.length>0 && req.body.password && req.body.password.length>0 && req.body.password2 && req.body.password2.length>0) {
+    
+    if (req.body.username && req.body.username.length > 0 && req.body.name && req.body.name.length>0 && req.body.avatar && req.body.avatar.length>0 && req.body.password && req.body.password.length>0 && req.body.password2 && req.body.password2.length>0) {
         if (req.body.password2 != req.body.password)  {
             res.send({signup_warning_message:'Passwords do not match.'});
         } else {
-            db.collection(userModelName).findOne({username:req.body.username}, function(err, ditem) {
-              if (ditem!=null) {
-                  res.send({signup_warning_message:'An account with that email address already exists.'});
+             // update avatar only when changed
+            console.log('seek avatar');
+            db.collection(userModelName).find({avatar:{$eq:req.body.avatar}}).toArray().then(function(avUser) {
+              console.log(['found avatar',avUser]);
+              if (avUser!=null && avUser.length>0) {
+//                   avUser.warning_message="Avatar name is already taken, try something different.";
+                  console.log(['realy found avatar',avUser]);
+                  res.send({warning_message:'Avatar name is already taken, try something different.'});
               } else {
-                  let item={name:req.body.name,username:req.body.username,password:req.body.password};
-                  db.collection(userModelName).insert(item,function(err,result) {
-                      var params={
-                            username: item.username,
-                            password: req.body.password,
-                            'grant_type':'password',
-                            'client_id':config.clientId,
-                            'client_secret':config.clientSecret
-                      };
-                        fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            //Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
-                          },
-                          
-                          body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(token) {
-                            //console.log(['got token',token]);
-                            item.token = token.access_token;
-                            item.tmp_password=item.password;
-                            item.password='';
-                            db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(result2) {
-                                // console.log(['jjjjj']);
-                                 var hostParts = req.headers.host.split(":");
-                                 var host = hostParts[0];
-                                 var link = req.protocol + "://"  + host + ':4000/login/confirm?code='+token.access_token;
-                                //res.redir(config.authorizeUrl);
-                                  utils.sendMail(config.mailFrom,req.body.username,'Confirm your registration with Nemos Library',
-                                  mustache.render(`<div>Hi {{name}}! <br/>
+                  console.log(['set avatar',req.body.avatar]);
+                  
+                db.collection(userModelName).findOne({username:req.body.username}, function(err, ditem) {
+                  if (ditem!=null) {
+                      res.send({warning_message:'An account with that email address already exists.'});
+                  } else {
+                      let item={name:req.body.name,username:req.body.username,password:req.body.password,avatar:req.body.avatar};
+                      db.collection(userModelName).insert(item,function(err,result) {
+                          var params={
+                                username: item.username,
+                                password: req.body.password,
+                                'grant_type':'password',
+                                'client_id':config.clientId,
+                                'client_secret':config.clientSecret
+                          };
+                         // no update email address, item.username = req.body.username;
+                          //    console.log(['save new item',item]);
+                          db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(xres) {
+                                      fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
+                                          method: 'POST',
+                                          headers: {
+                                            'Content-Type': 'application/x-www-form-urlencoded',
+                                            //Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
+                                          },
+                                          
+                                          body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+                                        }).then(function(response) {
+                                            return response.json();
+                                        }).then(function(token) {
+                                            //console.log(['got token',token]);
+                                            item.token = token.access_token;
+                                            item.tmp_password=item.password;
+                                            item.password='';
+                                            db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(result2) {
+                                                // console.log(['jjjjj']);
+                                                 var hostParts = req.headers.host.split(":");
+                                                 var host = hostParts[0];
+                                                 var link = req.protocol + "://"  + host + ':4000/login/confirm?code='+token.access_token;
+                                                //res.redir(config.authorizeUrl);
+                                                  utils.sendMail(config.mailFrom,req.body.username,'Confirm your registration with Nemos Library',
+                                                  mustache.render(`<div>Hi {{name}}! <br/>
 
-Welcome to Mnemo's Library.<br/>
+                                Welcome to Mnemo's Library.<br/>
 
-To confirm your registration, please click the link below.<br/>
+                                To confirm your registration, please click the link below.<br/>
 
-<a href="{{link}}" >Confirm registration</a><br/>
+                                <a href="{{link}}" >Confirm registration</a><br/>
 
-If you did not recently register with Mnemo's Library, please ignore this email.<br/><br/>
+                                If you did not recently register with Mnemo's Library, please ignore this email.<br/><br/>
 
-Mnemo's Library
+                                Mnemo's Library
 
-                                  
-                                  
-                                  </div>`,{link:link,name:item.name})
-                              );
-                              item.signup_warning_message = 'Check your email to confirm your sign up.';
-                              res.send(item);
-                            
-                            });
-                            //db.collection(userModelName).update({"_id":result._id},{$set:item},function(err,result) {
-                                
-                            //});  
-                        })
-                        .catch(function(err) {
-                            console.log(['ERR',err]);
-                        });
-                  });  
-              }
-            });
+                                                  
+                                                  
+                                                  </div>`,{link:link,name:item.name})
+                                              );
+                                              item.signup_warning_message = 'Check your email to confirm your sign up.';
+                                              res.send(item);
+                                            
+                                            });
+                                            //db.collection(userModelName).update({"_id":result._id},{$set:item},function(err,result) {
+                                                
+                                            //});  
+                                        })
+                                        .catch(function(err) {
+                                            console.log(['ERR',err]);
+                                        });
+                                  });  
+                              
+                          });
+                      }
+                  }).catch(function(err) {
+                    console.log(['ERR',err]);
+                  });;  
+                }
+            }).catch(function(err) {
+                console.log(['ERR',err]);
+            });;
         }
     } else {
-        res.send({signup_warning_message:'Missing required information.'});
+        res.send({warning_message:'Missing required information.'});
     }
     
 });

@@ -11,7 +11,23 @@ let db;
 MongoClient.connect(config.databaseConnection, (err, client) => {
   if (err) return console.log(err)
   db = client.db(config.database) 
+  // seed topicCollections
+    db.collection('topicCollections').find().toArray().then(function(topicCollections) {
+            if (topicCollections!= null && topicCollections.length > 0) {
+                // OK
+                console.log('Topic collections exists');
+            } else {
+                console.log('Create Topic collections ');
+                db.collection ('topicCollections').insertMany(config.topicCollections);
+            }
+        }).catch(function(e) {
+            console.log('Error creating topic collections on init');
+            console.log(e);
+        });
+
 })
+
+
 
 //const database = require('../../oauth/database');
 
@@ -32,10 +48,10 @@ router.post('/import', (req, res) => {
         Papa.parse(response, {
             'header': true, 
             'complete': function(data) {
-                 //console.log(['parse',data]);
+                 console.log(['parse',data]);
                 const toImport = {'questions':data.data};
                 let json = utils.createIndexes(toImport);
-               // console.log(['parsed',data,data.errors,json]);
+                console.log(['parsed',data.errors,json]);
                        
                 for (collection in json) {
                     //console.log(['save collection',collection,Array.isArray(json[collection]),json[collection]]);
@@ -55,6 +71,15 @@ router.post('/import', (req, res) => {
                                     console.log(['IMPORT',record]);
                           
                                 }
+                                if (record.tags) {
+                                  let aTags = record.tags.trim().toLowerCase().split(',');
+                                  let nTags = [];
+                                  aTags.forEach(function(aTag) {
+                                      nTags.push(aTag.trim());
+                                  });
+                                  record.tags=nTags;
+                                }
+                                console.log(record.tags);
                                 // remove and restore id to allow update
                                 let thePromise = null;
                                 if (json[collection][a].hasOwnProperty('_id')&& json[collection][a]._id.length > 0) {
@@ -62,7 +87,7 @@ router.post('/import', (req, res) => {
                                     delete record._id;
                                     thePromise = new Promise(function(resolve,reject) {
                                         db.collection(collection).update({_id:ObjectId(id)},{$set:record},{upsert:true}).then(function(resy) {
-                                            // console.log(['UPDATE',resy]);
+                                            console.log(['UPDATE']);
                                             let newRecord={_id:id,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
                                             resolve(newRecord);
                                             
@@ -75,7 +100,7 @@ router.post('/import', (req, res) => {
                                 } else {
                                     thePromise = new Promise(function(resolve,reject) {
                                         db.collection(collection).insert(record).then(function(resy) {
-                                           // console.log(['INSERT',resy]);
+                                            console.log(['INSERT']);
                                             let newRecord={_id:resy.insertedIds[0],admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
                                             resolve(newRecord);
                                             
@@ -94,7 +119,7 @@ router.post('/import', (req, res) => {
                                 
                             }
                         }
-                       // console.log(['STARTED UPDATES',promises,questionPromises]);
+                       console.log(['STARTED UPDATES',promises,questionPromises]);
                         // cleanup 
                             // TODO warning problem here if ever loading multiple sheets
                         let b = function (collection) {
@@ -188,7 +213,7 @@ router.post('/import', (req, res) => {
                             });;   
                     }
                 }
-                
+                console.log('NOW CREATE INDEXES FOR QUESTIONS TEXT');
                   
                 db.collection('questions').dropIndex();
                 db.collection('questions').createIndex({
@@ -290,12 +315,16 @@ router.get('/lookups', (req, res) => {
                 db.collection('topicTags').findOne().then(function(topicTags) {
                     db.collection('relatedTags').findOne().then(function(relatedTags) {
                         db.collection('words').find().toArray().then(function(words) {
-                            if (tags) delete tags._id;
-                            if (topics) delete topics._id;
-                            if (tagTopics) delete tagTopics._id;
-                            if (topicTags) delete topicTags._id;
-                            if (relatedTags) delete relatedTags._id;
-                            res.send({tags:tags,topics:topics,tagTopics:tagTopics,topicTags:topicTags,relatedTags:relatedTags,words:words});
+                           // db.collection('contentPages').find().toArray().then(function(contentPages) {
+                                if (tags) delete tags._id;
+                                if (topics) delete topics._id;
+                                if (tagTopics) delete tagTopics._id;
+                                if (topicTags) delete topicTags._id;
+                                if (relatedTags) delete relatedTags._id;
+                                res.send({tags:tags,topics:topics,tagTopics:tagTopics,topicTags:topicTags,relatedTags:relatedTags,words:words});
+                            //}).catch(function(e) {
+                            //console.log(e);
+                            //});
                         }).catch(function(e) {
                             console.log(e);
                         });
@@ -334,24 +363,56 @@ router.get('/progress', (req, res) => {
 })
 
 
-router.get('/discover', (req, res) => {
-   console.log('discoer',req.query.user);
-    let orderBy = req.query.orderBy ? req.query.orderBy : 'successRate';
+router.post('/discover', (req, res) => {
+    console.log('discover',req.body.user);
+    let orderBy = req.body.orderBy ? req.body.orderBy : 'successRate';
     let sortFilter={};
     let limit = 20;
     let criteria = [];
-    if (req.query.user) {
-        criteria.push({$or:[{access:{$eq:req.query.user}},{access :{$eq:'public'}}]})
+    if (req.body.user) {
+        criteria.push({$or:[{access:{$eq:req.body.user}},{access :{$eq:'public'}}]})
     } else {
         criteria.push({access :{$eq:'public'}});
     }
+    // question block
+    criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
+    // filtering
+    let blockCriteria=[];
+    if (req.body.blocks) {
+        let blocks = req.body.blocks;
+        if (blocks.tag && Array.isArray(blocks.tag)) {
+            blocks.tag.forEach(function(tag) {
+                blockCriteria.push({'tags': {$nin:[tag]}});
+                //blockCriteria.push({'tags': {$regex:tag}});
+            });
+        }
+        if (blocks.topic && Array.isArray(blocks.topic)) {
+            blocks.topic.forEach(function(topic) {
+                console.log({$ne: topic});
+                blockCriteria.push({quiz: {$ne: topic}});
+            });
+        }
+        if (blocks.technique && Array.isArray(blocks.technique)) {
+            blocks.technique.forEach(function(technique) {
+                console.log({$ne: technique});
+                blockCriteria.push({mnemonic_technique: {$ne: technique}});
+            });
+        }
+    }
+    console.log(['BC',blockCriteria]);
+    if (blockCriteria.length > 0) {
+        blockCriteria.forEach(function(c) {
+            criteria.push(c);
+        });
+        
+    }
     sortFilter[orderBy]=1;
     
-    let user = req.query.user ? req.query.user : null;
+    let user = req.body.user ? req.body.user : null;
     console.log(['discover',orderBy]);
     db.collection('userquestionprogress').find({user:user}).sort(sortFilter).toArray().then(function(progress) {
          if (progress) {
-             console.log(['progress res',progress]);
+             //console.log(['progress res',progress]);
             let notThese = [];
             for (var seenId in progress) {
                 notThese.push(ObjectId(progress[seenId].question));
@@ -366,14 +427,14 @@ router.get('/discover', (req, res) => {
             db.collection('questions').find({$and:criteria})
             //db.collection('questions').aggregate({$match:{$nin:notThese}})
             .sort(sortFilter).limit(limit).toArray().then(function( questions) {
-                console.log(['user res',questions ? questions.length : 0,questions]);    
+               //   console.log(['user res',questions ? questions.length : 0,questions]);    
                 res.send({questions:questions});
             })
         } else {
             console.log(['no user']);    
             // NO USER, SHOW BY POPULAR
              db.collection('questions').find({$and:criteria}).limit(limit).toArray().then(function(results) {
-                 console.log(['no user res',results ? results.length : 0]);    
+                 //console.log(['no user res',results ? results.length : 0]);    
                 res.send({'questions':results});
             })
         }
@@ -382,50 +443,6 @@ router.get('/discover', (req, res) => {
         res.send('e '+JSON.stringify(e));
     })
 })
-  //if (req.query.user && req.query.user.length > 0) {
-        //let user = req.query.user;
-        //console.log(['discoer',user]);
-        //db.collection('questions').aggregate([
-           //{ $match : { score : '10' } } ,
-           ////{ $match : { _id : '5ab81f45a75fe100687f30e0' } } ,
-          ////{ "$match": {  } },
-          ////{ "$sort": { "progress.timeScore": -1 } },
-          ////{ "$limit": 20 },
-          ////{ "$lookup":  {
-           ////from: "progress",
-           ////let: { question_id: "$_id" },
-           ////pipeline: [
-              ////{ $match:
-                 ////{ $expr:
-                    ////{ $and:
-                       ////[
-                         ////{ $eq: [ "$user",  req.query.user ] },
-                       //////  { $eq: [ "$question", "$$question_id" ] }
-                       ////]
-                    ////}
-                 ////}
-              ////},
-              ////{ $project: { questions: 0, _id: 0 } }
-           ////],
-           ////as: "progress"
-         ////} },
-          ////{ "$unwind": "$progress" },
-          ////{ "$project": {
-            ////"question": 1,
-            ////"answer": 1,
-            //////"progress.questions": 1,
-            //////"progress._id": 1
-          ////} }
-          
-        //]).toArray().then(function(results) {
-            //console.log(results);
-            //res.send({'ddd':results});
-        //}).catch(function(e) {
-            //console.log(['e',e]);
-            //r(['e',e]);
-        //});
-        
-
 
 
 
@@ -438,8 +455,12 @@ router.get('/review', (req, res) => {
      let criteria=[];
      criteria.push({user:req.query.user});
      criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
+     //let oneHourBack = new Date().getTime() - 3600000;
+     //criteria.push({$or:[]});   seen:{$lt:oneHourBack}
+     //console.log({seen:{$lt:oneHourBack}});
      if (req.query.user && req.query.user.length > 0) {
-        db.collection('userquestionprogress').find({$and:criteria}).sort(orderMeBy).limit(limit).toArray().then(function(questions) {
+         // sort by successTally and then most recently seen first
+        db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':-1}).limit(limit).toArray().then(function(questions) {
             console.log(questions);
             //let questions=[];
             if (questions) {
@@ -454,7 +475,7 @@ router.get('/review', (req, res) => {
                             //const timeScore = progress.timeScore.hasOwnProperty(questionId) ? progress.timeScore[questionId] : 0;
                             //const question = {'successRate':successRate,'timeScore':timeScore,'questionId':questionId};
                             //questions.push(question);
-                        //}
+                        //} 
                     //}
                 //}
             
@@ -543,7 +564,9 @@ router.get('/questions', (req, res) => {
             })
         // SEARCH BY topic
         } else  if (req.query.topic && req.query.topic.length > 0) {
-            criteria.push({'quiz': req.query.topic});
+            console.log(['topic search',req.query.topic,{'quiz': {$eq:req.query.topic}}]);
+            criteria.push({'quiz': {$eq:req.query.topic}});
+            console.log(['topic search C    ',criteria]);
             db.collection('questions').find({$and:criteria}).sort({question:1}).toArray(function(err, results) {
               res.send({'questions':results});
             })
@@ -551,9 +574,9 @@ router.get('/questions', (req, res) => {
         } else if (req.query.tag && req.query.tag.length > 0) {
             if (req.query.tag) { 
                 let tag = req.query.tag.trim().toLowerCase(); 
-                criteria.push({'tags': {$regex:tag}});
+                criteria.push({'tags': {$in:[tag]}});
                 console.log(['search by tag',criteria,tag]);
-                db.collection('questions').find({'tags': {$regex:tag}}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
+                db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
                     console.log(['search by tag res',results]);
                   res.send({'questions':results});
                 })
@@ -649,30 +672,18 @@ router.post('/block', (req, res) => {
     }
 })
 
+// update question stats into the questions collection
 function updateQuestionTallies(user,question,tallySuccess=false) {
-    //console.log(['update tallies for question',question]);
     db.collection('questions').findOne({_id:ObjectId(question)}).then(function(result) {
-         //   console.log(['update res',result]);
             if (result && result._id) {
-                //// get success tstamp and seen tstamp for calculations
-                //db.collection('seen').find({question:question}).toArray(function( seenResult) {
-                    //console.log(['seenResult',seenResult]);
-                    //db.collection('successes').find({question:question}).toArray(function( successResult) {
-                        //console.log(['successResult',successResult]);
-                          let data={};
-                          data.seenTally = result.seenTally ? parseInt(result.seenTally,10) + 1 : 1;
-                          let successTally = result.successTally ? parseInt(result.successTally,10) + 1 : (tallySuccess?1:0);
-                        //  console.log(['tallySuccess',tallySuccess]);
-                          //if (tallySuccess) 
-                          data.successTally = successTally;
-                          data.successRate = data.seenTally > 0 ? successTally/data.seenTally : 0;
-                          //console.log(['save question',data]);
-                          db.collection('questions').update({_id: question},{$set:data}).then(function(qres) {
-                               // console.log(['saved question',qres]);
-                          });
-                         
-                   //});
-                //});
+                let data={};
+                data.seenTally = result.seenTally ? parseInt(result.seenTally,10) + 1 : 1;
+                let successTally = result.successTally ? parseInt(result.successTally,10) + 1 : (tallySuccess?1:0);
+                data.successTally = successTally;
+                data.successRate = data.seenTally > 0 ? successTally/data.seenTally : 0;
+                db.collection('questions').update({_id: question},{$set:data}).then(function(qres) {
+                   // console.log(['saved question',qres]);
+                });
                 updateUserQuestionProgress(user,question,tallySuccess);
             }
     }).catch(function(e) {
@@ -682,60 +693,51 @@ function updateQuestionTallies(user,question,tallySuccess=false) {
 
 }
 
+// update per user progress stats into the userquestionprogress collection
 function updateUserQuestionProgress(user,question,tallySuccess) {
-    //return;
-    console.log(['update user question tallies',user,question]);
-     // update user progress stats
     db.collection('userquestionprogress').findOne({user:user,question:question}).then(function(progress) {
         if (!progress) progress = {user:user,question:question};
         progress.seenTally = progress.seenTally ? parseInt(progress.seenTally,10) + 1 : 1;
-        if (tallySuccess) progress.successTally = progress.successTally ? parseInt(progress.successTally,10) + 1 : 1;
+        progress.seen = new Date().getTime();
+        if (tallySuccess) {
+            progress.successTally = progress.successTally ? parseInt(progress.successTally,10) + 1 : 1;
+            progress.success = progress.seen;
+        }
         progress.successRate = (parseInt(progress.successTally,10) > 0 && parseInt(progress.seenTally,10) > 0) ? progress.successTally/progress.seenTally : 0;
         progress.block=0;
-                            
-        //db.collection('questions').findOne({_id:ObjectId(question)}).then(function( question) {
-            //console.log('looked up q',question);
-            //if (question) {
-                //progress.tags=question.tags;
-                //progress.mnemonic_technique=question.mnemonic_technique ;
+        db.collection('userquestionprogress').save(progress).then(function() {
+            //if (tallySuccess) {
+                //// the seen and successes collections contain a single record per user/question containing the last seen/success date as a timestamp integer
+                //db.collection('seen').findOne({question:question,user:user}).then(function( seenResult) {
+                    //db.collection('successes').findOne({question:question,user:user}).then(function( successResult) {
+                        //let seen = seenResult ? seenResult.timestamp : 0;
+                        //let success = successResult ? successResult.timestamp : 0;
+                        //const time = new Date().getTime();
+                        //var timeDiff = 0;
+                        //if (success > 0) {
+                            //timeDiff = seen - success;
+                        //} else {
+                            //timeDiff = time - seen;
+                        //}
+                        //let data={};
+                        //// integrate success rate and time between seen and success
+                        ////progress.timeScore = (parseInt(progress.successTally,10) > 0 && parseInt(progress.seenTally) > 0) ? (progress.successTally + timeDiff* 0.00000001)/progress.seenTally : 0;
+                        //progress.timeScore = progress.successRate;
+                        //db.collection('userquestionprogress').save(progress).then(function(sres) {
+                               ////console.log(['saved again',sres]);
+                        //}).catch(function(e) {
+                                //console.log(['err',e]);
+                        //});
+                        
+                    //}).catch(function(e) { 
+                        //console.log(['err',e]);
+                    //});
+                //}).catch(function(e) {
+                    //console.log(['err',e]);
+                //});
             //}
-            
-            db.collection('userquestionprogress').save(progress).then(function() {
-                console.log('saved');
-                if (tallySuccess) {
-                    db.collection('seen').findOne({question:question,user:user}).then(function( seenResult) {
-                        console.log(['seenResult',seenResult]);
-                        db.collection('successes').findOne({question:question,user:user}).then(function( successResult) {
-                
-                          console.log(['update user tallies success res',successResult]);
-                            
-                            let seen = seenResult ? seenResult.timestamp : 0;
-                            let success = successResult ? successResult.timestamp : 0;
-                            const time = new Date().getTime();
-                            var timeDiff = 0;
-                            if (success > 0) {
-                                timeDiff = seen - success;
-                            } else {
-                                timeDiff = time - seen;
-                            }
-                            let data={};
-                            progress.timeScore = (parseInt(progress.successTally,10) > 0 && parseInt(progress.seenTally) > 0) ? (progress.successTally + timeDiff* 0.00000001)/progress.seenTally : 0;
-                            console.log(['update user tallies WITH',progress]);
-                            db.collection('userquestionprogress').save(progress).then(function(sres) {
-                                   console.log(['saved again',sres]);
-                            }).catch(function(e) {
-                                    console.log(['err',e]);
-                            });
-                            
-                        }).catch(function(e) { 
-                            console.log(['err',e]);
-                        });
-                    }).catch(function(e) {
-                        console.log(['err',e]);
-                    });
-                }
-                });
-        //});
+            });
+    
   }).catch(function(e) {
       console.log(['err',e]);
   });

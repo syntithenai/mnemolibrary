@@ -40,7 +40,10 @@ export default class Navigation extends Component {
         return  (
         <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark" >
           <div className="navbar-brand" >
-          <a  href="#" onClick={() => this.props.setCurrentPage('home')}><img alt="Mnemonikas" src="/mnemoicon.jpg" height="100%" data-toggle="collapse" data-target="#navbarCollapse"/></a>
+          <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemonikas" src="/mnemoicon.jpg" height="100%" data-toggle="collapse" data-target="#navbarCollapse"/></a>
+          {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='btn btn-outline btn-warning' style={{verticalAlign: 'top',marginLeft: '1em'}}>
+                   Login
+                  </a>}
           </div>
           <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" >
             <span className="navbar-toggler-icon"></span>
@@ -67,9 +70,7 @@ export default class Navigation extends Component {
                 
               </li>
               <li className="nav-item">
-                {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='nav-link'>
-                   Login
-                  </a>}
+                
                 {this.props.isLoggedIn() && <a href='#' onClick={() => this.props.setCurrentPage('login')} className='nav-link'>
                    Profile
                   </a>}
@@ -82,4 +83,4 @@ export default class Navigation extends Component {
     };
     
 }
-Navigation.pageTitles= {'home':'Mnemos Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','about':'About Nemo','info':'Getting Started','login':''}
+Navigation.pageTitles= {'home':'Mnemos Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','about':'About Mnemo','info':'Getting Started','login':''}

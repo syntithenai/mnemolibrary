@@ -14,6 +14,7 @@ export default class ProfilePage extends Component {
                 _id: this.props.user._id?this.props.user._id:'',
                 name:this.props.user.name?this.props.user.name:'',
                 username:this.props.user.username?this.props.user.username:'',
+                avatar:this.props.user.avatar?this.props.user.avatar:'',
                 password:this.props.user.password?this.props.user.password:'',
                 password2:this.props.user.password2?this.props.user.password:'',
             }
@@ -31,6 +32,7 @@ export default class ProfilePage extends Component {
             '_id': this.state.user._id,
           }
           if (this.state.user.name)  data.name= this.state.user.name;
+          if (this.state.user.avatar)  data.avatar= this.state.user.avatar;
           if (this.state.user.username)  data.username= this.state.user.username;  
           if (this.state.user.password && this.state.user.password.length > 0 && this.state.user.password2 && this.state.user.password2.length > 0) {
             data.password= this.state.user.password
@@ -86,6 +88,7 @@ export default class ProfilePage extends Component {
                 <div className='col-12 warning-message'>{this.state.warning_message}</div>
                    
                         <label htmlFor="name" className='row'>Name </label><input autoComplete="false" id="name" type='text' name='name' onChange={this.change} value={this.state.user.name} />
+                        <label htmlFor="avatar" className='row'>Avatar </label><input autoComplete="false" id="avatar" type='text' name='avatar' onChange={this.change} value={this.state.user.avatar} />
                         <label htmlFor="username" className='row'>Email </label><input autoComplete="false" id="username" readOnly="true" type='text' name='username' onChange={this.change} value={this.state.user.username}  />
                         <label htmlFor="password" className='row'>Password</label> <input  autoComplete="false" id="password" type='password' name='fake_password' onChange={this.change}  value={this.state.user.password}  />
                         <label htmlFor="password2" className='row'>Repeat Password</label><input  autoComplete="false" id="password2" type='password' name='fake_password2' onChange={this.change} value={this.state.user.password2} />

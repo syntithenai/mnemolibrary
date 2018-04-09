@@ -50,11 +50,14 @@ module.exports = {
         var topicTags = {};
         var updatedQuestions = [];
         // collate quizzes and tags
+        console.log(json);
         let indexedQuestions= {};
         for (var questionKey in json['questions']) {
+            console.log('index q '+questionKey);
             const question = json['questions'][questionKey]
-            question.tags = question.tags ? question.tags.trim().toLowerCase() : '';
+            //question.tags = question.tags ? question.tags.trim().toLowerCase() : '';
             if (question.access=="public") {
+                console.log('public q');
                 var id = question._id ? question._id :  new ObjectId();
                 question._id = id;
                 var tagList = question.tags.split(',');
@@ -63,8 +66,9 @@ module.exports = {
                     quizzes[quiz] = []
                 }
                 quizzes[quiz].push(id);        
+                console.log(['taglist',tagList]);
                 for (var tagKey in tagList) {
-                    
+                    console.log(['taglist each',tagKey,tagList[tagKey]]);
                     var tag = tagList[tagKey].trim().toLowerCase();
                     if (tag.length > 0) {
                         if (! (Array.isArray(tags[tag]))) {

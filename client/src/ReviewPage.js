@@ -24,18 +24,17 @@ export default class ReviewPage extends Component {
         
    
    // return seen questionIds sorted by 'review status'
-  getQuestionsForReview() {
-      console.log('getQuestionsForReview');
+    getQuestionsForReview() {
+       console.log('getQuestionsForReview');
      this.props.getQuestionsForReview();
-  };
+    };
     
     finishReview(questions,success) {
        console.log('finish review');
-       this.getQuestionsForReview();
        //this.setCurrentPage('review');
-       //this.props.setMessage('Review complete. You recalled '+success.length+' out of '+questions.length+' questions.'); 
-       
-   };
+       this.props.setMessage('Review complete. You recalled '+success.length+' out of '+questions.length+' questions.'); 
+       this.getQuestionsForReview();
+    };
     
     render() {
         //console.log(['REVIEW',this.props.user]);
@@ -45,12 +44,16 @@ export default class ReviewPage extends Component {
                //  console.log(['REVIEW questions']);
                 return (
                 <div>
-                    <QuizCarousel setQuizFromTag={this.props.setQuizFromTag}  setCurrentQuestion={this.props.setCurrentQuestion} discoverQuestions={this.props.discoverQuestions}  questions={this.props.questions} currentQuiz={this.props.currentQuiz} currentQuestion={this.props.currentQuestion} finishQuiz={this.finishReview} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.props.setCurrentQuiz} />
+                    <QuizCarousel setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} setDiscoveryBlock={this.props.setDiscoveryBlock} clearDiscoveryBlock={this.props.clearDiscoveryBlock} blocks={this.props.blocks} setQuizFromTag={this.props.setQuizFromTag}  setCurrentQuestion={this.props.setCurrentQuestion} discoverQuestions={this.props.discoverQuestions}  questions={this.props.questions} currentQuiz={this.props.currentQuiz} currentQuestion={this.props.currentQuestion} finishQuiz={this.finishReview} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.props.setCurrentQuiz} />
                 </div>
                 )
             } else {
                 return (
-                <div><b>No questions seen yet. </b><FindQuestions  discoverQuestions={this.props.discoverQuestions} setCurrentPage={this.props.setCurrentPage} /></div>
+                <div><b>First up you need to discover something interesting. </b> <br/><br/><button className="btn btn-info" href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</button>
+                <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</button>
+                <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</button>
+                <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</button>
+               </div>
                 )
             }
       } else {

@@ -75,19 +75,19 @@ export default class QuizCarousel extends Component {
           //this.logStatus('seen',id);
           //questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           //questions.review[id].push(time);
-          if (this.isQuizFinished()) {
+            if (this.isQuizFinished()) {
                this.logStatus('success',id);
-              this.finishQuiz(this.props.questions,this.state.success);
+               this.finishQuiz(this.props.questions,this.state.success);
             }  else {
                 // local collate success ids for finishQuiz function
-                //const time = new Date().getTime();
-                //let success = this.state.success;
-                //if (!success.includes(this.props.currentQuestion)) {
-                    //success.push(this.props.currentQuestion);
-                //}
+                const time = new Date().getTime();
+                let success = this.state.success;
+                if (!success.includes(this.props.currentQuestion)) {
+                    success.push(this.props.currentQuestion);
+                }
                 //questions.success[id]=time;
                 //questions.successTally[id] = questions.successTally.hasOwnProperty(id) ? questions.successTally[id] + 1 : 1;
-                //this.setState({ 'success': success});
+                this.setState({ 'success': success});
                 //console.log(['success',this.props.currentQuestion]);
                 this.props.setCurrentQuestion(parseInt(this.props.currentQuestion,10) + 1);
                 this.logStatus('success',id);
@@ -204,7 +204,7 @@ export default class QuizCarousel extends Component {
         let content = '';
         const question = this.currentQuestion();
         console.log(['RENDER CAROUS2',question,questions]);
-        if (Array.isArray(questions) && questions.length > 0 && Utils.isObject(question)) {
+      //  if (Array.isArray(questions) && questions.length > 0 && Utils.isObject(question)) {
             if (this.state.showList) {
                 let listQuestions = this.getQuestions(this.props.currentQuiz);
                 let label='Start' ;
@@ -214,15 +214,15 @@ export default class QuizCarousel extends Component {
                 content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList questions={listQuestions} setQuiz={this.setQuizQuestion}  ></QuestionList></div>);
             } else {
                 // single question
-                content = (<SingleQuestion setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn}/> )
+                content = (<SingleQuestion setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} setDiscoveryBlock={this.props.setDiscoveryBlock} clearDiscoveryBlock={this.props.clearDiscoveryBlock} blocks={this.props.blocks}  setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn}/> )
             }
         
-        } else {
-            //console.log(['ren',question,questions]);
-           // content = (<div>{JSON.stringify(question)} - {questions} </div>)
-            // no matching questions
-            content = (<div><FindQuestions discoverQuestions={this.props.discoverQuestions} setCurrentPage={this.props.setCurrentPage} /></div>)
-        }
+        //} else {
+            ////console.log(['ren',question,questions]);
+           //// content = (<div>{JSON.stringify(question)} - {questions} </div>)
+            //// no matching questions
+            //content = (<div><FindQuestions discoverQuestions={this.props.discoverQuestions} setCurrentPage={this.props.setCurrentPage} /></div>)
+        //}
                 
         return (
             <div className='quiz-carousel'>

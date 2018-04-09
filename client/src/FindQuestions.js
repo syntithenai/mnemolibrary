@@ -10,11 +10,11 @@ export default class FindQuestions extends Component {
         return  (
             <div className='findquestions'>
                 <span>Welcome to Mnemo's Library, a community of lifelong learners who use mnemonics.</span>
-                <br/> 
+                <p>"Staggering pun&nbsp;for learning fun."</p>
                 <br/> 
                 <b>Learn something new</b>
                 <br/> 
-                <button className="btn btn-info" href="#"  onClick={() => this.props.discoverQuestions()}>Discover</button>
+                <button className="btn btn-info" href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</button>
                 <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</button>
                 <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</button>
                 <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</button>

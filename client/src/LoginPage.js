@@ -4,6 +4,8 @@ import GoogleLogin from './GoogleLogin'
 //import mustache  from 'mustache';
 const config=require('../../config');
 //const utils=require('../../auth_utils');
+var faker = require('faker');
+            
 
 export default class LoginPage extends Component {
     
@@ -23,7 +25,9 @@ export default class LoginPage extends Component {
             password:'',
             password2:'',
             justSignedUp: false,
-            forgotPassword: false
+            forgotPassword: false,
+            avatar: faker.commerce.productAdjective()+faker.name.firstName()
+            
         }
         this.change = this.change.bind(this);
         this.submitSignUp = this.submitSignUp.bind(this);
@@ -145,6 +149,7 @@ export default class LoginPage extends Component {
           },
           body: JSON.stringify({
             name: this.state.name,
+            avatar: this.state.avatar,
             username: this.state.email,
             password: this.state.password,
             password2: this.state.password2,
@@ -156,6 +161,8 @@ export default class LoginPage extends Component {
        // console.log(['signup  request with JSON response', data])
         if (data._id && data._id.length > 0) {
             that.setState({justSignedUp: true, warning_message:data.warning_message});            
+        } else {
+            that.setState({warning_message:data.warning_message});            
         }
       }).catch(function(error) {
         console.log(['request failed', error]);
@@ -198,7 +205,6 @@ export default class LoginPage extends Component {
                 </div>
                 )
         } else {
-            
             return (
                 <div className="row">
                     <div className='col-12 warning-message'>{this.state.warning_message}</div>
@@ -225,6 +231,7 @@ export default class LoginPage extends Component {
                           <div className='col-12 warning-message'>{this.state.signup_warning_message}</div>
                     
                             <label htmlFor="name" className='row'>Name </label><input autoComplete="false" id="name" type='text' name='name' onChange={this.change} />
+                            <label htmlFor="avatar" className='row'>Avatar </label><input autoComplete="false" id="avatar" type='text' name='avatar' value={this.state.avatar} onChange={this.change} />
                             <label htmlFor="email" className='row'>Email </label><input autoComplete="false" id="email" type='text' name='email' onChange={this.change} />
                             <label htmlFor="password" className='row'>Password</label> <input  autoComplete="false"  id="password" type='password' name='password' onChange={this.change} />
                             <label htmlFor="password2" className='row'>Repeat Password</label><input  autoComplete="false"  id="password2" type='password' name='password2' onChange={this.change} />
