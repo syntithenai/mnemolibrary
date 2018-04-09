@@ -20,9 +20,7 @@ import Footer from './Footer';
 import FindQuestions from './FindQuestions';
 import FAQ from './FAQ';
 
-
 //import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-
 //import SignIn from './SignIn';
 //import FindQuestions from './FindQuestions';
 
@@ -624,6 +622,7 @@ export default class AppLayout extends Component {
             {(showLogin) && <LoginPage token={this.state.token} login={this.login}/>
             }<br/>
             <Footer/>
+            <div className='addsbygoogle'></div>
         </div>
         
     );
