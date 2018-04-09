@@ -182,7 +182,7 @@ export default class AppLayout extends Component {
             return response.json();
             
         }).then(function(res) {
-          //  console.log(['ddtoken response',res]);
+            console.log(['ddtoken response',res]);
             state.token = res;
             // load progress
             fetch('/api/progress')
