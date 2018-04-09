@@ -99,7 +99,7 @@ export default class LoginPage extends Component {
       .then(function(data) {
         //    console.log(['gsignin request with JSON response', data])
            if (data.code && data.code.length > 0) {
-             // window.location='/?code='+data.code;
+              window.location='/?code='+data.code;
            }
         });
     };

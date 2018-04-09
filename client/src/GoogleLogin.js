@@ -8,6 +8,7 @@ export default class GoogleLogin extends Component {
         
         this.loggedIn = false;
         this.accessToken = '';
+        //this.apiKey = 'AIzaSyCe01AFr01CUf3g82kAlJhC126j_AF7l2A';
         this.apiKey = 'AIzaSyCe01AFr01CUf3g82kAlJhC126j_AF7l2A';
 	//mnemolibrary-1517864563209
     //mnemoslibrary@gmail.com
@@ -33,6 +34,7 @@ export default class GoogleLogin extends Component {
         this.createPicker = this.createPicker.bind(this);
         this.onPickerApiLoad = this.onPickerApiLoad.bind(this);
         this.pickerCallback = this.pickerCallback.bind(this);
+        this.handleFailure = this.handleFailure.bind(this);
         
     };
     
@@ -57,6 +59,11 @@ export default class GoogleLogin extends Component {
         document.body.appendChild(script);
     }
     
+    handleFailure() {
+        console.log('FAIL LOGIN');
+        this.googleSignOut();
+    };
+    
 	renderSignIn() {
         //console.log('redner signin');
 		gapi.signin2.render('google-signin', {
@@ -65,7 +72,8 @@ export default class GoogleLogin extends Component {
 			'height': 30,
 			'longtitle': true,
 			'theme': 'dark',
-			'onsuccess': this.handleAuthClick
+			'onsuccess': this.handleAuthClick,
+             'onfailure': this.handleFailure
 		});
 	}
 
