@@ -88,7 +88,7 @@ router.post('/import', (req, res) => {
                                     thePromise = new Promise(function(resolve,reject) {
                                         db.collection(collection).update({_id:ObjectId(id)},{$set:record},{upsert:true}).then(function(resy) {
                                             console.log(['UPDATE']);
-                                            let newRecord={_id:id,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
+                                            let newRecord={_id:id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
                                             resolve(newRecord);
                                             
                                         }).catch(function(e) {
@@ -101,7 +101,7 @@ router.post('/import', (req, res) => {
                                     thePromise = new Promise(function(resolve,reject) {
                                         db.collection(collection).insert(record).then(function(resy) {
                                             console.log(['INSERT']);
-                                            let newRecord={_id:resy.insertedIds[0],admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
+                                            let newRecord={_id:resy.insertedIds[0],discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
                                             resolve(newRecord);
                                             
                                         }).catch(function(e) {
@@ -374,6 +374,7 @@ router.post('/discover', (req, res) => {
     } else {
         criteria.push({access :{$eq:'public'}});
     }
+    criteria.push({discoverable :{$ne:'no'}});
     // question block
     criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
     // filtering
@@ -567,7 +568,7 @@ router.get('/questions', (req, res) => {
             console.log(['topic search',req.query.topic,{'quiz': {$eq:req.query.topic}}]);
             criteria.push({'quiz': {$eq:req.query.topic}});
             console.log(['topic search C    ',criteria]);
-            db.collection('questions').find({$and:criteria}).sort({question:1}).toArray(function(err, results) {
+            db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
               res.send({'questions':results});
             })
         // SEARCH BY tag
