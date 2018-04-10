@@ -568,7 +568,7 @@ router.get('/questions', (req, res) => {
             console.log(['topic search',req.query.topic,{'quiz': {$eq:req.query.topic}}]);
             criteria.push({'quiz': {$eq:req.query.topic}});
             console.log(['topic search C    ',criteria]);
-            db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
+            db.collection('questions').find({$and:criteria}).sort({question:1}).toArray(function(err, results) {
               res.send({'questions':results});
             })
         // SEARCH BY tag
@@ -580,6 +580,17 @@ router.get('/questions', (req, res) => {
                 db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
                     console.log(['search by tag res',results]);
                   res.send({'questions':results});
+                })
+            }
+        // search by question (return single element array
+        } else if (req.query.question && req.query.question.length > 0) {
+            if (req.query.question) { 
+                let question = req.query.question.trim().toLowerCase(); 
+                criteria.push({'_id': ObjectId(question)});
+                console.log(['search by id',criteria,question]);
+                db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
+                    console.log(['search by id res',results]);
+                    res.send({'questions':results});
                 })
             }
         } else {

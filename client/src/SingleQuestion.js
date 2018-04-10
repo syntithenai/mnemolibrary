@@ -16,6 +16,7 @@ import ExternalLink from 'react-icons/lib/fa/external-link';
 import ConnectDevelop from 'react-icons/lib/fa/connectdevelop';
 import Close from 'react-icons/lib/fa/close';
 import Book from 'react-icons/lib/fa/book';
+import ShareAlt from 'react-icons/lib/fa/share-alt';
 
 import scrollToComponent from 'react-scroll-to-component';
 
@@ -137,6 +138,9 @@ export default class SingleQuestion extends Component {
                       //!this.isVisible('moreinfo') 
                       // !this.isVisible('topic')) && 
                       // (!this.isVisible('tags')) && 
+            
+                      
+            let mailTo='mailto:?subject=Mnemos Library - '+header+'&body='+window.location.protocol+'//'+window.location.host+"?question="+question._id;
                      
            return (
             <div className="card question container" >
@@ -158,7 +162,9 @@ export default class SingleQuestion extends Component {
                     {blockedTechniques && blockedTechniques.length>0 && <span>Techniques </span>} {blockedTechniques}
                 </div>
                 <div className="">
+                   
                     <h4 className="card-title">{header}?</h4>
+                    
                     <div className="row form" >
                       <div className="col-sm-8" >
                         {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Mnemonic</span></button>
@@ -179,6 +185,7 @@ export default class SingleQuestion extends Component {
                     </div>
                    
                     &nbsp;
+                    <a style={{float:'right'}} target='_new' href={mailTo} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></a>
                     </div>
                 </div>
                 <br/>
@@ -187,11 +194,11 @@ export default class SingleQuestion extends Component {
                 </div>}
                 {this.isVisible('mnemonic') && showRecallButton && <div  ref={(section) => { this.scrollTo.mnemonic = section; }}  className="card-block mnemonic">
                     <div className='card-text'><b>Mnemonic</b><pre className='mnemonic' >{question.mnemonic}</pre></div>
-                    <div className='card-text' ><b>Type</b><button className="btn btn-outline btn-primary"   > <span className="hidden-sm-down" >{question.mnemonic_technique}</span></button>{likeButton}</div>
+                    <div className='card-text' ><b>Technique</b><button className="btn btn-outline btn-primary"   > <span className="hidden-sm-down" >{question.mnemonic_technique}</span></button>{likeButton}</div>
                 </div>}
                 {this.isVisible('mnemonic') && !showRecallButton && <div  ref={(section) => { this.scrollTo.mnemonic = section; }}  className="card-block mnemonic">
                     <div className='card-text'><b>Mnemonic</b><pre  className='mnemonic' >{question.mnemonic}</pre></div>
-                    <div className='card-text' ><b>Type</b> <span><button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('technique',question.mnemonic_technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(question.mnemonic_technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{question.mnemonic_technique}</span></button></span>{likeButton}</div>
+                    <div className='card-text' ><b>Technique</b> <span><button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('technique',question.mnemonic_technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(question.mnemonic_technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{question.mnemonic_technique}</span></button></span>{likeButton}</div>
                 </div>}
                 <br/>
                  {(!showRecallButton) && question.quiz && <div  ref={(section) => { this.scrollTo.topic = section; }} className="card-block answer">

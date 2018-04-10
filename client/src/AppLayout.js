@@ -76,6 +76,7 @@ export default class AppLayout extends Component {
       this.setCurrentPage = this.setCurrentPage.bind(this);
       this.setQuiz = this.setQuiz.bind(this);
       this.setQuizFromQuestion = this.setQuizFromQuestion.bind(this);
+      this.setQuizFromQuestionId = this.setQuizFromQuestionId.bind(this);
       this.setQuizFromTopic = this.setQuizFromTopic.bind(this);
       this.setQuizFromTag = this.setQuizFromTag.bind(this);
       this.updateProgress = this.updateProgress.bind(this);
@@ -131,10 +132,28 @@ export default class AppLayout extends Component {
   
 
   componentDidMount() {
-      if (window.location.search && window.location.search.startsWith('?code=')) {
-          this.loginByToken(window.location.search.slice(6));
-      }
       let that = this;
+      if (window.location.search) {
+          let parts = window.location.search.slice(1).split("&");
+          parts.forEach(function(part) {
+              let iParts=part.split("=");
+              // load by token ?
+              if (iParts[0]==="code") {
+                  that.loginByToken(window.location.search.slice(6));
+              }
+              // search on load
+              // question
+              if (iParts[0]==="question") {
+                  that.setQuizFromQuestionId(iParts[1]);
+              }
+              
+              // topic
+              // tag
+              
+          });
+      }
+      
+      
       // load tags and quizzes and indexes
       fetch('/api/lookups')
       .then(function(response) {
@@ -519,12 +538,50 @@ export default class AppLayout extends Component {
       this.discoverQuestions()
       
   };
+
+
+  setQuizFromQuestionId(questionId) {
+      console.log(['SQFQid',questionId]);
+      let that = this;
+      //this.setState({'currentQuiz':'1,2,3,4,5'});
+      // load initial questions
+      fetch('/api/questions?question='+questionId )
+      .then(function(response) {
+        console.log(['got response', response])
+        return response.json()
+      }).then(function(json) {
+        console.log(['create indexes', json])
+        let currentQuiz = [];
+        let indexedQuestions= {};
+        let currentQuestion=0;
+        let j=0;
+        for (var questionKey in json['questions']) {
+            const question = json['questions'][questionKey]
+            var id = question._id;
+            if (questionId && questionId===id) {
+                currentQuestion=j;
+                console.log(['ID match',id, j])
+            }
+            currentQuiz.push(id);
+            indexedQuestions[id]=questionKey;
+            j++;
+        }
+        console.log(currentQuiz);
+        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover'});
+        console.log(['set state done', that.state])
+      }).catch(function(ex) {
+        console.log(['parsing failed', ex])
+      })
+      
+  };
+  
   setQuizFromQuestion(question) {
-      //console.log(['SQFQ',question,question._id]);
+      console.log(['SQFQ',question,question._id]);
       this.setQuizFromTopic(question.quiz,question._id)
   };
+  
   setQuizFromTopic(topic,currentQuestionId=null) {
-       console.log(['set quiz from topic',topic,currentQuestionId]);
+      console.log(['set quiz from topic',topic,currentQuestionId]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
