@@ -42,7 +42,7 @@ export default class SingleQuestion extends Component {
         this.setState({'visible':visible});
         console.log(['scroll to ',toShow,this.scrollTo[toShow],this.scrollTo]);
         //setTimeout(function(toShow) {
-            scrollToComponent(this.scrollTo[toShow]);
+            scrollToComponent(this.scrollTo[toShow],{align:'top',offset:-200});
         //},1000) 
     };
     
@@ -78,15 +78,15 @@ export default class SingleQuestion extends Component {
         if (!showRecallButton)  {
             blockedTags = this.props.blocks.tag.map((tag, key) => {
               
-              return <button className="btn btn-outline btn-primary" key={key}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('tag',tag)} /><span className="hidden-sm-down" >{tag}</span></button>
+              return <button className="btn btn-outline btn-primary" key={key}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('tag',tag)} /><span className="hidden-sm-down" >&nbsp;{tag}</span></button>
             })          
             blockedTopics = this.props.blocks.topic.map((topic, key) => {
               
-              return <button className="btn btn-outline btn-primary" key={topic}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('topic',topic)} /><span className="hidden-sm-down" >{topic}</span></button>
+              return <button className="btn btn-outline btn-primary" key={topic}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('topic',topic)} /><span className="hidden-sm-down" >&nbsp;{topic}</span></button>
             }) 
             blockedTechniques = this.props.blocks.technique.map((technique, key) => {
               
-              return <button className="btn btn-outline btn-primary" key={technique}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('technique',technique)} /><span className="hidden-sm-down" >{technique}</span></button>
+              return <button className="btn btn-outline btn-primary" key={technique}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('technique',technique)} /><span className="hidden-sm-down" >&nbsp;{technique}</span></button>
             }) 
         }
       
@@ -172,7 +172,7 @@ export default class SingleQuestion extends Component {
                         }
                         {(target) && <a  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
                         }&nbsp;
-                        {showRecallButton && <button  className='btn btn-primary' onClick={() => this.setVisible('topic')}><Book size={26}  />&nbsp;<span className="d-none d-md-inline-block">Topic</span></button>
+                        {showRecallButton && question.quiz && <button  className='btn btn-primary' onClick={() => this.setVisible('topic')}><Book size={26}  />&nbsp;<span className="d-none d-md-inline-block">Topic</span></button>
                         }&nbsp;
                         {showRecallButton && <button  className='btn btn-primary' onClick={() => this.setVisible('tags')}><Tags size={26}  />&nbsp;<span className="d-none d-md-inline-block">Tags</span></button>
                         }
@@ -181,22 +181,23 @@ export default class SingleQuestion extends Component {
                     &nbsp;
                     </div>
                 </div>
+                <br/>
                 {this.isVisible('answer') && question.answer && <div className="card-block answer">
-                    <div ref={(section) => { this.scrollTo.answer = section; }} className='card-text'><b>Answer</b> <span>{question.answer}</span></div>
+                    <div ref={(section) => { this.scrollTo.answer = section; }} className='card-text'><b>Answer</b> <span><pre>{question.answer}</pre></span></div>
                 </div>}
                 {this.isVisible('mnemonic') && showRecallButton && <div  ref={(section) => { this.scrollTo.mnemonic = section; }}  className="card-block mnemonic">
-                    <div className='card-text'><b>Mnemonic</b><h4>{question.mnemonic}</h4></div>
+                    <div className='card-text'><b>Mnemonic</b><pre className='mnemonic' >{question.mnemonic}</pre></div>
                     <div className='card-text' ><b>Type</b><button className="btn btn-outline btn-primary"   > <span className="hidden-sm-down" >{question.mnemonic_technique}</span></button>{likeButton}</div>
                 </div>}
                 {this.isVisible('mnemonic') && !showRecallButton && <div  ref={(section) => { this.scrollTo.mnemonic = section; }}  className="card-block mnemonic">
-                    <div className='card-text'><b>Mnemonic</b><h4>{question.mnemonic}</h4></div>
+                    <div className='card-text'><b>Mnemonic</b><pre  className='mnemonic' >{question.mnemonic}</pre></div>
                     <div className='card-text' ><b>Type</b> <span><button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('technique',question.mnemonic_technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(question.mnemonic_technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{question.mnemonic_technique}</span></button></span>{likeButton}</div>
                 </div>}
                 <br/>
-                 {(!showRecallButton) && <div  ref={(section) => { this.scrollTo.topic = section; }} className="card-block answer">
-                    <div className='card-text'><b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('topic',question.quiz)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTopic(question.quiz)} style={{float:'right'}}/><span className="hidden-sm-down" >{question.quiz}</span></button></span></div><br/>
+                 {(!showRecallButton) && question.quiz && <div  ref={(section) => { this.scrollTo.topic = section; }} className="card-block answer">
+                    <div className='card-text'><b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('topic',question.quiz)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTopic(question.quiz)} style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{question.quiz}&nbsp;</span></button></span></div><br/>
                 </div>}
-                {(this.isVisible('topic') && showRecallButton) && <div  ref={(section) => { this.scrollTo.topic = section; }} className="card-block answer">
+                {(this.isVisible('topic') && question.quiz && showRecallButton) && <div  ref={(section) => { this.scrollTo.topic = section; }} className="card-block answer">
                     <div className='card-text'><b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.quiz}</span></button></span></div><br/>
                 </div>}
                 
@@ -214,7 +215,7 @@ export default class SingleQuestion extends Component {
             
                 </div>
                 <div className="card-block">
-                    {(this.isVisible('image') && question.image) && <img  ref={(section) => { this.scrollTo.image = section; }}  alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/> }
+                    {(this.isVisible('image') && question.image) && <span><img  className="d-lg-none" ref={(section) => { this.scrollTo.image = section; }}  alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block" ref={(section) => { this.scrollTo.image = section; }}  alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></span> }
             
                 </div>
                 

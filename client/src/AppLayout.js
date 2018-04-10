@@ -158,6 +158,43 @@ export default class AppLayout extends Component {
       })
   }
   
+
+  refreshLogin () {
+      var state={};
+      var that = this;
+      state.user = this.state.user;
+      //state.currentPage = 'home';
+      console.log('refresh token');
+        //console.log(user);
+        var params={
+            'refresh_token':this.state.token.refresh_token,
+            'grant_type':'refresh_token',
+            'client_id':config.clientId,
+            'client_secret':config.clientSecret
+          };
+        fetch('/oauth/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            //Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
+          },
+          body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+        }).then(function(response) {
+            return response.json();
+            
+        }).then(function(res) {
+            console.log(['ddtoken response',res]);
+            state.token = res;
+            console.log(['refreshed token',res]);
+            that.setState(state);
+        })
+        .catch(function(err) {
+            console.log(['ERR',err]);
+        });
+
+  }
+
+
   login (user) {
       var state={};
       var that = this;
@@ -194,6 +231,10 @@ export default class AppLayout extends Component {
               //  console.log(['set progress', json])
                 that.setState(state);
                 that.updateProgress(json);
+                setInterval(function() {
+                    console.log('toke ref');
+                    that.refreshLogin(state.user)
+                },(parseInt(this.state.token.expires_in,10)-1)*1000);
               }).catch(function(ex) {
                 console.log(['parsing failed', ex])
               })
@@ -217,6 +258,10 @@ export default class AppLayout extends Component {
             state.user = res.user;
             state.token = res.token;
             that.setState(state);
+            setInterval(function() {
+                console.log('toke ref tok');
+                that.refreshLogin(state.user)
+            },(parseInt(this.state.token.expires_in,10)-1)*1000);
         })
         .catch(function(err) {
             console.log(['ERR',err]);

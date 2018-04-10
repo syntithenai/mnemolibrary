@@ -9,7 +9,7 @@ export default class GoogleLogin extends Component {
         this.loggedIn = false;
         this.accessToken = '';
         //this.apiKey = 'AIzaSyCe01AFr01CUf3g82kAlJhC126j_AF7l2A';
-        this.apiKey = 'AIzaSyCe01AFr01CUf3g82kAlJhC126j_AF7l2A';
+        //this.apiKey = 'AIzaSyCe01AFr01CUf3g82kAlJhC126j_AF7l2A';
 	//mnemolibrary-1517864563209
     //mnemoslibrary@gmail.com
     //1049709865001-vd3ddolmkf66rdo73624ocj16d6g5ueo.apps.googleusercontent.com

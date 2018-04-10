@@ -19,10 +19,6 @@ body {
 .question,.tags .btn {
    text-align:left !important;
 }
-.question .mnemonic h4 {
-    color :  red;
-    font-size: 1.2em;
-}
 .question .buttons button {  }
 
 .container {
@@ -53,4 +49,18 @@ iframe {
 
 .navbar .nav-item {
     font-size: 1.5em;
+}
+
+.question .buttons .btn {
+    margin-top: 0.2em;
+}
+
+pre {
+    white-space: pre-wrap;
+    font-family: sans-serif;
+}
+pre.mnemonic {
+    color :  red;
+    font-size: 1.3em;
+
 }
