@@ -1,13 +1,48 @@
 import React, { Component } from 'react';
 
+import {
+  FacebookShareButton,
+  TwitterShareButton,
+  EmailShareButton,
+  FacebookShareCount
+  //GooglePlusShareButton,
+  //LinkedinShareButton,
+  //WhatsappShareButton,
+  //PinterestShareButton,
+  //RedditShareButton,
+  //TumblrShareButton,
+} from 'react-share';
+import Utils from './Utils';
+          
+
 import Email from 'react-icons/lib/fa/envelope-o';
 import Twitter from 'react-icons/lib/fa/twitter';
+import Facebook from 'react-icons/lib/fa/facebook';
 
 export default class ShareDialog extends Component {
     
     render() {
-        let mailTo='mailto:?subject=Mnemos Library - '+this.props.header+'&body='+this.props.shareLink;
-        let twitterLink="https://twitter.com/intent/tweet?text="+this.props.header+'&url='+this.props.shareLink   ;
+        let question=this.props.question;
+        //let mailTo='mailto:?subject=Mnemos Library - '+this.props.header+'&body='+this.props.shareLink;
+        //let twitterText= this.props.question.mnemonic ? this.props.question.mnemonic : '';
+        let header = Utils.getQuestionTitle(question);
+
+        // use the question link as the main link if available (so article images show on social network)
+        // fallback to generated link back to nemo
+        let shareLink=window.location.protocol+'//'+window.location.host+"/?question="+question._id;          
+        let mainLink=question.link ? question.link : shareLink;
+        // where we haven't used the link as the main link, 
+        let otherLink=question.link ? shareLink : "";
+        let bothLinks = mainLink + "  \n\n" + otherLink;
+        
+        
+        let title="Mnemos Library -"+(this.props.question.mnemonic ? this.props.question.mnemonic : '') + " - \n" + question.question;
+        let longTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.question + "  \n" + otherLink;
+        
+        let allTogether = title + "  \n" + otherLink  + "  \n" + mainLink ;
+        
+        let mailTo='mailto:?subject='+title+'&body='+bothLinks;
+        
         return  (
             <div id="sharedialog" className="modal" tabIndex="-1" role="dialog">
               <div className="modal-dialog" role="document">
@@ -19,22 +54,11 @@ export default class ShareDialog extends Component {
                     </button>
                   </div>
                   <div className="modal-body">
-                     
-                     
-                     <a  target='_new'  href={mailTo} className='btn btn-primary'  ><Email size={26}  />&nbsp;<span >&nbsp;Email</span></a>
-                      &nbsp;&nbsp;
-                     
-                     
-                      <a target="_new"  className="btn btn-primary twitter-share-button"
-                      href={twitterLink}
-                      data-size="large"><Twitter size={26}  />&nbsp;<span >&nbsp;Tweet</span></a>  
-                      &nbsp;&nbsp;
-                     <div  className="fb-share-button" 
-                        data-href={this.props.shareLink}
-                        data-size="large" data-mobile-iframe="true"
-                        data-layout="button_count" > </div>
-                      &nbsp;&nbsp;   
-                      
+                    <a className='btn btn-primary' href={mailTo} target='_new' ><Email size={26} />&nbsp;Email</a>
+                    <br/>
+                    <br/><TwitterShareButton className='btn btn-primary' title={longTitle} url={mainLink} hashtags={["MnemosLibrary"]}><Twitter size={26} />&nbsp;Twitter</TwitterShareButton>
+                    <br/><br/><FacebookShareButton className='btn btn-primary' quote={longTitle} url={mainLink}  ><Facebook size={26} />&nbsp;Facebook</FacebookShareButton>
+                    
                   </div>
                 </div>
               </div>
@@ -44,3 +68,24 @@ export default class ShareDialog extends Component {
     };
     
 }
+
+//<GooglePlusShareButton />
+                    //<LinkedinShareButton/>
+                    //<WhatsappShareButton/>
+                    //<PinterestShareButton/>
+                    //<RedditShareButton/>
+                    //<TumblrShareButton/>
+                      
+ //<a  target='_new'  href={mailTo} className='btn btn-primary'  ><Email size={26}  />&nbsp;<span >&nbsp;Email</span></a>
+                      //&nbsp;&nbsp;
+                     
+                     
+                      //<a target="_new"  className="btn btn-primary twitter-share-button"
+                      //href={twitterLink}
+                      //data-size="large"><Twitter size={26}  />&nbsp;<span >&nbsp;Tweet</span></a>  
+                      //&nbsp;&nbsp;
+                     //<div  className="fb-share-button" 
+                        //data-href={this.props.shareLink}
+                        //data-size="large" data-mobile-iframe="true"
+                        //data-layout="button_count" > </div>
+                      //&nbsp;&nbsp;   

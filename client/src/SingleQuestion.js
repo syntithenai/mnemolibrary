@@ -21,6 +21,7 @@ import scrollToComponent from 'react-scroll-to-component';
 
 import ShareDialog from './ShareDialog';
 import Utils from './Utils';
+import Swipe from 'react-swipe-component';
 
 //import ThumbsDown from 'react-icons/lib/fa/thumbs-down';
 
@@ -138,11 +139,10 @@ export default class SingleQuestion extends Component {
                       // !this.isVisible('topic')) && 
                       // (!this.isVisible('tags')) && 
             
-            let shareLink=window.location.protocol+'//'+window.location.host+"/?question="+question._id;          
                      
            return (
             <div className="card question container" >
-                
+              <Swipe onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')} mouseSwipe={false} >
                 <div className="row buttons justify-content-between" >
                     <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} />&nbsp;</button>
                     <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Prev&nbsp;</span></button>
@@ -183,7 +183,7 @@ export default class SingleQuestion extends Component {
                       </div>
                     <div className="col-sm-4">
                        <button style={{float:'right'}} target='_new' data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
-                      <ShareDialog id="sharedialog"  header={header} shareLink={shareLink}/>
+                      <ShareDialog id="sharedialog"  header={header}  question={question}/>
                     </div>
                       </div>
                    
@@ -227,7 +227,7 @@ export default class SingleQuestion extends Component {
                     <div ref={(section) => { this.scrollTo.image = section; }} ></div>
                     {(this.isVisible('image') && question.image) && <span><img  className="d-lg-none" ref={(section) => { this.scrollTo.image = section; }}  alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></span> }
                 </div>
-                
+              </Swipe>  
             </div>
    
           
