@@ -20,6 +20,20 @@ The login system is provided using an Open Auth server based on https://github.c
 // to insteall npm packages on live sserver (when non starting)
 docker run -v /var/docker/mnemolibrary:/usr/src/app --entrypoint=/bin/bash -it syntithenai/nemo
 
+
+Content AI
+https://medium.com/search?q=Mycroft
+
+
+Content Tech
+
+
+Content Kids
+
+
+
+
+
 # LINKS
 
 # swipe react

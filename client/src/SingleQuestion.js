@@ -17,10 +17,9 @@ import ConnectDevelop from 'react-icons/lib/fa/connectdevelop';
 import Close from 'react-icons/lib/fa/close';
 import Book from 'react-icons/lib/fa/book';
 import ShareAlt from 'react-icons/lib/fa/share-alt';
-
 import scrollToComponent from 'react-scroll-to-component';
 
-
+import ShareDialog from './ShareDialog';
 import Utils from './Utils';
 
 //import ThumbsDown from 'react-icons/lib/fa/thumbs-down';
@@ -139,8 +138,7 @@ export default class SingleQuestion extends Component {
                       // !this.isVisible('topic')) && 
                       // (!this.isVisible('tags')) && 
             
-                      
-            let mailTo='mailto:?subject=Mnemos Library - '+header+'&body='+window.location.protocol+'//'+window.location.host+"?question="+question._id;
+            let shareLink=window.location.protocol+'//'+window.location.host+"/?question="+question._id;          
                      
            return (
             <div className="card question container" >
@@ -182,12 +180,15 @@ export default class SingleQuestion extends Component {
                         }&nbsp;
                         {showRecallButton && <button  className='btn btn-primary' onClick={() => this.setVisible('tags')}><Tags size={26}  />&nbsp;<span className="d-none d-md-inline-block">Tags</span></button>
                         }
+                      </div>
+                    <div className="col-sm-4">
+                       <button style={{float:'right'}} target='_new' data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
+                      <ShareDialog id="sharedialog"  header={header} shareLink={shareLink}/>
                     </div>
+                      </div>
                    
                     &nbsp;
-                    <a style={{float:'right'}} target='_new' href={mailTo} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></a>
                     </div>
-                </div>
                 <br/>
                 {this.isVisible('answer') && question.answer && <div className="card-block answer">
                     <div ref={(section) => { this.scrollTo.answer = section; }} className='card-text'><b>Answer</b> <span><pre>{question.answer}</pre></span></div>
@@ -218,12 +219,13 @@ export default class SingleQuestion extends Component {
                 </div>}
                 <br/>
                 <div className="card-block">
-                    {(this.isVisible('moreinfo') && !target) && <iframe  ref={(section) => { this.scrollTo.moreinfo = section; }}  src={link} style={{width:"98%", height: "1200px", border: "0px"}}/> }
+                    <div ref={(section) => { this.scrollTo.moreinfo = section; }} ></div>
+                    {(this.isVisible('moreinfo') && !target) && <iframe   src={link} style={{width:"98%", height: "1200px", border: "0px"}}/> }
             
                 </div>
                 <div className="card-block">
-                    {(this.isVisible('image') && question.image) && <span><img  className="d-lg-none" ref={(section) => { this.scrollTo.image = section; }}  alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block" ref={(section) => { this.scrollTo.image = section; }}  alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></span> }
-            
+                    <div ref={(section) => { this.scrollTo.image = section; }} ></div>
+                    {(this.isVisible('image') && question.image) && <span><img  className="d-lg-none" ref={(section) => { this.scrollTo.image = section; }}  alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></span> }
                 </div>
                 
             </div>

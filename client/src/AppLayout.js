@@ -102,6 +102,7 @@ export default class AppLayout extends Component {
        this.setQuizFromDiscovery = this.setQuizFromDiscovery.bind(this);
        
        this.login = this.login.bind(this);
+       this.refreshLogin = this.refreshLogin.bind(this);
        this.loginByToken = this.loginByToken.bind(this);
        this.logout = this.logout.bind(this);
        this.isLoggedIn = this.isLoggedIn.bind(this);
@@ -145,6 +146,10 @@ export default class AppLayout extends Component {
               // question
               if (iParts[0]==="question") {
                   that.setQuizFromQuestionId(iParts[1]);
+              } else if (iParts[0]==="tag") {
+                  that.setQuizFromTag({text:iParts[1]});
+              } else if (iParts[0]==="topic") {
+                  that.setQuizFromTopic(iParts[1]);
               }
               
               // topic

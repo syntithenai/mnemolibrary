@@ -301,7 +301,7 @@ router.post('/signup', function(req, res) {
                                                  var host = hostParts[0];
                                                  var link = req.protocol + "://"  + host + ':4000/login/confirm?code='+token.access_token;
                                                 //res.redir(config.authorizeUrl);
-                                                  utils.sendMail(config.mailFrom,req.body.username,'Confirm your registration with Nemos Library',
+                                                  utils.sendMail(config.mailFrom,req.body.username,'Confirm your registration with Mnemos Library',
                                                   mustache.render(`<div>Hi {{name}}! <br/>
 
                                 Welcome to Mnemo's Library.<br/>
