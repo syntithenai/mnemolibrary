@@ -732,12 +732,13 @@ export default class AppLayout extends Component {
             {(showLogin) && <LoginPage token={this.state.token} login={this.login}/>
             }<br/>
             <Footer/>
-            <AdSense.Google
-              client='ca-pub-8152690534650306'
-              slot='5452746977'
-            />
+            
         </div>
         
     );
   }
 }
+//<AdSense.Google
+              //client='ca-pub-8152690534650306'
+              //slot='5452746977'
+            ///>

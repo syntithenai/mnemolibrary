@@ -469,7 +469,7 @@ router.get('/review', (req, res) => {
      criteria.push({user:req.query.user});
      criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
      let oneHourBack = new Date().getTime() - 1800000;
-     //criteria.push({seen:{$lt:oneHourBack}});   
+     criteria.push({seen:{$lt:oneHourBack}});   
      //console.log({seen:{$lt:oneHourBack}});
      if (req.query.user && req.query.user.length > 0) {
          // sort by successTally and then most recently seen first
