@@ -58,7 +58,7 @@ export default class ReviewPage extends Component {
             }
       } else {
         return (
-            <div><b><a onClick={() => this.props.setCurrentPage('login')} >Join</a> the library to build your knowledge bank.</b></div>
+            <div><b><a onClick={() => this.props.setCurrentPage('login')} className="btn btn-info" >Join</a> the library to build your knowledge bank.</b></div>
         );
       }
     }
