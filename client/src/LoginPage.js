@@ -210,7 +210,7 @@ export default class LoginPage extends Component {
                     <div className='col-12 warning-message'>{this.state.warning_message}</div>
                     <div className="col-6 card">
                         <form method="POST" onSubmit={this.submitSignIn} className="form-group">
-                          <h3 className="card-title">Sign In</h3>
+                          <h3 className="card-title">Login</h3>
                           <GoogleLogin 
                                 clientId={config.googleClientId}
                                 onSuccess={this.googleLogin}
@@ -220,14 +220,14 @@ export default class LoginPage extends Component {
                             <label htmlFor="email_login" className="row">Email </label><input id="email_login" type='text' name='email_login'   onChange={this.change} value={this.state.email_login}  autoComplete="false"  />
                             <label htmlFor="password_login" className="row">Password </label><input id="password_login" type='password' name='password_login'  onChange={this.change} value={this.state.password_login}  autoComplete="false"  />
                             <br/><br/>
-                           <button  className='btn btn-info'>Sign In</button>
+                           <button  className='btn btn-info'>Login</button>
                            <button onClick={this.forgotPassword} className='btn btn-info'>Forgot</button>
                            
                         </form>
                     </div>
                     <div className="col-6  card">
                         <form method="POST" onSubmit={this.submitSignUp} className="form-group" >
-                          <h3 className="card-title">Sign Up</h3>
+                          <h3 className="card-title">Registration</h3>
                           <div className='col-12 warning-message'>{this.state.signup_warning_message}</div>
                     
                             <label htmlFor="name" className='row'>Name </label><input autoComplete="false" id="name" type='text' name='name' onChange={this.change} />
@@ -237,7 +237,7 @@ export default class LoginPage extends Component {
                             <label htmlFor="password2" className='row'>Repeat Password</label><input  autoComplete="false"  id="password2" type='password' name='password2' onChange={this.change} />
                             <br/>
                             <br/>
-                            <button  className='btn btn-info'>Sign Up</button>
+                            <button  className='btn btn-info'>Register</button>
                         </form>
                         <br/>
                     </div>

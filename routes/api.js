@@ -446,10 +446,21 @@ router.post('/discover', (req, res) => {
     })
 })
 
+function shuffle (array) {
+  var i = 0
+    , j = 0
+    , temp = null
 
+  for (i = array.length - 1; i > 0; i -= 1) {
+    j = Math.floor(Math.random() * (i + 1))
+    temp = array[i]
+    array[i] = array[j]
+    array[j] = temp
+  }
+}
 
 router.get('/review', (req, res) => {
-    console.log('review');
+    //console.log('review');
     let limit=20;
      let orderBy = (req.body.orderBy == 'successRate') ? 'successRate' : 'timeScore'
      let orderMeBy = {};
@@ -457,13 +468,13 @@ router.get('/review', (req, res) => {
      let criteria=[];
      criteria.push({user:req.query.user});
      criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
-     //let oneHourBack = new Date().getTime() - 3600000;
-     //criteria.push({$or:[]});   seen:{$lt:oneHourBack}
+     let oneHourBack = new Date().getTime() - 1800000;
+     //criteria.push({seen:{$lt:oneHourBack}});   
      //console.log({seen:{$lt:oneHourBack}});
      if (req.query.user && req.query.user.length > 0) {
          // sort by successTally and then most recently seen first
-        db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':-1}).limit(limit).toArray().then(function(questions) {
-            console.log(questions);
+        db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(limit).toArray().then(function(questions) {
+      //      console.log(questions);
             //let questions=[];
             if (questions) {
                 //for (var questionId in progress.seen) {
@@ -480,7 +491,7 @@ router.get('/review', (req, res) => {
                         //} 
                     //}
                 //}
-            
+             
                 //let orderBy = (req.body.orderBy == 'successRate') ? 'successRate' : 'timeScore'
                 //questions.sort(function(a,b) {
                     //if (a[orderBy] === b[orderBy]) {
@@ -491,31 +502,69 @@ router.get('/review', (req, res) => {
                         //return -1;
                     //}
                 //});
-               console.log(['REVIEW',questions]);
+             //  console.log(['REVIEW',questions]);
                // questions = questions.slice(0,limit);
                // let questionIds = [];
                 let questionKeys = [];
-                //let indexedQuestions = {};
+                let indexedQuestions = {};
+                let successAndDateKeyed={};
+                let successKeys=[];
+                let successDateKeys={};
                 //let i = 0;
                 questions.forEach(function(question) {
+                    successTally = parseInt(question.successTally,10) > 0 ? parseInt(question.successTally,10) : 0;
+                    if (!successAndDateKeyed.hasOwnProperty(successTally)) {
+                        successAndDateKeyed[successTally]={};
+                        successKeys.push(successTally);
+                    };
+                    let d = new Date(question.seen);
+                    let dateKey=d.getDate()+' '+d.getMonth()+' '+d.getFullYear();
+                    if (!successAndDateKeyed[successTally].hasOwnProperty(dateKey)) {
+                        successAndDateKeyed[successTally][dateKey]=[];
+                        if (!successDateKeys.hasOwnProperty(successTally)) {
+                            successDateKeys[successTally] = [];
+                        }
+                        successDateKeys[successTally].push(dateKey);
+                    };
+                    successAndDateKeyed[successTally][dateKey].push(question);
                 //    questionIds.push(question.questionId);
                     questionKeys.push(ObjectId(question.question));
                 //    indexedQuestions[question.questionId] = i;
                 //    i++;
                 });
-                console.log(['REVItEW',questionKeys]);
-                db.collection('questions').find({_id:{$in:questionKeys}}).toArray(function(err,results) {
+                let successAndDateOrderedIds=[];
+                successKeys.forEach(function(successTally) {
+                    //let tallyGroup=
+                    console.log(successTally,successAndDateKeyed[successTally]);
+                    successDateKeys[successTally].forEach(function(day) {
+                        let shuffleGroup = successAndDateKeyed[successTally][day];
+                        shuffleGroup.sort(function() {
+                          return .5 - Math.random();
+                        });
+                        shuffleGroup.forEach(function(question) {
+                            successAndDateOrderedIds.push(ObjectId(question.question));
+                        });
+                    }); 
+                });
+ //               }
+                
+                
+                console.log(['REVItEW',successAndDateOrderedIds]);
+                db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).toArray(function(err,results) {
+                   // console.log(results);
                     let questionIndex={};
                     results.forEach(function(question) {
                         questionIndex[question._id]=question;
+                        //console.log(question._id);
                     });
                     let orderedResults=[];
-                    questions.forEach(function(question) {
-                        orderedResults.push(questionIndex[question.question]);   
+                    successAndDateOrderedIds.forEach(function(question) {
+                        orderedResults.push(questionIndex[question]);   
                     });
-                    console.log(['q',err,orderedResults]);
+                    //console.log(['q',err,orderedResults]);
                     //res.send({'currentQuestion':'0','currentQuiz':questionIds,'questions':results,indexedQuestions:indexedQuestions});
                     res.send({'questions':orderedResults});
+                    //res.send({'questions':results});
                 })
             } else {
                 res.send('Invalid request, no user progress');

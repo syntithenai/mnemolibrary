@@ -296,7 +296,7 @@ export default class AppLayout extends Component {
       var state={};
       state.user = '';
       state.token = '';
-      state.currentPage = 'home';
+      state.currentPage = 'splash';
       this.setState(state);
       let GoogleAuth = gapi.auth2.getAuthInstance();
       GoogleAuth.disconnect();

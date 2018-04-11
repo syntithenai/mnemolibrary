@@ -9,9 +9,11 @@ export default class FindQuestions extends Component {
     render() {
         return  (
             <div className='findquestions'>
-                <span>Welcome to Mnemo's Library, a community of lifelong learners who use mnemonics.</span>
-                <p>"Staggering pun&nbsp;for learning fun."</p>
-                <br/> 
+                <div>For teachers and students, lifelong learners, news junkies, academics, language learners, trivia buffs, and punsters.</div>
+                <div>A community of lifelong learners who use mnemonics.</div>
+                
+                <i>"Staggering puns for learning fun."</i>
+                <br/> <br/> 
                 <b>Learn something new</b>
                 <br/> 
                 <button className="btn btn-info" href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</button>

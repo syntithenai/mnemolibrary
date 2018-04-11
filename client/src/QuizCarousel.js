@@ -75,17 +75,17 @@ export default class QuizCarousel extends Component {
           //this.logStatus('seen',id);
           //questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           //questions.review[id].push(time);
+            // local collate success ids for finishQuiz function
+            const time = new Date().getTime();
+            let success = this.state.success;
+            if (!success.includes(this.props.currentQuestion)) {
+                success.push(this.props.currentQuestion);
+            }
+            //questions.success[id]=time;
             if (this.isQuizFinished()) {
                this.logStatus('success',id);
                this.finishQuiz(this.props.questions,this.state.success);
             }  else {
-                // local collate success ids for finishQuiz function
-                const time = new Date().getTime();
-                let success = this.state.success;
-                if (!success.includes(this.props.currentQuestion)) {
-                    success.push(this.props.currentQuestion);
-                }
-                //questions.success[id]=time;
                 //questions.successTally[id] = questions.successTally.hasOwnProperty(id) ? questions.successTally[id] + 1 : 1;
                 this.setState({ 'success': success});
                 //console.log(['success',this.props.currentQuestion]);
@@ -160,9 +160,11 @@ export default class QuizCarousel extends Component {
    finishQuiz() {
        console.log(['finish quiz',this.props.finishQuiz]);
         // inject override
+        
        if (this.props.finishQuiz) {
             this.props.finishQuiz(this.props.questions,this.state.success);
         } 
+        this.setState({'success' : []});
         //else {
            //this.props.setCurrentPage('home');
            //this.props.setMessage('You added '+((this.props.questions && this.props.questions.length)?this.props.questions.length:'')+' questions to your knowledge base.') ;

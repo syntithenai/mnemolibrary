@@ -26,7 +26,7 @@ export default class ReviewPage extends Component {
    // return seen questionIds sorted by 'review status'
     getQuestionsForReview() {
        console.log('getQuestionsForReview');
-     this.props.getQuestionsForReview();
+       this.props.getQuestionsForReview();
     };
     
     finishReview(questions,success) {
@@ -49,7 +49,7 @@ export default class ReviewPage extends Component {
                 )
             } else {
                 return (
-                <div><b>First up you need to discover something interesting. </b> <br/><br/><button className="btn btn-info" href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</button>
+                <div><br/><b>You have no questions available for review. <br/>Note that questions that you have seen in the last half hour are excluded from review. <br/><br/>Time to discover something new ! </b> <br/><br/><button className="btn btn-info" href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</button>
                 <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</button>
                 <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</button>
                 <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</button>
