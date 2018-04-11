@@ -698,10 +698,12 @@ export default class AppLayout extends Component {
     const tags = this.state.words;
     const showProfile = this.isCurrentPage('login') && this.isLoggedIn();
     const showLogin = this.isCurrentPage('login') && !this.isLoggedIn();
+    let title=decodeURIComponent(this.state.title);
+    
     return (
         <div className="mnemo">
             <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
-            <div className='page-title'><h4>{this.state.title}</h4></div>
+            <div className='page-title'><h4>{title}</h4></div>
             {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
             {this.isCurrentPage('splash') && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} /></div>}
             
