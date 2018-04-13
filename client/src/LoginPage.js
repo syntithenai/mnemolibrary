@@ -131,6 +131,8 @@ export default class LoginPage extends Component {
             that.setState(data); 
             that.props.login(data);
             
+        } else {
+            that.setState(data); 
         }
         
       }).catch(function(error) {
