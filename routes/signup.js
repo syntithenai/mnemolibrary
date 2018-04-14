@@ -48,7 +48,7 @@ router.get('/me',function(req,res) {
                                     'client_id':config.clientId,
                                     'client_secret':config.clientSecret
                                 };
-                                fetch(config.protocol + "://" +config.host+':4000/oauth/token', {
+                                fetch(config.protocol + "://" +'localhost'+':4000/oauth/token', {
                                   method: 'POST',
                                   headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -142,7 +142,7 @@ function sendToken(req,res,user) {
         'client_id':config.clientId,
         'client_secret':config.clientSecret
   };
-    fetch(config.protocol + "://" +config.host+':4000/oauth/token', {
+    fetch(config.protocol + "://" +'localhost'+':4000/oauth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -280,7 +280,7 @@ router.post('/signup', function(req, res) {
                          // no update email address, item.username = req.body.username;
                           //    console.log(['save new item',item]);
                           db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(xres) {
-                                      fetch(config.protocol + "://" +config.host+':4000/oauth/token', {
+                                      fetch(config.protocol + "://" +'localhost'+':4000/oauth/token', {
                                           method: 'POST',
                                           headers: {
                                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -356,7 +356,7 @@ router.post('/signin', function(req, res) {
                             'client_id':config.clientId,
                             'client_secret':config.clientSecret
                       };
-                        fetch(config.protocol + "://" +config.host+':4000/oauth/token', {
+                        fetch(config.protocol + "://" +'localhost'+':4000/oauth/token', {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
