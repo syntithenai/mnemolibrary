@@ -1,6 +1,6 @@
 /* global gapi */
 import React, { Component } from 'react';
-import AdSense from 'react-adsense';
+//import AdSense from 'react-adsense';
  
 import Navigation from './Navigation';
 //import SingleQuestion from './SingleQuestion';
@@ -44,6 +44,7 @@ export default class AppLayout extends Component {
         //  'review':[]
         }};
         let users = null;
+      this.GoogleAuth = null; // Google Auth object.
       let userString = localStorage.getItem('users');
       if (userString) {
           let data = JSON.parse(userString);
@@ -70,7 +71,7 @@ export default class AppLayout extends Component {
           token:null,
           mnemonic_techniques :	["homonym","association","alliteration","rhyme","acronym","mnemonic major system","visual"],
           topicCollections:[],
-          discoveryBlocks:{tag:[],topic:[],technique:[]}
+          discoveryBlocks:{tag:[],topic:[],technique:[]},
       }
       // make 'this' available in setCurrentPage function
       this.setCurrentPage = this.setCurrentPage.bind(this);
@@ -134,6 +135,29 @@ export default class AppLayout extends Component {
 
   componentDidMount() {
       let that = this;
+      
+        const script = document.createElement("script");
+        script.src = "https://apis.google.com/js/platform.js";
+        script.onload = () => {
+            console.log('loaded gapis platform');
+          gapi.load('client', () => {
+            console.log('loaded gapis client platform');
+            gapi.client.setApiKey(this.props.clientId);
+            console.log('loaded gapis client platform set key');
+            gapi.load('client:auth2', function() {
+                console.log('loaded gapis client platform auth2');
+                let instance=gapi.auth2;  
+                console.log(['loaded gapis client platform',instance]);
+                that.GoogleAuth = instance;
+            });
+            console.log('loaded gapis platform ex1');
+          });
+          console.log('loaded gapis platform ex2');
+        };
+        console.log('loaded gapis platform ex3');
+
+        document.body.appendChild(script);
+
       if (window.location.search) {
           let parts = window.location.search.slice(1).split("&");
           parts.forEach(function(part) {
@@ -298,13 +322,19 @@ export default class AppLayout extends Component {
       state.token = '';
       state.currentPage = 'splash';
       this.setState(state);
-      let GoogleAuth = gapi.auth2.getAuthInstance();
-      GoogleAuth.disconnect();
+      console.log(['logout',gapi.auth2]);
+      console.log(this.state);
+      this.GoogleAuth.disconnect();
+      //gapi.auth2.getAuthInstance().disconnect();
+      //var auth2 = gapi.auth2.getAuthInstance();
+        //auth2.signOut().then(function () {
+          //console.log('User signed out.');
+        //});
     //console.log('logout at root');
       
   };
         
-  isLoggedIn() {
+  isLoggedIn() { 
       //
       if (this.state.token && this.state.token.access_token && this.state.token.access_token.length > 0 && this.state.user && this.state.user.username  && this.state.user.username.length > 0) {
           return true;
@@ -407,11 +437,11 @@ export default class AppLayout extends Component {
   
 
   // send an api request to like a question
-  like(questionId) {
+  like(questionId,mnemonicId) {
      let user = this.state.users.default;
     //console.log(['like',questionId,this.state,user]); 
      if (!user.questions.likes) user.questions.likes = {};
-     if (questionId in user.questions.likes) {
+     if (false && questionId in user.questions.likes) {
         // console.log('already voted');
      } else {
          user.questions.likes[questionId] = 1;
@@ -430,7 +460,7 @@ export default class AppLayout extends Component {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({'user':this.state.user._id,'question':questionId})
+          body: JSON.stringify({'user':this.state.user._id,'question':questionId,'mnemonic':mnemonicId})
         }).catch(function(err) {
             this.setState({'warning_message':'Not Saved'});
         });

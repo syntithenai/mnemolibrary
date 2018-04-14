@@ -7,7 +7,7 @@ import ArrowLeft from 'react-icons/lib/fa/arrow-left';
 import Trash from 'react-icons/lib/fa/trash';
 import Info from 'react-icons/lib/fa/info';
 import Ellipsis from 'react-icons/lib/fa/ellipsis-v';
-import ThumbsUp from 'react-icons/lib/fa/thumbs-up';
+//import ThumbsUp from 'react-icons/lib/fa/thumbs-up';
 import Image from 'react-icons/lib/fa/image';
 import Ban from 'react-icons/lib/fa/ban';
 import Search from 'react-icons/lib/fa/search';
@@ -18,10 +18,10 @@ import Close from 'react-icons/lib/fa/close';
 import Book from 'react-icons/lib/fa/book';
 import ShareAlt from 'react-icons/lib/fa/share-alt';
 import scrollToComponent from 'react-scroll-to-component';
-
+import MnemonicsList from './MnemonicsList';
 import ShareDialog from './ShareDialog';
 import Utils from './Utils';
-import Swipe from 'react-swipe-component';
+//import Swipe from 'react-swipe-component';
 
 //import ThumbsDown from 'react-icons/lib/fa/thumbs-down';
 
@@ -33,6 +33,7 @@ export default class SingleQuestion extends Component {
         this.setVisible = this.setVisible.bind(this);
         this.isVisible = this.isVisible.bind(this);
         this.hideAll = this.hideAll.bind(this);
+        this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.scrollTo={};
     };
@@ -116,12 +117,7 @@ export default class SingleQuestion extends Component {
               link = 'https://www.google.com.au/search?q='+header;
               target='_new';
           }
-          let likeButton='';
-          if (this.isVisible('mnemonic') && this.props.isLoggedIn())
-                likeButton=<span className='like_dislike' >&nbsp;&nbsp;&nbsp;
-                        <a  className='btn btn-primary'  onClick={() => this.props.like(question._id)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Like&nbsp;<span className="badge badge-pill badge-info"  >{question.score}</span></a>
-                       
-                    </span> 
+       
           let tags = question.tags.map((tag, key) => {
               tag=tag.trim().toLowerCase();
               return <button className="btn btn-outline btn-primary" key={key}  ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('tag',tag)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTag({text:tag})} style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{tag}&nbsp;</span></button>
@@ -142,7 +138,7 @@ export default class SingleQuestion extends Component {
                      
            return (
             <div className="card question container" >
-              <Swipe onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')} mouseSwipe={false} >
+              
                 <div className="row buttons justify-content-between" >
                     <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} />&nbsp;</button>
                     <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Prev&nbsp;</span></button>
@@ -167,7 +163,7 @@ export default class SingleQuestion extends Component {
                       <div className="col-sm-8" >
                         {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Mnemonic</span></button>
                         }&nbsp;
-                        {showAnswerButton && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
+                        {showAnswerButton && showRecallButton && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
                         }&nbsp;
                         {question.image && <button  className='btn btn-primary' onClick={() => this.setVisible('image')}><Image size={26} />&nbsp;<span className="d-none d-md-inline-block">Image</span></button>
                         }&nbsp;
@@ -190,21 +186,10 @@ export default class SingleQuestion extends Component {
                     &nbsp;
                     </div>
                 <br/>
-                {this.isVisible('answer') && question.answer && <div className="card-block answer">
+                {(this.isVisible('answer') || !showRecallButton) && question.answer && <div className="card-block answer">
                     <div ref={(section) => { this.scrollTo.answer = section; }} className='card-text'><b>Answer</b> <span><pre>{question.answer}</pre></span></div>
                 </div>}
-                {this.isVisible('mnemonic') && showRecallButton && <div  ref={(section) => { this.scrollTo.mnemonic = section; }}  className="card-block mnemonic">
-                    <div className='card-text'><b>Mnemonic</b><pre className='mnemonic' >{question.mnemonic}</pre></div>
-                    <div className='card-text' ><b>Technique</b><button className="btn btn-outline btn-primary"   > <span className="hidden-sm-down" >{question.mnemonic_technique}</span></button>{likeButton}</div>
-                </div>}
-                {this.isVisible('mnemonic') && !showRecallButton && <div  ref={(section) => { this.scrollTo.mnemonic = section; }}  className="card-block mnemonic">
-                    <div className='card-text'><b>Mnemonic</b><pre  className='mnemonic' >{question.mnemonic}</pre></div>
-                    <div className='card-text' ><b>Technique</b> <span><button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('technique',question.mnemonic_technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(question.mnemonic_technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{question.mnemonic_technique}</span></button></span>{likeButton}</div>
-                </div>}
-                <br/>
-                 {(!showRecallButton) && question.quiz && <div  ref={(section) => { this.scrollTo.topic = section; }} className="card-block answer">
-                    <div className='card-text'><b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('topic',question.quiz)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTopic(question.quiz)} style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{question.quiz}&nbsp;</span></button></span></div><br/>
-                </div>}
+               {(this.isVisible('mnemonic') || !showRecallButton) &&<MnemonicsList user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
                 {(this.isVisible('topic') && question.quiz && showRecallButton) && <div  ref={(section) => { this.scrollTo.topic = section; }} className="card-block answer">
                     <div className='card-text'><b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.quiz}</span></button></span></div><br/>
                 </div>}
@@ -225,15 +210,15 @@ export default class SingleQuestion extends Component {
                 </div>
                 <div className="card-block">
                     <div ref={(section) => { this.scrollTo.image = section; }} ></div>
-                    {(this.isVisible('image') && question.image) && <span><img  className="d-lg-none" ref={(section) => { this.scrollTo.image = section; }}  alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></span> }
+                    {((this.isVisible('image') || !showRecallButton) && question.image) && <span><img  className="d-lg-none" ref={(section) => { this.scrollTo.image = section; }}  alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></span> }
                 </div>
-              </Swipe>  
+
             </div>
    
           
           
             )
-          
+//            <Swipe onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')} mouseSwipe={false} >  </Swipe>            
         } else {
             return <div className="card question container" >
                 <div className='blocked-tags' style={{float:'right'}}>

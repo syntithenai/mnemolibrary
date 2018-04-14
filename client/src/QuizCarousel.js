@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Utils from './Utils';
-import FindQuestions from './FindQuestions';
+//import FindQuestions from './FindQuestions';
 import SingleQuestion from './SingleQuestion';
 import QuestionList from './QuestionList';
 import Play from 'react-icons/lib/fa/play';
@@ -76,7 +76,6 @@ export default class QuizCarousel extends Component {
           //questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
           //questions.review[id].push(time);
             // local collate success ids for finishQuiz function
-            const time = new Date().getTime();
             let success = this.state.success;
             if (!success.includes(this.props.currentQuestion)) {
                 success.push(this.props.currentQuestion);

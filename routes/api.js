@@ -446,19 +446,6 @@ router.post('/discover', (req, res) => {
     })
 })
 
-function shuffle (array) {
-  var i = 0
-    , j = 0
-    , temp = null
-
-  for (i = array.length - 1; i > 0; i -= 1) {
-    j = Math.floor(Math.random() * (i + 1))
-    temp = array[i]
-    array[i] = array[j]
-    array[j] = temp
-  }
-}
-
 router.get('/review', (req, res) => {
     //console.log('review');
     let limit=20;
@@ -469,7 +456,7 @@ router.get('/review', (req, res) => {
      criteria.push({user:req.query.user});
      criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
      let oneHourBack = new Date().getTime() - 1800000;
-     criteria.push({seen:{$lt:oneHourBack}});   
+     //criteria.push({seen:{$lt:oneHourBack}});   
      //console.log({seen:{$lt:oneHourBack}});
      if (req.query.user && req.query.user.length > 0) {
          // sort by successTally and then most recently seen first
@@ -655,7 +642,7 @@ router.get('/questions', (req, res) => {
 
 router.post('/like', (req, res) => {
    // console.log(['like']);
-    if (req.body.user && req.body.user.length > 0 && req.body.question && String(req.body.question).length > 0 ) {
+    if (req.body.user && req.body.user.length > 0 && req.body.question && String(req.body.question).length > 0  && req.body.mnemonic && String(req.body.mnemonic).length > 0 ) {
       //  console.log(['ok']);
         let user = req.body.user;
         let question = req.body.question;
@@ -670,7 +657,7 @@ router.post('/like', (req, res) => {
                 } else {
                     // create a votet
          //           console.log(['like vote']);
-                    db.collection('likes').insert({'user':user,question:question}).then(function(inserted) {
+                    db.collection('likes').insert({'user':user,question:question,mnemonic:mnemonic}).then(function(inserted) {
            //             console.log(['like inserted']);
                         // collate tally of all likes for this question and save to question.score
                         db.collection('likes').find({question:question}).toArray(function(err, likes) {
@@ -889,6 +876,59 @@ router.post('/success', (req, res) => {
     }
 })
 
+router.post('/savemnemonic', (req, res) => {
+    //console.log(['seen',req.body]);
+    if (req.body.user && req.body.user.length > 0 && req.body.question && req.body.question.length > 0 && req.body.mnemonic && String(req.body.mnemonic).length > 0  && req.body.technique && String(req.body.technique).length > 0 && req.body.questionText && String(req.body.questionText).length > 0) {
+        let user = req.body.user;
+        let question = req.body.question;
+        db.collection('mnemonics').find({user:user,question:question}).toArray(function(err, result) {
+            console.log(['seen found',result]);
+            if (result.length > 0) {
+          //    console.log(['seen update']);
+                db.collection('mnemonics').update({_id:ObjectId(result[0]._id)},{$set:{mnemonic:req.body.mnemonic,questionText:req.body.questionText,technique:req.body.technique}}).then(function(updated) {
+                    res.send('updated');
+                }).catch(function(e) {
+                    res.send('error on update');
+                });
+            } else {
+                // create a seen record
+            //    console.log(['seen insert']);
+                let ts = new Date().getTime();
+                db.collection('mnemonics').insert({user:user,question:question,mnemonic:req.body.mnemonic,questionText:req.body.questionText,technique:req.body.technique}).then(function(inserted) {
+              //      console.log(['seen inserted']);
+                    // collate tally of all seen, calculate success percentage to successScore
+                    res.send('inserted');
+                }).catch(function(e) {
+                    res.send('error on insert');
+                });
+            }
+        });
+    } else {
+        res.send({message:'Invalid request'});
+    }
+})
+
+router.post('/mnemonics', (req, res) => {
+    //console.log(['seen',req.body]);
+    if (req.body.question && req.body.question.length > 0) {
+        db.collection('mnemonics').find({question:req.body.question}).toArray(function(err, result) {
+            res.send(result);
+        });
+    } else {
+        res.send({message:'Invalid request'});
+    }
+})
+
+router.post('/mymnemonics', (req, res) => {
+    //console.log(['seen',req.body]);
+    if (req.body.user && req.body.user.length > 0) {
+        db.collection('mnemonics').find({user:req.body.user}).toArray(function(err, result) {
+            res.send(result);
+        });
+    } else {
+        res.send({message:'Invalid request'});
+    }
+})
 
 module.exports = router;
      //let bulk = db.collection(collection).initializeOrderedBulkOp();

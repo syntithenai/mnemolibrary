@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import {
   FacebookShareButton,
   TwitterShareButton,
-  EmailShareButton,
-  FacebookShareCount
+  //EmailShareButton,
+  //FacebookShareCount
   //GooglePlusShareButton,
   //LinkedinShareButton,
   //WhatsappShareButton,
@@ -12,7 +12,7 @@ import {
   //RedditShareButton,
   //TumblrShareButton,
 } from 'react-share';
-import Utils from './Utils';
+//import Utils from './Utils';
           
 
 import Email from 'react-icons/lib/fa/envelope-o';
@@ -25,7 +25,7 @@ export default class ShareDialog extends Component {
         let question=this.props.question;
         //let mailTo='mailto:?subject=Mnemos Library - '+this.props.header+'&body='+this.props.shareLink;
         //let twitterText= this.props.question.mnemonic ? this.props.question.mnemonic : '';
-        let header = Utils.getQuestionTitle(question);
+        //let header = Utils.getQuestionTitle(question);
 
         // use the question link as the main link if available (so article images show on social network)
         // fallback to generated link back to nemo
@@ -39,7 +39,7 @@ export default class ShareDialog extends Component {
         let title="Mnemos Library -"+(this.props.question.mnemonic ? this.props.question.mnemonic : '') + " - \n" + question.question;
         let longTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.question + "  \n" + otherLink;
         
-        let allTogether = title + "  \n" + otherLink  + "  \n" + mainLink ;
+        //let allTogether = title + "  \n" + otherLink  + "  \n" + mainLink ;
         
         let mailTo='mailto:?subject='+title+'&body='+bothLinks;
         

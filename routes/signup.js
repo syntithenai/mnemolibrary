@@ -48,7 +48,7 @@ router.get('/me',function(req,res) {
                                     'client_id':config.clientId,
                                     'client_secret':config.clientSecret
                                 };
-                                fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
+                                fetch(config.protocol + "://" +config.host+':4000/oauth/token', {
                                   method: 'POST',
                                   headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -142,7 +142,7 @@ function sendToken(req,res,user) {
         'client_id':config.clientId,
         'client_secret':config.clientSecret
   };
-    fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
+    fetch(config.protocol + "://" +config.host+':4000/oauth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -210,10 +210,10 @@ router.post('/recover', function(req, res) {
                   // no update email address, item.username = req.body.username;
                   db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(xres) {
                         //res.redir(config.authorizeUrl);
-                     var hostParts = req.headers.host.split(":");
-                     var host = hostParts[0];
+                     //var hostParts = req.headers.host.split(":");
+                     //var host = hostParts[0];
                         
-                       var link = req.protocol + "://"  + host + ':4000/login/recover?code='+item.token;
+                       var link = config.protocol + "://"  + config.host + ':4000/login/recover?code='+item.token;
                        var mailTemplate =  mustache.render(`<div>Hi {{name}}! <br/>
 
 
@@ -251,7 +251,7 @@ router.post('/signup', function(req, res) {
     
     if (req.body.username && req.body.username.length > 0 && req.body.name && req.body.name.length>0 && req.body.avatar && req.body.avatar.length>0 && req.body.password && req.body.password.length>0 && req.body.password2 && req.body.password2.length>0) {
         if (req.body.password2 != req.body.password)  {
-            res.send({signup_warning_message:'Passwords do not match.'});
+            res.send({warning_message:'Passwords do not match.'});
         } else {
              // update avatar only when changed
             console.log('seek avatar');
@@ -280,7 +280,7 @@ router.post('/signup', function(req, res) {
                          // no update email address, item.username = req.body.username;
                           //    console.log(['save new item',item]);
                           db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(xres) {
-                                      fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
+                                      fetch(config.protocol + "://" +config.host+':4000/oauth/token', {
                                           method: 'POST',
                                           headers: {
                                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -297,9 +297,9 @@ router.post('/signup', function(req, res) {
                                             item.password='';
                                             db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(result2) {
                                                 // console.log(['jjjjj']);
-                                                 var hostParts = req.headers.host.split(":");
-                                                 var host = hostParts[0];
-                                                 var link = req.protocol + "://"  + host + ':4000/login/confirm?code='+token.access_token;
+                                                 //var hostParts = req.headers.host.split(":");
+                                                 //var host = hostParts[0];
+                                                 var link = config.protocol + "://"  + config.host + ':4000/login/confirm?code='+token.access_token;
                                                 //res.redir(config.authorizeUrl);
                                                   utils.sendMail(config.mailFrom,req.body.username,'Confirm your registration with Mnemos Library',
                                                   mustache.render(`<div>Hi {{name}}! <br/>
@@ -318,7 +318,7 @@ router.post('/signup', function(req, res) {
                                                   
                                                   </div>`,{link:link,name:item.name})
                                               );
-                                              item.signup_warning_message = 'Check your email to confirm your sign up.';
+                                              item.warning_message = 'Check your email to confirm your sign up.';
                                               res.send(item);
                                             
                                             });
@@ -358,7 +358,7 @@ router.post('/signin', function(req, res) {
                             'client_id':config.clientId,
                             'client_secret':config.clientSecret
                       };
-                        fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
+                        fetch(config.protocol + "://" +config.host+':4000/oauth/token', {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -376,11 +376,11 @@ router.post('/signin', function(req, res) {
                              res.send({message:'Error logging in'});
                         });
               } else {
-                  res.send({signin_warning_message:'Invalid login credentials.'});
+                  res.send({warning_message:'Invalid login credentials.'});
               }
             });  
     } else {
-         res.send({signin_warning_message:'Missing required information'});
+         res.send({warning_message:'Missing required information'});
     }
 });
 

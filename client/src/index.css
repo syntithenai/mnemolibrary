@@ -21,6 +21,10 @@ body {
 }
 .question .buttons button {  }
 
+.question .answer span {
+    font-size: 1.3em;
+}
+
 .container {
     max-width: none !important;
 }

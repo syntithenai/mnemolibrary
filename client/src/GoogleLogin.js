@@ -54,7 +54,7 @@ export default class GoogleLogin extends Component {
               //this.setState({ gapiReady: true });
             //});
           });
-          };
+        };
 
         document.body.appendChild(script);
     }
