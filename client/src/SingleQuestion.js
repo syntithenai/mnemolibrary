@@ -163,7 +163,7 @@ export default class SingleQuestion extends Component {
                       <div className="col-sm-8" >
                         {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Mnemonic</span></button>
                         }&nbsp;
-                        {showAnswerButton && showRecallButton && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
+                        {showAnswerButton  && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
                         }&nbsp;
                         {question.image && <button  className='btn btn-primary' onClick={() => this.setVisible('image')}><Image size={26} />&nbsp;<span className="d-none d-md-inline-block">Image</span></button>
                         }&nbsp;
@@ -186,10 +186,10 @@ export default class SingleQuestion extends Component {
                     &nbsp;
                     </div>
                 <br/>
-                {(this.isVisible('answer') || !showRecallButton) && question.answer && <div className="card-block answer">
+                {(this.isVisible('answer') ) && question.answer && <div className="card-block answer">
                     <div ref={(section) => { this.scrollTo.answer = section; }} className='card-text'><b>Answer</b> <span><pre>{question.answer}</pre></span></div>
                 </div>}
-               {(this.isVisible('mnemonic') || !showRecallButton) &&<MnemonicsList user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
+               {(this.isVisible('mnemonic')) &&<MnemonicsList user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
                 {(this.isVisible('topic') && question.quiz && showRecallButton) && <div  ref={(section) => { this.scrollTo.topic = section; }} className="card-block answer">
                     <div className='card-text'><b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.quiz}</span></button></span></div><br/>
                 </div>}

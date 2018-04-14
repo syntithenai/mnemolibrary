@@ -8,6 +8,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api',require('./routes/api'));
 app.use('/login',require('./routes/signup'));
 app.use('/oauth',require('./publicapi/routes/oauth'));
+//app.use('/signup',require('./publicapi/routes/signup'));
 
 const port = 5000;
 app.listen(port, () => console.log(`Listening on port ${port}`));

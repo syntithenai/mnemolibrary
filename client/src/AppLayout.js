@@ -105,6 +105,8 @@ export default class AppLayout extends Component {
        this.login = this.login.bind(this);
        this.refreshLogin = this.refreshLogin.bind(this);
        this.loginByToken = this.loginByToken.bind(this);
+       this.loginByRecovery = this.loginByRecovery.bind(this);
+       this.loginByConfirm = this.loginByConfirm.bind(this);
        this.logout = this.logout.bind(this);
        this.isLoggedIn = this.isLoggedIn.bind(this);
        this.saveUser = this.saveUser.bind(this);
@@ -165,10 +167,14 @@ export default class AppLayout extends Component {
               // load by token ?
               if (iParts[0]==="code") {
                   that.loginByToken(window.location.search.slice(6));
-              }
+              } else if (iParts[0]==="confirm") {
+                  that.loginByConfirm(window.location.search.slice(9));
+              } else if (iParts[0]==="recovery") {
+                  that.loginByRecovery(window.location.search.slice(10));
+              } 
               // search on load
               // question
-              if (iParts[0]==="question") {
+              else if (iParts[0]==="question") {
                   that.setQuizFromQuestionId(iParts[1]);
               } else if (iParts[0]==="tag") {
                   that.setQuizFromTag({text:iParts[1]});
@@ -297,6 +303,52 @@ export default class AppLayout extends Component {
       let state = {token: token};
       let that = this;
       fetch('/login/me?code='+token, {
+          method: 'GET',
+        }).then(function(response) {
+            return response.json();
+            
+        }).then(function(res) {
+        //    console.log(['ddtoken response',res]);
+            state.user = res.user;
+            state.token = res.token;
+            that.setState(state);
+            setInterval(function() {
+                console.log('toke ref tok');
+                that.refreshLogin(state.user)
+            },(parseInt(this.state.token.expires_in,10)-1)*1000);
+        })
+        .catch(function(err) {
+            console.log(['ERR',err]);
+        });
+  };
+  
+    loginByConfirm(token) {
+      let state = {token: token};
+      let that = this;
+      fetch('/login/doconfirm?code='+token, {
+          method: 'GET',
+        }).then(function(response) {
+            return response.json();
+            
+        }).then(function(res) {
+        //    console.log(['ddtoken response',res]);
+            state.user = res.user;
+            state.token = res.token;
+            that.setState(state);
+            setInterval(function() {
+                console.log('toke ref tok');
+                that.refreshLogin(state.user)
+            },(parseInt(this.state.token.expires_in,10)-1)*1000);
+        })
+        .catch(function(err) {
+            console.log(['ERR',err]);
+        });
+  };
+  
+    loginByRecovery(token) {
+      let state = {token: token};
+      let that = this;
+      fetch('/login/dorecover?code='+token, {
           method: 'GET',
         }).then(function(response) {
             return response.json();

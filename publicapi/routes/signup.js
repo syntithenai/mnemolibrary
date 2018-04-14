@@ -65,7 +65,7 @@ router.get('/confirm',function(req,res) {
                                 'client_id':config.clientId,
                                 'client_secret':config.clientSecret
                           };
-                          fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
+                          fetch(config.protocol + "://" +config.host+'/oauth/token', {
                               method: 'POST',
                               headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
