@@ -333,9 +333,7 @@ router.post('/signup', function(req, res) {
                               
                           });
                       }
-                  }).catch(function(err) {
-                    console.log(['ERR',err]);
-                  });;  
+                  })  
                 }
             }).catch(function(err) {
                 console.log(['ERR',err]);
