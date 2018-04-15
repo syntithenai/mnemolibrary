@@ -48,7 +48,7 @@ router.get('/me',function(req,res) {
                                     'client_id':config.clientId,
                                     'client_secret':config.clientSecret
                                 };
-                                fetch(config.protocol + "://" +'localhost'+':4000/oauth/token', {
+                                fetch("http://localhost:3000/oauth/token", {
                                   method: 'POST',
                                   headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -142,7 +142,7 @@ function sendToken(req,res,user) {
         'client_id':config.clientId,
         'client_secret':config.clientSecret
   };
-    fetch(config.protocol + "://" +'localhost'+':4000/oauth/token', {
+    fetch("http://localhost:3000/oauth/token", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -280,7 +280,7 @@ router.post('/signup', function(req, res) {
                          // no update email address, item.username = req.body.username;
                           //    console.log(['save new item',item]);
                           db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(xres) {
-                                      fetch(config.protocol + "://" +'localhost'+':4000/oauth/token', {
+                                      fetch("http://localhost:3000/oauth/token", {
                                           method: 'POST',
                                           headers: {
                                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -356,7 +356,7 @@ router.post('/signin', function(req, res) {
                             'client_id':config.clientId,
                             'client_secret':config.clientSecret
                       };
-                        fetch(config.protocol + "://" +'localhost'+':4000/oauth/token', {
+                        fetch("http://localhost:3000/oauth/token", {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -410,9 +410,9 @@ router.get('/doconfirm',function(req,res) {
                       //console.log(user._id);  
                       
                       user.password = user.tmp_password;
-                      user.token = undefined;
-                      user.tmp_password = undefined;
-                   //   console.log(['KKK',user]); 
+                     // user.token = undefined;
+                     // user.tmp_password = undefined;
+                      console.log(['KKK',user]); 
                       user.save().then(function() {
                           console.log(['approved']);
                            var params={
@@ -422,7 +422,7 @@ router.get('/doconfirm',function(req,res) {
                                 'client_id':config.clientId,
                                 'client_secret':config.clientSecret
                           };
-                          fetch(config.protocol + "://" +'localhost'+'/oauth/token', {
+                          fetch("http://localhost:3000/oauth/token", {
                               method: 'POST',
                               headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -490,7 +490,7 @@ router.get('/dorecover',function(req,res) {
                             'client_id':config.clientId,
                             'client_secret':config.clientSecret
                       };
-                      fetch(req.protocol + "://" +req.headers.host+'/oauth/token', {
+                      fetch("http://localhost:3000/oauth/token", {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
