@@ -142,18 +142,32 @@ export default class AppLayout extends Component {
         script.src = "https://apis.google.com/js/platform.js";
         script.onload = () => {
             console.log('loaded gapis platform');
-          gapi.load('client', () => {
-            console.log('loaded gapis client platform');
-            gapi.client.setApiKey(this.props.clientId);
-            console.log('loaded gapis client platform set key');
-            gapi.load('client:auth2', function() {
-                console.log('loaded gapis client platform auth2');
-                let instance=gapi.auth2;  
-                console.log(['loaded gapis client platform',instance]);
-                that.GoogleAuth = instance;
-            });
-            console.log('loaded gapis platform ex1');
-          });
+           //gapi.auth2.init({
+                //clientId: this.props.clientId,
+                //scope: 'profile email'
+            //}).then(function() {
+                
+                //console.log('iNIT loaded gapis client platform');
+            //});
+          gapi.load('client:auth2', () => {
+                //});
+                console.log('loaded gapis client platform');
+                gapi.client.init({
+                    clientId: config.clientId,
+                    scope: 'profile email'
+                }).then(function () {
+                  //// Listen for sign-in state changes.
+                  //gapi.auth2.getAuthInstance();
+                //gapi.client.setApiKey(this.props.clientId);
+                console.log('loaded gapis client platform set key');
+                //gapi.load('client:auth2', function() {
+                    console.log('loaded gapis client platform auth2',gapi.auth2);
+                    let instance=gapi.auth2.getAuthInstance();  
+                    console.log(['loaded gapis client platform',instance]);
+                    that.GoogleAuth = instance;
+                });
+              });
+            //console.log('loaded gapis platform ex1');
           console.log('loaded gapis platform ex2');
         };
         console.log('loaded gapis platform ex3');
@@ -376,7 +390,10 @@ export default class AppLayout extends Component {
       this.setState(state);
       console.log(['logout',gapi.auth2]);
       console.log(this.state);
+      //this.GoogleAuth.disconnect();
+      //let GoogleAuth = gapi.auth2.getAuthInstance();
       this.GoogleAuth.disconnect();
+      window.location='/';
       //gapi.auth2.getAuthInstance().disconnect();
       //var auth2 = gapi.auth2.getAuthInstance();
         //auth2.signOut().then(function () {

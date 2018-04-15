@@ -49,6 +49,7 @@ export default class GoogleLogin extends Component {
           gapi.load('client', () => {
             gapi.client.setApiKey(this.props.clientId);
             gapi.load('client:auth2', this.renderSignIn);
+            window.gapi = gapi;
             //gapi.load('picker', {'callback': onPickerApiLoad});
             //gapi.client.load('client:auth2', 'v3', () => {
               //this.setState({ gapiReady: true });
