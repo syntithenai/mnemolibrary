@@ -10,5 +10,5 @@ app.use('/login',require('./routes/signup'));
 app.use('/oauth',require('./publicapi/routes/oauth'));
 //app.use('/signup',require('./publicapi/routes/signup'));
 
-const port = 5000;
+const port = 8080;
 app.listen(port, () => console.log(`Listening on port ${port}`));

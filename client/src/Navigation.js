@@ -83,4 +83,4 @@ export default class Navigation extends Component {
     };
     
 }
-Navigation.pageTitles= {'splash':'Mnemos Library', 'home':'Mnemos Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','about':'About Mnemo','info':'Getting Started','login':'','intro':'','termsofuse':'','faq':''}
+Navigation.pageTitles= {'splash':'Mnemos\' Library', 'home':'Mnemos\s Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','about':'About Mnemo','info':'Getting Started','login':'','intro':'','termsofuse':'','faq':''}
