@@ -63,7 +63,7 @@ export default class CreatePage extends Component {
         return (
         <div >
         
-              Mnemos Library is just getting started and we want your help. <br/>  
+              Mnemo's Library is just getting started and we want your help. <br/>  
               <b>Coming soon</b> you will be able to add your own questions and mnemonics.<br/>
               In the meantime, please email your ideas <a href='mailto:mnemoslibrary@gmail.com' >here.</a>
               

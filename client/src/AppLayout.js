@@ -51,7 +51,7 @@ export default class AppLayout extends Component {
           users = data['users'];
       }
       this.state = {
-          title : "Mnemos Library",
+          title : "Mnemo's Library",
           message: null,
           currentPage: "splash",
           currentQuestion: 0,

@@ -217,7 +217,7 @@ router.post('/recover', function(req, res) {
                        var mailTemplate =  mustache.render(`<div>Hi {{name}}! <br/>
 
 
-To confirm your password recovery of your account with Mnemos Library, please click the link below.<br/>
+To confirm your password recovery of your account with Mnemo's Library, please click the link below.<br/>
 
 <a href="{{link}}" >Confirm your password update</a><br/>
 
@@ -228,7 +228,7 @@ Mnemo's Library
                                   </div>`,{link:link,name:item.name});
        //                console.log(mailTemplate);
                                 //res.redir(config.authorizeUrl);
-                       utils.sendMail(config.mailFrom,req.body.email,'Update your password on Mnemos Library',
+                       utils.sendMail(config.mailFrom,req.body.email,"Update your password on Mnemo's Library",
                                  mailTemplate
                               );  
                       item.warning_message="Sent recovery email";
