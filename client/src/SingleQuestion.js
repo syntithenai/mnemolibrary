@@ -188,7 +188,7 @@ export default class SingleQuestion extends Component {
                 {(this.isVisible('answer') || !showRecallButton) && question.answer && <div className="card-block answer">
                     <div ref={(section) => { this.scrollTo.answer = section; }} className='card-text'><b>Answer</b> <span><pre>{question.answer}</pre></span></div>
                 </div>}
-               {(this.isVisible('mnemonic') || !showRecallButton) &&<MnemonicsList user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
+               {(this.isVisible('mnemonic')) &&<MnemonicsList user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
                 {(this.isVisible('topic') && question.quiz && showRecallButton) && <div  ref={(section) => { this.scrollTo.topic = section; }} className="card-block answer">
                     <div className='card-text'><b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.quiz}</span></button></span></div><br/>
                 </div>}
