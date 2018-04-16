@@ -410,8 +410,8 @@ router.get('/doconfirm',function(req,res) {
                       //console.log(user._id);  
                       
                       user.password = user.tmp_password;
-                     // user.token = undefined;
-                     // user.tmp_password = undefined;
+                      user.token = undefined;
+                      user.tmp_password = undefined;
                       console.log(['KKK',user]); 
                       user.save().then(function() {
                           console.log(['approved']);
@@ -529,9 +529,9 @@ router.get('/dorecover',function(req,res) {
 
 
 // TESTS
-router.get('/mail',function(req,res) {
-  utils.sendMail(config.mailFrom,'syntithenai@gmail.com','mnemo tester message','<div>This is a message</div>');
-});
+//router.get('/mail',function(req,res) {
+  //utils.sendMail(config.mailFrom,'syntithenai@gmail.com','mnemo tester message','<div>This is a message</div>');
+//});
 
 
 

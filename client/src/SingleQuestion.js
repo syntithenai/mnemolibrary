@@ -160,7 +160,10 @@ export default class SingleQuestion extends Component {
                     <h4 className="card-title">{header}?</h4>
                     
                     <div className="row form" >
-                      <div className="col-sm-8" >
+                      <div className="col-sm-12" >
+                         <button style={{float:'right'}} target='_new' data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
+                        <ShareDialog id="sharedialog"  header={header}  question={question}/>
+                    
                         {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Mnemonic</span></button>
                         }&nbsp;
                         {showAnswerButton  && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
@@ -177,19 +180,15 @@ export default class SingleQuestion extends Component {
                         {showRecallButton && <button  className='btn btn-primary' onClick={() => this.setVisible('tags')}><Tags size={26}  />&nbsp;<span className="d-none d-md-inline-block">Tags</span></button>
                         }
                       </div>
-                    <div className="col-sm-4">
-                       <button style={{float:'right'}} target='_new' data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
-                      <ShareDialog id="sharedialog"  header={header}  question={question}/>
                     </div>
-                      </div>
                    
                     &nbsp;
                     </div>
                 <br/>
-                {(this.isVisible('answer') ) && question.answer && <div className="card-block answer">
+                {(this.isVisible('answer') || !showRecallButton) && question.answer && <div className="card-block answer">
                     <div ref={(section) => { this.scrollTo.answer = section; }} className='card-text'><b>Answer</b> <span><pre>{question.answer}</pre></span></div>
                 </div>}
-               {(this.isVisible('mnemonic')) &&<MnemonicsList user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
+               {(this.isVisible('mnemonic') || !showRecallButton) &&<MnemonicsList user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
                 {(this.isVisible('topic') && question.quiz && showRecallButton) && <div  ref={(section) => { this.scrollTo.topic = section; }} className="card-block answer">
                     <div className='card-text'><b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.quiz}</span></button></span></div><br/>
                 </div>}

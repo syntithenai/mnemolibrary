@@ -91,16 +91,19 @@ export default class MnemonicsList extends Component {
             console.log(['rebnmnlist',this.state.mnemonics,this.state.defaultMnemonic]);
             let mainLikeButton='';
             if (this.props.isLoggedIn()) {
-                mainLikeButton = <span className='like_dislike' style={{float:'right'}} >&nbsp;&nbsp;&nbsp;<a  className='btn btn-primary'  onClick={() => this.props.like(question._id,this.state.mnemonics[this.state.defaultMnemonic]._id)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Like&nbsp;<span className="badge badge-pill badge-info"  >{question.score}</span></a></span>
+                mainLikeButton = <span className='like_dislike'  >&nbsp;&nbsp;&nbsp;<a  className='btn btn-primary'  onClick={() => this.props.like(question._id,this.state.mnemonics[this.state.defaultMnemonic]._id)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Like&nbsp;<span className="badge badge-pill badge-info"  >{question.score}</span></a></span>
             } 
-            let mainTechniqueButton=<button className="btn btn-outline btn-primary"  style={{float:'right'}}  ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.props.setDiscoveryBlock('technique',this.state.mnemonics[this.state.defaultMnemonic].technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(this.state.mnemonics[this.state.defaultMnemonic].technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{this.state.mnemonics[this.state.defaultMnemonic].technique}</span></button>
+            let mainTechniqueButton=<button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.props.setDiscoveryBlock('technique',this.state.mnemonics[this.state.defaultMnemonic].technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(this.state.mnemonics[this.state.defaultMnemonic].technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{this.state.mnemonics[this.state.defaultMnemonic].technique}</span></button>
             return (<div   className="card-block mnemonics list-group">
                 <div className='card-text'>
                     <b>Mnemonics</b>
-                    {mainLikeButton}{mainTechniqueButton}
-                    <pre  className='mnemonic' >{this.state.mnemonics[this.state.defaultMnemonic].mnemonic}</pre>
+                    <div className='row' >
+                        <pre  className='mnemonic col-12 col-lg-8' >{this.state.mnemonics[this.state.defaultMnemonic].mnemonic}</pre>
+                        <div className='col-12 col-lg-4' >{mainTechniqueButton}&nbsp;{mainLikeButton}</div>
+                    </div>
                     {otherMnemonics}
                 </div>
+                <br/>
             </div>);
         } else {
             return '';
