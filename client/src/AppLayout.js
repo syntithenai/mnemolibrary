@@ -185,6 +185,9 @@ export default class AppLayout extends Component {
                   that.loginByConfirm(window.location.search.slice(9));
               } else if (iParts[0]==="recovery") {
                   that.loginByRecovery(window.location.search.slice(10));
+              } else {
+                    //  console.log('loginByLocalStorage');
+                  that.loginByLocalStorage();
               }
           });
     } else {
