@@ -185,15 +185,9 @@ export default class AppLayout extends Component {
                   that.loginByConfirm(window.location.search.slice(9));
               } else if (iParts[0]==="recovery") {
                   that.loginByRecovery(window.location.search.slice(10));
-              } else {
-                    //  console.log('loginByLocalStorage');
-                  that.loginByLocalStorage();
-              }
+              } 
           });
-    } else {
-        //  console.log('loginByLocalStorage');
-          that.loginByLocalStorage();
-    }
+    } 
 
     if (window.location.search) {
         let parts = window.location.search.slice(1).split("&");
@@ -212,6 +206,11 @@ export default class AppLayout extends Component {
         });
       }
       
+      console.log([this.state.user,this.state.token]);
+      if (!this.state.user || !this.state.user._id  || !this.state.token|| !this.state.token._id) {
+          console.log('login by local store');
+          that.loginByLocalStorage();
+      }
       
       // load tags and quizzes and indexes
       fetch('/api/lookups')

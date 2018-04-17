@@ -15,7 +15,7 @@ import Tags from 'react-icons/lib/fa/tags';
 import ExternalLink from 'react-icons/lib/fa/external-link';
 import ConnectDevelop from 'react-icons/lib/fa/connectdevelop';
 import Close from 'react-icons/lib/fa/close';
-import Book from 'react-icons/lib/fa/book';
+//import Book from 'react-icons/lib/fa/book';
 import ShareAlt from 'react-icons/lib/fa/share-alt';
 import scrollToComponent from 'react-scroll-to-component';
 import MnemonicsList from './MnemonicsList';
