@@ -192,22 +192,22 @@ export default class AppLayout extends Component {
           that.loginByLocalStorage();
     }
 
-    //if (window.location.search) {
-        //let parts = window.location.search.slice(1).split("&");
-        //parts.forEach(function(part) {
-              //let iParts=part.split("=");
+    if (window.location.search) {
+        let parts = window.location.search.slice(1).split("&");
+        parts.forEach(function(part) {
+              let iParts=part.split("=");
 
-              //// search on load
-              //if (iParts[0]==="question") {
-                  //that.setQuizFromQuestionId(iParts[1]);
-              //} else if (iParts[0]==="tag") {
-                  //that.setQuizFromTag({text:iParts[1]});
-              //} else if (iParts[0]==="topic") {
-                  //that.setQuizFromTopic(iParts[1]);
-              //}
+              // search on load
+              if (iParts[0]==="question") {
+                  that.setQuizFromQuestionId(iParts[1]);
+              } else if (iParts[0]==="tag") {
+                  that.setQuizFromTag({text:iParts[1]});
+              } else if (iParts[0]==="topic") {
+                  that.setQuizFromTopic(iParts[1]);
+              }
               
-        //});
-      //}
+        });
+      }
       
       
       // load tags and quizzes and indexes
