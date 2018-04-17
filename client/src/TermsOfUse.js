@@ -7,7 +7,6 @@ export default class TermsOfUse extends Component {
         return  (
         <div className="termsofuse" >
         
-        <h3>Terms of Use</h3>
             <HelpNavigation setCurrentPage={this.props.setCurrentPage}/>
             <br/>
             <ol>

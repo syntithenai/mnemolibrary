@@ -110,7 +110,7 @@ export default class AppLayout extends Component {
        this.logout = this.logout.bind(this);
        this.isLoggedIn = this.isLoggedIn.bind(this);
        this.saveUser = this.saveUser.bind(this);
-       
+       this.loginByLocalStorage = this.loginByLocalStorage.bind(this);
        this.like = this.like.bind(this);
        this.import = this.import.bind(this);
         this.discoverQuestions = this.discoverQuestions.bind(this);
@@ -151,7 +151,7 @@ export default class AppLayout extends Component {
             //});
           gapi.load('client:auth2', () => {
                 //});
-                console.log('loaded gapis client platform');
+                //console.log('loaded gapis client platform');
                 gapi.client.init({
                     clientId: config.clientId,
                     scope: 'profile email'
@@ -159,22 +159,22 @@ export default class AppLayout extends Component {
                   //// Listen for sign-in state changes.
                   //gapi.auth2.getAuthInstance();
                 //gapi.client.setApiKey(this.props.clientId);
-                console.log('loaded gapis client platform set key');
+                //console.log('loaded gapis client platform set key');
                 //gapi.load('client:auth2', function() {
-                    console.log('loaded gapis client platform auth2',gapi.auth2);
+                    //console.log('loaded gapis client platform auth2',gapi.auth2);
                     let instance=gapi.auth2.getAuthInstance();  
-                    console.log(['loaded gapis client platform',instance]);
+                    //console.log(['loaded gapis client platform',instance]);
                     that.GoogleAuth = instance;
                 });
               });
             //console.log('loaded gapis platform ex1');
-          console.log('loaded gapis platform ex2');
+          //console.log('loaded gapis platform ex2');
         };
-        console.log('loaded gapis platform ex3');
+        //console.log('loaded gapis platform ex3');
 
         document.body.appendChild(script);
 
-      if (window.location.search) {
+    if (window.location.search) {
           let parts = window.location.search.slice(1).split("&");
           parts.forEach(function(part) {
               let iParts=part.split("=");
@@ -185,22 +185,29 @@ export default class AppLayout extends Component {
                   that.loginByConfirm(window.location.search.slice(9));
               } else if (iParts[0]==="recovery") {
                   that.loginByRecovery(window.location.search.slice(10));
-              } 
-              // search on load
-              // question
-              else if (iParts[0]==="question") {
-                  that.setQuizFromQuestionId(iParts[1]);
-              } else if (iParts[0]==="tag") {
-                  that.setQuizFromTag({text:iParts[1]});
-              } else if (iParts[0]==="topic") {
-                  that.setQuizFromTopic(iParts[1]);
               }
-              
-              // topic
-              // tag
-              
           });
-      }
+    } else {
+        //  console.log('loginByLocalStorage');
+          that.loginByLocalStorage();
+    }
+
+    //if (window.location.search) {
+        //let parts = window.location.search.slice(1).split("&");
+        //parts.forEach(function(part) {
+              //let iParts=part.split("=");
+
+              //// search on load
+              //if (iParts[0]==="question") {
+                  //that.setQuizFromQuestionId(iParts[1]);
+              //} else if (iParts[0]==="tag") {
+                  //that.setQuizFromTag({text:iParts[1]});
+              //} else if (iParts[0]==="topic") {
+                  //that.setQuizFromTopic(iParts[1]);
+              //}
+              
+        //});
+      //}
       
       
       // load tags and quizzes and indexes
@@ -227,15 +234,18 @@ export default class AppLayout extends Component {
   }
   
 
-  refreshLogin () {
+  refreshLogin (token=null) {
+      if (!token) {
+          token=this.state.token;
+      }
       var state={};
       var that = this;
       state.user = this.state.user;
       //state.currentPage = 'home';
-      console.log('refresh token');
+      //console.log('refresh token');
         //console.log(user);
         var params={
-            'refresh_token':this.state.token.refresh_token,
+            'refresh_token':token.refresh_token,
             'grant_type':'refresh_token',
             'client_id':config.clientId,
             'client_secret':config.clientSecret
@@ -251,10 +261,11 @@ export default class AppLayout extends Component {
             return response.json();
             
         }).then(function(res) {
-            console.log(['ddtoken response',res]);
+            //console.log(['ddtoken response',res]);
             state.token = res;
-            console.log(['refreshed token',res]);
+          //  console.log(['refreshed token',res]);
             that.setState(state);
+            localStorage.setItem('token',JSON.stringify(res));
         })
         .catch(function(err) {
             console.log(['ERR',err]);
@@ -288,8 +299,10 @@ export default class AppLayout extends Component {
             return response.json();
             
         }).then(function(res) {
-            console.log(['ddtoken response',res]);
+           // console.log(['ddtoken response',res]);
             state.token = res;
+            localStorage.setItem('token',JSON.stringify(res));
+            localStorage.setItem('user',JSON.stringify(that.state.user));
             // load progress
             fetch('/api/progress')
               .then(function(response) {
@@ -300,7 +313,7 @@ export default class AppLayout extends Component {
                 that.setState(state);
                 that.updateProgress(json);
                 setInterval(function() {
-                    console.log('toke ref');
+                   // console.log('toke ref');
                     that.refreshLogin(state.user)
                 },(parseInt(this.state.token.expires_in,10)-1)*1000);
               }).catch(function(ex) {
@@ -312,6 +325,14 @@ export default class AppLayout extends Component {
         });
 
   }
+  
+  loginByLocalStorage() {
+      //console.log(['loginByLocalStorage1',localStorage.getItem('token'),JSON.parse(localStorage.getItem('token'))]);
+      if (localStorage.getItem('token') && localStorage.getItem('token').length > 0 && localStorage.getItem('user') && localStorage.getItem('user').length > 0) {
+          this.setState({user:JSON.parse(localStorage.getItem('user')),token:JSON.parse(localStorage.getItem('token'))});
+      }
+      
+  };
   
   loginByToken(token) {
       let state = {token: token};
@@ -325,9 +346,11 @@ export default class AppLayout extends Component {
         //    console.log(['ddtoken response',res]);
             state.user = res.user;
             state.token = res.token;
+            localStorage.setItem('token',JSON.stringify(res.token));
+            localStorage.setItem('user',JSON.stringify(state.user));
             that.setState(state);
             setInterval(function() {
-                console.log('toke ref tok');
+          //      console.log('toke ref tok');
                 that.refreshLogin(state.user)
             },(parseInt(this.state.token.expires_in,10)-1)*1000);
         })
@@ -348,9 +371,11 @@ export default class AppLayout extends Component {
         //    console.log(['ddtoken response',res]);
             state.user = res.user;
             state.token = res.token;
+            localStorage.setItem('token',JSON.stringify(res.token));
+            localStorage.setItem('user',JSON.stringify(state.user));
             that.setState(state);
             setInterval(function() {
-                console.log('toke ref tok');
+            //    console.log('toke ref tok');
                 that.refreshLogin(state.user)
             },(parseInt(this.state.token.expires_in,10)-1)*1000);
         })
@@ -371,9 +396,11 @@ export default class AppLayout extends Component {
         //    console.log(['ddtoken response',res]);
             state.user = res.user;
             state.token = res.token;
+            localStorage.setItem('token',JSON.stringify(res.token));
+            localStorage.setItem('user',JSON.stringify(state.user));
             that.setState(state);
             setInterval(function() {
-                console.log('toke ref tok');
+              //  console.log('toke ref tok');
                 that.refreshLogin(state.user)
             },(parseInt(this.state.token.expires_in,10)-1)*1000);
         })
@@ -387,9 +414,10 @@ export default class AppLayout extends Component {
       state.user = '';
       state.token = '';
       state.currentPage = 'splash';
+      localStorage.setItem('token','{}');
       this.setState(state);
-      console.log(['logout',gapi.auth2]);
-      console.log(this.state);
+      //console.log(['logout',gapi.auth2]);
+      //console.log(this.state);
       //this.GoogleAuth.disconnect();
       //let GoogleAuth = gapi.auth2.getAuthInstance();
       this.GoogleAuth.disconnect();
@@ -745,8 +773,8 @@ export default class AppLayout extends Component {
             currentQuiz.push(id);
             indexedQuestions[id]=questionKey;
         }
-        that.setCurrentPage('home');
-        that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Tag '+ Utils.snakeToCamel(tag.text),'tagFilter':tag.text});
+        //that.setCurrentPage('home');
+        that.setState({'currentPage':'home','currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Tag '+ Utils.snakeToCamel(tag.text),'tagFilter':tag.text});
         console.log(['set state done', that.state])
          //that.setState({});
       }).catch(function(ex) {
@@ -802,9 +830,8 @@ export default class AppLayout extends Component {
     return (
         <div className="mnemo">
             <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
-            <div className='page-title'><h4>{title}</h4></div>
             {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
-            {this.isCurrentPage('splash') && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} /></div>}
+            {this.isCurrentPage('splash') && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} title={title}/></div>}
             
             {this.isCurrentPage('home') && <QuizCarousel setQuizFromTechnique={this.setQuizFromTechnique} setQuizFromTopic={this.setQuizFromTopic} setDiscoveryBlock={this.setDiscoveryBlock} clearDiscoveryBlock={this.clearDiscoveryBlock} blocks={this.state.discoveryBlocks}  setQuizFromTag={this.setQuizFromTag} setCurrentQuestion={this.setCurrentQuestion} finishQuiz={this.finishQuiz}  discoverQuestions={this.discoverQuestions}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz}  /> }
             

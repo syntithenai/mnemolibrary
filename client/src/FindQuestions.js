@@ -9,10 +9,10 @@ export default class FindQuestions extends Component {
     render() {
         return  (
             <div className='findquestions'>
+                <br/>
                 <div>For teachers and students, news junkies, academics, language learners, trivia buffs, and punsters.</div>
                 <div>A community of lifelong learners who use mnemonics.</div>
                 
-                <i>"Staggering puns for learning fun."</i>
                 <br/> <br/> 
                 <b>Learn something new</b>
                 <br/> 

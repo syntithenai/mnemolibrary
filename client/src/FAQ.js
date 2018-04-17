@@ -6,7 +6,6 @@ export default class FAQ extends Component {
     render() {
         return  (
         <div className="faq" >
-            <h3>Frequently Asked Questions</h3>
            <HelpNavigation setCurrentPage={this.props.setCurrentPage}/> 
             <br/>
 

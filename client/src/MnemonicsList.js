@@ -19,6 +19,15 @@ export default class MnemonicsList extends Component {
         
     };
 
+    componentWillReceiveProps(nextProps) {
+      const question = nextProps.question;
+        
+      this.setState({
+           defaultMnemonic:'default', 
+           mnemonics:{'default':{question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question}}
+        });  
+    }
+    
     componentDidMount() {
         let that=this;
         console.log(['mount mnem list',this.props.question,this.props.user]);
@@ -69,9 +78,14 @@ export default class MnemonicsList extends Component {
                 
                     console.log(['mnemoth',key,mnemonic]);
                     if (key !== this.state.defaultMnemonic) {
-                        
-                        var techniqueButton = <button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.props.setDiscoveryBlock('technique',question.mnemonic_technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(question.mnemonic_technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{question.mnemonic_technique}</span></button>
-                        
+                        var techniqueButton = '';
+                        if (this.props.showRecallButton) {
+                            techniqueButton = <button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.mnemonic_technique}</span></button>
+                            
+
+                        } else {
+                            techniqueButton = <button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.props.setDiscoveryBlock('technique',question.mnemonic_technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(question.mnemonic_technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{question.mnemonic_technique}</span></button>                            
+                        }
                        // if (showRecallButton) {
                             //// remove search options from tech button
                         //}
@@ -93,7 +107,12 @@ export default class MnemonicsList extends Component {
             if (this.props.isLoggedIn()) {
                 mainLikeButton = <span className='like_dislike'  >&nbsp;&nbsp;&nbsp;<a  className='btn btn-primary'  onClick={() => this.props.like(question._id,this.state.mnemonics[this.state.defaultMnemonic]._id)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Like&nbsp;<span className="badge badge-pill badge-info"  >{question.score}</span></a></span>
             } 
-            let mainTechniqueButton=<button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.props.setDiscoveryBlock('technique',this.state.mnemonics[this.state.defaultMnemonic].technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(this.state.mnemonics[this.state.defaultMnemonic].technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{this.state.mnemonics[this.state.defaultMnemonic].technique}</span></button>
+            var mainTechniqueButton = '';
+            if (this.props.showRecallButton) {
+                mainTechniqueButton=<button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{this.state.mnemonics[this.state.defaultMnemonic].technique}</span></button>
+            } else {
+                mainTechniqueButton=<button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.props.setDiscoveryBlock('technique',this.state.mnemonics[this.state.defaultMnemonic].technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(this.state.mnemonics[this.state.defaultMnemonic].technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{this.state.mnemonics[this.state.defaultMnemonic].technique}</span></button>
+            }
             return (<div   className="card-block mnemonics list-group">
                 <div className='card-text'>
                     <b>Mnemonics</b>

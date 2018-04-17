@@ -8,10 +8,39 @@ body {
 .aboutpage div {
     padding-bottom: 1em;
 }
-.question .buttons {
-    background-color: #8a2be245;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+.spage-title {
+    float:'right';
+    color:'yellow';
+    font-size:'1.2em';
+    position: 'fixed';
+    right: '1em';
+    z-index: 99;
+    background-color: lightgrey;
+    opacity: 0.6;
+}
+.questionwrap .question {
+    margin-top:4em;
+    
+}
+.questionwrap .blocked-tags {
+margin-top:4em;
+}
+.holds-the-iframe {
+  background:url(/loading.gif) center center no-repeat;
+  min-height: 3em;
+}
+.scrollbuttons {
+    border-top: 6px solid lightsteelblue;
+}
+.questionwrap .buttons {
+    background-color: plum;
+    dpadding-top: 0.5em;
+    dpadding-bottom: 0.5em;
+    margin-top:-4.2em;
+    position: fixed;
+    width: 100%;
+    z-index: 99;
+    opacity: 1;
 }
 .question,.tags {
     background-color: lightblue !important;
@@ -67,4 +96,12 @@ pre.mnemonic {
     color :  red;
     font-size: 1.3em;
 
+}
+
+.loginbutton {
+    margin-top: 3.6em;
+}
+
+.navbar-toggler {
+    margin-top: 3em;
 }

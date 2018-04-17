@@ -38,20 +38,28 @@ export default class Navigation extends Component {
     
     render() {
         return  (
-        <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark" >
-          <div className="navbar-brand" >
-          <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemonikas" src="/mnemoicon.jpg" height="100%" data-toggle="collapse" data-target="#navbarCollapse"/></a>
-          {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='btn btn-outline btn-warning' style={{verticalAlign: 'top',marginLeft: '1em'}}>
+        <div className="navbar-dark fixed-top bg-dark" >
+        <div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title}</div>
+              
+       
+        <nav className="navbar navbar-expand-md" >
+       <div className="navbar-brand" >
+          
+          <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemonikas" src="/mnemoicon.jpg" height="100%" data-toggle="collapse" data-target="#navbarCollapse" style={{clear:'right'}}/></a>
+             
+          {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='loginbutton btn btn-outline btn-warning' style={{verticalAlign: 'top',marginLeft: '1em'}}>
                    Login
                   </a>}
+      
           </div>
+          
           <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" >
             <span className="navbar-toggler-icon"></span>
           </button>
-           
+       
           <div className="collapse navbar-collapse" id="navbarCollapse">
             <ul className="navbar-nav mr-auto" data-toggle="collapse" data-target="#navbarCollapse" >
-              <li className="nav-item active" >
+              <li className="nav-item" >
                 <a className="nav-link"  href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</a>
               </li>
               <li className="nav-item">
@@ -77,10 +85,12 @@ export default class Navigation extends Component {
               </li>
             </ul>
           </div>
-          
+            
         </nav>
+          
+        </div>
         )
     };
     
 }
-Navigation.pageTitles= {'splash':'Mnemo\'s Library', 'home':'Mnemo\'s Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','about':'About Mnemo','info':'Getting Started','login':'','intro':'','termsofuse':'','faq':''}
+Navigation.pageTitles= {'splash':'Mnemo\'s Library', 'home':'Mnemo\'s Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','about':'About Mnemo','info':'Getting Started','login':'','intro':'Getting Started','termsofuse':'Terms of Use','faq':'Frequently Asked Questions'}
