@@ -614,7 +614,7 @@ router.get('/questions', (req, res) => {
                 let tag = req.query.tag.trim().toLowerCase(); 
                 criteria.push({'tags': {$in:[tag]}});
                 console.log(['search by tag',criteria,tag]);
-                db.collection('questions').find({$and:criteria}).limit(limit*2).skip(skip).sort({question:1}).toArray(function(err, results) {
+                db.collection('questions').find({$and:criteria}).limit(limit*10).skip(skip).sort({question:1}).toArray(function(err, results) {
                     console.log(['search by tag res',results]);
                   res.send({'questions':results});
                 })

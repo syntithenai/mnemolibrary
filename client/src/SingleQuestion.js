@@ -191,7 +191,7 @@ export default class SingleQuestion extends Component {
                             <b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.quiz}</span></button></span><br/>
                         </div>}
                         {((!showRecallButton) && question.quiz) && <div className="card-block topic">
-                            <b>Topic&nbsp;&nbsp;&nbsp;</b><button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('topic',question.quiz)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTopic({text:question.quiz})} style={{float:'right'}}/> <span className="hidden-sm-down" >{question.quiz}</span></button><br/>
+                            <b>Topic&nbsp;&nbsp;&nbsp;</b><button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('topic',question.quiz)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTopic(question.quiz)} style={{float:'right'}}/> <span className="hidden-sm-down" >{question.quiz}</span></button><br/>
                         </div>}
                         
                         {(!showRecallButton) && <div   className="card-block tags" >
