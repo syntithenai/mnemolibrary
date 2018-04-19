@@ -468,10 +468,10 @@ export default class AppLayout extends Component {
    } 
   
   setCurrentPage(page) {
+      console.log(['SETCURRENTPAGE',page]);
       ReactGA.event({
           category: 'Navigation',
-          action: 'Navigate to',
-          value: page
+          action: 'Navigate to' + page
         });
       if (page==="review") {
           this.getQuestionsForReview();
