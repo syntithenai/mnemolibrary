@@ -791,7 +791,7 @@ export default class AppLayout extends Component {
             indexedQuestions[id]=questionKey;
         }
         //that.setCurrentPage('home');
-        this.analyticsEvent('discover tag')
+        that.analyticsEvent('discover tag')
         that.setState({'currentPage':'home','currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Tag '+ Utils.snakeToCamel(tag.text),'tagFilter':tag.text});
         console.log(['set state done', that.state])
          //that.setState({});
