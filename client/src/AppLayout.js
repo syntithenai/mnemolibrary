@@ -416,6 +416,7 @@ export default class AppLayout extends Component {
       var state={};
       state.user = '';
       state.token = '';
+      this.analyticsEvent('logout')
       state.currentPage = 'splash';
       localStorage.setItem('token','{}');
       this.setState(state);
@@ -467,12 +468,17 @@ export default class AppLayout extends Component {
        console.log(['save quesgtions',data]);
    } 
   
-  setCurrentPage(page) {
-      console.log(['SETCURRENTPAGE',page]);
+  analyticsEvent(page) {
+      console.log(['ANALYTICS CURRENTPAGE',page]);
       ReactGA.event({
           category: 'Navigation',
           action: 'Navigate to' + page
         });
+      
+  };
+  
+  setCurrentPage(page) {
+      this.analyticsEvent(page);
       if (page==="review") {
           this.getQuestionsForReview();
       }
@@ -605,6 +611,7 @@ export default class AppLayout extends Component {
           if (!that.state.users.default.questions.block.hasOwnProperty(questionId)) newIds.push(questionId);
       });
       //console.log({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
+      this.analyticsEvent('discover')
       this.setState({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
   };
 
@@ -707,6 +714,7 @@ export default class AppLayout extends Component {
             j++;
         }
         console.log(currentQuiz);
+        this.analyticsEvent('discover question')
         that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover'});
         console.log(['set state done', that.state])
       }).catch(function(ex) {
@@ -747,6 +755,7 @@ export default class AppLayout extends Component {
             j++;
         }
         console.log(currentQuiz);
+        this.analyticsEvent('discover topic')
         that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  Utils.snakeToCamel(topic)});
         console.log(['set state done', that.state])
       }).catch(function(ex) {
@@ -782,6 +791,7 @@ export default class AppLayout extends Component {
             indexedQuestions[id]=questionKey;
         }
         //that.setCurrentPage('home');
+        this.analyticsEvent('discover tag')
         that.setState({'currentPage':'home','currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Tag '+ Utils.snakeToCamel(tag.text),'tagFilter':tag.text});
         console.log(['set state done', that.state])
          //that.setState({});
