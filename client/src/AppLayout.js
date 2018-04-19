@@ -20,7 +20,7 @@ import QuizCarousel from './QuizCarousel';
 import Footer from './Footer';
 import FindQuestions from './FindQuestions';
 import FAQ from './FAQ';
-
+import ReactGA from 'react-ga';
 //import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 //import SignIn from './SignIn';
 //import FindQuestions from './FindQuestions';
@@ -137,6 +137,7 @@ export default class AppLayout extends Component {
 
   componentDidMount() {
       let that = this;
+      ReactGA.initialize(config.analyticsKey);
       
         const script = document.createElement("script");
         script.src = "https://apis.google.com/js/platform.js";
@@ -467,6 +468,10 @@ export default class AppLayout extends Component {
    } 
   
   setCurrentPage(page) {
+      ReactGA.event({
+          category: 'Navigation',
+          action: page
+        });
       if (page==="review") {
           this.getQuestionsForReview();
       }
