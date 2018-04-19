@@ -714,7 +714,7 @@ export default class AppLayout extends Component {
             j++;
         }
         console.log(currentQuiz);
-        this.analyticsEvent('discover question')
+        that.analyticsEvent('discover question')
         that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover'});
         console.log(['set state done', that.state])
       }).catch(function(ex) {
@@ -755,7 +755,7 @@ export default class AppLayout extends Component {
             j++;
         }
         console.log(currentQuiz);
-        this.analyticsEvent('discover topic')
+        that.analyticsEvent('discover topic')
         that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  Utils.snakeToCamel(topic)});
         console.log(['set state done', that.state])
       }).catch(function(ex) {
