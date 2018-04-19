@@ -469,10 +469,10 @@ export default class AppLayout extends Component {
    } 
   
   analyticsEvent(page) {
-      console.log(['ANALYTICS CURRENTPAGE',page]);
+     // console.log(['ANALYTICS CURRENTPAGE',page]);
       ReactGA.event({
           category: 'Navigation',
-          action: 'Navigate to' + page
+          action:  page
         });
       
   };
