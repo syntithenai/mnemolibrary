@@ -756,7 +756,7 @@ export default class AppLayout extends Component {
         }
         console.log(currentQuiz);
         that.analyticsEvent('discover topic')
-        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  Utils.snakeToCamel(topic)});
+        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
         console.log(['set state done', that.state])
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
