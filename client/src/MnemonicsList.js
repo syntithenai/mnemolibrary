@@ -27,6 +27,7 @@ export default class MnemonicsList extends Component {
            mnemonics:{'default':{question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question}}
         });  
     }
+    //{question:'5abeec3d91ce1409b01e9553',mnemonic:'marshaled ..',technique:'association',questionText:'waht is marsh pln'}
     
     componentDidMount() {
         let that=this;
@@ -48,12 +49,13 @@ export default class MnemonicsList extends Component {
             //console.log(['got response', response])
             return response.json()
           }).then(function(json) {
+              console.log(['got response', json])
               let final={'default':{question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question}};
               
             json.forEach(function(mnemonic) {
                 final[mnemonic._id] = mnemonic;
             });
-            //console.log(['create indexes', json])
+            console.log(['create MNEM indexes', final])
             that.setState({defaultMnemonic:'default',mnemonics:final});
              
           }).catch(function(ex) {
@@ -68,40 +70,41 @@ export default class MnemonicsList extends Component {
         //let user=this.props.user;
         let question=this.props.question;
         let otherMnemonics = '';
+        console.log(['mnemoth ren',this.state.mnemonics]);
         if (this.state.mnemonics) {
-            if (this.state.mnemonics.length > 0) {
-                otherMnemonics = Object.keys(this.state.mnemonics).map((key,mnemonic) => {
-                    let likeButton=<a  className='btn btn-primary' >LLL</a>
+            //if (this.state.mnemonics.length > 0) {
+                //console.log(['mnemoth ren have len',this.state.mnemonics]);
+                otherMnemonics = Object.keys(this.state.mnemonics).map((mnemonicId,key) => {
+                    let mnemonic=this.state.mnemonics[mnemonicId]
+                    console.log(['MNN',mnemonic]);
+                    let likeButton=''
                     if (this.props.isLoggedIn()) {
                         likeButton = <span className='like_dislike' >&nbsp;&nbsp;&nbsp;<a  className='btn btn-primary'  onClick={() => this.props.like(question._id,mnemonic._id)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Like&nbsp;<span className="badge badge-pill badge-info"  >{question.score}</span></a></span>
                     }  
                 
                     console.log(['mnemoth',key,mnemonic]);
-                    if (key !== this.state.defaultMnemonic) {
+                    if (mnemonicId !== this.state.defaultMnemonic) {
                         var techniqueButton = '';
                         if (this.props.showRecallButton) {
                             techniqueButton = <button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.mnemonic_technique}</span></button>
-                            
-
                         } else {
                             techniqueButton = <button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.props.setDiscoveryBlock('technique',question.mnemonic_technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(question.mnemonic_technique)} style={{float:'right'}}/><span className="hidden-sm-down" >{question.mnemonic_technique}</span></button>                            
                         }
-                       // if (showRecallButton) {
+                        // if (showRecallButton) {
                             //// remove search options from tech button
                         //}
                         
                         //{likeButton}
-                        return <div className='list-group-item' key={key} >
-                            {likeButton}{techniqueButton}
-                            <pre  className='mnemonic' >{mnemonic.mnemonic}</pre>
-                            <hr/>
-                        </div>
-                    
+                        return  <div className='row' key={mnemonicId} >
+                                    <pre  className='mnemonicalternative col-12 col-lg-8' >{mnemonic.mnemonic}}</pre>
+                                    <div className='col-12 col-lg-4' >{techniqueButton}&nbsp;{likeButton}</div>
+                                </div>
+                        
                     } else {
                         return '';
                     }
                 })
-            }
+            //}
             console.log(['rebnmnlist',this.state.mnemonics,this.state.defaultMnemonic]);
             let mainLikeButton='';
             if (this.props.isLoggedIn()) {

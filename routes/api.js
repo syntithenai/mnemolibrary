@@ -909,9 +909,10 @@ router.post('/savemnemonic', (req, res) => {
 })
 
 router.post('/mnemonics', (req, res) => {
-    //console.log(['seen',req.body]);
+    console.log(['mnemonics',req.body.question]);
     if (req.body.question && req.body.question.length > 0) {
         db.collection('mnemonics').find({question:req.body.question}).toArray(function(err, result) {
+            console.log(['mnemonics found',result]);
             res.send(result);
         });
     } else {
@@ -929,6 +930,55 @@ router.post('/mymnemonics', (req, res) => {
         res.send({message:'Invalid request'});
     }
 })
+
+router.post('/saveusertopic', (req, res) => {
+    //let body=JSON.parse(req.body);
+    //res.send({message:req.body});
+    let body=req.body;
+    if (body.user  && body.questions && body.topic) {
+        let id = body._id && String(body._id).length > 0 ? new ObjectId(body._id) : new ObjectId();
+        let user = body.user;
+        let questions = body.questions;
+        let toSave = {_id:id,user:user,questions:questions,topic:body.topic};
+        console.log(['saveusertopic']);
+        console.log([toSave]);
+        db.collection('userTopics').save(toSave).then(function(result) {
+            console.log(['saved usertopic',result]);
+            res.send({id:id});
+        }).catch(function(err) {
+            console.log(['save usertopic ERR',err]);
+            res.send({message:'Invaddlid request ERR'});
+        });
+    } else {
+        res.send({message:'Invaddlid request'});
+    }
+})
+
+
+router.post('/myusertopics', (req, res) => {
+    //console.log(['seen',req.body]);
+    if (req.body.user && req.body.user.length > 0) {
+        db.collection('userTopics').find({user:req.body.user}).toArray(function(err, result) {
+            res.send(result);
+        });
+    } else {
+        res.send({message:'Invalid request'});
+    }
+})
+
+router.post('/usertopic', (req, res) => {
+    console.log(['usrtop',req.body]);
+    if (req.body._id && req.body._id.length > 0) {
+        db.collection('userTopics').findOne({_id:ObjectId(req.body._id)}).then(function(result) {
+            res.send(result);
+        }).catch(function(e) {
+            res.send({'err':e});
+        });
+    } else {
+        res.send({message:'Invalid request'});
+    }
+})
+
 
 module.exports = router;
      //let bulk = db.collection(collection).initializeOrderedBulkOp();

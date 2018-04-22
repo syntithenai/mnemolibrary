@@ -37,6 +37,11 @@ export default class SingleQuestion extends Component {
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.scrollTo={};
     };
+    
+     componentWillReceiveProps(props) {
+        scrollToComponent(this.scrollTo['mnemonic'],{align:'top',offset:-230});
+    };
+    
     // which question parts are visible - mnemonic, answer, moreinfo
     setVisible(toShow) {
         let visible = this.state.visible;

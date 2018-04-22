@@ -103,6 +103,7 @@ export default class AppLayout extends Component {
        this.setQuizFromDiscovery = this.setQuizFromDiscovery.bind(this);
        
        this.login = this.login.bind(this);
+       this.isAdmin = this.isAdmin.bind(this);
        this.refreshLogin = this.refreshLogin.bind(this);
        this.loginByToken = this.loginByToken.bind(this);
        this.loginByRecovery = this.loginByRecovery.bind(this);
@@ -276,7 +277,18 @@ export default class AppLayout extends Component {
 
   }
 
-
+ isAdmin() {
+        if (this.state.user && 
+        (this.state.user.username==="stever@syntithenai.com" 
+            || this.state.user.username==="syntithenai@gmail.com" 
+            || this.state.user.username==="sofieblossom@gmail.com" 
+            || this.state.user.username==="mnemoslibrary@gmail.com" 
+            || this.state.user.username.toLowerCase()==="trevorryan123@gmail.com")) {
+            return true;
+        }
+        return false;
+    };
+    
   login (user) {
       var state={};
       var that = this;
@@ -861,7 +873,7 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('review') && <ReviewPage setQuizFromTechnique={this.setQuizFromTechnique} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromTopic={this.setQuizFromTopic} setDiscoveryBlock={this.setDiscoveryBlock} clearDiscoveryBlock={this.clearDiscoveryBlock} blocks={this.state.discoveryBlocks} setQuizFromTag={this.setQuizFromTag}  setCurrentQuestion={this.setCurrentQuestion} discoverQuestions={this.discoverQuestions}  getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} currentQuestion={this.state.currentQuestion} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
             }
-            {this.isCurrentPage('create') && <CreatePage mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion}  />
+            {this.isCurrentPage('create') && <CreatePage  user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion}  />
             }
             {this.isCurrentPage('about') && <AboutPage setCurrentPage={this.setCurrentPage} />
             }
@@ -871,7 +883,7 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('faq') && <FAQ  setCurrentPage={this.setCurrentPage} />
             }
-            {showProfile && <ProfilePage saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
+            {showProfile && <ProfilePage isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
             }
             {(showLogin) && <LoginPage token={this.state.token} login={this.login}/>
             }<br/>
@@ -882,6 +894,8 @@ export default class AppLayout extends Component {
     );
   }
 }
+
+ 
 //<AdSense.Google
               //client='ca-pub-8152690534650306'
               //slot='5452746977'

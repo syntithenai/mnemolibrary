@@ -64,6 +64,19 @@ iframe {
 .footer {
     background-color: lightgrey;
 }
+#topiceditorheader {
+    position: fixed;
+    background-color: white;
+    min-height: 4em;
+    width: 97%;
+}
+
+#answer {
+    min-height: 7em;
+}
+.questionform label {
+    font-weight: bold;
+}
 
 .question .card-title {
     color: blue;
@@ -95,9 +108,12 @@ pre {
 pre.mnemonic {
     color :  red;
     font-size: 1.3em;
+}
+pre.mnemonicalternative {
+    color :  black;
+    font-size: 1.2em;
 
 }
-
 .loginbutton {
     margin-top: 3.6em;
 }

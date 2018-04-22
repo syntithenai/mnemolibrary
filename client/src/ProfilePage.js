@@ -20,7 +20,6 @@ export default class ProfilePage extends Component {
             }
         }
        // console.log(['constr',this.state]);
-        this.isAdmin = this.isAdmin.bind(this);
     };
     
     saveUser(e) {
@@ -59,16 +58,7 @@ export default class ProfilePage extends Component {
         return true;
     };
     
-    isAdmin() {
-        if (this.state.user && 
-        (this.state.user.username==="stever@syntithenai.com" 
-            || this.state.user.username==="syntithenai@gmail.com" 
-            || this.state.user.username==="mnemoslibrary@gmail.com" 
-            || this.state.user.username.toLowerCase()==="trevorryan123@gmail.com")) {
-            return true;
-        }
-        return false;
-    };              
+                
     
     render() { //req,vars/
         return (
@@ -80,7 +70,7 @@ export default class ProfilePage extends Component {
                       <a  href='#' onClick={() => this.props.logout()} className='btn btn-info ' style={{'float':'right'}}>
                        Logout
                       </a>
-                      {this.isAdmin() && 
+                      {this.props.isAdmin() && 
                       <a  href='#' onClick={() => this.props.import()} className='btn btn-info ' style={{'float':'right'}}>
                        Import
                       </a>
