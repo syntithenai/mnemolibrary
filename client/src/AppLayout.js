@@ -431,6 +431,7 @@ export default class AppLayout extends Component {
       this.analyticsEvent('logout')
       state.currentPage = 'splash';
       localStorage.setItem('token','{}');
+      localStorage.setItem('user','{}');
       this.setState(state);
       //console.log(['logout',gapi.auth2]);
       //console.log(this.state);
