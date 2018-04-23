@@ -38,7 +38,7 @@ export default class ReviewPage extends Component {
     
     render() {
         //console.log(['REVIEW',this.props.user]);
-       if (this.props.user) {
+       if (this.props.isLoggedIn()) {
             //console.log(['REVIEW USER',this.props.questions]);
             if (this.props.questions.length > 0) {
                //  console.log(['REVIEW questions']);
