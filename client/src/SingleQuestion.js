@@ -124,26 +124,27 @@ export default class SingleQuestion extends Component {
           }
        
           let tags = '';
+          let tagsClean='';
           if (question.tags && Array.isArray(question.tags)) {
               tags = question.tags.map((tag, key) => {
                   tag=tag.trim().toLowerCase();
                   return <button className="btn btn-outline btn-primary" key={key}  ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('tag',tag)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTag({text:tag})} style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{tag}&nbsp;</span></button>
                 })
             //
-          }
         
-          let tagsClean = question.tags.map((tag, key) => {
-              
-              return <button className="btn btn-outline btn-primary" key={key}  ><span className="hidden-sm-down" >{tag}</span></button>
-            })
-             //!this.isVisible('mnemonic') && 
+              tagsClean = question.tags.map((tag, key) => {
+                  
+                  return <button className="btn btn-outline btn-primary" key={key}  ><span className="hidden-sm-down" >{tag}</span></button>
+                })
+                 //!this.isVisible('mnemonic') && 
                       //(!this.isVisible('image')) && 
                       //(!this.isVisible('image')) && 
                       //!this.isVisible('moreinfo') 
                       // !this.isVisible('topic')) && 
                       // (!this.isVisible('tags')) && 
             
-                     
+            }
+                   
            return (
             <div className="questionwrap" >
             <ShareDialog id="sharedialog"  header={header}  question={question}/>
