@@ -990,7 +990,7 @@ router.post('/deleteusertopic', (req, res) => {
            if (result) {
                let questionsToDelete=[];
                if (Array.isArray(result.questions)) {
-                   result.questions.map(function(key,question) {
+                   result.questions.map(function(question,key) {
                        if (question._id && String(question._id).length > 0) {
                            questionsToDelete.push(ObjectId(question._id));
                        }
