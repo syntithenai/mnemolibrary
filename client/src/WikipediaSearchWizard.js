@@ -8,7 +8,7 @@ export default  class WikipediaSearchWizard extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-            search:'',
+            search:this.props.topic,
             lists: [],
             showLoader:false
 		}
@@ -16,29 +16,32 @@ export default  class WikipediaSearchWizard extends React.Component {
          this.search = this.search.bind(this);
          this.doSearch = this.doSearch.bind(this);
          this.setSearchEvent = this.setSearchEvent.bind(this);
+         
 	}
     
+    componentDidMount() {
+        this.doSearch(this.props.topic);
+    };
     
     componentWillReceiveProps(props) {
-        this.setState({search:props.topic});
+       // this.setState({search:props.topic});
+         //this.setState({lists: [],showLoader:true})
+        ////let query=this.refs.keyword.value.length > 0  ? this.refs.keyword.value : this.refs.topic.value;
+        //this.doSearch(props.topic);
     };
 
 	_handleSubmit(e) {
 		e.preventDefault();
         this.setState({lists: [],showLoader:true})
-        //var esc = encodeURIComponent;
-        //var query = Object.keys(params)
-        //.map(k => esc(k) + '=' + esc(params[k]))
-        //.join('&');
-        //let url="https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=" + this.refs.keyword.value + "&prop=info&inprop=url&utf8=&limit=5&format=json&origin=*";
         let query=this.refs.keyword.value.length > 0  ? this.refs.keyword.value : this.refs.topic.value;
         this.doSearch(query);
 	}
     
     doSearch(query) {
         let that=this;
+        //this.refs.keyword.value
         if (query && query.length>0) {
-            let url="https://en.wikipedia.org/w/api.php?action=opensearch&search=" + this.refs.keyword.value + "&limit=50&format=json&origin=*";
+            let url="https://en.wikipedia.org/w/api.php?action=opensearch&search=" + query + "&limit=50&format=json&origin=*";
             fetch(url).then(function(response) {
                // console.log(['reponse',response]);
                 return response.json();
@@ -58,6 +61,9 @@ export default  class WikipediaSearchWizard extends React.Component {
     setSearchEvent(e) {
         console.log(['SE',e]);
         this.setState({search:e.target.value});
+         this.setState({lists: [],showLoader:true})
+        let query=this.refs.keyword.value.length > 0  ? this.refs.keyword.value : this.refs.topic.value;
+        this.doSearch(query);
     };
     
     search(search) {
@@ -122,14 +128,10 @@ export default  class WikipediaSearchWizard extends React.Component {
 			<div>
             	<form onSubmit={this._handleSubmit.bind(this)}>
 					<div className="input-group">
-                        <label><b>Search&nbsp;</b></label>
+                        <label><b>Search&nbsp;Wikipedia&nbsp;&nbsp;</b></label>
 						<input ref="keyword"  type="text" className="form-control input-lg" placeholder="" value={this.state.search} onChange={this.setSearchEvent}/>
 						
-                        <span className="input-group-btn">
-							<button type="submit" className="btn btn-info">
-								Search
-							</button>
-						</span>
+                      
 					</div>			
 				</form>
 				<br/>
@@ -143,4 +145,8 @@ export default  class WikipediaSearchWizard extends React.Component {
 	}
 }
 
-
+  //<span className="input-group-btn">
+							//<button type="submit" className="btn btn-info">
+								//Search
+							//</button>
+						//</span>

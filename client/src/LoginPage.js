@@ -94,7 +94,8 @@ export default class LoginPage extends Component {
             email: user.email,
             name: user.name
           })
-        }).then(this.checkStatus)
+        })
+        //.then(this.checkStatus)
       .then(this.parseJSON)
       .then(function(data) {
         //    console.log(['gsignin request with JSON response', data])

@@ -36,6 +36,10 @@ Content Kids
 
 # LINKS
 
+https://www.npmjs.com/package/react-confirm-alert
+
+https://github.com/reactjs/react-autocomplete
+
 # swipe react
 https://github.com/dogfessional/react-swipeable
 

@@ -12,6 +12,10 @@ export default class TagsPage extends Component {
         this.filterTags = this.filterTags.bind(this);
     };
     
+    componentDidMount() {
+        this.filterTags();
+    };
+    
     setTitleFilter(event) {
         let title = event.target.value;
         let newState={'titleFilter':title};
@@ -20,39 +24,53 @@ export default class TagsPage extends Component {
     };
     
     filterTags(title) {
-        let tags = [];
-        let tagsCollation = {};
-        if (title.length > 0) {
-            let that = this;   
-            console.log(['filter tags',this.props.tags]);     
-            //Object.keys(this.props.tags).forEach(function(tagKey) {
-            for (var w in this.props.tags) {
-                let word = this.props.tags[w];
-                let tag = word.text;
-                //console.log(word);
-                // collate on tag
-                if (tag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
-                    word.value *= 20;
-                    tagsCollation[tag]=word;
-                }
-                // check related
-                Object.keys(that.props.relatedTags[tag]).forEach(function(reltag) {
+        let that = this;
+          fetch('/api/tags?title='+(title ? title : '') )
+          .then(function(response) {
+            return response.json()
+          }).then(function(json) {
+              console.log(['SET TAGS', json])
+            that.setState({'tags':json});
+          }).catch(function(ex) {
+            console.log(['parsing failed', ex])
+          })
+        
+        
+        //let tags = [];
+        //let tagsCollation = {};
+        
+        
+        //if (title.length > 0) {
+            //let that = this;   
+            //console.log(['filter tags',this.props.tags]);     
+            ////Object.keys(this.props.tags).forEach(function(tagKey) {
+            //for (var w in this.props.tags) {
+                //let word = this.props.tags[w];
+                //let tag = word.text;
+                ////console.log(word);
+                //// collate on tag
+                //if (tag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
+                    //word.value *= 20;
+                    //tagsCollation[tag]=word;
+                //}
+                //// check related
+                ////Object.keys(that.props.relatedTags[tag]).forEach(function(reltag) {
                     
-                    //if (reltag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
-                    //    tagsCollation[reltag.trim().toLowerCase()]={text:reltag.trim().toLowerCase(),value:word.value /30};
-                    //}    
-                });
+                    //////if (reltag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
+                    //////    tagsCollation[reltag.trim().toLowerCase()]={text:reltag.trim().toLowerCase(),value:word.value /30};
+                    //////}    
+                ////});
                    
-            };
-            console.log(['TAGS collation',tagsCollation]);
-            for (var theTag in tagsCollation) {
-                tags.push(tagsCollation[theTag]);
-            }
-            console.log(['TAGS',tags]);
-        } else {
-            tags = this.props.tags;
-        }
-        this.setState({'tags':tags});
+            //};
+            //console.log(['TAGS collation',tagsCollation]);
+            //for (var theTag in tagsCollation) {
+                //tags.push(tagsCollation[theTag]);
+            //}
+            //console.log(['TAGS',tags]);
+        //} else {
+            //tags = this.props.tags;
+        //}
+//        this.setState({'tags':tags});
     };
     
     render() {

@@ -33,7 +33,7 @@ export default class SearchPage extends Component {
     };
     
     
-  filterQuestions(filters) {
+    filterQuestions(filters) {
       let that = this;
       // load mnemonics and collate tags, topics
       fetch('/api/questions?search='+filters.titleFilter+'&technique='+filters.techniqueFilter.toLowerCase())

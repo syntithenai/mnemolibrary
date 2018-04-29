@@ -42,16 +42,9 @@ module.exports = {
         res.send(mustache.render(template.layout,templateVars));    
     },
     
-    createIndexes: function (json) {
-        var quizzes = {};
-        var tags = {};
-        var relatedTags = {};
-        var tagTopics = {};
-        var topicTags = {};
-        var updatedQuestions = [];
-        // collate quizzes and tags
+    updateIndexes: function (json,quizzes,tags,relatedTags,tagTopics,topicTags,indexedQuestions) {
+                // collate quizzes and tags
         console.log(json);
-        let indexedQuestions= {};
         for (var questionKey in json['questions']) {
             console.log('index q '+questionKey);
             const question = json['questions'][questionKey]
@@ -61,11 +54,11 @@ module.exports = {
                 var id = question._id ? question._id :  new ObjectId();
                 question._id = id;
                 var tagList = question.tags.split(',');
-                var quiz = question.quiz;
-                if (! (Array.isArray(quizzes[quiz]))) {
-                    quizzes[quiz] = []
-                }
-                quizzes[quiz].push(id);        
+                //var quiz = question.quiz;
+                //if (! (Array.isArray(quizzes[quiz]))) {
+                    //quizzes[quiz] = []
+                //}
+                //quizzes[quiz].push(id);        
                 console.log(['taglist',tagList]);
                 for (var tagKey in tagList) {
                     console.log(['taglist each',tagKey,tagList[tagKey]]);
@@ -74,27 +67,27 @@ module.exports = {
                         if (! (Array.isArray(tags[tag]))) {
                             tags[tag] = []
                         }
-                        if (! (Array.isArray(relatedTags[tag]))) {
-                            relatedTags[tag] = {}
-                        }
-                        if (!(Array.isArray(tagTopics[tag]))) {
-                            tagTopics[tag] = []
-                        }
-                        if (! (Array.isArray(topicTags[quiz]))) {
-                            topicTags[quiz] = []
-                        }
+                        //if (! (Array.isArray(relatedTags[tag]))) {
+                            //relatedTags[tag] = {}
+                        //}
+                        //if (!(Array.isArray(tagTopics[tag]))) {
+                            //tagTopics[tag] = []
+                        //}
+                        //if (! (Array.isArray(topicTags[quiz]))) {
+                            //topicTags[quiz] = []
+                        //}
                         tags[tag].push(id);
-                        if (!tagTopics[tag].includes(quiz)) {
-                            tagTopics[tag].push(quiz)
-                        }
-                        if (!topicTags[quiz].includes(tag)) {
-                            topicTags[quiz].push(tag)
-                        }
-                        tagList.forEach(function(relatedTag) {
-                            if (relatedTag !== tag) {
-                                relatedTags[tag][relatedTag]=true;
-                            }
-                        });
+                        //if (!tagTopics[tag].includes(quiz)) {
+                            //tagTopics[tag].push(quiz)
+                        //}
+                        //if (!topicTags[quiz].includes(tag)) {
+                            //topicTags[quiz].push(tag)
+                        //}
+                        //tagList.forEach(function(relatedTag) {
+                            //if (relatedTag !== tag) {
+                                //relatedTags[tag][relatedTag]=true;
+                            //}
+                        //});
                         
                     }
                     
@@ -103,10 +96,24 @@ module.exports = {
             }
         }
         let words = [];
+        let finalTags = [];
         for (let tag in tags) {
             words.push({_id: new ObjectId(),text:tag, value: tags[tag].length});
+            finalTags.push({'title':tag,questions:[]});
         }
-        return {'questions':json['questions'], 'indexedQuestions':indexedQuestions,'topics':quizzes,'words':words,'tags':tags,'relatedTags':relatedTags,'topicTags':topicTags,'tagTopics':tagTopics};
+        return {'questions':json['questions'], 'indexedQuestions':indexedQuestions,'topics':quizzes,'words':words,'tags':finalTags};
+    },
+    
+    createIndexes: function (json) {
+        var quizzes = {};
+        var tags = {};
+        var relatedTags = {};
+        var tagTopics = {};
+        var topicTags = {};
+        var updatedQuestions = [];
+        let indexedQuestions= {};
+        
+        return this.updateIndexes(json,quizzes,tags,relatedTags,tagTopics,topicTags,indexedQuestions);
   }
 
 }

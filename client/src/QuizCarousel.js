@@ -4,6 +4,8 @@ import Utils from './Utils';
 import SingleQuestion from './SingleQuestion';
 import QuestionList from './QuestionList';
 import Play from 'react-icons/lib/fa/play';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 
 export default class QuizCarousel extends Component {
     constructor(props) {
@@ -24,6 +26,9 @@ export default class QuizCarousel extends Component {
         this.setQuizQuestion = this.setQuizQuestion.bind(this);
         this.finishQuiz = this.finishQuiz.bind(this);
         this.logStatus = this.logStatus.bind(this);
+        this.banQuestion = this.banQuestion.bind(this);
+        this.percentageFinished = this.percentageFinished.bind(this);
+        this.discoverQuestions = this.discoverQuestions.bind(this);
         console.log(['QUIZ carousel constr']);
     };
     
@@ -41,6 +46,10 @@ export default class QuizCarousel extends Component {
       //}
       
   };  
+  
+  percentageFinished()  {
+      return (this.props.currentQuiz.length > 0 ? (this.props.currentQuestion/this.props.currentQuiz.length) : 0)*100 + '%';
+  };
       
   logStatus(status,question) {
      // console.log(['log status',status,question]);
@@ -59,6 +68,25 @@ export default class QuizCarousel extends Component {
             });
         }
   };    
+
+  banQuestion(questions,id,time) {
+      questions.block[id] = time;
+       this.logStatus('block',id);
+       // quiz complete ?
+          if (this.props.currentQuiz.length > 0) {
+            if (this.isQuizFinished()) {
+              this.finishQuiz();
+            }  else {
+                // move forward one question and strip blocked questions from currentQuiz 
+                let currentQuestion = this.props.currentQuestion;
+                console.log(['block',currentQuestion]);
+                let currentQuiz = this.props.currentQuiz;
+                currentQuiz.splice(parseInt(currentQuestion,10),1);
+               // this.props.setCurrentQuestion(this.props.currentQuestion + 1);
+                this.props.setCurrentQuiz(currentQuiz);
+            }
+          }
+  };
       
   // handle user click on Remember, Forgot, Skip, Ban
   // update user questions history and remove question from current Quiz
@@ -122,25 +150,21 @@ export default class QuizCarousel extends Component {
           // flag as blocked
       //    console.log(['block',id]);
           if (id.length > 0) { 
-              questions.block[id] = time;
-               console.log(['block logged a']);
-               this.logStatus('block',id);
-               console.log(['block logged']);
+              confirmAlert({
+                  title: 'Delete Question',
+                  message: 'Are you sure?',
+                  buttons: [
+                    {
+                      label: 'Yes',
+                      onClick: () => this.banQuestion(questions,id,time)
+                    },
+                    {
+                      label: 'No'
+                    }
+                  ]
+                })
           }
-          // quiz complete ?
-          if (this.props.currentQuiz.length > 0) {
-            if (this.isQuizFinished()) {
-              this.finishQuiz();
-            }  else {
-                // move forward one question and strip blocked questions from currentQuiz 
-                let currentQuestion = this.props.currentQuestion;
-                console.log(['block',currentQuestion]);
-                let currentQuiz = this.props.currentQuiz;
-                currentQuiz.splice(parseInt(currentQuestion,10),1);
-               // this.props.setCurrentQuestion(this.props.currentQuestion + 1);
-                this.props.setCurrentQuiz(currentQuiz);
-            }
-          }
+          
       }
       //this.props.updateProgress(user);
   }; 
@@ -156,20 +180,41 @@ export default class QuizCarousel extends Component {
     };
     
        // FINISH QUIZ CAROUSEL
-   finishQuiz() {
+   finishQuiz(success,questions) {
        console.log(['finish quiz',this.props.finishQuiz]);
         // inject override
-        
+       // alert('finsih');
        if (this.props.finishQuiz) {
             this.props.finishQuiz(this.props.questions,this.state.success);
-        } 
+        } else {
+        //this.props.setMessage('You\'ve seen '+(questions ? questions.length : 0)+' questions. Time for review ?'); 
+        //console.log('root finish quiz');
+            confirmAlert({
+              title: 'Question set complete',
+              message: 'Time for review?',
+              buttons: [
+                {
+                  label: 'Review',
+                  onClick: () => this.props.setCurrentPage('review')
+                },
+                {
+                  label: 'Continue',
+                  onClick: () => this.discoverQuestions()
+                }
+              ]
+            })
+        }    
         this.setState({'success' : []});
+        
         //else {
            //this.props.setCurrentPage('home');
            //this.props.setMessage('You added '+((this.props.questions && this.props.questions.length)?this.props.questions.length:'')+' questions to your knowledge base.') ;
         //}
    }; 
    
+    discoverQuestions() {
+        this.props.discoverQuestions();
+    };
     
     getQuestions(questionIds) {
         console.log(['get ques',questionIds]);
@@ -215,7 +260,7 @@ export default class QuizCarousel extends Component {
                 content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList questions={listQuestions} setQuiz={this.setQuizQuestion}  ></QuestionList></div>);
             } else {
                 // single question
-                content = (<SingleQuestion setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} setDiscoveryBlock={this.props.setDiscoveryBlock} clearDiscoveryBlock={this.props.clearDiscoveryBlock} blocks={this.props.blocks}  setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn}/> )
+                content = (<SingleQuestion percentageFinished={this.percentageFinished} isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} setDiscoveryBlock={this.props.setDiscoveryBlock} clearDiscoveryBlock={this.props.clearDiscoveryBlock} blocks={this.props.blocks}  setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn}/> )
             }
         
         //} else {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-//import { render } from 'react-dom';
+//import  'react-dom';
 //import Pagination from './Pagination';
 import WordCloud from 'react-d3-cloud';
 import SignIn from './SignIn';

@@ -32,7 +32,7 @@ export default class CreatePage extends Component {
     render() {
         if (true && this.props.isAdmin()) {
             return <div>
-                <TopicEditor user={this.props.user._id} mnemonic_techniques={this.props.mnemonic_techniques} />
+                <TopicEditor user={this.props.user} setQuizFromTopic={this.props.setQuizFromTopic} mnemonic_techniques={this.props.mnemonic_techniques} />
             </div>
         } else {
             return (

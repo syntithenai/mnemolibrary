@@ -20,10 +20,11 @@ body {
 }
 .questionwrap .question {
     margin-top:4em;
+    padding-top:4em;
     
 }
-.questionwrap .blocked-tags {
-margin-top:4em;
+.dddquestionwrap .blocked-tags {
+margin-top:2em;
 }
 .holds-the-iframe {
   background:url(/loading.gif) center center no-repeat;
@@ -70,12 +71,22 @@ iframe {
     min-height: 4em;
     width: 97%;
 }
-
+#problemdialog {
+    z-index:99999;
+}
 #answer {
     min-height: 7em;
 }
 .questionform label {
     font-weight: bold;
+}
+
+.questionErrors,#warningmessage {
+    color: red;    
+}
+
+.questionform .form-inline label {
+    margin-right: 1em;
 }
 
 .question .card-title {

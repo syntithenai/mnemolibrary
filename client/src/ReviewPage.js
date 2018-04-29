@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 //import FindQuestions from './FindQuestions';
 import QuizCarousel from './QuizCarousel';
 import 'whatwg-fetch'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 
 export default class ReviewPage extends Component {
 
@@ -32,8 +34,22 @@ export default class ReviewPage extends Component {
     finishReview(questions,success) {
        console.log('finish review');
        //this.setCurrentPage('review');
-       this.props.setMessage('Review complete. You recalled '+success.length+' out of '+questions.length+' questions.'); 
-       this.getQuestionsForReview();
+        confirmAlert({
+          title: 'Review set complete',
+          message: 'You recalled '+success.length+' out of '+questions.length+' questions.',
+          buttons: [
+            {
+              label: 'Continue Review',
+              onClick: () => this.getQuestionsForReview()
+            },
+            {
+              label: 'Discover',
+              onClick: () => this.props.discoverQuestions()
+            }
+          ]
+        })
+      // this.props.setMessage('Review complete. You recalled '+success.length+' out of '+questions.length+' questions.'); 
+       
     };
     
     render() {
@@ -44,7 +60,7 @@ export default class ReviewPage extends Component {
                //  console.log(['REVIEW questions']);
                 return (
                 <div>
-                    <QuizCarousel setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} setDiscoveryBlock={this.props.setDiscoveryBlock} clearDiscoveryBlock={this.props.clearDiscoveryBlock} blocks={this.props.blocks} setQuizFromTag={this.props.setQuizFromTag}  setCurrentQuestion={this.props.setCurrentQuestion} discoverQuestions={this.props.discoverQuestions}  questions={this.props.questions} currentQuiz={this.props.currentQuiz} currentQuestion={this.props.currentQuestion} finishQuiz={this.finishReview} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.props.setCurrentQuiz} />
+                    <QuizCarousel isAdmin={this.props.isAdmin}  saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} setDiscoveryBlock={this.props.setDiscoveryBlock} clearDiscoveryBlock={this.props.clearDiscoveryBlock} blocks={this.props.blocks} setQuizFromTag={this.props.setQuizFromTag}  setCurrentQuestion={this.props.setCurrentQuestion} discoverQuestions={this.props.discoverQuestions}  questions={this.props.questions} currentQuiz={this.props.currentQuiz} currentQuestion={this.props.currentQuestion} finishQuiz={this.finishReview} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.props.setCurrentQuiz} />
                 </div>
                 )
             } else {

@@ -3,6 +3,8 @@ import QuizList from './QuizList';
 import QuizCollection from './QuizCollection';
 import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 
 export default class TopicQuestionsList extends Component {
     constructor(props) {
@@ -10,16 +12,39 @@ export default class TopicQuestionsList extends Component {
         this.state = {
             
         };
+        this.deleteQuestion=this.deleteQuestion.bind(this);
     };
     
     componentDidMount() {
         
     }
     
+    deleteQuestion(key) {
+        confirmAlert({
+          title: 'Delete Question',
+          message: 'Are you sure?',
+          buttons: [
+            {
+              label: 'Yes',
+              onClick: () => this.props.deleteQuestion(key)
+            },
+            {
+              label: 'No'
+            }
+          ]
+        })
+            
+    };
+    
     render() {
+       // console.log(['VAL ERR',this.props.validationErrors]);
         if (this.props.questions) {
             let list = this.props.questions.map((question,key) => {
-                 return <div className='list-group-item' key={key} ><button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.props.deleteQuestion(key)} >Delete</button><button  className='btn btn-info' style={{float:'right'}} onClick={() => this.props.editQuestion(key)} >Edit</button>{question.interrogative} {question.question} </div>
+                let errors='';
+                if (this.props.validationErrors && this.props.validationErrors.hasOwnProperty(key) && this.props.validationErrors[key].length > 0) {
+                    errors="Missing required information for "+this.props.validationErrors[key].join(" and ");
+                }
+                return <div className='list-group-item' key={key} ><button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.deleteQuestion(key)} >Delete</button><button  className='btn btn-info' style={{float:'right'}} onClick={() => this.props.editQuestion(key)} >Edit</button>{key+1}. {question.interrogative} {question.question} <div className="questionErrors">{errors}</div></div>
             });
             return (
                 <div className='list-group' >{list}

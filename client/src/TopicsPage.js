@@ -16,7 +16,7 @@ export default class TopicsPage extends Component {
     };
     
     componentDidMount() {
-        this.filterQuizzes('');
+       // this.filterQuizzes('');
     }
     
     setTitleFilter(event) {
@@ -34,30 +34,41 @@ export default class TopicsPage extends Component {
     };
     
     filterQuizzes(title) {
-        console.log(' FILTER TOPICS '+title);
-        console.log(this.props.topics);
-        let topics = {};
-        //if (title.length > 0) {
-        let that = this;        
-        Object.keys(this.props.topics).forEach(function(key) {
-            let allowTitle = true;
-            let allowTag = true;
-            let topic = Utils.snakeToCamel(key);
-            if (title && title.length > 0 && topic.toLowerCase().indexOf(title.toLowerCase()) === -1) {
-                allowTitle = false;
-            }
-            //if (that.state.tagFilter && that.state.tagFilter.length > 0 && that.props.topicTags.hasOwnProperty(key) && !that.props.topicTags[key].includes(that.props.tagFilter)) {
-                //allowTag = false
+         let that = this;
+          fetch('/api/topics?title='+title )
+          .then(function(response) {
+            console.log(['got response', response])
+            return response.json()
+          }).then(function(json) {
+            that.setState({'topics':json});
+          }).catch(function(ex) {
+            console.log(['parsing failed', ex])
+          })
+          
+        //console.log(' FILTER TOPICS '+title);
+        //console.log(this.props.topics);
+        //let topics = {};
+        ////if (title.length > 0) {
+        //let that = this;        
+        //Object.keys(this.props.topics).forEach(function(key) {
+            //let allowTitle = true;
+            //let allowTag = true;
+            //let topic = Utils.snakeToCamel(key);
+            //if (title && title.length > 0 && topic.toLowerCase().indexOf(title.toLowerCase()) === -1) {
+                //allowTitle = false;
             //}
-            if (allowTitle && allowTag) {
-                topics[key] = that.props.topics[key];
-            }
-        });
-        //} else {
-            //topics = this.props.topics;
-        //}
-        console.log(['FILTERED TO ',topics]);
-        this.setState({'topics':topics});
+            ////if (that.state.tagFilter && that.state.tagFilter.length > 0 && that.props.topicTags.hasOwnProperty(key) && !that.props.topicTags[key].includes(that.props.tagFilter)) {
+                ////allowTag = false
+            ////}
+            //if (allowTitle && allowTag) {
+                //topics[key] = that.props.topics[key];
+            //}
+        //});
+        ////} else {
+            ////topics = this.props.topics;
+        ////}
+        //console.log(['FILTERED TO ',topics]);
+        //this.setState({'topics':topics});
     };
     // {this.state.tagFilter && <button className='btn btn-warning' onClick={this.clearTagFilter}> Tag: {this.state.tagFilter} <FaClose/></button>}
     render() {

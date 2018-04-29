@@ -29,6 +29,10 @@ import 'whatwg-fetch'
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+    
+
 import Utils from './Utils';
 var config = require('../../config')
     
@@ -83,18 +87,18 @@ export default class AppLayout extends Component {
       this.updateProgress = this.updateProgress.bind(this);
       this.componentDidMount = this.componentDidMount.bind(this);
       
-      this.getTagsByTitle = this.getTagsByTitle.bind(this);
-      this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
-      this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
-      this.getQuestionsByTopic = this.getQuestionsByTopic.bind(this);
+      //this.getTagsByTitle = this.getTagsByTitle.bind(this);
+      //this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
+      //this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
+      //this.getQuestionsByTopic = this.getQuestionsByTopic.bind(this);
       
       //this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
       //this.getTopicsForReview = this.getTopicsForReview.bind(this);
       //this.getTagsForReview = this.getTagsForReview.bind(this);
-      this.getTagsByTitle = this.getTagsByTitle.bind(this);
-      this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
-      this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
-      this.getQuestionsByTopic = this.getQuestionsByTopic.bind(this);
+      //this.getTagsByTitle = this.getTagsByTitle.bind(this);
+      //this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
+      //this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
+      //this.getQuestionsByTopic = this.getQuestionsByTopic.bind(this);
          
       // this.finishTopic = this.finishTopic.bind(this);
        //this.finishReview = this.finishReview.bind(this);
@@ -102,6 +106,7 @@ export default class AppLayout extends Component {
        this.setMessage = this.setMessage.bind(this);
        this.setQuizFromDiscovery = this.setQuizFromDiscovery.bind(this);
        
+       this.saveSuggestion = this.saveSuggestion.bind(this);
        this.login = this.login.bind(this);
        this.isAdmin = this.isAdmin.bind(this);
        this.refreshLogin = this.refreshLogin.bind(this);
@@ -181,16 +186,23 @@ export default class AppLayout extends Component {
           parts.forEach(function(part) {
               let iParts=part.split("=");
               // load by token ?
-              if (iParts[0]==="code") {
-                  that.loginByToken(window.location.search.slice(6));
-              } else if (iParts[0]==="confirm") {
+              if (iParts[0]==="confirm") {
                   that.loginByConfirm(window.location.search.slice(9));
               } else if (iParts[0]==="recovery") {
                   that.loginByRecovery(window.location.search.slice(10));
-              } 
+              } else if (iParts[0]==="code") {
+                  that.loginByToken(window.location.search.slice(6));
+              }
           });
     } 
-
+    console.log([this.state.user,this.state.token]);
+    // try login from localstorage
+    let token = JSON.parse(localStorage.getItem('token'));
+      if (token) {
+          console.log('login by local store');
+          that.refreshLogin(token);
+      }
+    
     if (window.location.search) {
         let parts = window.location.search.slice(1).split("&");
         parts.forEach(function(part) {
@@ -208,23 +220,19 @@ export default class AppLayout extends Component {
         });
       }
       
-      console.log([this.state.user,this.state.token]);
-      if (!this.state.user || !this.state.user._id  || !this.state.token|| !this.state.token._id) {
-          console.log('login by local store');
-          that.loginByLocalStorage();
-      }
+     
       
-      // load tags and quizzes and indexes
-      fetch('/api/lookups')
-      .then(function(response) {
-        //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-        //console.log(['create indexes', json])
-        that.setState(json);
-      }).catch(function(ex) {
-        console.log(['parsing failed', ex])
-      })
+      //// load tags and quizzes and indexes
+      //fetch('/api/lookups')
+      //.then(function(response) {
+        ////console.log(['got response', response])
+        //return response.json()
+      //}).then(function(json) {
+        ////console.log(['create indexes', json])
+        //that.setState(json);
+      //}).catch(function(ex) {
+        //console.log(['parsing failed', ex])
+      //})
       fetch('/api/topiccollections')
       .then(function(response) {
         //console.log(['got response', response])
@@ -268,8 +276,28 @@ export default class AppLayout extends Component {
             //console.log(['ddtoken response',res]);
             state.token = res;
           //  console.log(['refreshed token',res]);
-            that.setState(state);
-            localStorage.setItem('token',JSON.stringify(res));
+//            that.setState(state);
+  //          localStorage.setItem('token',JSON.stringify(res));
+            fetch('/login/me?code='+state.token.access_token, {
+              method: 'GET',
+            }).then(function(response) {
+                return response.json();
+                
+            }).then(function(res) {
+            //    console.log(['ddtoken response',res]);
+                state.user = res.user;
+                state.token = res.token;
+                localStorage.setItem('token',JSON.stringify(res.token));
+                localStorage.setItem('user',JSON.stringify(state.user));
+                that.setState(state);
+                //setInterval(function() {
+              ////      console.log('toke ref tok');
+                    //that.refreshLogin(state.user)
+                //},(parseInt(that.state.token.expires_in,10)-1)*1000);
+            })
+            .catch(function(err) {
+                console.log(['ERR',err]);
+            });
         })
         .catch(function(err) {
             console.log(['ERR',err]);
@@ -278,10 +306,10 @@ export default class AppLayout extends Component {
   }
 
  isAdmin() {
-        if (this.state.user && 
+        if (this.state.user && this.state.user.username && 
         (this.state.user.username==="stever@syntithenai.com" 
             || this.state.user.username==="syntithenai@gmail.com" 
-            || this.state.user.username==="sofieblossom@gmail.com" 
+//            || this.state.user.username==="sofieblossom@gmail.com" 
             || this.state.user.username==="mnemoslibrary@gmail.com" 
             || this.state.user.username.toLowerCase()==="trevorryan123@gmail.com")) {
             return true;
@@ -290,63 +318,65 @@ export default class AppLayout extends Component {
     };
     
   login (user) {
-      var state={};
-      var that = this;
-      state.user = user;
-      //state.currentPage = 'home';
-      //console.log('login at root');
-        //console.log(user);
-        var params={
-            username: user.email ? user.email : user.username,
-            password: user.password,
-            'grant_type':'password',
-            'client_id':config.clientId,
-            'client_secret':config.clientSecret
-          };
-        fetch('/oauth/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            //Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
-          },
-          body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
-        }).then(function(response) {
-            return response.json();
-            
-        }).then(function(res) {
-           // console.log(['ddtoken response',res]);
-            state.token = res;
-            localStorage.setItem('token',JSON.stringify(res));
-            localStorage.setItem('user',JSON.stringify(that.state.user));
-            // load progress
-            fetch('/api/progress')
-              .then(function(response) {
-            //    console.log(['got response', response])
-                return response.json()
-              }).then(function(json) {
-              //  console.log(['set progress', json])
-                that.setState(state);
-                that.updateProgress(json);
-                setInterval(function() {
-                   // console.log('toke ref');
-                    that.refreshLogin(state.user)
-                },(parseInt(this.state.token.expires_in,10)-1)*1000);
-              }).catch(function(ex) {
-                console.log(['parsing failed', ex])
-              })
-        })
-        .catch(function(err) {
-            console.log(['ERR',err]);
-        });
-
+      if (user) {
+          var state={};
+          var that = this;
+          state.user = user;
+          //state.currentPage = 'home';
+          //console.log('login at root');
+            //console.log(user);
+            var params={
+                username: user.email ? user.email : user.username,
+                password: user.password,
+                'grant_type':'password',
+                'client_id':config.clientId,
+                'client_secret':config.clientSecret
+              };
+            fetch('/oauth/token', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                //Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
+              },
+              body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+            }).then(function(response) {
+                return response.json();
+                
+            }).then(function(res) {
+               // console.log(['ddtoken response',res]);
+                state.token = res;
+                localStorage.setItem('token',JSON.stringify(res));
+                localStorage.setItem('user',JSON.stringify(that.state.user));
+                // load progress
+                fetch('/api/progress')
+                  .then(function(response) {
+                //    console.log(['got response', response])
+                    return response.json()
+                  }).then(function(json) {
+                  //  console.log(['set progress', json])
+                    that.setState(state);
+                    that.updateProgress(json);
+                    setInterval(function() {
+                       // console.log('toke ref');
+                        that.refreshLogin(state.token)
+                    },(parseInt(this.state.token.expires_in,10)-1)*1000);
+                  }).catch(function(ex) {
+                    console.log(['parsing failed', ex])
+                  })
+            })
+            .catch(function(err) {
+                console.log(['ERR',err]);
+            });
+        }
   }
   
   loginByLocalStorage() {
+      return ;
       //console.log(['loginByLocalStorage1',localStorage.getItem('token'),JSON.parse(localStorage.getItem('token'))]);
       if (localStorage.getItem('token') && localStorage.getItem('token').length > 0 && localStorage.getItem('user') && localStorage.getItem('user').length > 0) {
-          this.setState({user:JSON.parse(localStorage.getItem('user')),token:JSON.parse(localStorage.getItem('token'))});
+          //this.setState({user:JSON.parse(localStorage.getItem('user')),token:JSON.parse(localStorage.getItem('token'))});
+          this.login(JSON.parse(localStorage.getItem('user')));
       }
-      
   };
   
   loginByToken(token) {
@@ -367,7 +397,7 @@ export default class AppLayout extends Component {
             setInterval(function() {
           //      console.log('toke ref tok');
                 that.refreshLogin(state.user)
-            },(parseInt(this.state.token.expires_in,10)-1)*1000);
+            },(parseInt(that.state.token.expires_in,10)-1)*1000);
         })
         .catch(function(err) {
             console.log(['ERR',err]);
@@ -515,21 +545,70 @@ export default class AppLayout extends Component {
       this.setState({'message':message});
   };
 
-  getTagsByTitle(title) {
-      return this.state.words.filter(e => e.text.indexOf(title) >= 0);
-  };
+  //getTagsByTitle(title) {
+        //let that = this;
+      ////this.setState({'currentQuiz':'1,2,3,4,5'});
+      //// load initial questions
+      //fetch('/api/tags?title='+title )
+      //.then(function(response) {
+        //console.log(['got response', response])
+        //return response.json()
+      //}).then(function(json) {
+        //that.setState('tags':json);
+      //}).catch(function(ex) {
+        //console.log(['parsing failed', ex])
+      //})
+      
+     //// return this.state.words.filter(e => e.text.indexOf(title) == 0);
+  //};
 
-  getTopicsByTitle(title) {
-      return this.state.topics.filter(e => e.text.indexOf(title) >= 0);
-  }; 
+  //getTopicsByTitle(title) {
+        //let that = this;
+      ////this.setState({'currentQuiz':'1,2,3,4,5'});
+      //// load initial questions
+      //fetch('/api/topics?title='+title )
+      //.then(function(response) {
+        //console.log(['got response', response])
+        //return response.json()
+      //}).then(function(json) {
+        //that.setState('topics':json);
+      //}).catch(function(ex) {
+        //console.log(['parsing failed', ex])
+      //})
+     //// return this.state.topics.filter(e => e.text.indexOf(title) >= 0);
+  //}; 
   
-  getQuestionsByTag(tag) {
-      return this.state.tags[tag];
-  }; 
+  //getQuestionsByTag(tag) {
+          //let that = this;
+      ////this.setState({'currentQuiz':'1,2,3,4,5'});
+      //// load initial questions
+      //fetch('/api/questions?tag='+tag )
+      //.then(function(response) {
+        //console.log(['got response', response])
+        //return response.json()
+      //}).then(function(json) {
+        //that.setState('questions':json);
+      //}).catch(function(ex) {
+        //console.log(['parsing failed', ex])
+      //})
+      ////return this.state.tags[tag];
+  //}; 
 
-  getQuestionsByTopic(topic) {
-      return this.state.topics[topic];
-  }; 
+  //getQuestionsByTopic(topic) {
+      //let that = this;
+      ////this.setState({'currentQuiz':'1,2,3,4,5'});
+      //// load initial questions
+      //fetch('/api/questions?topic='+topic )
+      //.then(function(response) {
+        //console.log(['got response', response])
+        //return response.json()
+      //}).then(function(json) {
+        //that.setState('questions':json);
+      //}).catch(function(ex) {
+        //console.log(['parsing failed', ex])
+      //})
+      ////return this.state.topics[topic];
+  //}; 
   
   setDiscoveryBlock(type,id) {
       this.clearDiscoveryBlock(type,id);
@@ -559,38 +638,52 @@ export default class AppLayout extends Component {
   };
 
   
+    saveSuggestion(id,question,mnemonic,technique) {
+        let that=this;
+        if (this.state.user) {
+            console.log(['SAVE SUGGESTION',id,question,mnemonic,technique]);
+             return fetch('/api/savemnemonic', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({_id:id,user:that.state.user._id,mnemonic:mnemonic,technique:technique,question:question._id,questionText:question.question})
+            }).then(function(res) {
+                return res.json();  
+            }).then(function(res) {
+                
+            }).catch(function(err) {
+                //console.log(err);
+                that.setState({'warning_message':'Not Saved'});
+            });
+        }
+    };
 
   // send an api request to like a question
+  
   like(questionId,mnemonicId) {
-     let user = this.state.users.default;
-    //console.log(['like',questionId,this.state,user]); 
-     if (!user.questions.likes) user.questions.likes = {};
-     if (false && questionId in user.questions.likes) {
-        // console.log('already voted');
-     } else {
-         user.questions.likes[questionId] = 1;
-      //   console.log(['setstate',user]); 
-         this.setState({'users':{'default':user}});
-         let questions = this.state.questions;
-         let qScore = 0;
-         if (this.state.indexedQuestions.hasOwnProperty(questionId) && this.state.indexedQuestions[questionId].score) {
-            qScore = questions[this.state.indexedQuestions[questionId]].score;
-         }
-         questions[this.state.indexedQuestions[questionId]].score = parseInt(qScore,10) + 1; 
-         this.setState({'questions':questions});
-         // central storage
-         fetch('/api/like', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({'user':this.state.user._id,'question':questionId,'mnemonic':mnemonicId})
-        }).catch(function(err) {
-            this.setState({'warning_message':'Not Saved'});
-        });
-         
-     }
-     return false;
+      //console.log(['applike']);
+    let that = this;
+    let userSelections = this.state.user.selectedMnemonics ? this.state.user.selectedMnemonics : {} ;  
+    userSelections[questionId] = mnemonicId;
+    return fetch('/login/saveuser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({'_id':this.state.user._id,avatar:this.state.user.avatar,selectedMnemonics:userSelections})
+    }).then(function() {
+        //console.log(['applike results']);
+        let user=that.state.user;
+        //console.log(['applike results user',user]);
+        user.selectedMnemonics = userSelections;
+        //console.log(['applike results set mn',userSelections]);
+         that.setState(user:user);
+        //console.log(['set user',user]);
+    }).catch(function(err) {
+        //that.setState({'warning_message':'Not Saved'});
+    });
+    return false;
   };
 
   // request api import and dowload results as csv
@@ -612,6 +705,8 @@ export default class AppLayout extends Component {
             that.setState({'warning_message':'Not Saved'});
         });
   };
+  
+ 
 
   // SET QUIZ
   setQuiz(title,questionIds) {
@@ -630,8 +725,22 @@ export default class AppLayout extends Component {
 
     
     finishQuiz() {
-        console.log('root finish quiz');
-        this.discoverQuestions();
+        //console.log('root finish quiz');
+        //confirmAlert({
+          //title: 'Question set complete',
+          //message: 'Time for review?',
+          //buttons: [
+            //{
+              //label: 'Review',
+              //onClick: () => this.setPage('review')
+            //},
+            //{
+              //label: 'Continue',
+              //onClick: () => this.discoverQuestions()
+            //}
+          //]
+        //})
+            
     };
     
      getQuestionsForReview() {
@@ -775,14 +884,6 @@ export default class AppLayout extends Component {
         console.log(['parsing failed', ex])
       })
       
-      
-      //const questions = this.getQuestionsByTopic(topic);
-      ////questions.filter(e => !this.state.users.default.questions.blocked.hasOwnProperty(e));
-      //this.setQuiz(topic,questions);
-      //// ensure topic key exists
-      //let user = this.state.users.default;
-      //user.topics[topic] = new Date().getTime();
-      //this.updateProgress(user);
   };
   setQuizFromTag(tag) {
      console.log(['set quiz form tag',tag]);
@@ -805,7 +906,7 @@ export default class AppLayout extends Component {
         }
         //that.setCurrentPage('home');
         that.analyticsEvent('discover tag')
-        that.setState({'currentPage':'home','currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Tag '+ Utils.snakeToCamel(tag.text),'tagFilter':tag.text});
+        that.setState({'currentPage':'home','currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Tag '+ decodeURI(tag.text),'tagFilter':tag.text});
         console.log(['set state done', that.state])
          //that.setState({});
       }).catch(function(ex) {
@@ -832,7 +933,7 @@ export default class AppLayout extends Component {
             indexedQuestions[id]=questionKey;
         }
         that.setCurrentPage('home');
-        that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Technique '+ Utils.snakeToCamel(tag)});
+        that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Technique '+ decodeURI(tag)});
         console.log(['set state done', that.state])
          //that.setState({});
       }).catch(function(ex) {
@@ -860,11 +961,12 @@ export default class AppLayout extends Component {
     
     return (
         <div className="mnemo">
-            <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
             {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
+            <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
+            
             {this.isCurrentPage('splash') && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} title={title}/></div>}
             
-            {this.isCurrentPage('home') && <QuizCarousel setQuizFromTechnique={this.setQuizFromTechnique} setQuizFromTopic={this.setQuizFromTopic} setDiscoveryBlock={this.setDiscoveryBlock} clearDiscoveryBlock={this.clearDiscoveryBlock} blocks={this.state.discoveryBlocks}  setQuizFromTag={this.setQuizFromTag} setCurrentQuestion={this.setCurrentQuestion} finishQuiz={this.finishQuiz}  discoverQuestions={this.discoverQuestions}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz}  /> }
+            {this.isCurrentPage('home') && <QuizCarousel isAdmin={this.isAdmin}  saveSuggestion={this.saveSuggestion} setQuizFromTechnique={this.setQuizFromTechnique} setQuizFromTopic={this.setQuizFromTopic} setDiscoveryBlock={this.setDiscoveryBlock} clearDiscoveryBlock={this.clearDiscoveryBlock} blocks={this.state.discoveryBlocks}  setQuizFromTag={this.setQuizFromTag} setCurrentQuestion={this.setCurrentQuestion}   discoverQuestions={this.discoverQuestions}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} currentQuiz={this.state.currentQuiz} indexedQuestions={this.state.indexedQuestions} user={this.state.user} progress={progress}  updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage}  setMessage={this.setMessage}  like={this.like} isLoggedIn={this.isLoggedIn} setCurrentQuiz={this.setCurrentQuiz} mnemonic_techniques={this.state.mnemonic_techniques} setMessage={this.setMessage} /> }
             
             {this.isCurrentPage('topics') && <TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage}/>
             }
@@ -872,9 +974,9 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('search') && <SearchPage mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
             }
-            {this.isCurrentPage('review') && <ReviewPage setQuizFromTechnique={this.setQuizFromTechnique} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromTopic={this.setQuizFromTopic} setDiscoveryBlock={this.setDiscoveryBlock} clearDiscoveryBlock={this.clearDiscoveryBlock} blocks={this.state.discoveryBlocks} setQuizFromTag={this.setQuizFromTag}  setCurrentQuestion={this.setCurrentQuestion} discoverQuestions={this.discoverQuestions}  getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} currentQuestion={this.state.currentQuestion} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
+            {this.isCurrentPage('review') && <ReviewPage isAdmin={this.isAdmin}  saveSuggestion={this.saveSuggestion} mnemonic_techniques={this.state.mnemonic_techniques} setQuizFromTechnique={this.setQuizFromTechnique} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromTopic={this.setQuizFromTopic} setDiscoveryBlock={this.setDiscoveryBlock} clearDiscoveryBlock={this.clearDiscoveryBlock} blocks={this.state.discoveryBlocks} setQuizFromTag={this.setQuizFromTag}  setCurrentQuestion={this.setCurrentQuestion} discoverQuestions={this.discoverQuestions}  getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} currentQuestion={this.state.currentQuestion} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} />
             }
-            {this.isCurrentPage('create') && <CreatePage  user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion}  />
+            {this.isCurrentPage('create') && <CreatePage  user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} />
             }
             {this.isCurrentPage('about') && <AboutPage setCurrentPage={this.setCurrentPage} />
             }

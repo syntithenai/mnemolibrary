@@ -21,9 +21,12 @@ import scrollToComponent from 'react-scroll-to-component';
 import MnemonicsList from './MnemonicsList';
 import ShareDialog from './ShareDialog';
 import Utils from './Utils';
+import ProblemReport from './ProblemReport';
 //import Swipe from 'react-swipe-component';
 import Swipeable from 'react-swipeable'
 //import ThumbsDown from 'react-icons/lib/fa/thumbs-down';
+
+import ExclamationTriangle from 'react-icons/lib/fa/exclamation-triangle';
 
 export default class SingleQuestion extends Component {
     
@@ -36,6 +39,7 @@ export default class SingleQuestion extends Component {
         this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.scrollTo={};
+        this.questionmessage='hithere';
     };
     
      componentWillReceiveProps(props) {
@@ -124,7 +128,7 @@ export default class SingleQuestion extends Component {
           }
        
           let tags = '';
-          let tagsClean='';
+          let tagsClean=''; 
           if (question.tags && Array.isArray(question.tags)) {
               tags = question.tags.map((tag, key) => {
                   tag=tag.trim().toLowerCase();
@@ -148,7 +152,8 @@ export default class SingleQuestion extends Component {
            return (
             <div className="questionwrap" >
             <ShareDialog id="sharedialog"  header={header}  question={question}/>
-                            
+             <ProblemReport user={this.props.user} question={this.props.question} />
+                                            
                 <div className="row buttons justify-content-between" >
                     <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} />&nbsp;</button>
                     <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Prev&nbsp;</span></button>
@@ -158,7 +163,9 @@ export default class SingleQuestion extends Component {
                     <div className='col-1'>&nbsp;</div>
                     {<button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Bin</span></button>}
                     <div className="scrollbuttons col-sm-12" >
-                             <button style={{float:'right'}} target='_new' data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
+                             <button style={{float:'right'}} data-toggle="modal" data-target="#problemdialog" className='btn btn-primary'><ExclamationTriangle size={26} /><span className="d-none d-md-inline-block">&nbsp;Report Problem&nbsp;</span></button>
+                    &nbsp;
+                            <button style={{float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
                                            
                             {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Mnemonic</span></button>
                             }&nbsp;
@@ -177,18 +184,23 @@ export default class SingleQuestion extends Component {
                 </div>
                 
                 <div className="card question container" >
-                  
-                    <div className='blocked-tags' style={{float:'right'}}>
-                        {((blockedTags && blockedTags.length > 0) || (blockedTopics && blockedTopics.length > 0) || (blockedTechniques && blockedTechniques.length > 0)) && <b>Filter </b>}
+                 <div ref={(section) => { this.scrollTo.mnemonic = section; }} ></div>
+                     <div id="spacerforsmall" className='d-none d-sm-block d-md-none' >dddd<br/><br/> </div>
+                    <div id="progressbar" style={{backgroundColor: 'blue',width: '100%'}} > <div id="innerprogressbar" style={{backgroundColor: 'red',width: this.props.percentageFinished()}} >&nbsp;</div></div>
+                    
+                    {((blockedTags && blockedTags.length > 0) || (blockedTopics && blockedTopics.length > 0) || (blockedTechniques && blockedTechniques.length > 0)) && <div className='blocked-tags' style={{float:'right'}}><b>Filter </b>
                         {blockedTags && blockedTags.length>0 && <span>Tags </span>} {blockedTags}
                         {blockedTopics && blockedTopics.length>0 && <span>Topics </span>} {blockedTopics}
                         {blockedTechniques && blockedTechniques.length>0 && <span>Techniques </span>} {blockedTechniques}
-                    </div>
+                       <hr/> </div>}
+                        
+                    
+                  
+                        
                     <Swipeable onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')}   >  
-                        <div ref={(section) => { this.scrollTo.mnemonic = section; }} ></div>
-                       <h4 className="card-title">{header}?</h4>
+                        <h4 className="card-title">{header}?</h4>
                            
-                       {(this.isVisible('mnemonic')|| !showRecallButton) &&<MnemonicsList user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
+                       {(this.isVisible('mnemonic')|| !showRecallButton) &&<MnemonicsList isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
                         
                         <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
                         {(this.isVisible('answer') || !showRecallButton) && question.answer && <div className="card-block answer">
