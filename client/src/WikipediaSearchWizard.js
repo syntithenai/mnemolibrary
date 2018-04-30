@@ -24,7 +24,11 @@ export default  class WikipediaSearchWizard extends React.Component {
     };
     
     componentWillReceiveProps(props) {
-       // this.setState({search:props.topic});
+       if (this.state.search === '') {
+          this.setState({search:props.topic}); 
+          this.doSearch(props.topic);
+       }
+       // 
          //this.setState({lists: [],showLoader:true})
         ////let query=this.refs.keyword.value.length > 0  ? this.refs.keyword.value : this.refs.topic.value;
         //this.doSearch(props.topic);

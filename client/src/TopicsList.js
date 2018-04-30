@@ -7,6 +7,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import Edit from 'react-icons/lib/fa/edit';
 import Trash from 'react-icons/lib/fa/trash';
+import Plus from 'react-icons/lib/fa/plus';
 
 
 export default class TopicsList extends Component {
@@ -68,14 +69,14 @@ export default class TopicsList extends Component {
         let list='';
         if (this.state.topics && this.state.topics.length > 0) {
             list = this.state.topics.map((topic,key) => {
-                     return <div className='list-group-item' key={key} ><button  className='btn btn-danger'  onClick={() => this.askDeleteTopic(topic._id)} style={{float:'right'}} ><Trash size={28}/><span className="d-none d-sm-inline" >Delete</span> </button><button  className='btn btn-info'  onClick={() => this.props.loadTopic(topic._id)} style={{float:'right'}} ><Edit size={28}/><span className="d-none d-sm-inline" >Edit</span> </button>{topic.topic}</div>
+                     return <div className='list-group-item' key={key} ><button  className='btn btn-danger'  onClick={() => this.askDeleteTopic(topic._id)} style={{float:'right'}} ><Trash size={28}/>&nbsp;<span className="d-none d-sm-inline" >Delete</span> </button><button  className='btn btn-info'  onClick={() => this.props.loadTopic(topic._id)} style={{float:'right'}} ><Edit size={28}/>&nbsp;<span className="d-none d-sm-inline" >Edit</span> </button>{topic.topic}</div>
                 });
         } else {
             list = <div></div>
         }
         return (
             <div>
-        <button   className='btn btn-success' onClick={() => this.props.newTopic()} >Create Topic</button>
+        <button   className='btn btn-success' onClick={() => this.props.newTopic()} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >Create Topic</span> </button>
             {list}
             </div>
         )

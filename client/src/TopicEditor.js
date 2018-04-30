@@ -357,17 +357,17 @@ export default class TopicEditor extends Component {
                         </div>
                         <div className='col-12 col-lg-6'>
                         
-                            <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/><span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions.length}</span></button>
-                            <button  className='btn btn-success' onClick={this.createQuestion} ><Plus size={28}/><span className="d-none d-sm-inline" >Create Question</span></button>
+                            <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/>&nbsp;<span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions.length}</span></button>
+                            <button  className='btn btn-success' onClick={this.createQuestion} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >Create Question</span></button>
                         
-                             <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/><span className="d-none d-sm-inline" >Publish</span></button>
-                            <button  className='btn btn-warning' style={{float:'right'}} onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/><span className="d-none d-sm-inline" >Preview</span></button>
+                             <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Publish</span></button>
+                            <button  className='btn btn-warning' style={{float:'right'}} onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>
 
                         </div>
                         <div className='col-12 col-lg-6'>
-                            <button  href='#' onClick={() => this.showHelp()} className='btn btn-info ' ><Question size={28}/><span className="d-none d-sm-inline" >Help</span></button>
+                            <button  href='#' onClick={() => this.showHelp()} className='btn btn-info ' ><Question size={28}/>&nbsp;<span className="d-none d-sm-inline" >Help</span></button>
                             <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sources&nbsp;&nbsp;</b>
-                            <button  className='btn btn-info'  onClick={this.showSearch} ><WikipediaW size={28}/><span className="d-none d-sm-inline" >Wikpedia</span></button>
+                            <button  className='btn btn-info'  onClick={this.showSearch} ><WikipediaW size={28}/>&nbsp;<span className="d-none d-sm-inline" >Wikpedia</span></button>
                                                      
                         </div>
                         
