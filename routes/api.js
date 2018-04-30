@@ -867,10 +867,10 @@ router.post('/saveusertopic', (req, res) => {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('mnemonic');
             }
-            if (question.interrogative.length === 0) {
-                if (!errors.hasOwnProperty(key)) errors[key]=[];
-                errors[key].push('interrogative');
-            }
+            //if (question.interrogative.length === 0) {
+                //if (!errors.hasOwnProperty(key)) errors[key]=[];
+                //errors[key].push('interrogative');
+            //}
             if (question.question.length === 0) {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('question');
@@ -1050,10 +1050,10 @@ router.post('/publishusertopic', (req, res) => {
                             if (!errors.hasOwnProperty(key)) errors[key]=[];
                             errors[key].push('mnemonic');
                         }
-                        if (question.interrogative.length === 0) {
-                            if (!errors.hasOwnProperty(key)) errors[key]=[];
-                            errors[key].push('interrogative');
-                        }
+                        //if (question.interrogative.length === 0) {
+                            //if (!errors.hasOwnProperty(key)) errors[key]=[];
+                            //errors[key].push('interrogative');
+                        //}
                         if (question.question.length === 0) {
                             if (!errors.hasOwnProperty(key)) errors[key]=[];
                             errors[key].push('question');
