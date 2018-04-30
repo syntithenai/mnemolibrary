@@ -158,7 +158,7 @@ export default class QuestionEditor extends Component {
                             <Autocomplete
                               getItemValue={(item) => item.label}
                               items={[
-                                { label: '' },
+                                { label: ' ' },
                                 { label: 'Can you explain' },
                                 { label: 'What is' },
                                 { label: 'Who is' },

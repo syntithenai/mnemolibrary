@@ -273,7 +273,7 @@ export default class TopicEditor extends Component {
     createQuestion() {
         let question = {
             _id: '',
-            interrogative: 'Can you explain ',
+            interrogative: '',
             question:'',
             mnemonic:'',
             technique:'',
