@@ -84,7 +84,8 @@ export default class LoginPage extends Component {
       return response.json()
     }
     googleLogin(user) {
-        console.log(['glogin ',user]);
+        let that=this;
+        //console.log(['glogin ',user]);
         fetch('/login/googlesignin', {
           method: 'POST',
           headers: {
@@ -101,9 +102,32 @@ export default class LoginPage extends Component {
         //    console.log(['gsignin request with JSON response', data])
            if (data.code && data.code.length > 0) {
               window.location='/?code='+data.code;
+             // that.postToUrl('/',{code:data.code},'POST');
            }
         });
     };
+    
+    postToUrl(path, params, method) {
+        method = method || "post";
+
+        var form = document.createElement("form");
+        form.setAttribute("method", method);
+        form.setAttribute("action", path);
+
+        for(var key in params) {
+            if(params.hasOwnProperty(key)) {
+                var hiddenField = document.createElement("input");
+                hiddenField.setAttribute("type", "hidden");
+                hiddenField.setAttribute("name", key);
+                hiddenField.setAttribute("value", params[key]);
+
+                form.appendChild(hiddenField);
+             }
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+    }
     
     submitSignIn(e) {
         var that=this;
@@ -126,6 +150,7 @@ export default class LoginPage extends Component {
        //console.log(['signin request with JSON response', data])
        
        if (data.code && data.code.length > 0) {
+         // that.postToUrl('/',{code:data.code},'POST');
           window.location='/?code='+data.code;
        } else if (data._id && data._id.length > 0) {
          //   console.log(['login at signin',data]);

@@ -29,7 +29,7 @@ export default class TagsPage extends Component {
           .then(function(response) {
             return response.json()
           }).then(function(json) {
-              console.log(['SET TAGS', json])
+              //console.log(['SET TAGS', json])
             that.setState({'tags':json});
           }).catch(function(ex) {
             console.log(['parsing failed', ex])
@@ -78,7 +78,7 @@ export default class TagsPage extends Component {
         const rotate = word => 0; //word.value % 360;
         const wordCloudWidth = window.innerWidth * 0.9;
         const wordCloudHeight = window.innerHeight * 0.5;
-        console.log(this.state.tags);
+        //console.log(this.state.tags);
         
         return (
         <div>

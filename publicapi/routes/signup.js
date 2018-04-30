@@ -57,7 +57,7 @@ router.get('/confirm',function(req,res) {
                       user.tmp_password = undefined;
                    //   console.log(['KKK',user]); 
                       user.save().then(function() {
-                          console.log(['approved']);
+                          //console.log(['approved']);
                            var params={
                                 username: user.username,
                                 password: user.password,

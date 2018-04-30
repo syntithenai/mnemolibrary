@@ -33,7 +33,8 @@ router.get('/me',function(req,res) {
             .then(function(token)  {
                 //console.log(['token',token]);
                 let now = new Date();
-                let expire = new Date(token.accessTokenExpiresAt)
+                let expire = 0;
+                if (token.accessTokenExpiresAt)  expire = new Date(token.accessTokenExpiresAt);
                 if (now >= expire) {
                     res.send('token expired' );
                 } else {
@@ -82,14 +83,14 @@ router.get('/me',function(req,res) {
 
 
 router.post('/saveuser', function(req, res) {
-    console.log(req.body);
+   // console.log(req.body);
     if (req.body._id && req.body._id.length > 0) {
         if (req.body.password2 != req.body.password)  {
             res.send({warning_message:'Passwords do not match'});
         } else {
             //console.log(['find on saveuser',req.body._id]);
             db.collection(userModelName).findOne(ObjectId(req.body._id), function(err, item) {
-              console.log([err,item]);
+             // console.log([err,item]);
               if (err) {
                   console.log(err);
                   res.send({warning_message:err});
@@ -98,15 +99,15 @@ router.post('/saveuser', function(req, res) {
                   item.name = req.body.name;
                   if (req.body.selectedMnemonics) item.selectedMnemonics=req.body.selectedMnemonics;
                   // update avatar only when changed
-                  console.log(['CHECK AVATORA',item.avatar,req.body.avatar]);
+                 // console.log(['CHECK AVATORA',item.avatar,req.body.avatar]);
                   if (item.avatar != req.body.avatar) {
                       db.collection(userModelName).findOne({avatar:{$eq:req.body.avatar}}, function(err, avUser) {
                           if (avUser!=null) {
-                              console.log('FOUND');
+                             // console.log('FOUND');
                               //avUser.;
                               res.send({warning_message:"Avatar name is already taken, try something different."});
                           } else {
-                              console.log('SET');
+                             // console.log('SET');
                               item.avatar = req.body.avatar;
                               // no update email address, item.username = req.body.username;
                               //    console.log(['save new item',item]);
@@ -157,7 +158,7 @@ function sendToken(req,res,user) {
       //  console.log(['got token',token]);
        res.send({code:token.access_token});
     }).catch(function(e) {
-        console.log(e);
+       // console.log(e);
          res.send({message:'Error logging in'});
     });
 }
@@ -255,15 +256,15 @@ router.post('/signup', function(req, res) {
             res.send({warning_message:'Passwords do not match.'});
         } else {
              // update avatar only when changed
-            console.log('seek avatar');
+           // console.log('seek avatar');
             db.collection(userModelName).find({avatar:{$eq:req.body.avatar}}).toArray().then(function(avUser) {
-              console.log(['found avatar',avUser]);
+             // console.log(['found avatar',avUser]);
               if (avUser!=null && avUser.length>0) {
 //                   avUser.warning_message="Avatar name is already taken, try something different.";
-                  console.log(['realy found avatar',avUser]);
+                //  console.log(['realy found avatar',avUser]);
                   res.send({warning_message:'Avatar name is already taken, try something different.'});
               } else {
-                  console.log(['set avatar',req.body.avatar]);
+            //      console.log(['set avatar',req.body.avatar]);
                   
                 db.collection(userModelName).findOne({username:req.body.username}, function(err, ditem) {
                   if (ditem!=null) {
@@ -413,9 +414,9 @@ router.get('/doconfirm',function(req,res) {
                       user.password = user.tmp_password;
                       user.token = undefined;
                       user.tmp_password = undefined;
-                      console.log(['KKK',user]); 
+                     // console.log(['KKK',user]); 
                       user.save().then(function() {
-                          console.log(['approved']);
+                        //  console.log(['approved']);
                            var params={
                                 username: user.username,
                                 password: user.password,

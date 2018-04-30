@@ -5,6 +5,8 @@ import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+import Edit from 'react-icons/lib/fa/edit';
+import Trash from 'react-icons/lib/fa/trash';
 
 
 export default class TopicsList extends Component {
@@ -32,7 +34,7 @@ export default class TopicsList extends Component {
         }).then(function(response) {
             return response.json();
         }).then(function(topics) {
-            console.log(['loaded topics',topics]);
+          //  console.log(['loaded topics',topics]);
             //res.send({user:user,token:token});
             that.setState({topics:topics});
         })
@@ -66,7 +68,7 @@ export default class TopicsList extends Component {
         let list='';
         if (this.state.topics && this.state.topics.length > 0) {
             list = this.state.topics.map((topic,key) => {
-                     return <div className='list-group-item' key={key} ><button  className='btn btn-danger'  onClick={() => this.askDeleteTopic(topic._id)} style={{float:'right'}} >Delete</button><button  className='btn btn-info'  onClick={() => this.props.loadTopic(topic._id)} style={{float:'right'}} >Edit</button>{topic.topic}</div>
+                     return <div className='list-group-item' key={key} ><button  className='btn btn-danger'  onClick={() => this.askDeleteTopic(topic._id)} style={{float:'right'}} ><Trash size={28}/><span className="d-none d-sm-inline" >Delete</span> </button><button  className='btn btn-info'  onClick={() => this.props.loadTopic(topic._id)} style={{float:'right'}} ><Edit size={28}/><span className="d-none d-sm-inline" >Edit</span> </button>{topic.topic}</div>
                 });
         } else {
             list = <div></div>

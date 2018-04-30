@@ -185,7 +185,7 @@ export default class SingleQuestion extends Component {
                 
                 <div className="card question container" >
                  <div ref={(section) => { this.scrollTo.mnemonic = section; }} ></div>
-                     <div id="spacerforsmall" className='d-none d-sm-block d-md-none' >dddd<br/><br/> </div>
+                     <div id="spacerforsmall" className='d-none d-sm-block d-md-none' ><br/><br/> </div>
                     <div id="progressbar" style={{backgroundColor: 'blue',width: '100%'}} > <div id="innerprogressbar" style={{backgroundColor: 'red',width: this.props.percentageFinished()}} >&nbsp;</div></div>
                     
                     {((blockedTags && blockedTags.length > 0) || (blockedTopics && blockedTopics.length > 0) || (blockedTechniques && blockedTechniques.length > 0)) && <div className='blocked-tags' style={{float:'right'}}><b>Filter </b>

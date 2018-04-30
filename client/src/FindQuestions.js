@@ -12,6 +12,8 @@ export default class FindQuestions extends Component {
                 <br/>
                 <div>For teachers and students, news junkies, academics, language learners, trivia buffs, and punsters.</div>
                 <div>A community of lifelong learners who use mnemonics.</div>
+                <br/>
+                 <div><b><button className="btn btn-info" onClick={() => this.props.setCurrentPage('login')}    >Join</button> the library to save and review your progress across devices.</b></div>
                 
                 <br/> <br/> 
                 <b>Learn something new</b>
@@ -25,7 +27,9 @@ export default class FindQuestions extends Component {
                 <b>Lock down those memories</b>
                 <br/> 
                     <button className="btn  btn-info" href="#"  onClick={() => this.props.setCurrentPage('review')} >Review</button>
-                   <br/> 
+                   <br/>  <br/>  <br/> 
+                   
+                <iframe width="300" height="700" src="https://www.youtube-nocookie.com/embed/qXh6hkzy-8k" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>   
             </div>
             
         )

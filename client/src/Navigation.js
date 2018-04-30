@@ -39,7 +39,10 @@ export default class Navigation extends Component {
     render() {
         return  (
         <div className="navbar-dark fixed-top bg-dark" >
-        <div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title}</div>
+        <div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title} &nbsp;&nbsp;&nbsp;{!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('splash')} className='btn btn-outline btn-warning' style={{display:'inline'}}>
+                   Tutorial
+                  </a>}</div>
+        
               
        
         <nav className="navbar navbar-expand-md" >
@@ -47,7 +50,8 @@ export default class Navigation extends Component {
           
           <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemonikas" src="/mnemoicon.jpg" height="80%" data-toggle="collapse" data-target="#navbarCollapse" style={{clear:'right'}}/></a>
              
-          {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='loginbutton btn btn-outline btn-warning' style={{verticalAlign: 'top',marginLeft: '1em'}}>
+
+            {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='loginbutton btn btn-outline btn-warning' style={{verticalAlign: 'top',marginLeft: '1em'}}>
                    Login
                   </a>}
       

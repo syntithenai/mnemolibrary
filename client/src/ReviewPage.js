@@ -27,12 +27,12 @@ export default class ReviewPage extends Component {
    
    // return seen questionIds sorted by 'review status'
     getQuestionsForReview() {
-       console.log('getQuestionsForReview');
+     //  console.log('getQuestionsForReview');
        this.props.getQuestionsForReview();
     };
     
     finishReview(questions,success) {
-       console.log('finish review');
+      // console.log('finish review');
        //this.setCurrentPage('review');
         confirmAlert({
           title: 'Review set complete',

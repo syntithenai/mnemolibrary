@@ -148,7 +148,7 @@ export default class AppLayout extends Component {
         const script = document.createElement("script");
         script.src = "https://apis.google.com/js/platform.js";
         script.onload = () => {
-            console.log('loaded gapis platform');
+           // console.log('loaded gapis platform');
            //gapi.auth2.init({
                 //clientId: this.props.clientId,
                 //scope: 'profile email'
@@ -195,11 +195,11 @@ export default class AppLayout extends Component {
               }
           });
     } 
-    console.log([this.state.user,this.state.token]);
+   // console.log([this.state.user,this.state.token]);
     // try login from localstorage
     let token = JSON.parse(localStorage.getItem('token'));
       if (token) {
-          console.log('login by local store');
+     //     console.log('login by local store');
           that.refreshLogin(token);
       }
     
@@ -533,7 +533,7 @@ export default class AppLayout extends Component {
   };  
 
     setCurrentQuestion(id) {
-        console.log(['set current question',id]);
+       // console.log(['set current question',id]);
         this.setState({currentQuestion:parseInt(id,10)});
     };
     
@@ -641,7 +641,7 @@ export default class AppLayout extends Component {
     saveSuggestion(id,question,mnemonic,technique) {
         let that=this;
         if (this.state.user) {
-            console.log(['SAVE SUGGESTION',id,question,mnemonic,technique]);
+           // console.log(['SAVE SUGGESTION',id,question,mnemonic,technique]);
              return fetch('/api/savemnemonic', {
               method: 'POST',
               headers: {
@@ -712,7 +712,7 @@ export default class AppLayout extends Component {
   setQuiz(title,questionIds) {
       let newIds = [];
       let that = this;
-      console.log(questionIds);
+     // console.log(questionIds);
       questionIds.forEach(function(questionId) {
        //   console.log(questionId,questionIds[questionId]);
         //  console.log(that.state.users.default.questions.block);
@@ -744,7 +744,7 @@ export default class AppLayout extends Component {
     };
     
      getQuestionsForReview() {
-         console.log('getQuestionsForReview');
+     //    console.log('getQuestionsForReview');
       let that = this;
       //console.log('get q for review');
       if (this.state.user) {
@@ -754,17 +754,19 @@ export default class AppLayout extends Component {
             return response.json()
           }).then(function(json) {
             //console.log(['create indexes', json])
-            console.log(['create indexes', json])
+            //console.log(['create indexes', json])
             let currentQuiz = [];
             let indexedQuestions= {};
             for (var questionKey in json['questions']) {
                 const question = json['questions'][questionKey]
-                var id = question._id;
-                currentQuiz.push(id);
-                indexedQuestions[id]=questionKey;
+                if (question) {
+                    var id = question._id;
+                    currentQuiz.push(id);
+                    indexedQuestions[id]=questionKey;                    
+                }
             }
             that.setState({'currentQuestion':0,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Review'});
-            console.log(['set state done', that.state])
+           // console.log(['set state done', that.state])
           }).catch(function(ex) {
             console.log(['parsing failed', ex])
           })
@@ -773,7 +775,7 @@ export default class AppLayout extends Component {
     
        
    discoverQuestions() {
-      console.log(['discover da questions']);
+     // console.log(['discover da questions']);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
@@ -782,10 +784,10 @@ export default class AppLayout extends Component {
       fetch('/api/discover',{ method: "POST",headers: {
     "Content-Type": "application/json"},body:JSON.stringify({user:(this.state.user ? this.state.user._id : ''),rand:rand,blocks:this.state.discoveryBlocks})})
       .then(function(response) {
-        console.log(['got response', response])
+       // console.log(['got response', response])
         return response.json()
       }).then(function(json) {
-        console.log(['create indexes', json])
+        //console.log(['create indexes', json])
         let currentQuiz = [];
         let indexedQuestions= {};
         for (var questionKey in json['questions']) {
@@ -795,14 +797,14 @@ export default class AppLayout extends Component {
             indexedQuestions[id]=questionKey;
         }
         that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover'});
-        console.log(['set state done', that.state])
+        //console.log(['set state done', that.state])
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })
   }; 
   
   setQuizFromDiscovery() {
-      console.log(['Setquiz discovery']);
+     // console.log(['Setquiz discovery']);
       this.setCurrentPage('home')
       this.discoverQuestions()
       
@@ -810,16 +812,16 @@ export default class AppLayout extends Component {
 
 
   setQuizFromQuestionId(questionId) {
-      console.log(['SQFQid',questionId]);
+      //console.log(['SQFQid',questionId]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
       fetch('/api/questions?question='+questionId )
       .then(function(response) {
-        console.log(['got response', response])
+        //console.log(['got response', response])
         return response.json()
       }).then(function(json) {
-        console.log(['create indexes', json])
+        //console.log(['create indexes', json])
         let currentQuiz = [];
         let indexedQuestions= {};
         let currentQuestion=0;
@@ -835,10 +837,10 @@ export default class AppLayout extends Component {
             indexedQuestions[id]=questionKey;
             j++;
         }
-        console.log(currentQuiz);
+      //  console.log(currentQuiz);
         that.analyticsEvent('discover question')
         that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover'});
-        console.log(['set state done', that.state])
+        //console.log(['set state done', that.state])
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })
@@ -851,16 +853,16 @@ export default class AppLayout extends Component {
   };
   
   setQuizFromTopic(topic,currentQuestionId=null) {
-      console.log(['set quiz from topic',topic,currentQuestionId]);
+      //console.log(['set quiz from topic',topic,currentQuestionId]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
       fetch('/api/questions?topic='+topic )
       .then(function(response) {
-        console.log(['got response', response])
+      //  console.log(['got response', response])
         return response.json()
       }).then(function(json) {
-        console.log(['create indexes', json])
+        //console.log(['create indexes', json])
         let currentQuiz = [];
         let indexedQuestions= {};
         let currentQuestion=0;
@@ -876,26 +878,26 @@ export default class AppLayout extends Component {
             indexedQuestions[id]=questionKey;
             j++;
         }
-        console.log(currentQuiz);
+        //console.log(currentQuiz);
         that.analyticsEvent('discover topic')
         that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
-        console.log(['set state done', that.state])
+        //console.log(['set state done', that.state])
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })
       
   };
   setQuizFromTag(tag) {
-     console.log(['set quiz form tag',tag]);
+     //console.log(['set quiz form tag',tag]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
       fetch('/api/questions?tag='+tag.text )
       .then(function(response) {
-        console.log(['got response', response])
+        //console.log(['got response', response])
         return response.json()
       }).then(function(json) {
-        console.log(['create indexes', json])
+        //console.log(['create indexes', json])
         let currentQuiz = [];
         let indexedQuestions= {};
         for (var questionKey in json['questions']) {
@@ -907,7 +909,7 @@ export default class AppLayout extends Component {
         //that.setCurrentPage('home');
         that.analyticsEvent('discover tag')
         that.setState({'currentPage':'home','currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Tag '+ decodeURI(tag.text),'tagFilter':tag.text});
-        console.log(['set state done', that.state])
+        //console.log(['set state done', that.state])
          //that.setState({});
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
@@ -915,15 +917,15 @@ export default class AppLayout extends Component {
   };
   setQuizFromTechnique(tag) {
      let that=this;
-     console.log(['set quiz form tag',tag]);
+     //console.log(['set quiz form tag',tag]);
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
       fetch('/api/questions?technique='+tag )
       .then(function(response) {
-        console.log(['got response', response])
+       // console.log(['got response', response])
         return response.json()
       }).then(function(json) {
-        console.log(['create indexes', json])
+        //console.log(['create indexes', json])
         let currentQuiz = [];
         let indexedQuestions= {};
         for (var questionKey in json['questions']) {
@@ -934,7 +936,7 @@ export default class AppLayout extends Component {
         }
         that.setCurrentPage('home');
         that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Technique '+ decodeURI(tag)});
-        console.log(['set state done', that.state])
+        //console.log(['set state done', that.state])
          //that.setState({});
       }).catch(function(ex) {
         console.log(['parsing failed', ex])

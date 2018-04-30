@@ -29,7 +29,7 @@ export default class QuizCarousel extends Component {
         this.banQuestion = this.banQuestion.bind(this);
         this.percentageFinished = this.percentageFinished.bind(this);
         this.discoverQuestions = this.discoverQuestions.bind(this);
-        console.log(['QUIZ carousel constr']);
+      //  console.log(['QUIZ carousel constr']);
     };
     
     componentDidMount() {
@@ -79,7 +79,7 @@ export default class QuizCarousel extends Component {
             }  else {
                 // move forward one question and strip blocked questions from currentQuiz 
                 let currentQuestion = this.props.currentQuestion;
-                console.log(['block',currentQuestion]);
+                //console.log(['block',currentQuestion]);
                 let currentQuiz = this.props.currentQuiz;
                 currentQuiz.splice(parseInt(currentQuestion,10),1);
                // this.props.setCurrentQuestion(this.props.currentQuestion + 1);
@@ -170,7 +170,7 @@ export default class QuizCarousel extends Component {
   }; 
     
     currentQuestion() {
-        console.log(['currentQuestion',this.state]);
+       // console.log(['currentQuestion',this.state]);
         let question=null;
         if (this.props.currentQuestion !== null && Array.isArray(this.props.currentQuiz) && this.props.indexedQuestions && this.props.questions) {
             question = this.props.questions[this.props.indexedQuestions[this.props.currentQuiz[this.props.currentQuestion]]];
@@ -181,7 +181,7 @@ export default class QuizCarousel extends Component {
     
        // FINISH QUIZ CAROUSEL
    finishQuiz(success,questions) {
-       console.log(['finish quiz',this.props.finishQuiz]);
+      // console.log(['finish quiz',this.props.finishQuiz]);
         // inject override
        // alert('finsih');
        if (this.props.finishQuiz) {
@@ -217,7 +217,7 @@ export default class QuizCarousel extends Component {
     };
     
     getQuestions(questionIds) {
-        console.log(['get ques',questionIds]);
+      //  console.log(['get ques',questionIds]);
         let questions=[];
         let that = this;
         questionIds.forEach(function(questionId) {
@@ -228,11 +228,11 @@ export default class QuizCarousel extends Component {
     };
     
     setQuizQuestion(question) {
-        console.log(['set quiz ques',question,this.props.currentQuiz]);
+    //    console.log(['set quiz ques',question,this.props.currentQuiz]);
         if (Utils.isObject(question) && question._id && question._id.length > 0) {
-            console.log(['setQuizQuestion',question]);
+            //console.log(['setQuizQuestion',question]);
             let index = this.props.currentQuiz.indexOf(question._id);
-            console.log(['index',index]);
+            //console.log(['index',index]);
             this.setState({'showList':false});
             this.props.setCurrentQuestion(index);
         }
@@ -249,7 +249,7 @@ export default class QuizCarousel extends Component {
       //  console.log(['RENDER CAROUS2',questions]);
         let content = '';
         const question = this.currentQuestion();
-        console.log(['RENDER CAROUS2',question,questions]);
+      //  console.log(['RENDER CAROUS2',question,questions]);
       //  if (Array.isArray(questions) && questions.length > 0 && Utils.isObject(question)) {
             if (this.state.showList) {
                 let listQuestions = this.getQuestions(this.props.currentQuiz);

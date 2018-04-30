@@ -47,7 +47,7 @@ export default  class WikipediaSearchWizard extends React.Component {
                 return response.json();
                 
             }).then(function(response) {
-                    console.log(response);
+                   // console.log(response);
                     that.setState({lists: response,showLoader:false})
 
             })
@@ -59,7 +59,7 @@ export default  class WikipediaSearchWizard extends React.Component {
     };
 
     setSearchEvent(e) {
-        console.log(['SE',e]);
+       // console.log(['SE',e]);
         this.setState({search:e.target.value});
          this.setState({lists: [],showLoader:true})
         let query=this.refs.keyword.value.length > 0  ? this.refs.keyword.value : this.refs.topic.value;
@@ -67,13 +67,13 @@ export default  class WikipediaSearchWizard extends React.Component {
     };
     
     search(search) {
-        console.log(['SEA',search]);
+     //   console.log(['SEA',search]);
         this.setState({search:search});
         this.doSearch(search);
     };
     
     expandResult(key) {
-        console.log(['expand result',key]);
+      //  console.log(['expand result',key]);
         this.setState({currentResult:key});
     };
     
@@ -98,7 +98,7 @@ export default  class WikipediaSearchWizard extends React.Component {
 	render() {
          let wikiResults = [];
          if (Array.isArray(this.state.lists) && this.state.lists.length===4) {
-             console.log(['render',this.state.lists]);
+            // console.log(['render',this.state.lists]);
              wikiResults = this.state.lists[1].map((title,key) => {
                  //console.log(['renderi',title,key]);
                     

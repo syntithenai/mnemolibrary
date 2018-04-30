@@ -35,7 +35,7 @@ export default class ProblemReport extends Component {
       };
     
     change(e) {
-        console.log(e.target);
+       // console.log(e.target);
         let state = {...this.props.question};
         var key = e.target.name;
         state[key] =  e.target.value;
@@ -47,7 +47,7 @@ export default class ProblemReport extends Component {
     
     
     render() {
-        console.log(['QE REN',this.props]);
+      //  console.log(['QE REN',this.props]);
         if (this.props.question) {
             return (
             

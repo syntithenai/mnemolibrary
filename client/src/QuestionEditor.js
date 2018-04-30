@@ -5,6 +5,8 @@ import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
 import CreateHelp from './CreateHelp';
 import Autocomplete from 'react-autocomplete';
+const ReactTags = require('react-tag-autocomplete')
+ 
 
 export default class QuestionEditor extends Component {
     constructor(props) {
@@ -13,6 +15,10 @@ export default class QuestionEditor extends Component {
         
         this.state={
             warning_message: '',
+              tags: [
+              ],
+              suggestions: []
+            
             //question : {
                 //_id: question._id ? question._id : '',
                 //interrogative: question.interrogative ? question.interrogative:'What is ',
@@ -29,11 +35,66 @@ export default class QuestionEditor extends Component {
        // this.saveQuestion = this.saveQuestion.bind(this);
         this.change = this.change.bind(this);
         this.changeInterrogative = this.changeInterrogative.bind(this);
+        this.handleDeleteTag = this.handleDeleteTag.bind(this);
+        this.handleAddTag = this.handleAddTag.bind(this);
+        this.updateQuestionTag = this.updateQuestionTag.bind(this);
+        
     };
     
     componentDidMount() {
-        
+         let that = this;
+         // set tags from question
+         if (Array.isArray(this.props.question.tags)) {
+             let tags=[];
+             console.log(['set tags from q',this.props.question.tags]);
+             this.props.question.tags.map(function(val,key) {
+                 console.log(val,key);
+                 tags.push({id:val,name:val});
+             });
+             that.setState({tags:tags});
+         }
+         
+          fetch('/api/tags?sort=title&title=') //+(title ? title : '') )
+          .then(function(response) {
+            return response.json()
+          }).then(function(json) {
+              let suggestions=[];
+              json.map(function(val,key) {
+                  suggestions.push({id:val._id,name:val.text});
+              });
+              //console.log(['SET TAGS', json])
+            that.setState({'suggestions':suggestions});
+          }).catch(function(ex) {
+            console.log(['parsing failed', ex])
+          })
     }
+   
+   
+   updateQuestionTag(tags) {
+       console.log(['updateQuestionTag',tags]);
+        let state = {...this.props.question};
+        let cleanTags=[];
+        tags.map(function(val,key) {
+            cleanTags.push(val.name);
+        });
+        state.tags =  cleanTags;
+        this.props.updateQuestion(state);
+       
+   };
+    
+  handleDeleteTag (i) {
+    const tags = this.state.tags.slice(0)
+    tags.splice(i, 1)
+    this.setState({ tags })
+    this.updateQuestionTag(tags);
+    
+  }
+ 
+  handleAddTag (tag) {
+    const tags = [].concat(this.state.tags, tag)
+    this.setState({ tags })
+    this.updateQuestionTag(tags);
+  }
     
     //saveQuestion(e) {
         //e.preventDefault();
@@ -46,16 +107,16 @@ export default class QuestionEditor extends Component {
     //};
     
     change(e) {
-        console.log(e.target);
+        //console.log(e.target);
         let state = {...this.props.question};
         var key = e.target.name;
-        if (key==="tags") {
-            state[key] =  e.target.value.split(",");
-        } else {
+        //if (key==="tags") {
+            //state[key] =  e.target.value.split(",");
+        //} else {
             state[key] =  e.target.value;
-        }
+        //}
         
-        console.log(['CHANGE',this.props.currentQuestion,state]);
+       // console.log(['CHANGE',this.props.currentQuestion,state]);
         //this.setState({'question':state});
         this.props.updateQuestion(state);
         return true;
@@ -64,8 +125,6 @@ export default class QuestionEditor extends Component {
     changeInterrogative(e,value) {
         let state = {...this.props.question};
         state.interrogative =  value;
-        //console.log(['CHANGE',this.props.currentQuestion,state]);
-        //this.setState({'question':state});
         this.props.updateQuestion(state);
         return true;
     };
@@ -75,13 +134,13 @@ export default class QuestionEditor extends Component {
         var key = 'interrogative';
         state[key] =  value;
         //this.setState({'question':state});
-        console.log(['sel inter',value]);
+        //console.log(['sel inter',value]);
         this.props.updateQuestion(state);
         return true;
     };
     
     render() {
-        console.log(['QE REN',this.props]);
+       // console.log(['QE REN',this.props]);
         if (this.props.question) {
           let techniques = this.props.mnemonic_techniques.map((technique, key) => {
                 return <option  key={key} value={technique}  >{technique}</option>
@@ -99,6 +158,7 @@ export default class QuestionEditor extends Component {
                             <Autocomplete
                               getItemValue={(item) => item.label}
                               items={[
+                                { label: '' },
                                 { label: 'Can you explain' },
                                 { label: 'What is' },
                                 { label: 'Who is' },
@@ -129,7 +189,17 @@ export default class QuestionEditor extends Component {
                         </div>
                         
                         <div className='form-group'>    
-                            <label htmlFor="tags" >*&nbsp;Tags</label><input autoComplete="false" id="tags" type='text' name='tags' onChange={this.change} value={this.props.question.tags} className='form-control' />
+                            <label htmlFor="tags" >*&nbsp;Tags</label>
+                            <ReactTags
+                            autoresize={false} 
+                            tags={this.state.tags}
+                            suggestions={this.state.suggestions}
+                            handleDelete={this.handleDeleteTag.bind(this)}
+                            handleAddition={this.handleAddTag.bind(this)} 
+                            id="tags"  
+                            name='tags'
+                            className='form-control'
+                            />
                         </div>
                         
                         <div className='form-group'>     
@@ -137,7 +207,7 @@ export default class QuestionEditor extends Component {
                         </div>
                         
                          <div className='form-group'>     
-                                <label htmlFor="link" >Image </label><input autoComplete="false" id="image" type='text' name='image' onChange={this.change} value={this.props.question.image}  className='form-control' />
+                                <label htmlFor="link" >Image URL</label><input autoComplete="false" id="image" type='text' name='image' onChange={this.change} value={this.props.question.image}  className='form-control' />
                         </div>
                         
                         <div className='form-group'>    

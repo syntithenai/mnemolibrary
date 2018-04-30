@@ -27,7 +27,7 @@ export default class TopicsPage extends Component {
     };
     
     clearTagFilter() {
-        console.log('CLEAR FILTER');
+       // console.log('CLEAR FILTER');
         //this.props.clearTagFilter();
         this.setState({'tagFilter':null});
         this.filterQuizzes(this.state.titleFilter);
@@ -37,7 +37,7 @@ export default class TopicsPage extends Component {
          let that = this;
           fetch('/api/topics?title='+title )
           .then(function(response) {
-            console.log(['got response', response])
+            //console.log(['got response', response])
             return response.json()
           }).then(function(json) {
             that.setState({'topics':json});

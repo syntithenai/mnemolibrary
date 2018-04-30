@@ -10,6 +10,17 @@ import CreateHelp from './CreateHelp';
 import {debounce} from 'throttle-debounce';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+
+import Plus from 'react-icons/lib/fa/plus';
+import List from 'react-icons/lib/fa/list';
+import ListAlt from 'react-icons/lib/fa/list-alt';
+import Camera from 'react-icons/lib/fa/camera';
+import Cloud from 'react-icons/lib/fa/cloud';
+import WikipediaW from 'react-icons/lib/fa/wikipedia-w';
+import Question from 'react-icons/lib/fa/question';
+
+
+
  
 export default class TopicEditor extends Component {
     constructor(props) {
@@ -54,12 +65,12 @@ export default class TopicEditor extends Component {
     
     handleSubmit() {
         //e.preventDefault();
-        console.log('SAVE TOPIC');
+       // console.log('SAVE TOPIC');
         return false;
     };
     
     setTopicEvent(e) {
-        console.log(e);
+        //console.log(e);
         this.setState({topic:e.target.value});
         this.saveTopic();
     };
@@ -71,10 +82,10 @@ export default class TopicEditor extends Component {
     };
         
     addResultToQuestions(result) {
-        console.log(['addResultToQuestions',result]);
+        //console.log(['addResultToQuestions',result]);
         let question = {
                 _id: '',
-                interrogative: 'What is ',
+                interrogative: '',
                 question:result.title,
                 mnemonic:'',
                 technique:'',
@@ -118,7 +129,7 @@ export default class TopicEditor extends Component {
         }).then(function(response) {
             return response.json();
         }).then(function(id) {
-            console.log(['saved topic',id,id.id]);
+          //  console.log(['saved topic',id,id.id]);
             that.setState({_id:id.id});
             if (id.errors && Object.keys(id.errors).length > 0) {
                 that.setState({validationErrors:id.errors,message:'Some of your questions are missing required information.'});
@@ -147,7 +158,7 @@ export default class TopicEditor extends Component {
         }).then(function(response) {
             return response.json();
         }).then(function(id) {
-            console.log(['deleted topic',id,id.id]);
+            //console.log(['deleted topic',id,id.id]);
             //this.loadTopics();
         })
         .catch(function(err) {
@@ -170,7 +181,7 @@ export default class TopicEditor extends Component {
         }).then(function(response) {
             return response.json();
         }).then(function(topic) {
-            console.log(['loaded topic',topic]);
+            //console.log(['loaded topic',topic]);
             //res.send({user:user,token:token});
             localStorage.setItem('currentTopic',topic._id);
             that.setState({topic:topic.topic,_id:topic._id,questions:topic.questions,currentView:'questions',validationErrors:{},message:' '});
@@ -197,7 +208,7 @@ export default class TopicEditor extends Component {
             if (publishResponse.errors) {
                 that.setState({validationErrors:publishResponse.errors,currentView:'questions',message:'Cannot preview yet because some of your questions are missing required information.'});
             } else {
-                console.log(['PREVIEW',publishResponse]);
+              //  console.log(['PREVIEW',publishResponse]);
                 that.props.setQuizFromTopic(that.props.user.avatar+'\'s '+publishResponse.topic);
                 //let questions=0;
                 //if (publishResponse.questions) questions =publishResponse.questions.length;
@@ -278,7 +289,7 @@ export default class TopicEditor extends Component {
     };
     
     editQuestion(key) {
-        console.log(['editQuestion',key]);
+        //console.log(['editQuestion',key]);
         this.setState({currentQuestion:key,currentView:'editor',validationErrors:{},message:' '});
     };
         
@@ -303,7 +314,7 @@ export default class TopicEditor extends Component {
     };  
 
     updateQuestion(question)  {
-        console.log(['update que',question,this.state.currentQuestion]);
+       // console.log(['update que',question,this.state.currentQuestion]);
         let questions = this.state.questions;
         //question.tags = question.tags.trim().toLowerCase().split(',');
         questions.splice(this.state.currentQuestion,1,question);
@@ -340,29 +351,30 @@ export default class TopicEditor extends Component {
             return (
                 <div id='topiceditor' className={this.state.topic}>
                         <div id='topiceditorheader' className='row'>
-                        <div className='col-12 col-lg-9'>
-                             <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} >Topics</button>
-                            <label>&nbsp;&nbsp;<b>Topic&nbsp;</b><input name="topic" onChange={this.setTopicEvent}  value={this.state.topic} /></label>
-                            <button  className='btn btn-info'  onClick={this.showQuestions} >Questions <span className="badge badge-light">{this.state.questions.length}</span></button>
-                            <button  className='btn btn-success' onClick={this.createQuestion} >Create Question</button>
-                        
+                        <div className='col-12 col-lg-6'>
+                             <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} ><ListAlt size={28}/>&nbsp;<span className="d-none d-sm-inline" >Topics</span></button>
+                            <label>&nbsp;<b>Topic&nbsp;</b><input name="topic" onChange={this.setTopicEvent}  value={this.state.topic} /></label>
                         </div>
-                        <div className='col-12 col-lg-3'>
-                             <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} >Publish</button>
-                            <button  className='btn btn-warning' style={{float:'right'}} onClick={() => this.previewTopic(this.state._id)} >Preview</button>
+                        <div className='col-12 col-lg-6'>
+                        
+                            <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/><span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions.length}</span></button>
+                            <button  className='btn btn-success' onClick={this.createQuestion} ><Plus size={28}/><span className="d-none d-sm-inline" >Create Question</span></button>
+                        
+                             <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/><span className="d-none d-sm-inline" >Publish</span></button>
+                            <button  className='btn btn-warning' style={{float:'right'}} onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/><span className="d-none d-sm-inline" >Preview</span></button>
 
                         </div>
-                        <div className='col-12'>
-                            <button  href='#' onClick={() => this.showHelp()} className='btn btn-info ' >Help</button>
+                        <div className='col-12 col-lg-6'>
+                            <button  href='#' onClick={() => this.showHelp()} className='btn btn-info ' ><Question size={28}/><span className="d-none d-sm-inline" >Help</span></button>
                             <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sources&nbsp;&nbsp;</b>
-                            <button  className='btn btn-info'  onClick={this.showSearch} >Wikipedia</button>
+                            <button  className='btn btn-info'  onClick={this.showSearch} ><WikipediaW size={28}/><span className="d-none d-sm-inline" >Wikpedia</span></button>
                                                      
                         </div>
                         
                          
                          
                         </div>
-                        <div className="hidden-xs-up" ><br/><br/><br/></div>
+                        <div className="hidden-xs-up" ><br/><br/><br/><br/><br/></div>
                         <br/><br/>
                         {this.state.message && <div id="warningmessage" >{this.state.message}</div>}
                         {this.state.currentView==='search' &&
