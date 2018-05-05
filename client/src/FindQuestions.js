@@ -14,7 +14,7 @@ export default class FindQuestions extends Component {
                 <div>An encyclopedia. A memorization tool. A community.</div>
                 <br/>
                 
-                <iframe width="300" height="150" src="https://www.youtube-nocookie.com/embed/qXh6hkzy-8k" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>   
+               <iframe width="560" height="315" src="https://www.youtube.com/embed/qXh6hkzy-8k" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                 <iframe width="560" height="315" src="https://www.youtube.com/embed/7gsi34b2pLQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                 
                 
