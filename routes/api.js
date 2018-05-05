@@ -38,6 +38,8 @@ router.post('/reportproblem', (req, res) => {
     utils.sendMail(config.mailFrom,config.mailFrom,"Problem Content Report from Mnemo's Library ",content)
 });
 
+
+
 router.post('/import', (req, res) => {
   //  console.log(['import']);
     let that = this;
@@ -57,193 +59,229 @@ router.post('/import', (req, res) => {
                 // console.log(['parse',data]);
                 const toImport = {'questions':data.data};
                 let json = utils.createIndexes(toImport);
-                //console.log(['parsed',data.errors,json]);
+                
+                // iterate questions collecting promises and insert/update as required
+                let promises=[];
+                for (var a in json.questions) {
+                 //  console.log([a]); //,json[collection][a]]);
+                    if (json.questions[a]) {
+                        let record =  json.questions[a];
+                        record.successRate = Math.random()/100; // randomisation to get started
+                        // remove and restore id to allow update
+                        let thePromise = null;
+                        // convert to ObjectId or create new 
+                        if (json.questions[a].hasOwnProperty('_id')&& json.questions[a]._id.length > 0) {
+                            record._id = ObjectId(json.questions[a]._id);  
+                        } else {
+                             record._id = ObjectId();  
+                        }
+                        thePromise = new Promise(function(resolve,reject) {
+                            db.collection('questions').save(record).then(function(resy) {
+                                //console.log(['UPDATE']);
+                                let newRecord={_id:record._id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
+                                resolve(record._id);
+                                
+                            }).catch(function(e) {
+                                console.log(['array update err',e]);
+                                reject();
+                            });
+                            
+                        })   
+                        promises.push(thePromise);
+                        
+                    }
+                }
+                Promise.all(promises).then(function(ids) {
+                    //console.log(['del ids',ids]);
+                    // delete all questions that are not in this updated set (except userTopic questions)
+                    db.collection('questions').remove({$and:[{_id:{$nin:ids}},{userTopic:{$not:{$exists:true}}}]}).then(function(dresults) {
+                        console.log('DELETEd THESE');
+                        console.log(dresults.result);
+                        // update tags
+                        console.log('UPDATE TAGS');
+                        //console.log(Object.keys(json.tags));
+                        
+                        updateTags(json.tags);
+                        // create indexes   
+                        db.collection('questions').dropIndex();
+                        db.collection('questions').createIndex({
+                            question: "text",
+                            prefix: "text",
+                            postfix: "text",
+                            interrogative: "text",
+                            answer:"text",
+                            //mnemonic: "text",
+                            //answer: "text"
+                        });
                        
-                for (collection in json) {
-                    //console.log(['save collection',collection,Array.isArray(json[collection]),json[collection]]);
-                    if (Array.isArray(json[collection])) {
-                        //console.log(['IMPORT AS ARRAY '+collection ]);
-                        //if (collection=="words") {
-                            //console.log(json[collection]);
-                        //}
-                       let promises=[];
-                       let questionPromises=[];
-                       for (var a in json[collection]) {
-                         //  console.log([a]); //,json[collection][a]]);
-                            if (json[collection][a]) {
-                                let record =  json[collection][a];
-                                if (collection === "questions") {
-                                    record.successRate = Math.random()/100; // randomisation to get started
-                                    console.log(['IMPORT',record]);
-                                }
-                                if (record.tags) {
-                                  let aTags = record.tags.trim().toLowerCase().split(',');
-                                  let nTags = [];
-                                  aTags.forEach(function(aTag) {
-                                      nTags.push(aTag.trim());
-                                  });
-                                  record.tags=nTags;
-                                }
-                                //console.log(record.tags);
-                                // remove and restore id to allow update
-                                let thePromise = null;
-                                if (json[collection][a].hasOwnProperty('_id')&& json[collection][a]._id.length > 0) {
-                                    let id = json[collection][a]._id;  
-                                    delete record._id;
-                                    thePromise = new Promise(function(resolve,reject) {
-                                        db.collection(collection).update({_id:ObjectId(id)},{$set:record},{upsert:true}).then(function(resy) {
-                                            console.log(['UPDATE']);
-                                            let newRecord={_id:id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
-                                            resolve(newRecord);
-                                            
-                                        }).catch(function(e) {
-                                            console.log(['array update err',e]);
-                                            reject();
-                                        });
-                                        
-                                    })   
-                                } else {
-                                    thePromise = new Promise(function(resolve,reject) {
-                                        db.collection(collection).insert(record).then(function(resy) {
-                                            console.log(['INSERT']);
-                                            let newRecord={_id:resy.insertedIds[0],discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
-                                            resolve(newRecord);
-                                            
-                                        }).catch(function(e) {
-                                            console.log(['array update err',e]);
-                                            reject();
-                                        });;
-                                    })
-                                }
-                                
-                                if (collection === "questions") {
-                                    questionPromises.push(thePromise);
-                                } else {
-                                    promises.push(thePromise);
-                                }
-                                
-                            }
-                        }
-                      // console.log(['STARTED UPDATES',promises,questionPromises]);
-                        // cleanup 
-                            // TODO warning problem here if ever loading multiple sheets
-                        let b = function (collection) {
-                            if (promises.length > 0) {
-                              //  console.log('othr promises' + collection);
-                                Promise.all(promises).then((dresults) => {
-                                    let ids = [];
-                                    dresults.forEach(function(result) {
-                                        ids.push(result._id);
-                                    });
+                       //db.collection('words').dropIndex();
+                        //db.collection('words').createIndex({
+                            //text: "text"                    
+                        //}); 
+                        let unparsed = Papa.unparse(json.questions,{quotes: true});
+                        res.send(unparsed);
+                    });
+                    
+                    
+                    
+                    
+                });
+            }
+        });
+    })
+                
+});
+
+//router.post('/import', (req, res) => {
+  ////  console.log(['import']);
+    //let that = this;
+    //let url = config.masterSpreadsheet;
+    //// load mnemonics and collate tags, topics
+    //var request = get(url, function(err,response) {
+        //if (err) {
+            //console.log(['e',err]);
+            //return;
+        //}
+        //// clear and reimport topicCollections
+        
+        ////console.log(['response',response]);
+        //Papa.parse(response, {
+            //'header': true, 
+            //'complete': function(data) {
+                //// console.log(['parse',data]);
+                //const toImport = {'questions':data.data};
+                //let json = utils.createIndexes(toImport);
+                ////console.log(['parsed',data.errors,json]);
+                       
+                //for (collection in json) {
+                    ////console.log(['save collection',collection,Array.isArray(json[collection]),json[collection]]);
+                    //if (Array.isArray(json[collection])) {
+                        ////console.log(['IMPORT AS ARRAY '+collection ]);
+                        ////if (collection=="words") {
+                            ////console.log(json[collection]);
+                        ////}
+                       
+                      //// console.log(['STARTED UPDATES',promises,questionPromises]);
+                        //// cleanup 
+                            //// TODO warning problem here if ever loading multiple sheets
+                        //let b = function (collection) {
+                            //if (promises.length > 0) {
+                              ////  console.log('othr promises' + collection);
+                                //Promise.all(promises).then((dresults) => {
+                                    //let ids = [];
+                                    //dresults.forEach(function(result) {
+                                        //ids.push(result._id);
+                                    //});
                                     
-                                 //   console.log(['del ids',collection,ids]);
-                                    db.collection(collection).find({_id:{$nin:ids}}).toArray().then(function(dresults) {
-                                      //  console.log('DELETE THESE');
-                                       // console.log(dresults);
-                                        if (Array.isArray(dresults)) {
-                                            dresults.forEach(function(toDelete) {
-                                                db.collection(collection).deleteOne({_id:toDelete._id}).then(function(ok) {
-                                         //           console.log('deleted');
-                                                }).catch(function(e) {
-                                                    console.log(['err',e ]);
-                                                });
-                                            });
-                                        }
-                                    });
-                                });
-                            }
-                        }
-                        b(collection);
+                                 ////   console.log(['del ids',collection,ids]);
+                                    //db.collection(collection).find({_id:{$nin:ids}}).toArray().then(function(dresults) {
+                                      ////  console.log('DELETE THESE');
+                                       //// console.log(dresults);
+                                        //if (Array.isArray(dresults)) {
+                                            //dresults.forEach(function(toDelete) {
+                                                //db.collection(collection).deleteOne({_id:toDelete._id}).then(function(ok) {
+                                         ////           console.log('deleted');
+                                                //}).catch(function(e) {
+                                                    //console.log(['err',e ]);
+                                                //});
+                                            //});
+                                        //}
+                                    //});
+                                //});
+                            //}
+                        //}
+                        //b(collection);
                         
 
-                        // question promises - delete and download
-                        if (questionPromises.length > 0) {
-                             Promise.all(questionPromises)
-                              .then((results) => {
-                          //      console.log("All prom done", results);
-                                let ids = [];
-                                results.forEach(function(result) {
-                                    ids.push(result._id);
-                                });
-                                 // cleanup 
-                                // TODO warning problem here if ever loading multiple sheets
-                                //db.collection(collection).find({$and:[{_id:{$nin:ids}},{userQuestion:{$ne:true}}]}).toArray().then(function(dresults) {
-                                    //console.log('DELETE THESE');
-                                    //console.log(dresults);
-                                    //if (Array.isArray(dresults)) {
-                                        //dresults.forEach(function(toDelete) {
-                                            //db.collection(collection).deleteOne({_id:toDelete._id}).then(function(ok) {
-                                                //console.log('deleted');
-                                            //}).catch(function(e) {
-                                                //console.log(['err',e ]);
-                                            //});
-                                        //});
-                                    //}
+                        //// question promises - delete and download
+                        //if (questionPromises.length > 0) {
+                             //Promise.all(questionPromises)
+                              //.then((results) => {
+                          ////      console.log("All prom done", results);
+                                //let ids = [];
+                                //results.forEach(function(result) {
+                                    //ids.push(result._id);
                                 //});
+                                 //// cleanup 
+                                //// TODO warning problem here if ever loading multiple sheets
+                                ////db.collection(collection).find({$and:[{_id:{$nin:ids}},{userQuestion:{$ne:true}}]}).toArray().then(function(dresults) {
+                                    ////console.log('DELETE THESE');
+                                    ////console.log(dresults);
+                                    ////if (Array.isArray(dresults)) {
+                                        ////dresults.forEach(function(toDelete) {
+                                            ////db.collection(collection).deleteOne({_id:toDelete._id}).then(function(ok) {
+                                                ////console.log('deleted');
+                                            ////}).catch(function(e) {
+                                                ////console.log(['err',e ]);
+                                            ////});
+                                        ////});
+                                    ////}
+                                ////});
 
                                 
-                                //res.set({"Content-Disposition":"attachment; filename=questions2.csv"});
-                                let unparsed = Papa.unparse(results,{quotes: true});
-                                //unparsed='sssss';
-                            //    console.log('papa');
-                               // console.log(csvQuestions);
-                              //  console.log(unparsed);
-                                res.send(unparsed);
-                              })
-                              .catch((e) => {
-                                  console.log(e);
-                                  // Handle errors here
-                              });   
-                        }
+                                ////res.set({"Content-Disposition":"attachment; filename=questions2.csv"});
+                                //let unparsed = Papa.unparse(results,{quotes: true});
+                                ////unparsed='sssss';
+                            ////    console.log('papa');
+                               //// console.log(csvQuestions);
+                              ////  console.log(unparsed);
+                                //res.send(unparsed);
+                              //})
+                              //.catch((e) => {
+                                  //console.log(e);
+                                  //// Handle errors here
+                              //});   
+                        //}
                       
 
                     
                       
                   
                         
-                    } else {
-                       // console.log('IMPORT AS SINGLE'+collection);
-                        db.collection(collection).update({_id:json[collection]._id},json[collection],{upsert:true}).then(function(res) {
-                                if (res.result && res.result.upserted && Array.isArray(res.result.upserted) && res.result.upserted.length > 0) {
-                                //    console.log(['done array update',res.result.upserted[0]._id]);
-                                    //csvQuestions.push({_id:res.result.upserted[0]._id}.assign(json[collection]));
-                                    //let data = json[collection];
-                                    //data._id = res.result.upserted[0]._id;
-                                    //let thePromise = new Promise((resolve) => {resolve(data)});
-                                    //allPromises.push(thePromise);
-                                }
+                    //} else {
+                       //// console.log('IMPORT AS SINGLE'+collection);
+                        //db.collection(collection).update({_id:json[collection]._id},json[collection],{upsert:true}).then(function(res) {
+                                //if (res.result && res.result.upserted && Array.isArray(res.result.upserted) && res.result.upserted.length > 0) {
+                                ////    console.log(['done array update',res.result.upserted[0]._id]);
+                                    ////csvQuestions.push({_id:res.result.upserted[0]._id}.assign(json[collection]));
+                                    ////let data = json[collection];
+                                    ////data._id = res.result.upserted[0]._id;
+                                    ////let thePromise = new Promise((resolve) => {resolve(data)});
+                                    ////allPromises.push(thePromise);
+                                //}
                                 
-                            }).catch(function(e) {
-                                console.log(['obj update err',e]);
-                            });;   
-                    }
-                }
-              //  console.log('NOW CREATE INDEXES FOR QUESTIONS TEXT');
+                            //}).catch(function(e) {
+                                //console.log(['obj update err',e]);
+                            //});;   
+                    //}
+                //}
+              ////  console.log('NOW CREATE INDEXES FOR QUESTIONS TEXT');
                   
-                db.collection('questions').dropIndex();
-                db.collection('questions').createIndex({
-                    question: "text",
-                    prefix: "text",
-                    postfix: "text",
-                    interrogative: "text",
-                    answer:"text",
-                    //mnemonic: "text",
-                    //answer: "text"
-                });  
-               db.collection('tags').dropIndex();
-                db.collection('tags').createIndex({
-                    title: "text"                    
-                });  
+                //db.collection('questions').dropIndex();
+                //db.collection('questions').createIndex({
+                    //question: "text",
+                    //prefix: "text",
+                    //postfix: "text",
+                    //interrogative: "text",
+                    //answer:"text",
+                    ////mnemonic: "text",
+                    ////answer: "text"
+                //});
+                
+               ////db.collection('tags').dropIndex();
+                ////db.collection('tags').createIndex({
+                    ////title: "text"                    
+                ////});  
                
-               db.collection('words').dropIndex();
-                db.collection('words').createIndex({
-                    text: "text"                    
-                });   
-                //res.send({'message':'Import complete'});
-            }
-        }) 
-    })  
-})
+               //db.collection('words').dropIndex();
+                //db.collection('words').createIndex({
+                    //text: "text"                    
+                //});   
+                ////res.send({'message':'Import complete'});
+            //}
+        //}) 
+    //})  
+//})
 router.get('/topiccollections', (req, res) => {
     db.collection('topicCollections').find({}).sort({sort:1}).toArray().then(function(collections) {
         db.collection('userTopics').find({published:{$eq:true}}).sort({updated:-1}).limit(10).toArray().then(function(userTopics) {
@@ -482,6 +520,8 @@ router.get('/review', (req, res) => {
 
 // search questions
 router.get('/questions', (req, res) => {
+    console.log('search questions');
+    console.log(req.query);
     let limit = 20;
     let skip = 0;
     if (req.query.limit && req.query.limit > 0) {
@@ -520,7 +560,8 @@ router.get('/questions', (req, res) => {
         // SEARCH BY topic
         } else  if (req.query.topic && req.query.topic.length > 0) {
             //console.log(['topic search',req.query.topic,{'quiz': {$eq:req.query.topic}}]);
-            criteria.push({'quiz': {$eq:req.query.topic}});
+            let topic = req.query.topic.trim(); //.toLowerCase(); 
+            criteria.push({'quiz': {$eq:topic}});
           //  console.log(['topic search C    ',criteria]);
             db.collection('questions').find({$and:criteria}).sort({question:1}).toArray(function(err, results) {
               res.send({'questions':results});
@@ -854,7 +895,6 @@ router.post('/saveusertopic', (req, res) => {
         let id = body._id && String(body._id).length > 0 ? new ObjectId(body._id) : new ObjectId();
         let user = body.user;
         let questions = body.questions;
-        
         let toSave = {_id:id,user:user,questions:questions,topic:body.topic,publishedTopic:body.publishedTopic};
         toSave.updated=new Date().getTime();
 //        console.log(['saveusertopic']);
@@ -862,7 +902,6 @@ router.post('/saveusertopic', (req, res) => {
         // validation info
         let errors={};
         questions.map(function(question,key) {
-            
             if (question.mnemonic.length === 0) {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('mnemonic');
@@ -879,10 +918,12 @@ router.post('/saveusertopic', (req, res) => {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('tags');
             }
+
         });
         if (req.body.deleteQuestion && String(req.body.deleteQuestion).length > 0) {
             db.collection('questions').remove({_id:ObjectId(req.body.deleteQuestion)}).then(function(result) {
-//                console.log(['deleted question',result]);
+                console.log(['deleted question',result]);
+                
             }).catch(function(err) {
 //                console.log(['save usertopic ERR',err]);
             });
@@ -974,18 +1015,109 @@ router.get('/topics', (req, res) => {
             let final={};
             results.map(function(key,val) {
       //          console.log([search,key,val]);
-                if (search && search.length > 0 && key.indexOf(search) >= 0) {
+                if (search && search.length > 0 && key.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
                     final[key]=1;
                 } 
             });
             res.send(final);
         }).catch(function(e) {
-            res.send({'err':e});
+            res.send({'err':e.message});
         });
     //} else {
         //res.send({message:'Invalid request'});
     //}
 })
+
+function updateTags(tags) {
+    console.log(['UPDATETAGS']);
+    console.log(tags);
+    Object.keys(tags).map(function(tag,key) {
+        console.log(['UPDATETAGS matching']);
+        let criteria=[];
+        criteria.push({'tags': {$in:[tag]}});
+        console.log(criteria);
+        db.collection('questions').find({$and:criteria}).toArray().then(function(result) {
+                console.log(['UPDATETAGS found']);
+                console.log(result);
+                if (result.length > 0) {
+                    console.log('UPDATETAGS found questions');
+                    db.collection('words').findOne({text:{$eq:tag}}).then(function(word) {
+                        console.log('UPDATETAGS UPDATED WORD');
+                        console.log(word);
+                        if (word) {
+                            console.log('UPDATETAGS UPDATED');
+                            word.value=result.length;
+                            db.collection('words').save(word).then(function(saveres) {
+                                    console.log('UPDATETAGS TAG');
+                                    //console.log(saveres);
+                            });                            
+                        } else {
+                            db.collection('words').save({'text':tag,value:result.length}).then(function(saveres) {
+                                    console.log('UPDATETAGS TAG NEW');
+                                   // console.log(saveres);
+                            });                            
+                        }
+                    });
+                } else {
+                    db.collection('words').remove({text:{$eq:tag}}).then(function(word) {
+                        console.log('UPDATETAGS REMOVED TAG');
+                    });
+                }
+         });
+    });
+}
+
+
+router.post('/unpublishusertopic', (req, res) => {
+    //console.log(['del usrtop',req.body]);
+    if (req.body._id && req.body._id.length > 0) {
+        
+        db.collection('userTopics').findOne({_id:ObjectId(req.body._id)}).then(function(result) {
+           if (result) {
+                let tags={};
+                       
+      //          console.log(['NOW delete related q',questionsToDelete]);
+               db.collection('questions').find({userTopic:{$eq:req.body._id}}).toArray().then(function(questions) {
+        //            console.log(['delete related q',questionsToDelete]);
+                           if (Array.isArray(questions)) {
+                               questions.map(function(question,key) {
+                                   if (Array.isArray(question.tags)) {
+                                       question.tags.map(function(tag,key) {
+                                           tags[tag]=1;
+                                       });
+                                   }
+                               });
+                                db.collection('questions').remove({userTopic:{$eq:req.body._id}}).then(function(delresult) {
+                                   updateTags(tags);
+                                }).catch(function(e) {
+                                    console.log({'erri1':e});
+                                });
+                           } 
+                
+                
+                       
+                }).catch(function(e) {
+                    console.log({'erri1':e});
+                });
+                result.published=false;
+                db.collection('userTopics').save(result);
+                // TODO also tags and topics ??????
+                // topic
+        
+               
+           }
+            
+           
+           
+            res.send(result);
+        }).catch(function(e) {
+            res.send({'err':e.message});
+        });
+    } else {
+        res.send({message:'Invalid request'});
+    }
+})
+
 
 router.post('/deleteusertopic', (req, res) => {
     //console.log(['del usrtop',req.body]);
@@ -993,27 +1125,43 @@ router.post('/deleteusertopic', (req, res) => {
         
         db.collection('userTopics').findOne({_id:ObjectId(req.body._id)}).then(function(result) {
            if (result) {
-               let questionsToDelete=[];
-               if (Array.isArray(result.questions)) {
-                   result.questions.map(function(question,key) {
-                       if (question._id && String(question._id).length > 0) {
-                           questionsToDelete.push(ObjectId(question._id));
-                       }
-                   });
-               } 
+                let tags={};
+                       
       //          console.log(['NOW delete related q',questionsToDelete]);
-               db.collection('questions').remove({_id:{$in:questionsToDelete}}).then(function(delresult) {
+               db.collection('questions').find({userTopic:{$eq:req.body._id}}).toArray().then(function(questions) {
         //            console.log(['delete related q',questionsToDelete]);
+                           if (Array.isArray(questions)) {
+                               questions.map(function(question,key) {
+                                   if (question._id && String(question._id).length > 0) {
+                                       questionsToDelete.push(ObjectId(question._id));
+                                   }
+                                   if (Array.isArray(question.tags)) {
+                                       question.tags.map(function(tag,key) {
+                                           tags[tag]=1;
+                                       });
+                                   }
+                               });
+                                db.collection('questions').remove({userTopic:{$eq:req.body._id}}).then(function(delresult) {
+                                   updateTags(tags);
+                                    db.collection('userTopics').remove({_id:ObjectId(req.body._id)}).then(function(delresult) {
+                              //          console.log(result);
+                                    }).catch(function(e) {
+                                        console.log({'erri2':e});
+                                    });
+                                   
+                                }).catch(function(e) {
+                                    console.log({'erri1':e});
+                                });
+                           } 
+                
+                
+                       
                 }).catch(function(e) {
                     console.log({'erri1':e});
                 });
                 // TODO also tags and topics ??????
                 // topic
-               db.collection('userTopics').remove({_id:ObjectId(req.body._id)}).then(function(delresult) {
-          //          console.log(result);
-                }).catch(function(e) {
-                    console.log({'erri2':e});
-                });
+        
                
            }
             
@@ -1031,69 +1179,105 @@ router.post('/deleteusertopic', (req, res) => {
 router.post('/publishusertopic', (req, res) => {
     //console.log(['pub usrtop',req.body]);
     let preview=req.body.preview;
+    let tags={}
+                         
     if (req.body._id && req.body._id.length > 0) {
-        db.collection('userTopics').findOne({_id:ObjectId(req.body._id)}).then(function(result) {
-            db.collection('users').findOne({_id:ObjectId(result.user)}).then(function(user) {
-                // save questions
-                let errors={};
-                let newQuestions = [];
-                if (result.questions && result.questions.length > 0) {
-                    result.questions.map(function(question,key) {
-      //                  console.log(['PUBLISH',question,key]);
-                        question.quiz=user.avatar+'\'s '+result.topic;
-                        question._id = question._id ? ObjectId(question._id) : new ObjectId();
-                        if (!preview) question.access="public";
-                        question.updated=new Date().getTime();
-                        question.user=user._id;
-                        question.userQuestion=true;
-                        if (question.mnemonic.length === 0) {
-                            if (!errors.hasOwnProperty(key)) errors[key]=[];
-                            errors[key].push('mnemonic');
-                        }
-                        //if (question.interrogative.length === 0) {
-                            //if (!errors.hasOwnProperty(key)) errors[key]=[];
-                            //errors[key].push('interrogative');
-                        //}
-                        if (question.question.length === 0) {
-                            if (!errors.hasOwnProperty(key)) errors[key]=[];
-                            errors[key].push('question');
-                        }
-                        if (question.tags.length === 0) {
-                            if (!errors.hasOwnProperty(key)) errors[key]=[];
-                            errors[key].push('tags');
-                        }
-                        newQuestions.push(question);
-                        
+        db.collection('userTopics').findOne({_id:ObjectId(req.body._id)}).then(function(userTopic) {
+            db.collection('users').findOne({_id:ObjectId(userTopic.user)}).then(function(user) {
+                db.collection('questions').find({userTopic:req.body._id}).toArray().then(function(questions) {
+                    // save questions
+                    let questionsMap={};
+                    questions.map(function(val,key) {
+                        questionsMap[val._id]=ObjectId(val._id);
                     });
-                    if (Object.keys(errors).length>0) {
-                        res.send({errors:errors});
-                    } else {
-                        if (!preview) result.published = true;
-                        result.questions = newQuestions;
-                        newQuestions.map(function(question,key) {
-                            db.collection('questions').save(question).then(function() {
-        //                        console.log(['saved q',question]);
+                    let errors={};
+                    let newQuestions = [];
+                    if (userTopic.questions && userTopic.questions.length > 0) {
+                        userTopic.questions.map(function(question,key) {
+          //                  console.log(['PUBLISH',question,key]);
+                            question.quiz=user.avatar+'\'s '+userTopic.topic;
+                            if (question._id) {
+                                delete questionsMap[question._id];
+                                question._id = ObjectId(question._id);
+                            } else {
+                                question._id = new ObjectId();
+                            }
+                            question._id = question._id ? ObjectId(question._id) : new ObjectId();
+                            if (!preview) {
+                                question.access="public";
+                            } else {
+                                question.access=user.username;
+                            }
+                            question.updated=new Date().getTime();
+                            question.user=user._id;
+                            question.userQuestion=true;
+                            question.userTopic=req.body._id;
+                             if (Array.isArray(question.tags)) {
+                                   question.tags.map(function(tag,key) {
+                                       tags[tag]=1;
+                                   });
+                               }
+                            if (question.mnemonic.length === 0) {
+                                if (!errors.hasOwnProperty(key)) errors[key]=[];
+                                errors[key].push('mnemonic');
+                            }
+                            //if (question.interrogative.length === 0) {
+                                //if (!errors.hasOwnProperty(key)) errors[key]=[];
+                                //errors[key].push('interrogative');
+                            //}
+                            if (question.question.length === 0) {
+                                if (!errors.hasOwnProperty(key)) errors[key]=[];
+                                errors[key].push('question');
+                            }
+                            if (question.tags.length === 0) {
+                                if (!errors.hasOwnProperty(key)) errors[key]=[];
+                                errors[key].push('tags');
+                            }
+                            newQuestions.push(question);
+                            
+                        });
+                        let promises=[];
+                        if (Object.keys(errors).length>0) {
+                            res.send({errors:errors});
+                        } else {
+                            if (!preview) userTopic.published = true;
+                            userTopic.questions = newQuestions;
+                            // save questions
+                            promises.push(newQuestions.map(function(question,key) {
+                                db.collection('questions').save(question).then(function() {
+            //                        console.log(['saved q',question]);
+                                        db.collection('questions').remove({_id:{$in:Object.values(questionsMap)}}).then(function() {
+                                            
+                                        })
+                                }).catch(function(e) {
+                                    console.log(['failed saved q',e]);
+                                });
+                            }));
+                             
+                            Promise.all(promises).then(function() {
+                                updateTags(tags);
+                            }); 
+                            // save usertopic
+                            db.collection('userTopics').save(userTopic).then(function(result) {
+                                console.log(['saved r',result]);
                             }).catch(function(e) {
-                                console.log(['failed saved q',e]);
+                                console.log(['failed saved r',e]);
                             });
-                        });
-                        db.collection('userTopics').save(result).then(function() {
-                            console.log(['saved r',result]);
-                        }).catch(function(e) {
-                            console.log(['failed saved r',e]);
-                        });
-                        res.send(result);
+                            res.send(userTopic);
+                        }
                     }
-                }
-                 
-                //let id=result.topicId ? ObjectId(result.topicId) : new ObjectId();
-                //let topic={_id:id,topic:}
-                
+                     
+                    //let id=result.topicId ? ObjectId(result.topicId) : new ObjectId();
+                    //let topic={_id:id,topic:}
+                    
+                 }).catch(function(e) {
+                    res.send({'err':e.message});
+                })
              }).catch(function(e) {
-                res.send({'err':e});
+                res.send({'err':e.message});
             })
         }).catch(function(e) {
-            res.send({'err':e});
+            res.send({'err':e.message});
         });
     } else {
         res.send({message:'Invalid request'});

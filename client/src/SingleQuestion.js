@@ -227,7 +227,7 @@ export default class SingleQuestion extends Component {
                     <br/>
                     <div className="card-block">
                         <div ref={(section) => { this.scrollTo.moreinfo = section; }} ></div>
-                        {(this.isVisible('moreinfo') && !target) && <div className="holds-the-iframe"><iframe   src={link} style={{width:"98%", height: "1200px", border: "0px"}}/></div> }
+                        {(this.isVisible('moreinfo') && !target) && <div className="holds-the-iframe"><iframe className='wikiiframe'  src={link} style={{width:"98%", height: "1200px", border: "0px"}}/></div> }
                 
                     </div>
                     <div className="card-block">

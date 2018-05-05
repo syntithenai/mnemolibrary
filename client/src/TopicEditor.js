@@ -28,6 +28,7 @@ export default class TopicEditor extends Component {
         this.state={
             _id:'',
             topic:'',
+            published:'',
             search:'',
             questions:[],
             currentQuestion:null,
@@ -50,7 +51,7 @@ export default class TopicEditor extends Component {
         this.updateQuestion = this.updateQuestion.bind(this);
         this.newTopic = this.newTopic.bind(this);
         this.loadTopic = this.loadTopic.bind(this);
-        this.saveTopic = this.saveTopic.bind(this);
+        this.saveTopic = debounce(500,this.saveTopic.bind(this));
         this.deleteTopic = this.deleteTopic.bind(this);
         this.previewTopic = this.previewTopic.bind(this);
         
@@ -70,7 +71,7 @@ export default class TopicEditor extends Component {
     };
     
     setTopicEvent(e) {
-        //console.log(e);
+        console.log(['topicevent',e.target.value]);
         this.setState({topic:e.target.value});
         this.saveTopic();
     };
@@ -92,7 +93,7 @@ export default class TopicEditor extends Component {
                 answer:result.description,
                 topic:'',
                 link:result.link, 
-                tags:'',
+                tags:[],
                 message:'',
             }
         let questions = this.state.questions;
@@ -117,33 +118,36 @@ export default class TopicEditor extends Component {
     };    
         
     saveTopic(deleteQuestion) {
-        let that=this;
-        let publishedTopic=this.props.user.avatar+'\'s '+this.state.topic;
-        let params = {_id:this.state._id,user:this.props.user._id,topic:this.state.topic,questions:this.state.questions,deleteQuestion:deleteQuestion,publishedTopic:publishedTopic}
-        fetch("/api/saveusertopic", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(params)
-        }).then(function(response) {
-            return response.json();
-        }).then(function(id) {
-          //  console.log(['saved topic',id,id.id]);
-            that.setState({_id:id.id});
-            if (id.errors && Object.keys(id.errors).length > 0) {
-                that.setState({validationErrors:id.errors,message:'Some of your questions are missing required information.'});
-            } else {
-                that.setState({validationErrors:{},message:' '});
-            }
+        //debounce(100,function() {
+            let that=this;
+            let publishedTopic=this.props.user.avatar+'\'s '+this.state.topic;
+            let params = {_id:this.state._id,user:this.props.user._id,topic:this.state.topic,questions:this.state.questions,deleteQuestion:deleteQuestion,publishedTopic:publishedTopic}
+            fetch("/api/saveusertopic", {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(params)
+            }).then(function(response) {
+                return response.json();
+            }).then(function(id) {
+              //  console.log(['saved topic',id,id.id]);
+                that.setState({_id:id.id});
+                if (id.errors && Object.keys(id.errors).length > 0) {
+                    that.setState({validationErrors:id.errors,message:'Some of your questions are missing required information.'});
+                } else {
+                    that.setState({validationErrors:{},message:' '});
+                }
+                
+                
+                //res.send({user:user,token:token});
+            })
+            .catch(function(err) {
+                console.log(['ERR',err]);
+            });
+            localStorage.setItem('currentTopic',this.state._id);
             
-            
-            //res.send({user:user,token:token});
-        })
-        .catch(function(err) {
-            console.log(['ERR',err]);
-        });
-        localStorage.setItem('currentTopic',this.state._id);
+      //  });
     }; 
     
     deleteTopic(key) {
@@ -184,7 +188,7 @@ export default class TopicEditor extends Component {
             //console.log(['loaded topic',topic]);
             //res.send({user:user,token:token});
             localStorage.setItem('currentTopic',topic._id);
-            that.setState({topic:topic.topic,_id:topic._id,questions:topic.questions,currentView:'questions',validationErrors:{},message:' '});
+            that.setState({topic:topic.topic,_id:topic._id,published:topic.published,questions:topic.questions,currentView:'questions',validationErrors:{},message:' '});
         })
         .catch(function(err) {
             console.log(['ERR',err]);
@@ -240,13 +244,30 @@ export default class TopicEditor extends Component {
                 let questions=0;
                 if (publishResponse.questions) questions =publishResponse.questions.length;
                 let message='Published '+questions+' questions.';
-                that.setState({validationErrors:{},message:message});
+                that.setState({published:true,validationErrors:{},message:message,_id:publishResponse._id,topic:publishResponse.topic,questions:publishResponse.questions});
             }
             //console.log(['published topic',topic]);
             //res.send({user:user,token:token});
             //that.setState({topic:topic.topic,_id:topic._id,questions:topic.questions,currentView:'questions'});
         })
     };  
+
+    unpublishTopic(id) {
+        let that=this;
+        fetch("/api/unpublishusertopic", {
+          method: 'POST',
+        headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                _id: id
+              })
+        }).then(function(response) {
+            return response.json();
+        }).then(function(publishResponse) {
+            that.setState({validationErrors:{},published:false});
+        })
+    }; 
     
     askPublishTopic(key) {
         if (this.state.questions.length > 0 && this.state.topic.length > 0) {
@@ -280,7 +301,7 @@ export default class TopicEditor extends Component {
             answer:'',
             topic:'',
             link:'', 
-            tags:''
+            tags:[]
         }
         let questions = this.state.questions;
         questions.push(question);
@@ -307,10 +328,12 @@ export default class TopicEditor extends Component {
     
     deleteQuestion(key) {
         let questions = this.state.questions;
+       // console.log(['DEL Q',key,questions]);
         let questionId = questions[key]._id;
+        this.saveTopic(questionId);
         questions.splice(key,1);
         this.setState({questions:questions});
-        this.saveTopic(questionId);
+        
     };  
 
     updateQuestion(question)  {
@@ -331,7 +354,7 @@ export default class TopicEditor extends Component {
         return false;
     };
     
-        
+
     render() {
         if (this.state.showHelp)    {
              return (<div className="row">
@@ -352,22 +375,26 @@ export default class TopicEditor extends Component {
                 <div id='topiceditor' className={this.state.topic}>
                         <div id='topiceditorheader' className='row'>
                         <div className='col-12 col-lg-6'>
-                             <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} ><ListAlt size={28}/>&nbsp;<span className="d-none d-sm-inline" >Topics</span></button>
+                             
+                              <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} ><ListAlt size={28}/>&nbsp;<span className="d-none d-sm-inline" >Topics</span></button>
                             <label>&nbsp;<b>Topic&nbsp;</b><input name="topic" onChange={this.setTopicEvent}  value={this.state.topic} /></label>
                         </div>
                         <div className='col-12 col-lg-6'>
                         
                             <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/>&nbsp;<span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions.length}</span></button>
                             <button  className='btn btn-success' onClick={this.createQuestion} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >Create Question</span></button>
-                        
-                             <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Publish</span></button>
-                            <button  className='btn btn-warning' style={{float:'right'}} onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>
-
+                             <button  className='btn btn-warning'  onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>
+                              
+                              {this.state.published===true && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Republish</span></button>}
+                             
+                             {!this.state.published && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Publish</span></button>}
+                             {this.state.published===true && <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.unpublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Unpublish</span></button>}
+                          
                         </div>
                         <div className='col-12 col-lg-6'>
                             <button  href='#' onClick={() => this.showHelp()} className='btn btn-info ' ><Question size={28}/>&nbsp;<span className="d-none d-sm-inline" >Help</span></button>
                             <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sources&nbsp;&nbsp;</b>
-                            <button  className='btn btn-info'  onClick={this.showSearch} ><WikipediaW size={28}/>&nbsp;<span className="d-none d-sm-inline" >Wikpedia</span></button>
+                            <button  className='btn btn-info'  onClick={this.showSearch} ><WikipediaW size={28}/>&nbsp;<span className="d-none d-sm-inline" >Wikipedia</span></button>
                                                      
                         </div>
                         

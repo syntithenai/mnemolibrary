@@ -91,10 +91,13 @@ export default class QuestionEditor extends Component {
   }
  
   handleAddTag (tag) {
+      console.log(['ADDTAG',tag]);
     const tags = [].concat(this.state.tags, tag)
     this.setState({ tags })
     this.updateQuestionTag(tags);
   }
+  
+
     
     //saveQuestion(e) {
         //e.preventDefault();
@@ -154,7 +157,7 @@ export default class QuestionEditor extends Component {
                             
                             
                         <div className='form-inline'>
-                            <label htmlFor="interrogative">*&nbsp;Interrogative </label>
+                            <label htmlFor="interrogative">Interrogative </label>
                             <Autocomplete
                               getItemValue={(item) => item.label}
                               items={[
@@ -194,8 +197,9 @@ export default class QuestionEditor extends Component {
                             autoresize={false} 
                             tags={this.state.tags}
                             suggestions={this.state.suggestions}
-                            handleDelete={this.handleDeleteTag.bind(this)}
-                            handleAddition={this.handleAddTag.bind(this)} 
+                            handleDelete={this.handleDeleteTag}
+                            handleAddition={this.handleAddTag} 
+                            allowNew={true}
                             id="tags"  
                             name='tags'
                             className='form-control'

@@ -857,7 +857,11 @@ export default class AppLayout extends Component {
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
-      fetch('/api/questions?topic='+topic )
+      let url='/api/questions?topic='+topic ;
+      if (this.state.user) {
+          url=url+'&user='+this.state.user.username;
+      }
+      fetch(url)
       .then(function(response) {
       //  console.log(['got response', response])
         return response.json()
