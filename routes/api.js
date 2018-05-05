@@ -1205,7 +1205,8 @@ router.post('/publishusertopic', (req, res) => {
                             question._id = question._id ? ObjectId(question._id) : new ObjectId();
                             if (!preview) {
                                 question.access="public";
-                            } else {
+                            } 
+                            if (!question.access && preview) {
                                 question.access=user.username;
                             }
                             question.updated=new Date().getTime();
