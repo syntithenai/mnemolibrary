@@ -31,6 +31,7 @@ export default class MnemonicsList extends Component {
         this.like = this.like.bind(this);
     };
     
+
     loadMnemonics(loadQuestion) {
         let that=this;
         let question=this.props.question;
@@ -44,7 +45,7 @@ export default class MnemonicsList extends Component {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                question: this.props.question._id
+                question: question._id
               })
           })
           .then(function(response) {
@@ -90,6 +91,7 @@ export default class MnemonicsList extends Component {
     };
 
     componentWillReceiveProps(nextProps) {
+        console.log(['UPDATEMNEMLIST',nextProps.question]);
       const question = nextProps.question;        
       //this.setState({
            //defaultMnemonic:'default', 
