@@ -11,7 +11,7 @@ export default class FindQuestions extends Component {
             <div className='findquestions'>
                 <br/> 
                 <div>For teachers and students, news junkies, academics, language learners, trivia buffs, and punsters.</div>
-                <div>A community of lifelong learners who use mnemonics.</div>
+                <div>An encyclopedia. A memorization tool. A community.</div>
                 <br/>
                 
                 <iframe width="300" height="150" src="https://www.youtube-nocookie.com/embed/qXh6hkzy-8k" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>   
