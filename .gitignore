@@ -19,3 +19,4 @@ yarn-error.log*
 /auth_config.js
 /old
 /config*
+/docker-compose.yml

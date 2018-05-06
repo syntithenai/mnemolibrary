@@ -21,7 +21,9 @@ services:
     restart: always
     volumes:
       - "/home/stever/projects/mnemolibrary:/usr/src/app/"
-    #environment:
+    environment:
+      AWS_ACCESS_KEY_ID:your id
+      AWS_SECRET_ACCESS_KEY:your key
       #VIRTUAL_HOST: mnemolibrary.com
       #LETSENCRYPT_HOST: syntithenai.com
       #LETSENCRYPT_EMAIL: stever@syntithenai.com

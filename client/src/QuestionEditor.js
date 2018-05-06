@@ -6,7 +6,7 @@ import Utils from './Utils';
 import CreateHelp from './CreateHelp';
 import Autocomplete from 'react-autocomplete';
 const ReactTags = require('react-tag-autocomplete')
- 
+import ReactS3Uploader  from 'react-s3-uploader';
 
 export default class QuestionEditor extends Component {
     constructor(props) {
@@ -212,6 +212,14 @@ export default class QuestionEditor extends Component {
                         
                          <div className='form-group'>     
                                 <label htmlFor="link" >Image URL</label><input autoComplete="false" id="image" type='text' name='image' onChange={this.change} value={this.props.question.image}  className='form-control' />
+                                <ReactS3Uploader
+                                    signingUrl="/api/s3/sign"
+                                    signingUrlMethod="GET"
+                                    accept="*/*"
+                                    s3path="/uploads/"
+                                    inputRef={cmp => this.uploadInput = cmp}
+                                    autoUpload={true}
+                                    />
                         </div>
                         
                         <div className='form-group'>    
@@ -230,3 +238,16 @@ export default class QuestionEditor extends Component {
 
   //<form method="POST" onSubmit={this.saveUser} className="form-group" autoComplete="false" >
                      //</form>
+//preprocess={this.onUploadStart}
+                                    //onSignedUrl={this.onSignedUrl}
+                                    //onProgress={this.onUploadProgress}
+                                    //onError={this.onUploadError}
+                                    //onFinish={this.onUploadFinish}
+                                    //signingUrlHeaders={{ additional: headers }}
+                                    //signingUrlQueryParams={{ additional: query-params }}
+                                    //signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
+                                    //uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
+                                    //contentDisposition="auto"
+                                    //scrubFilename={(filename) => filename.replace(/[^\w\d_\-.]+/ig, '')}
+                                    //server="http://cross-origin-server.com"
+                                    

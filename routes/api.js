@@ -31,6 +31,14 @@ MongoClient.connect(config.databaseConnection, (err, client) => {
 
 //const database = require('../../oauth/database');
 
+
+router.use('/s3', require('react-s3-uploader/s3router')({
+    bucket: "mnemolibrary.com",
+    headers: {'Access-Control-Allow-Origin': '*'}, // optional
+    uniquePrefix: true // (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
+}));
+
+
 router.post('/reportproblem', (req, res) => {
     let content='Reported By ' + req.body.user.username + '<br/><br/>' + req.body.problem + '<br/><br/>Question: ' + JSON.stringify(req.body.question);
     db.collection('reportedProblems').save(req.body);
@@ -914,10 +922,10 @@ router.post('/saveusertopic', (req, res) => {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('question');
             }
-            if (question.tags.length === 0) {
-                if (!errors.hasOwnProperty(key)) errors[key]=[];
-                errors[key].push('tags');
-            }
+            //if (question.tags.length === 0) {
+                //if (!errors.hasOwnProperty(key)) errors[key]=[];
+                //errors[key].push('tags');
+            //}
 
         });
         if (req.body.deleteQuestion && String(req.body.deleteQuestion).length > 0) {
