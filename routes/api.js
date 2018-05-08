@@ -502,9 +502,9 @@ router.get('/review', (req, res) => {
  //               }
                 
                 
-                console.log(['REVItEW',successAndDateOrderedIds]);
+                //console.log(['REVItEW',successAndDateOrderedIds]);
                 db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).toArray(function(err,results) {
-                    console.log([err,results]);
+                   // console.log([err,results]);
                     let questionIndex={};
                     results.forEach(function(question) {
                         questionIndex[question._id]=question;
