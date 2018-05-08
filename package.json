@@ -23,7 +23,7 @@
     "npm": "^5.7.1",
     "oauth2-server": "^3.0.0",
     "papaparse": "^4.3.7",
-    "react": "^16.2.0",
+    "react": "^16.3.2",
     "react-autocomplete": "^1.8.1",
     "react-confirm-alert": "^2.0.2",
     "react-debounce-input": "^3.2.0",
@@ -33,8 +33,10 @@
     "react-scripts": "^0.9.5",
     "react-swipeable": "^4.2.1",
     "react-tag-autocomplete": "^5.5.1",
+    "redux": "^4.0.0",
     "simple-get": "^2.7.0",
     "throttle-debounce": "^1.0.1",
+    "video-react": "^0.10.4",
     "xhr2": "^0.1.4"
   },
   "devDependencies": {

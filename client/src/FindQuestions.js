@@ -20,7 +20,7 @@ export default class FindQuestions extends Component {
                 
                 <br/>
                 <br/>
-                 <div><b><button className="btn btn-info" onClick={() => this.props.setCurrentPage('login')}    >Join</button> the library to save and review your progress across devices.</b></div>
+                 <b>To save and review your progress across devices<br/><button className="btn btn-info" onClick={() => this.props.setCurrentPage('login')}    >Join The Library</button> </b>
                 
                  <br/> 
                 <b>Learn something new</b>

@@ -5,6 +5,7 @@ import Check from 'react-icons/lib/fa/check';
 import ArrowRight from 'react-icons/lib/fa/arrow-right';
 import ArrowLeft from 'react-icons/lib/fa/arrow-left';
 import Trash from 'react-icons/lib/fa/trash';
+import Music from 'react-icons/lib/fa/music';
 import Info from 'react-icons/lib/fa/info';
 import Ellipsis from 'react-icons/lib/fa/ellipsis-v';
 //import ThumbsUp from 'react-icons/lib/fa/thumbs-up';
@@ -27,13 +28,21 @@ import Swipeable from 'react-swipeable'
 //import ThumbsDown from 'react-icons/lib/fa/thumbs-down';
 
 import ExclamationTriangle from 'react-icons/lib/fa/exclamation-triangle';
+import "video-react/dist/video-react.css"; // import css
+import { Player } from 'video-react';
 
 export default class SingleQuestion extends Component {
     
-    constructor(props) {
-        super(props);
-        this.state = {'visible':[]}
+    constructor(props,context) {
+        super(props,context);
+        this.player = null;
+        this.setPlayerRef = element => {
+          this.player = element;
+          if (this.player) this.player.subscribeToStateChange(this.handleStateChange.bind(this));
+        };
+        this.state = {'visible':['media']}
         this.setVisible = this.setVisible.bind(this);
+        this.toggleMedia = this.toggleMedia.bind(this);
         this.isVisible = this.isVisible.bind(this);
         this.hideAll = this.hideAll.bind(this);
         this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
@@ -42,9 +51,38 @@ export default class SingleQuestion extends Component {
         this.questionmessage='hithere';
     };
     
+      componentDidMount() {
+        // subscribe state change
+        //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
+      }
+
+      handleStateChange(state, prevState) {
+        // copy player state to this component's state
+        //console.log(['statechange',state,prevState]);
+        if (state.ended) {
+            this.setInvisible('media');
+        }
+        //this.setState({
+          //player: state
+        //});
+      }
+    
      componentWillReceiveProps(props) {
+         //console.log(['rcv props',props]);
+       // if (this.refs.player) this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['mnemonic'],{align:'top',offset:-230});
     };
+    
+    removeA(arr) {
+        var what, a = arguments, L = a.length, ax;
+        while (L > 1 && arr.length) {
+            what = a[--L];
+            while ((ax= arr.indexOf(what)) !== -1) {
+                arr.splice(ax, 1);
+            }
+        }
+        return arr;
+    }
     
     // which question parts are visible - mnemonic, answer, moreinfo
     setVisible(toShow) {
@@ -55,6 +93,19 @@ export default class SingleQuestion extends Component {
         //setTimeout(function(toShow) {
             scrollToComponent(this.scrollTo[toShow],{align:'top',offset:-230});
         //},1000) 
+    };
+    
+    toggleMedia() {
+        //console.log(['invisible',toHide]);
+        let visible = this.state.visible;
+        if (this.state.visible.indexOf('media')>=0) {
+            visible = this.removeA(visible,'media');
+        } else {
+            visible.push('media');
+        }
+        
+        this.setState({'visible':visible});
+        
     };
     
     isVisible(toShow) {
@@ -173,6 +224,8 @@ export default class SingleQuestion extends Component {
                             }&nbsp;
                             {question.image && <button  className='btn btn-primary' onClick={() => this.setVisible('image')}><Image size={26} />&nbsp;<span className="d-none d-md-inline-block">Image</span></button>
                             }&nbsp;
+                            {question.media && <button  className='btn btn-primary' onClick={() => this.toggleMedia()}><Music size={26} />&nbsp;<span className="d-none d-md-inline-block">Media</span></button>
+                            }&nbsp;
                             
                             {(!target) && <button  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
                             }
@@ -199,7 +252,18 @@ export default class SingleQuestion extends Component {
                         
                     <Swipeable onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')}   >  
                         <h4 className="card-title">{header}?</h4>
-                           
+                        <div className="card-block">
+                        
+                        <div ref={(section) => { this.scrollTo.media = section; }} ></div>
+                        {((this.isVisible('media')) && question.media) && <span>
+                            <Player
+                              ref={this.setPlayerRef}
+                              playsInline
+                              autoPlay={true}
+                              src={question.media}
+                            /></span> }
+                        </div>
+                        
                        {(this.isVisible('mnemonic')|| !showRecallButton) &&<MnemonicsList isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
                         
                         <div ref={(section) => { this.scrollTo.answer = section; }} ></div>

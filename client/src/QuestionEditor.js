@@ -7,6 +7,8 @@ import CreateHelp from './CreateHelp';
 import Autocomplete from 'react-autocomplete';
 const ReactTags = require('react-tag-autocomplete')
 import ReactS3Uploader  from 'react-s3-uploader';
+import "video-react/dist/video-react.css"; // import css
+import { Player } from 'video-react';
 
 export default class QuestionEditor extends Component {
     constructor(props) {
@@ -17,7 +19,10 @@ export default class QuestionEditor extends Component {
             warning_message: '',
               tags: [
               ],
-              suggestions: []
+              suggestions: [],
+              imageProgress: null,
+              mediaProgress: null
+             // imageURL:this.props.question.image
             
             //question : {
                 //_id: question._id ? question._id : '',
@@ -38,7 +43,12 @@ export default class QuestionEditor extends Component {
         this.handleDeleteTag = this.handleDeleteTag.bind(this);
         this.handleAddTag = this.handleAddTag.bind(this);
         this.updateQuestionTag = this.updateQuestionTag.bind(this);
-        
+        this.finishUploadImage = this.finishUploadImage.bind(this);
+        this.finishUploadMedia = this.finishUploadMedia.bind(this);
+        this.changeMedia = this.changeMedia.bind(this);
+        this.changeImage = this.changeImage.bind(this);
+        this.onImageProgress = this.onImageProgress.bind(this);
+        this.onMediaProgress = this.onMediaProgress.bind(this);
     };
     
     componentDidMount() {
@@ -119,7 +129,7 @@ export default class QuestionEditor extends Component {
             state[key] =  e.target.value;
         //}
         
-       // console.log(['CHANGE',this.props.currentQuestion,state]);
+        console.log(['CHANGE',this.props.currentQuestion,state]);
         //this.setState({'question':state});
         this.props.updateQuestion(state);
         return true;
@@ -132,6 +142,56 @@ export default class QuestionEditor extends Component {
         return true;
     };
     
+    changeImage(e) {
+        let state = {...this.props.question};
+        state.image=e.target.value
+        this.props.updateQuestion(state);
+        //this.setState({'question':state});
+        return true;
+    };
+    
+    finishUploadImage(signResult) {
+        console.log("Uppt finished: " + signResult.publicUrl)
+        let state = {...this.props.question};
+        //state.image='';
+        //this.props.updateQuestion(state);
+        //this.setState({'question':state});
+        let time = new Date().getTime();
+        state.image="/api"+signResult.publicUrl+'?no_cache='+time;
+        this.props.updateQuestion(state);
+        this.setState({imageProgress:null});
+        
+        //this.setState({imageURL:"/api"+signResult.publicUrl})
+    };
+    
+    changeMedia(e) {
+        let state = {...this.props.question};
+        state.media=e.target.value
+        this.props.updateQuestion(state);
+        this.setState({'question':state});
+        return true;
+    };
+    
+    finishUploadMedia(signResult) {
+        console.log("Uppt media finished: " + signResult.publicUrl)
+        let state = {...this.props.question};
+        let time = new Date().getTime();
+        state.media="/api"+signResult.publicUrl+'?no_cache='+time;
+        this.props.updateQuestion(state);
+        this.setState({mediaProgress:null});
+        //this.setState({imageURL:"/api"+signResult.publicUrl})
+    };
+    
+    onMediaProgress(percent, message) {
+        this.setState({'mediaProgess':percent});
+        console.log('Upload media progress: ' + percent + '% ' + message);
+    };
+    
+    onImageProgress(percent, message) {
+        this.setState({'imageProgress':percent});
+        console.log('Upload progress: ' + percent + '% ' + message);
+    };
+    
     selectInterrogative(value) {
         let state = {...this.props.question};
         var key = 'interrogative';
@@ -141,6 +201,7 @@ export default class QuestionEditor extends Component {
         this.props.updateQuestion(state);
         return true;
     };
+    
     
     render() {
        // console.log(['QE REN',this.props]);
@@ -192,7 +253,7 @@ export default class QuestionEditor extends Component {
                         </div>
                         
                         <div className='form-group'>    
-                            <label htmlFor="tags" >*&nbsp;Tags</label>
+                            <label htmlFor="tags" >Tags</label>
                             <ReactTags
                             autoresize={false} 
                             tags={this.state.tags}
@@ -210,20 +271,54 @@ export default class QuestionEditor extends Component {
                                 <label htmlFor="link" >Link </label><input autoComplete="false" id="link" type='text' name='link' onChange={this.change} value={this.props.question.link}  className='form-control' />
                         </div>
                         
-                         <div className='form-group'>     
-                                <label htmlFor="link" >Image URL</label><input autoComplete="false" id="image" type='text' name='image' onChange={this.change} value={this.props.question.image}  className='form-control' />
+                        <div className='form-group'>    
+                            <label htmlFor="answer" >Answer </label><textarea autoComplete="false" id="answer" type='text' name='answer' onChange={this.change} value={this.props.question.answer} className='form-control' ></textarea>
+                        </div>
+                        
+                        <div className='form-group'>  
+                                {this.state.imageProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.imageProgress)+'%'}} >&nbsp;</div></div>}
+                                <label htmlFor="link" >Image URL</label><input autoComplete="false" id="image" type='text' name='image' onChange={this.changeImage} value={this.props.question.image}  className='form-control' />
+                                {this.props.question.image && !this.state.imageProgress &&  <img src={this.props.question.image} style={{width: 200}}/>}
                                 <ReactS3Uploader
                                     signingUrl="/api/s3/sign"
                                     signingUrlMethod="GET"
-                                    accept="*/*"
-                                    s3path="/uploads/"
+                                    accept="image/*"
+                                    s3path="uploads/"
                                     inputRef={cmp => this.uploadInput = cmp}
                                     autoUpload={true}
+                                    signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
+                                    uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
+                                    contentDisposition="auto"
+                                    scrubFilename={(filename) => this.props.question._id}
+                                    onFinish={this.finishUploadImage}
+                                    onProgress={this.onImageProgress}
                                     />
                         </div>
                         
-                        <div className='form-group'>    
-                            <label htmlFor="answer" >Answer </label><textarea autoComplete="false" id="answer" type='text' name='answer' onChange={this.change} value={this.props.question.answer} className='form-control' ></textarea>
+                         <div className='form-group'>  
+                                {this.state.mediaProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress)+'%'}} >&nbsp;</div></div>}
+                                <label htmlFor="link" >Media URL</label><input autoComplete="false" id="image" type='text' name='media' onChange={this.changeMedia} value={this.props.question.media}  className='form-control' />
+                                {this.props.question.media && !this.state.mediaProgress &&  <span>
+                            <Player
+                              playsInline
+                              autoPlay={false}
+                              fluid={true}
+                              src={this.props.question.media}
+                            /></span> }
+                                <ReactS3Uploader
+                                    signingUrl="/api/s3/sign"
+                                    signingUrlMethod="GET"
+                                    accept="*"
+                                    s3path="uploads/"
+                                    inputRef={cmp => this.uploadInput = cmp}
+                                    autoUpload={true}
+                                    signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
+                                    uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
+                                    contentDisposition="auto"
+                                    scrubFilename={(filename) => "media_"+String(this.props.question._id)}
+                                    onFinish={this.finishUploadMedia}
+                                    onProgress={this.onMediaProgress}
+                                    />
                         </div>
                         
                     </div>
@@ -235,7 +330,7 @@ export default class QuestionEditor extends Component {
             
     }
 };
-
+//filename.replace(/[^\w\d_\-.]+/ig, '')
   //<form method="POST" onSubmit={this.saveUser} className="form-group" autoComplete="false" >
                      //</form>
 //preprocess={this.onUploadStart}

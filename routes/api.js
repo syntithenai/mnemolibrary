@@ -27,15 +27,18 @@ MongoClient.connect(config.databaseConnection, (err, client) => {
 
 })
 
-
+//arn:aws:s3:::mnemolibrary.com
 
 //const database = require('../../oauth/database');
 
 
 router.use('/s3', require('react-s3-uploader/s3router')({
     bucket: "mnemolibrary.com",
+    region: 'us-west-2', //optional
+    //signatureVersion: 'v4', //optional (use for some amazon regions: frankfurt and others)
     headers: {'Access-Control-Allow-Origin': '*'}, // optional
-    uniquePrefix: true // (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
+    ACL: 'private', // this is default
+    uniquePrefix: false // (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
 }));
 
 
@@ -501,7 +504,7 @@ router.get('/review', (req, res) => {
                 
                 console.log(['REVItEW',successAndDateOrderedIds]);
                 db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).toArray(function(err,results) {
-                   // console.log(results);
+                    console.log([err,results]);
                     let questionIndex={};
                     results.forEach(function(question) {
                         questionIndex[question._id]=question;
