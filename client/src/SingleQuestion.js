@@ -252,15 +252,6 @@ export default class SingleQuestion extends Component {
                      <div id="spacerforsmall" className='d-none d-sm-block d-md-none' ><br/><br/> </div>
                     <div id="progressbar" style={{backgroundColor: 'blue',width: '100%'}} > <div id="innerprogressbar" style={{backgroundColor: 'red',width: this.props.percentageFinished()}} >&nbsp;</div></div>
                     
-                    {((blockedTags && blockedTags.length > 0) || (blockedTopics && blockedTopics.length > 0) || (blockedTechniques && blockedTechniques.length > 0)) && <div className='blocked-tags' style={{float:'right'}}><b>Filter </b>
-                        {blockedTags && blockedTags.length>0 && <span>Tags </span>} {blockedTags}
-                        {blockedTopics && blockedTopics.length>0 && <span>Topics </span>} {blockedTopics}
-                        {blockedTechniques && blockedTechniques.length>0 && <span>Techniques </span>} {blockedTechniques}
-                       <hr/> </div>}
-                        
-                    
-                  
-                        
                     <Swipeable onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')}   >  
                         <h4 className="card-title">{header}?</h4>
                         <div className="card-block">
@@ -301,6 +292,12 @@ export default class SingleQuestion extends Component {
                           <b>Tags&nbsp;&nbsp;&nbsp;</b>
                            {tagsClean}
                         </div>}
+                          {((blockedTags && blockedTags.length > 0) || (blockedTopics && blockedTopics.length > 0) || (blockedTechniques && blockedTechniques.length > 0)) && <div className='blocked-tags' style={{float:'right'}}><b>Filter </b>
+                        {blockedTags && blockedTags.length>0 && <span>Tags </span>} {blockedTags}
+                        {blockedTopics && blockedTopics.length>0 && <span>Topics </span>} {blockedTopics}
+                        {blockedTechniques && blockedTechniques.length>0 && <span>Techniques </span>} {blockedTechniques}
+                       <hr/> </div>}
+                       
                     </Swipeable>
                     <br/>
                     <div className="card-block">

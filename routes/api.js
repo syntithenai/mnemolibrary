@@ -372,11 +372,11 @@ router.post('/discover', (req, res) => {
         });
         
     }
-    sortFilter[orderBy]=1;
+    sortFilter[orderBy]=-1;
     
     let user = req.body.user ? req.body.user : null;
    // console.log(['discover',orderBy]);
-    db.collection('userquestionprogress').find({user:user}).sort(sortFilter).toArray().then(function(progress) {
+    db.collection('userquestionprogress').find({user:user}).toArray().then(function(progress) {
          if (progress) {
              //console.log(['progress res',progress]);
             let notThese = [];
@@ -1198,8 +1198,10 @@ router.post('/publishusertopic', (req, res) => {
                 db.collection('questions').find({userTopic:req.body._id}).toArray().then(function(questions) {
                     // save questions
                     let questionsMap={};
+                    let questionsFullMap={};
                     questions.map(function(val,key) {
                         questionsMap[val._id]=ObjectId(val._id);
+                        questionsFullMap[val._id]=val;
                     });
                     let errors={};
                     let newQuestions = [];
@@ -1219,6 +1221,11 @@ router.post('/publishusertopic', (req, res) => {
                             } 
                             if (!question.access && preview) {
                                 question.access=user.username;
+                            }
+                            if (questionsFullMap.hasOwnProperty(question._id) && questionsFullMap[question._id].successRate) {
+                                question.successRate=questionsFullMap[question._id].successRate;
+                            } else {
+                                question.successRate=Math.random()/100;
                             }
                             question.updated=new Date().getTime();
                             question.user=user._id;

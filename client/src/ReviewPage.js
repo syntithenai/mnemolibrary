@@ -44,7 +44,7 @@ export default class ReviewPage extends Component {
             },
             {
               label: 'Discover',
-              onClick: () => this.props.discoverQuestions()
+              onClick: () => this.props.setQuizFromDiscovery()
             }
           ]
         })

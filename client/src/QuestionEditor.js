@@ -253,7 +253,7 @@ export default class QuestionEditor extends Component {
                         </div>
                         
                         <div className='form-group'>    
-                            <label htmlFor="tags" >Tags</label>
+                            <label htmlFor="tags" >Tags (press tab to add a tag)</label>
                             <ReactTags
                             autoresize={false} 
                             tags={this.state.tags}

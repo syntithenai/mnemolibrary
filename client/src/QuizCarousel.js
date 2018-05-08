@@ -17,7 +17,7 @@ export default class QuizCarousel extends Component {
             //'currentQuestion':this.props.currentQuestion,
             'quizComplete': false,
             'showList':false,
-            'isReview': (this.props.isReview ? true : false),
+            'isReview': this.props.isReview,
             'success' : []
         };
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
@@ -213,7 +213,7 @@ export default class QuizCarousel extends Component {
    }; 
    
     discoverQuestions() {
-        this.props.discoverQuestions();
+        this.props.setQuizFromDiscovery();
     };
     
     getQuestions(questionIds) {
