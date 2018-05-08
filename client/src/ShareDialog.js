@@ -37,11 +37,13 @@ export default class ShareDialog extends Component {
         
         
         let title="Mnemo's Library -"+(this.props.question.mnemonic ? this.props.question.mnemonic : '') + " - \n" + question.interrogative+ ' ' +question.question + '?';
-        let longTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + '?' + "  \n" + otherLink;
+        let longTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + '?' ;
+        let twitterTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + '?' + "\n" + question.link;
+        
         
         //let allTogether = title + "  \n" + otherLink  + "  \n" + mainLink ;
         
-        let mailTo='mailto:?subject='+title+'&body='+bothLinks;
+        let mailTo='mailto:?subject='+title+'&body='+shareLink;
         
         return  (
             <div id="sharedialog" className="modal" tabIndex="-1" role="dialog">
@@ -56,8 +58,8 @@ export default class ShareDialog extends Component {
                   <div className="modal-body">
                     <a className='btn btn-primary' href={mailTo} target='_new' ><Email size={26} />&nbsp;Email</a>
                     <br/>
-                    <br/><TwitterShareButton className='btn btn-primary' title={longTitle} url={mainLink} hashtags={["MnemosLibrary"]}><Twitter size={26} />&nbsp;Twitter</TwitterShareButton>
-                    <br/><br/><FacebookShareButton className='btn btn-primary' quote={longTitle} url={mainLink}  ><Facebook size={26} />&nbsp;Facebook</FacebookShareButton>
+                    <br/><TwitterShareButton className='btn btn-primary' title={twitterTitle} url={shareLink} hashtags={["MnemosLibrary"]}><Twitter size={26} />&nbsp;Twitter</TwitterShareButton>
+                    <br/><br/><FacebookShareButton className='btn btn-primary' quote={longTitle} url={shareLink}  ><Facebook size={26} />&nbsp;Facebook</FacebookShareButton>
                     
                   </div>
                 </div>
