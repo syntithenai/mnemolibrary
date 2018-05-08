@@ -40,7 +40,7 @@ export default class SingleQuestion extends Component {
           this.player = element;
           if (this.player) this.player.subscribeToStateChange(this.handleStateChange.bind(this));
         };
-        this.state = {'visible':[]}
+        this.state = {'visible':[],playerHeight:50,playerWidth:400}
         this.setVisible = this.setVisible.bind(this);
         this.toggleMedia = this.toggleMedia.bind(this);
         this.isVisible = this.isVisible.bind(this);
@@ -48,7 +48,7 @@ export default class SingleQuestion extends Component {
         this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.scrollTo={};
-        this.questionmessage='hithere';
+        this.questionmessage='';
     };
     
       componentDidMount() {
@@ -58,9 +58,20 @@ export default class SingleQuestion extends Component {
 
       handleStateChange(state, prevState) {
         // copy player state to this component's state
-        //console.log(['statechange',state,prevState]);
+        console.log(['statechange',state,prevState]);
+        
         if (state.ended) {
-            this.setInvisible('media');
+            this.toggleMedia();
+        }
+        if (state.videoHeight > 0) {
+            if (this.state.playerHeight != state.videoHeight) {
+                this.setState({'playerHeight':state.videoHeight});   
+                this.setState({'playerWidth':state.videoWidth});   
+            }
+           
+        } else {
+            this.setState({'playerHeight':50});   
+            this.setState({'playerWidth':400});   
         }
         //this.setState({
           //player: state
@@ -261,6 +272,9 @@ export default class SingleQuestion extends Component {
                               playsInline
                               autoPlay={true}
                               src={question.media}
+                              height={this.state.playerHeight}
+                              width={this.state.playerWidth}
+                              fluid={false}
                             /></span> }
                         </div>
                         

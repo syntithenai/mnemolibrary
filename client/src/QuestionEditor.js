@@ -183,7 +183,7 @@ export default class QuestionEditor extends Component {
     };
     
     onMediaProgress(percent, message) {
-        this.setState({'mediaProgess':percent});
+        this.setState({'mediaProgress':percent});
         console.log('Upload media progress: ' + percent + '% ' + message);
     };
     
@@ -276,10 +276,8 @@ export default class QuestionEditor extends Component {
                         </div>
                         
                         <div className='form-group'>  
-                                {this.state.imageProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.imageProgress)+'%'}} >&nbsp;</div></div>}
-                                <label htmlFor="link" >Image URL</label><input autoComplete="false" id="image" type='text' name='image' onChange={this.changeImage} value={this.props.question.image}  className='form-control' />
-                                {this.props.question.image && !this.state.imageProgress &&  <img src={this.props.question.image} style={{width: 200}}/>}
-                                <ReactS3Uploader
+                                
+                                <label htmlFor="link" >Image URL</label> <ReactS3Uploader
                                     signingUrl="/api/s3/sign"
                                     signingUrlMethod="GET"
                                     accept="image/*"
@@ -292,20 +290,14 @@ export default class QuestionEditor extends Component {
                                     scrubFilename={(filename) => this.props.question._id}
                                     onFinish={this.finishUploadImage}
                                     onProgress={this.onImageProgress}
-                                    />
+                                    /><input autoComplete="false" id="image" type='text' name='image' onChange={this.changeImage} value={this.props.question.image}  className='form-control' />
+                                {this.state.imageProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.imageProgress)+'%'}} >&nbsp;</div></div>}
+                                {this.props.question.image && !this.state.imageProgress &&  <img src={this.props.question.image} style={{width: 200}}/>}
+                                
                         </div>
                         
                          <div className='form-group'>  
-                                {this.state.mediaProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress)+'%'}} >&nbsp;</div></div>}
-                                <label htmlFor="link" >Media URL</label><input autoComplete="false" id="image" type='text' name='media' onChange={this.changeMedia} value={this.props.question.media}  className='form-control' />
-                                {this.props.question.media && !this.state.mediaProgress &&  <span>
-                            <Player
-                              playsInline
-                              autoPlay={false}
-                              fluid={true}
-                              src={this.props.question.media}
-                            /></span> }
-                                <ReactS3Uploader
+                                    <label htmlFor="link" >Media URL</label> <ReactS3Uploader
                                     signingUrl="/api/s3/sign"
                                     signingUrlMethod="GET"
                                     accept="*"
@@ -318,7 +310,16 @@ export default class QuestionEditor extends Component {
                                     scrubFilename={(filename) => "media_"+String(this.props.question._id)}
                                     onFinish={this.finishUploadMedia}
                                     onProgress={this.onMediaProgress}
-                                    />
+                                    /><input autoComplete="false" id="image" type='text' name='media' onChange={this.changeMedia} value={this.props.question.media}  className='form-control' />
+                            {this.state.mediaProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress)+'%'}} >&nbsp;</div></div>}
+                                
+                            {this.props.question.media && !this.state.mediaProgress &&  <span><Player
+                                      playsInline
+                                      autoPlay={false}
+                                      fluid={true}
+                                      src={this.props.question.media}
+                                    /></span> }
+                                        
                         </div>
                         
                     </div>
