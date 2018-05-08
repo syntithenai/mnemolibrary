@@ -91,7 +91,7 @@ export default class MnemonicsList extends Component {
     };
 
     componentWillReceiveProps(nextProps) {
-        console.log(['UPDATEMNEMLIST',nextProps.question]);
+       // console.log(['UPDATEMNEMLIST',nextProps.question]);
       const question = nextProps.question;        
       //this.setState({
            //defaultMnemonic:'default', 
@@ -102,7 +102,7 @@ export default class MnemonicsList extends Component {
     //{question:'5abeec3d91ce1409b01e9553',mnemonic:'marshaled ..',technique:'association',questionText:'waht is marsh pln'}
     
     componentDidMount() {
-        console.log(['mount mnem list',this.props.question,this.props.user]);
+      //  console.log(['mount mnem list',this.props.question,this.props.user]);
            //// load mnemonics
           //let user=this.props.user;
           this.loadMnemonics();

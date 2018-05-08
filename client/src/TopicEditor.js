@@ -71,7 +71,7 @@ export default class TopicEditor extends Component {
     };
     
     setTopicEvent(e) {
-        console.log(['topicevent',e.target.value]);
+        //console.log(['topicevent',e.target.value]);
         this.setState({topic:e.target.value});
         this.saveTopic();
     };

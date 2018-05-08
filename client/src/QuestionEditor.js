@@ -56,7 +56,7 @@ export default class QuestionEditor extends Component {
          // set tags from question
          if (Array.isArray(this.props.question.tags)) {
              let tags=[];
-             console.log(['set tags from q',this.props.question.tags]);
+            // console.log(['set tags from q',this.props.question.tags]);
              this.props.question.tags.map(function(val,key) {
                  console.log(val,key);
                  tags.push({id:val,name:val});
@@ -81,7 +81,7 @@ export default class QuestionEditor extends Component {
    
    
    updateQuestionTag(tags) {
-       console.log(['updateQuestionTag',tags]);
+       //console.log(['updateQuestionTag',tags]);
         let state = {...this.props.question};
         let cleanTags=[];
         tags.map(function(val,key) {
@@ -101,7 +101,7 @@ export default class QuestionEditor extends Component {
   }
  
   handleAddTag (tag) {
-      console.log(['ADDTAG',tag]);
+     // console.log(['ADDTAG',tag]);
     const tags = [].concat(this.state.tags, tag)
     this.setState({ tags })
     this.updateQuestionTag(tags);
@@ -129,7 +129,7 @@ export default class QuestionEditor extends Component {
             state[key] =  e.target.value;
         //}
         
-        console.log(['CHANGE',this.props.currentQuestion,state]);
+        //console.log(['CHANGE',this.props.currentQuestion,state]);
         //this.setState({'question':state});
         this.props.updateQuestion(state);
         return true;
@@ -151,7 +151,7 @@ export default class QuestionEditor extends Component {
     };
     
     finishUploadImage(signResult) {
-        console.log("Uppt finished: " + signResult.publicUrl)
+        //console.log("Uppt finished: " + signResult.publicUrl)
         let state = {...this.props.question};
         //state.image='';
         //this.props.updateQuestion(state);
@@ -173,7 +173,7 @@ export default class QuestionEditor extends Component {
     };
     
     finishUploadMedia(signResult) {
-        console.log("Uppt media finished: " + signResult.publicUrl)
+        //console.log("Uppt media finished: " + signResult.publicUrl)
         let state = {...this.props.question};
         let time = new Date().getTime();
         state.media="/api"+signResult.publicUrl+'?no_cache='+time;
@@ -184,12 +184,12 @@ export default class QuestionEditor extends Component {
     
     onMediaProgress(percent, message) {
         this.setState({'mediaProgress':percent});
-        console.log('Upload media progress: ' + percent + '% ' + message);
+        //console.log('Upload media progress: ' + percent + '% ' + message);
     };
     
     onImageProgress(percent, message) {
         this.setState({'imageProgress':percent});
-        console.log('Upload progress: ' + percent + '% ' + message);
+        //console.log('Upload progress: ' + percent + '% ' + message);
     };
     
     selectInterrogative(value) {
