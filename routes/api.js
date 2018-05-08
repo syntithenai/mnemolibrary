@@ -46,7 +46,8 @@ router.post('/reportproblem', (req, res) => {
     let content='Reported By ' + req.body.user.username + '<br/><br/>' + req.body.problem + '<br/><br/>Question: ' + JSON.stringify(req.body.question);
     db.collection('reportedProblems').save(req.body);
     //console.log(['report',req.body]);
-    utils.sendMail(config.mailFrom,config.mailFrom,"Problem Content Report from Mnemo's Library ",content)
+    utils.sendMail(config.mailFrom,config.mailFrom,"Problem Content Report from Mnemo's Library ",content);
+    res.send('sent email');
 });
 
 

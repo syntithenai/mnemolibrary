@@ -13,6 +13,7 @@ export default class ProblemReport extends Component {
         //let question = this.props.question ? this.props.question : {};
         
         this.state={
+            problem:''
         };
         this.change = this.change.bind(this);
     };
@@ -22,6 +23,7 @@ export default class ProblemReport extends Component {
     }
     
      reportProblem() {
+         //console.log('REPORT PROB '+this.state.question.problem);
           let that = this;
           fetch('/api/reportproblem', {
               method: 'POST',
@@ -29,18 +31,17 @@ export default class ProblemReport extends Component {
                 'Content-Type': 'application/json'
               },
               
-              body: JSON.stringify({question:this.props.question,user:this.props.user,problem:this.state.question.problem})
+              body: JSON.stringify({question:this.props.question,user:this.props.user,problem:this.state.problem})
+            }).then(function() {
+                console.log('reprted');
+                that.setState({'problem':''});                
             });
-            this.setState({});
       };
     
     change(e) {
        // console.log(e.target);
-        let state = {...this.props.question};
-        var key = e.target.name;
-        state[key] =  e.target.value;
-//        console.log(['CHANGE',this.props.currentQuestion,state]);
-        this.setState({'question':state});
+//          console.log(['CHANGE',this.props.currentQuestion,state]);
+        this.setState({'problem':e.target.value});
   //      this.props.updateQuestion(state);
         return true;
     };
@@ -63,7 +64,7 @@ export default class ProblemReport extends Component {
                     </button>
                   </div>
                   <div className="modal-body">
-                 <label htmlFor="problem" >*&nbsp;What is the problem with this question?</label><textarea autoComplete="false" id="problem" type='text' name='problem' onChange={this.change} value={this.props.question.problem} className='form-control'></textarea>
+                 <label htmlFor="problem" >*&nbsp;What is the problem with this question?</label><textarea autoComplete="false" id="problem" type='text' name='problem' onChange={this.change} value={this.state.problem} className='form-control'></textarea>
                             <br/>
                             <button  data-toggle="modal" data-target="#problemdialog" onClick={() => this.reportProblem()} className='btn btn-info'>&nbsp;Report Problem&nbsp;</button>   
                     

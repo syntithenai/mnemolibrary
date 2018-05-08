@@ -212,8 +212,11 @@ export default class TopicEditor extends Component {
             if (publishResponse.errors) {
                 that.setState({validationErrors:publishResponse.errors,currentView:'questions',message:'Cannot preview yet because some of your questions are missing required information.'});
             } else {
-              //  console.log(['PREVIEW',publishResponse]);
-                that.props.setQuizFromTopic(that.props.user.avatar+'\'s '+publishResponse.topic);
+                let id='';
+                if (that.state.questions.hasOwnProperty(that.state.currentQuestion) && that.state.questions[that.state.currentQuestion].hasOwnProperty('_id')) {
+                    id=that.state.questions[that.state.currentQuestion]._id;
+                }
+                that.props.setQuizFromTopic(that.props.user.avatar+'\'s '+publishResponse.topic,id);
                 //let questions=0;
                 //if (publishResponse.questions) questions =publishResponse.questions.length;
                 //let message='Published '+questions+' questions.';

@@ -7,6 +7,8 @@ export default class CreateHelp extends Component {
         <div>Extracting key points of encyclopedic, news, or academic articles focuses your reading and we find that the challenge of making mnemonic puns and rhymes is fun and addictive. 
         </div>
         
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/NV5dbVpZFXE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        
         <h4>Guidelines</h4>
         <ul>
             <li>No obscene, abusive or discriminatory entries</li>
