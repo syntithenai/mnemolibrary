@@ -69,7 +69,7 @@ iframe#wikiiframe {
     position: fixed;
     background-color: white;
     min-height: 4em;
-    width: 97%;
+    width: 100%;
 }
 #problemdialog {
     z-index:99999;

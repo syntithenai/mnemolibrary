@@ -17,8 +17,10 @@ import ListAlt from 'react-icons/lib/fa/list-alt';
 import Camera from 'react-icons/lib/fa/camera';
 import Cloud from 'react-icons/lib/fa/cloud';
 import WikipediaW from 'react-icons/lib/fa/wikipedia-w';
+import Google from 'react-icons/lib/fa/google';
 import Question from 'react-icons/lib/fa/question';
 
+import Trash from 'react-icons/lib/fa/trash';
 
 
  
@@ -33,7 +35,7 @@ export default class TopicEditor extends Component {
             questions:[],
             currentQuestion:null,
             currentResult:null,
-            currentView:'search',
+            currentView:'topics',
             showHelp: false,
             validationErrors:{}
         };
@@ -53,6 +55,7 @@ export default class TopicEditor extends Component {
         this.loadTopic = this.loadTopic.bind(this);
         this.saveTopic = debounce(500,this.saveTopic.bind(this));
         this.deleteTopic = this.deleteTopic.bind(this);
+        this.askDeleteTopic = this.askDeleteTopic.bind(this);
         this.previewTopic = this.previewTopic.bind(this);
         
     };
@@ -110,10 +113,11 @@ export default class TopicEditor extends Component {
             questions:[],
             currentQuestion:null,
             currentResult:null,
-            currentView:'search',
+            currentView:'questions',
             showHelp: false,
             validationErrors:{},
-            message:' '
+            message:' ',
+            published:null
         });
     };    
         
@@ -163,13 +167,31 @@ export default class TopicEditor extends Component {
             return response.json();
         }).then(function(id) {
             //console.log(['deleted topic',id,id.id]);
-            //this.loadTopics();
+            //that.loadTopics();
+            that.newTopic();
+            that.setState({currentView:'topics'});
         })
         .catch(function(err) {
             console.log(['ERR',err]);
         });
     };  
     
+    
+    askDeleteTopic(key) {
+        confirmAlert({
+          title: 'Delete Topic',
+          message: 'Are you sure you want to delete this topic and all associated questions?',
+          buttons: [
+            {
+              label: 'Yes',
+              onClick: () => this.deleteTopic(key)
+            },
+            {
+              label: 'No'
+            }
+          ]
+        })
+    };
 
  
     
@@ -196,6 +218,7 @@ export default class TopicEditor extends Component {
     };
         
     previewTopic(id) {
+        console.log(['preview topic',id]);
         let that=this;
         fetch("/api/publishusertopic", {
           method: 'POST',
@@ -212,11 +235,8 @@ export default class TopicEditor extends Component {
             if (publishResponse.errors) {
                 that.setState({validationErrors:publishResponse.errors,currentView:'questions',message:'Cannot preview yet because some of your questions are missing required information.'});
             } else {
-                let id='';
-                if (that.state.questions.hasOwnProperty(that.state.currentQuestion) && that.state.questions[that.state.currentQuestion].hasOwnProperty('_id')) {
-                    id=that.state.questions[that.state.currentQuestion]._id;
-                }
-                that.props.setQuizFromTopic(that.props.user.avatar+'\'s '+publishResponse.topic,id);
+
+                that.props.setQuizFromTopic('Preview '+that.props.user.avatar+'\'s '+publishResponse.topic,that.state.currentQuestion);
                 //let questions=0;
                 //if (publishResponse.questions) questions =publishResponse.questions.length;
                 //let message='Published '+questions+' questions.';
@@ -325,17 +345,18 @@ export default class TopicEditor extends Component {
         this.setState({currentView:'questions'});
     };    
 
-    showSearch() {
-        this.setState({currentView:'search'});
+    showSearch(searchFor) {
+        console.log(['showsearch',searchFor]);
+        this.setState({currentView:'search',search:searchFor});
     };  
     
     deleteQuestion(key) {
         let questions = this.state.questions;
-       // console.log(['DEL Q',key,questions]);
+        console.log(['DEL Q',key,questions]);
         let questionId = questions[key]._id;
         this.saveTopic(questionId);
         questions.splice(key,1);
-        this.setState({questions:questions});
+        this.setState({questions:questions,currentView:'questions'});
         
     };  
 
@@ -357,73 +378,76 @@ export default class TopicEditor extends Component {
         return false;
     };
     
-
+    
     render() {
-        if (this.state.showHelp)    {
-             return (<div className="row">
-                    <div className="col-12  card">
-                    <form>
-                    <a  href='#' onClick={() => this.hideHelp()} className='btn btn-info ' style={{'float':'right'}}>
-                       Close
-                      </a>
-                       <h3 className="card-title">Help</h3>
-                   
-                    <CreateHelp/>
-                    </form>
+       let question = this.state.questions.hasOwnProperty(this.state.currentQuestion) ? this.state.questions[this.state.currentQuestion] : {};
+        return (
+           <div id='topiceditor' className={this.state.topic}>
+                <div id='topiceditorheader' className='row'>
+                    <div className='col-12 col-lg-6'>
+                        <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} ><ListAlt size={28}/>&nbsp;<span className="d-none d-sm-inline" >Topics</span></button>
+                        {String(this.state._id).length > 0 && <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/>&nbsp;<span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions.length}</span></button>}
+                        <button  href='#' onClick={() => this.showHelp()} className='btn btn-info ' ><Question size={28}/>&nbsp;<span className="d-none d-sm-inline" >Help</span></button>
+                       
                     </div>
-                </div>)
-        } else {
-            let question = this.state.questions.hasOwnProperty(this.state.currentQuestion) ? this.state.questions[this.state.currentQuestion] : {};
-            return (
-                <div id='topiceditor' className={this.state.topic}>
-                        <div id='topiceditorheader' className='row'>
-                        <div className='col-12 col-lg-6'>
+                    <div className='col-12  col-lg-6'>
+                    
+                       
+                            {String(this.state._id).length > 0 && <button  className='btn btn-danger'  onClick={() => this.askDeleteTopic(this.state._id)} style={{float:'right'}} ><Trash size={28}/>&nbsp;<span className="d-none d-sm-inline" >Delete Topic</span> </button>}
+                            
+                              {String(this.state._id).length > 0 &&  this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Republish</span></button>}
                              
-                              <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} ><ListAlt size={28}/>&nbsp;<span className="d-none d-sm-inline" >Topics</span></button>
-                            <label>&nbsp;<b>Topic&nbsp;</b><input name="topic" onChange={this.setTopicEvent}  value={this.state.topic} /></label>
-                        </div>
-                        <div className='col-12 col-lg-6'>
-                        
-                            <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/>&nbsp;<span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions.length}</span></button>
-                            <button  className='btn btn-success' onClick={this.createQuestion} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >Create Question</span></button>
-                             <button  className='btn btn-warning'  onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>
+                             {String(this.state._id).length > 0 &&  this.state.questions.length >0 && !this.state.published && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Publish</span></button>}
+                             {String(this.state._id).length > 0 && this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.unpublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Unpublish</span></button>}
+                    </div>
+                    
+                    <div className='col-12'>
+                            <br/><br/>
+                           
+                            {!this.state.showHelp &&  this.state.currentView==='search' &&
+                                <WikipediaSearchWizard topic={this.state.search}  addResultToQuestions={this.addResultToQuestions} />
+                            }
+                            {!this.state.showHelp && this.state.currentView==='topics' && 
+                                <TopicsList topicId={this.state._id} user={this.props.user._id} loadTopic={this.loadTopic} newTopic={this.newTopic} setTopic={this.setTopic} deleteTopic={this.deleteTopic} />
+                            }
+                            {!this.state.showHelp && this.state.currentView==='questions' &&
+                                <span>
+                                 {!this.state.showHelp && this.state.message && <div id="warningmessage" >{this.state.message}</div>}
+                                  <label>&nbsp;<b>Topic&nbsp;</b><input name="topic" onChange={this.setTopicEvent}  value={this.state.topic} /></label>
+                                  
+                                 <button  className='btn btn-success' onClick={this.createQuestion} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >New Question</span></button>
+                                {this.state.topic && <button  className='btn btn-info'  onClick={()=>this.showSearch(this.state.topic)} ><WikipediaW size={28} /><span className="d-none d-sm-inline" >Wikipedia</span></button>}
+                             
+                                {this.state.topic && <a href={'https://www.google.com.au/search?q='+this.state.topic} target="_new"  className='btn btn-info'   ><Google size={28} /><span className="d-none d-sm-inline" >Google</span></a>}
+                             
+                                 { String(this.state._id).length > 0 && this.state.questions.length >0 && <button  className='btn btn-warning'  onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
                               
-                              {this.state.published===true && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Republish</span></button>}
                              
-                             {!this.state.published && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Publish</span></button>}
-                             {this.state.published===true && <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.unpublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Unpublish</span></button>}
-                          
-                        </div>
-                        <div className='col-12 col-lg-6'>
-                            <button  href='#' onClick={() => this.showHelp()} className='btn btn-info ' ><Question size={28}/>&nbsp;<span className="d-none d-sm-inline" >Help</span></button>
-                            <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sources&nbsp;&nbsp;</b>
-                            <button  className='btn btn-info'  onClick={this.showSearch} ><WikipediaW size={28}/>&nbsp;<span className="d-none d-sm-inline" >Wikipedia</span></button>
-                                                     
-                        </div>
+                                <TopicQuestionsList validationErrors={this.state.validationErrors} editQuestion={this.editQuestion}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} /></span>
+                            }
+                            {!this.state.showHelp && this.state.currentView==='editor' &&
+                                <QuestionEditor showSearch={this.showSearch} previewTopic={this.previewTopic} createQuestion={this.createQuestion} deleteQuestion={this.deleteQuestion} updateQuestion={this.updateQuestion} mnemonic_techniques={this.props.mnemonic_techniques}  question={question} questions={this.state.questions} _id={this.state._id} currentQuestion={this.state.currentQuestion} />
+                            }
+                            {this.state.showHelp &&
+                                <div className="row">
+                                    <div className="col-12  card">
+                                        <form>
+                                            <a  href='#' onClick={() => this.hideHelp()} className='btn btn-info ' style={{'float':'right'}}>
+                                               Close
+                                              </a>
+                                               <h3 className="card-title">Help</h3>
+                                           
+                                            <CreateHelp/>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
                         
-                         
-                         
-                        </div>
-                        <div className="hidden-xs-up" ><br/><br/><br/><br/><br/></div>
-                        <br/><br/>
-                        {this.state.message && <div id="warningmessage" >{this.state.message}</div>}
-                        {this.state.currentView==='search' &&
-                            <WikipediaSearchWizard topic={this.state.topic}  addResultToQuestions={this.addResultToQuestions} />
-                        }
-                        {this.state.currentView==='topics' && 
-                            <TopicsList user={this.props.user._id} loadTopic={this.loadTopic} newTopic={this.newTopic} setTopic={this.setTopic} deleteTopic={this.deleteTopic} />
-                        }
-                        {this.state.currentView==='questions' &&
-                            <TopicQuestionsList validationErrors={this.state.validationErrors} deleteQuestion={this.deleteQuestion} editQuestion={this.editQuestion} questions={this.state.questions} currentQuestion={this.state.currentQuestion} />
-                        }
-                        {this.state.currentView==='editor' &&
-                            <QuestionEditor  updateQuestion={this.updateQuestion} mnemonic_techniques={this.props.mnemonic_techniques}  question={question} questions={this.state.questions} currentQuestion={this.state.currentQuestion} />
-                        }
-                        
-                   
+                    </div>
                 </div>
-            )
-        }
+            </div>
+        )
     }
+
 };
 

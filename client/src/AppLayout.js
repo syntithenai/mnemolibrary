@@ -852,8 +852,8 @@ export default class AppLayout extends Component {
       this.setQuizFromTopic(question.quiz,question._id)
   };
   
-  setQuizFromTopic(topic,currentQuestionId=null) {
-      //console.log(['set quiz from topic',topic,currentQuestionId]);
+  setQuizFromTopic(topic,selectedQuestion) {
+      console.log(['set quiz from topic',topic,selectedQuestion]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
@@ -866,7 +866,7 @@ export default class AppLayout extends Component {
       //  console.log(['got response', response])
         return response.json()
       }).then(function(json) {
-        //console.log(['create indexes', json])
+        console.log(['create indexes', json])
         let currentQuiz = [];
         let indexedQuestions= {};
         let currentQuestion=0;
@@ -874,15 +874,16 @@ export default class AppLayout extends Component {
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
             var id = question._id;
-            if (currentQuestionId && currentQuestionId===id) {
+            console.log(['check ID match',id, selectedQuestion ])
+            if (selectedQuestion && selectedQuestion===j) {
                 currentQuestion=j;
-                console.log(['ID match',id, j])
+                console.log(['ID match',selectedQuestion, j])
             }
             currentQuiz.push(id);
             indexedQuestions[id]=questionKey;
             j++;
         }
-        //console.log(currentQuiz);
+        console.log(['currentQuiz',currentQuestion,currentQuiz]);
         that.analyticsEvent('discover topic')
         that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
         //console.log(['set state done', that.state])
@@ -982,7 +983,7 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('review') && <ReviewPage isAdmin={this.isAdmin}  saveSuggestion={this.saveSuggestion} mnemonic_techniques={this.state.mnemonic_techniques} setQuizFromTechnique={this.setQuizFromTechnique} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromTopic={this.setQuizFromTopic} setDiscoveryBlock={this.setDiscoveryBlock} clearDiscoveryBlock={this.clearDiscoveryBlock} blocks={this.state.discoveryBlocks} setQuizFromTag={this.setQuizFromTag}  setCurrentQuestion={this.setCurrentQuestion} discoverQuestions={this.discoverQuestions}  getQuestionsForReview={this.getQuestionsForReview} questions={this.state.questions} currentQuiz={this.state.currentQuiz} currentQuestion={this.state.currentQuestion} indexedQuestions={this.state.indexedQuestions} topicTags={this.state.topicTags} updateProgress={this.updateProgress} setCurrentPage={this.setCurrentPage} finishQuiz={this.finishReview}  isReview={true} setMessage={this.setMessage} like={this.like} user={this.state.user} progress={progress} isLoggedIn={this.isLoggedIn}  setCurrentQuiz={this.setCurrentQuiz} setQuizFromDiscovery={this.setQuizFromDiscovery}/>
             }
-            {this.isCurrentPage('create') && <CreatePage  user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} />
+            {this.isCurrentPage('create') && <CreatePage  user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
             }
             {this.isCurrentPage('about') && <AboutPage setCurrentPage={this.setCurrentPage} />
             }

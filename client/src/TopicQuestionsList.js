@@ -14,29 +14,14 @@ export default class TopicQuestionsList extends Component {
         this.state = {
             
         };
-        this.deleteQuestion=this.deleteQuestion.bind(this);
+       
     };
     
     componentDidMount() {
         
     }
-    
-    deleteQuestion(key) {
-        confirmAlert({
-          title: 'Delete Question',
-          message: 'Are you sure?',
-          buttons: [
-            {
-              label: 'Yes',
-              onClick: () => this.props.deleteQuestion(key)
-            },
-            {
-              label: 'No'
-            }
-          ]
-        })
-            
-    };
+
+
     
     render() {
        // console.log(['VAL ERR',this.props.validationErrors]);
@@ -46,10 +31,12 @@ export default class TopicQuestionsList extends Component {
                 if (this.props.validationErrors && this.props.validationErrors.hasOwnProperty(key) && this.props.validationErrors[key].length > 0) {
                     errors="Missing required information for "+this.props.validationErrors[key].join(" and ");
                 }
-                return <div className='list-group-item' key={key} ><button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.deleteQuestion(key)} ><Trash size={28}/>&nbsp;<span className="d-none d-sm-inline" >Delete</span> </button><button  className='btn btn-info' style={{float:'right'}} onClick={() => this.props.editQuestion(key)} ><Edit size={28}/>&nbsp;<span className="d-none d-sm-inline" >Edit</span> </button>{key+1}. {question.interrogative} {question.question} <div className="questionErrors">{errors}</div></div>
+                return <div className='list-group-item'  onClick={() => this.props.editQuestion(key)} key={key} ><span >{key+1}. {question.interrogative} {question.question} </span><div className="questionErrors">{errors}</div></div>
             });
             return (
-                <div className='list-group' >{list}
+                <div className='list-group' >
+                
+                {list}
                 </div>
             )
         } else {

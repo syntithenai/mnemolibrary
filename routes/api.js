@@ -918,10 +918,10 @@ router.post('/saveusertopic', (req, res) => {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('mnemonic');
             }
-            //if (question.interrogative.length === 0) {
-                //if (!errors.hasOwnProperty(key)) errors[key]=[];
-                //errors[key].push('interrogative');
-            //}
+            if (question.answer.length === 0) {
+                if (!errors.hasOwnProperty(key)) errors[key]=[];
+                errors[key].push('answer');
+            }
             if (question.question.length === 0) {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('question');
@@ -1144,9 +1144,6 @@ router.post('/deleteusertopic', (req, res) => {
         //            console.log(['delete related q',questionsToDelete]);
                            if (Array.isArray(questions)) {
                                questions.map(function(question,key) {
-                                   if (question._id && String(question._id).length > 0) {
-                                       questionsToDelete.push(ObjectId(question._id));
-                                   }
                                    if (Array.isArray(question.tags)) {
                                        question.tags.map(function(tag,key) {
                                            tags[tag]=1;
@@ -1196,38 +1193,41 @@ router.post('/publishusertopic', (req, res) => {
     if (req.body._id && req.body._id.length > 0) {
         db.collection('userTopics').findOne({_id:ObjectId(req.body._id)}).then(function(userTopic) {
             db.collection('users').findOne({_id:ObjectId(userTopic.user)}).then(function(user) {
-                db.collection('questions').find({userTopic:req.body._id}).toArray().then(function(questions) {
+                db.collection('questions').find({$and:[{userTopic:{$eq:req.body._id}},{isPreview:{$eq:false}}]}).toArray().then(function(questions) {
                     // save questions
-                    let questionsMap={};
+                    //let questionsMap={};  // used to track new/old/deleted questions
                     let questionsFullMap={};
                     questions.map(function(val,key) {
-                        questionsMap[val._id]=ObjectId(val._id);
+                        //questionsMap[val._id]=ObjectId(val._id);
                         questionsFullMap[val._id]=val;
                     });
                     let errors={};
                     let newQuestions = [];
                     if (userTopic.questions && userTopic.questions.length > 0) {
-                        userTopic.questions.map(function(question,key) {
+                        userTopic.questions.map(function(questionR,key) {
+                            let question = JSON.parse(JSON.stringify(questionR));
           //                  console.log(['PUBLISH',question,key]);
                             question.quiz=user.avatar+'\'s '+userTopic.topic;
                             if (question._id) {
-                                delete questionsMap[question._id];
+                                //delete questionsMap[question._id];
                                 question._id = ObjectId(question._id);
                             } else {
                                 question._id = new ObjectId();
                             }
                             question._id = question._id ? ObjectId(question._id) : new ObjectId();
-                            if (!preview) {
+                            //if (!preview) {
                                 question.access="public";
-                            } 
-                            if (!question.access && preview) {
-                                question.access=user.username;
-                            }
+                            //} 
+                            //if (!question.access && preview) {
+                                //question.access=user.username;
+                            //}
                             if (questionsFullMap.hasOwnProperty(question._id) && questionsFullMap[question._id].successRate) {
                                 question.successRate=questionsFullMap[question._id].successRate;
                             } else {
                                 question.successRate=Math.random()/100;
                             }
+                            question.isPreview=false;
+                                        
                             question.updated=new Date().getTime();
                             question.user=user._id;
                             question.userQuestion=true;
@@ -1249,9 +1249,9 @@ router.post('/publishusertopic', (req, res) => {
                                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                                 errors[key].push('question');
                             }
-                            if (question.tags.length === 0) {
+                            if (question.answer.length === 0) {
                                 if (!errors.hasOwnProperty(key)) errors[key]=[];
-                                errors[key].push('tags');
+                                errors[key].push('answer');
                             }
                             newQuestions.push(question);
                             
@@ -1260,30 +1260,55 @@ router.post('/publishusertopic', (req, res) => {
                         if (Object.keys(errors).length>0) {
                             res.send({errors:errors});
                         } else {
-                            if (!preview) userTopic.published = true;
-                            userTopic.questions = newQuestions;
+                            if (!preview) {
+                               userTopic.published = true;
+                               userTopic.questions = newQuestions; 
+                            }
                             // save questions
-                            promises.push(newQuestions.map(function(question,key) {
-                                db.collection('questions').save(question).then(function() {
-            //                        console.log(['saved q',question]);
-                                        db.collection('questions').remove({_id:{$in:Object.values(questionsMap)}}).then(function() {
-                                            
-                                        })
+                            // clear previous preview q
+                            ///
+                            //let deleteCriteria={$and:[{userTopic:{$eq:req.body._id}}]};
+                            //if (preview) {
+                            let    deleteCriteria={$and:[{userTopic:{$eq:req.body._id}},{isPreview:{$eq:true}}]};
+                            //}
+                            db.collection('questions').remove(deleteCriteria).then(function() {
+                                console.log('CLEANED UP PREVIEW QUESTIONS');
+                                promises.push(newQuestions.map(function(question,key) {
+                                    if (preview) {
+                                        question.quiz = "Preview "+question.quiz;
+                                        question._id=new ObjectId();
+                                        question.isPreview=true;
+                                        question.access=user.username;
+                                    }
+                                    db.collection('questions').save(question).then(function() {
+                                        console.log(['saved q',question]);
+                                            //if (preview) {
+                                                //db.collection('questions').remove({$and:[{userTopic:{$eq:req.body._id}},{isPreview:true}]});  
+                                            //} else {
+                                                                                          
+                                               //// db.collection('questions').remove({_id:{$in:Object.values(questionsMap)}});
+                                            //}
+                                    }).catch(function(e) {
+                                        console.log(['failed saved q',e]);
+                                    });
+                                }));
+                                 
+                                Promise.all(promises).then(function() {
+                                    updateTags(tags);
+                                });  
+                                // save usertopic
+                                db.collection('userTopics').save(userTopic).then(function(result) {
+                                    console.log(['saved r',result]);
                                 }).catch(function(e) {
-                                    console.log(['failed saved q',e]);
+                                    console.log(['failed saved r',e]);
                                 });
-                            }));
-                             
-                            Promise.all(promises).then(function() {
-                                updateTags(tags);
-                            }); 
-                            // save usertopic
-                            db.collection('userTopics').save(userTopic).then(function(result) {
-                                console.log(['saved r',result]);
-                            }).catch(function(e) {
-                                console.log(['failed saved r',e]);
+                                //if (preview) {
+                                    //res.send({});
+                                //} else {
+                                    res.send(userTopic);
+                                //}
+                                
                             });
-                            res.send(userTopic);
                         }
                     }
                      

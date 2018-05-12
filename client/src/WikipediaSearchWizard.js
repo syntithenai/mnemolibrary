@@ -110,12 +110,9 @@ export default  class WikipediaSearchWizard extends React.Component {
                 let link=result.link+'?printable=yes'
                 return (
                     <div key={key}>
-                    <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.deleteResult(key)} >Delete</button>
-
                     <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.props.addResultToQuestions(result)} >Create Question</button>
                     
-                    <button  className='btn btn-info' style={{float:'right'}} onClick={() => this.search(result.title)} >Search</button>
-
+                    
                     {key!==this.state.currentResult && <button  className='btn btn-info' style={{float:'right'}}  ref={key} onClick={() => this.expandResult(key)} >Expand</button>}
                     {key===this.state.currentResult && <button  className='btn btn-info' style={{float:'right'}}  ref={key} onClick={() => this.closeResult()} >Close</button>}
                     
@@ -148,6 +145,9 @@ export default  class WikipediaSearchWizard extends React.Component {
 		)
 	}
 }
+//<button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.deleteResult(key)} >Delete</button>
+
+                    //<button  className='btn btn-info' style={{float:'right'}} onClick={() => this.search(result.title)} >Search</button>
 
   //<span className="input-group-btn">
 							//<button type="submit" className="btn btn-info">

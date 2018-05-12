@@ -17,7 +17,6 @@ export default class TopicsList extends Component {
             topics:[]
         };
         this.loadTopics = this.loadTopics.bind(this);
-        this.deleteTopic = this.deleteTopic.bind(this);
     };
     
     componentDidMount() {
@@ -44,32 +43,13 @@ export default class TopicsList extends Component {
         });
     }; 
     
-    deleteTopic(key) {
-        this.props.deleteTopic(key).then(this.loadTopics);
-        
-    };
-    
-    askDeleteTopic(key) {
-        confirmAlert({
-          title: 'Delete Topic',
-          message: 'Are you sure you want to delete this topic and all associated questions?',
-          buttons: [
-            {
-              label: 'Yes',
-              onClick: () => this.deleteTopic(key)
-            },
-            {
-              label: 'No'
-            }
-          ]
-        })
-    };
+
     
     render() {
         let list='';
         if (this.state.topics && this.state.topics.length > 0) {
             list = this.state.topics.map((topic,key) => {
-                     return <div className='list-group-item' key={key} ><button  className='btn btn-danger'  onClick={() => this.askDeleteTopic(topic._id)} style={{float:'right'}} ><Trash size={28}/>&nbsp;<span className="d-none d-sm-inline" >Delete</span> </button><button  className='btn btn-info'  onClick={() => this.props.loadTopic(topic._id)} style={{float:'right'}} ><Edit size={28}/>&nbsp;<span className="d-none d-sm-inline" >Edit</span> </button>{topic.topic}</div>
+                     return <div onClick={() => this.props.loadTopic(topic._id)}  className='list-group-item' key={key} >{topic.topic}</div>
                 });
         } else {
             list = <div></div>

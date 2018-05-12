@@ -9,6 +9,13 @@ const ReactTags = require('react-tag-autocomplete')
 import ReactS3Uploader  from 'react-s3-uploader';
 import "video-react/dist/video-react.css"; // import css
 import { Player } from 'video-react';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+import Trash from 'react-icons/lib/fa/trash';
+import Plus from 'react-icons/lib/fa/plus';
+import WikipediaW from 'react-icons/lib/fa/wikipedia-w';
+import Google from 'react-icons/lib/fa/google';
+import Camera from 'react-icons/lib/fa/camera';
 
 export default class QuestionEditor extends Component {
     constructor(props) {
@@ -49,6 +56,8 @@ export default class QuestionEditor extends Component {
         this.changeImage = this.changeImage.bind(this);
         this.onImageProgress = this.onImageProgress.bind(this);
         this.onMediaProgress = this.onMediaProgress.bind(this);
+        this.deleteQuestion=this.deleteQuestion.bind(this);
+    
     };
     
     componentDidMount() {
@@ -201,6 +210,23 @@ export default class QuestionEditor extends Component {
         this.props.updateQuestion(state);
         return true;
     };
+        
+    deleteQuestion(key) {
+        confirmAlert({
+          title: 'Delete Question',
+          message: 'Are you sure?',
+          buttons: [
+            {
+              label: 'Yes',
+              onClick: () => this.props.deleteQuestion(key)
+            },
+            {
+              label: 'No'
+            }
+          ]
+        })
+            
+    };
     
     
     render() {
@@ -215,9 +241,13 @@ export default class QuestionEditor extends Component {
                 <div className="questionform card">
                     <div className="" >
                         <div className='warning-message'>{this.state.warning_message}</div>
-                            
-                            
-                        <div className='form-inline'>
+                        {<button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.deleteQuestion(this.props.currentQuestion)} ><Trash size={28}/>&nbsp;<span className="d-none d-sm-inline" >Delete</span> </button>}
+                        <button  className='btn btn-success' style={{float:'right'}} onClick={this.props.createQuestion} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >New Question</span></button>
+                         <button  className='btn btn-info' style={{float:'right'}}  onClick={()=>this.props.showSearch(this.props.question.question)} > <WikipediaW size={28} /><span className="d-none d-sm-inline" >Wikipedia</span></button>  
+                         <a  style={{float:'right'}}  href={'https://www.google.com.au/search?q='+this.props.question.question} target="_new"  className='btn btn-info'   ><Google size={28} /><span className="d-none d-sm-inline" >Google</span></a>
+                         { String(this.props._id).length > 0 && this.props.questions.length >0 && <button  className='btn btn-warning'  style={{float:'right'}}  onClick={() => this.props.previewTopic(this.props._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
+                              
+                        <br/><br/><div className='form-inline'>
                             <label htmlFor="interrogative">Interrogative </label>
                             <Autocomplete
                               getItemValue={(item) => item.label}
@@ -246,14 +276,16 @@ export default class QuestionEditor extends Component {
                            <label htmlFor="mnemonic" >*&nbsp;Mnemonic </label><textarea autoComplete="false" id="mnemonic" type='text' name='mnemonic' onChange={this.change} value={this.props.question.mnemonic} className='form-control'></textarea>
                             <br/>
                         </div>
-                        
+                        <div className='form-group'>    
+                            <label htmlFor="answer" >* Answer </label><textarea autoComplete="false" id="answer" type='text' name='answer' onChange={this.change} value={this.props.question.answer} className='form-control' ></textarea>
+                        </div>
                         <div className='form-inline'>    
                           
                              <label htmlFor="technique" >Technique</label><select autoComplete="false" id="technique" type='text' name='technique' onChange={this.change} value={this.props.question.technique} className='col-5 form-control' ><option/>{techniques}</select>
                         </div>
                         
                         <div className='form-group'>    
-                            <label htmlFor="tags" >Tags (press tab to add a tag)</label>
+                            <label htmlFor="tags" >Tags (press tab to create a tag)</label>
                             <ReactTags
                             autoresize={false} 
                             tags={this.state.tags}
@@ -271,9 +303,7 @@ export default class QuestionEditor extends Component {
                                 <label htmlFor="link" >Link </label><input autoComplete="false" id="link" type='text' name='link' onChange={this.change} value={this.props.question.link}  className='form-control' />
                         </div>
                         
-                        <div className='form-group'>    
-                            <label htmlFor="answer" >Answer </label><textarea autoComplete="false" id="answer" type='text' name='answer' onChange={this.change} value={this.props.question.answer} className='form-control' ></textarea>
-                        </div>
+                        
                         
                         <div className='form-group'>  
                                 
