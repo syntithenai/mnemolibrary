@@ -848,8 +848,45 @@ export default class AppLayout extends Component {
   };
   
   setQuizFromQuestion(question) {
-      console.log(['SQFQ',question,question._id]);
-      this.setQuizFromTopic(question.quiz,question._id)
+      let selectedQuestion=question._id;
+      console.log(['set quiz from question',topic,selectedQuestion]);
+      let topic = question.quiz;
+      let that = this;
+      //this.setState({'currentQuiz':'1,2,3,4,5'});
+      // load initial questions
+      let url='/api/questions?topic='+topic ;
+      if (this.state.user) {
+          url=url+'&user='+this.state.user.username;
+      }
+      fetch(url)
+      .then(function(response) {
+      //  console.log(['got response', response])
+        return response.json()
+      }).then(function(json) {
+        console.log(['create indexes', json])
+        let currentQuiz = [];
+        let indexedQuestions= {};
+        let currentQuestion=0;
+        let j=0;
+        for (var questionKey in json['questions']) {
+            const question = json['questions'][questionKey]
+            var id = question._id;
+            console.log(['check ID match',j,id, selectedQuestion ])
+            if (selectedQuestion && selectedQuestion===id) {
+                currentQuestion=j;
+                console.log(['ID match',selectedQuestion, j])
+            }
+            currentQuiz.push(id);
+            indexedQuestions[id]=questionKey;
+            j++;
+        }
+        console.log(['currentQuiz',currentQuestion,currentQuiz]);
+        that.analyticsEvent('discover topic')
+        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+        //console.log(['set state done', that.state])
+      }).catch(function(ex) {
+        console.log(['parsing failed', ex])
+      })
   };
   
   setQuizFromTopic(topic,selectedQuestion) {
@@ -874,7 +911,7 @@ export default class AppLayout extends Component {
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
             var id = question._id;
-            console.log(['check ID match',id, selectedQuestion ])
+            console.log(['check ID match',j,id, selectedQuestion ])
             if (selectedQuestion && selectedQuestion===j) {
                 currentQuestion=j;
                 console.log(['ID match',selectedQuestion, j])

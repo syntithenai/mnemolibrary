@@ -22,6 +22,8 @@ import Question from 'react-icons/lib/fa/question';
 
 import Trash from 'react-icons/lib/fa/trash';
 
+import ShareAlt from 'react-icons/lib/fa/share-alt';
+import ShareTopicDialog from './ShareTopicDialog';
 
  
 export default class TopicEditor extends Component {
@@ -37,7 +39,8 @@ export default class TopicEditor extends Component {
             currentResult:null,
             currentView:'topics',
             showHelp: false,
-            validationErrors:{}
+            validationErrors:{},
+            shareQuestion:{}
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.setTopicEvent = this.setTopicEvent.bind(this);
@@ -57,7 +60,9 @@ export default class TopicEditor extends Component {
         this.deleteTopic = this.deleteTopic.bind(this);
         this.askDeleteTopic = this.askDeleteTopic.bind(this);
         this.previewTopic = this.previewTopic.bind(this);
-        
+        this.updateResultToQuestion = this.updateResultToQuestion.bind(this);
+        this.moveQuestion = this.moveQuestion.bind(this);
+        this.shareQuestion = this.shareQuestion.bind(this);
     };
     
     componentDidMount() {
@@ -71,6 +76,10 @@ export default class TopicEditor extends Component {
         //e.preventDefault();
        // console.log('SAVE TOPIC');
         return false;
+    };
+    
+    shareQuestion(question) {
+        this.setState({shareQuestion:question});
     };
     
     setTopicEvent(e) {
@@ -104,7 +113,36 @@ export default class TopicEditor extends Component {
         this.setState({questions:questions,currentQuestion:questions.length-1,validationErrors:{},message:' '});
         this.saveTopic();
     };    
+    
+    
+    moveQuestion(index, delta) {
+      let array = this.state.questions;
+      var newIndex = index + delta;
+      if (newIndex < 0  || newIndex == array.length) return; //Already at the top or bottom.
+      var indexes = [index, newIndex].sort(); //Sort the indixes
+      array.splice(indexes[0], 2, array[indexes[1]], array[indexes[0]]); //Replace from lowest index, two elements, reverting the order
+        this.setState({questions:array});
+        this.saveTopic();
+    };
         
+   
+        
+
+   updateResultToQuestion(result) {
+       console.log(['upateres',result,this.state.currentQuestion]);
+       if (this.state.currentQuestion && this.state.questions.hasOwnProperty(this.state.currentQuestion)) {
+            let question =  this.state.questions[this.state.currentQuestion];
+            question.link = result.link;
+            question.answer = question.answer  + "\n\n" + result.description;
+            let questions = this.state.questions;
+            questions[this.state.currentQuestion] = question;
+            this.setState({questions:questions,validationErrors:{},message:' '});
+            this.saveTopic();
+            this.editQuestion(this.state.currentQuestion);
+       }
+       
+    }; 
+
     newTopic() {
         this.setState({
             _id:'',
@@ -235,8 +273,12 @@ export default class TopicEditor extends Component {
             if (publishResponse.errors) {
                 that.setState({validationErrors:publishResponse.errors,currentView:'questions',message:'Cannot preview yet because some of your questions are missing required information.'});
             } else {
-
-                that.props.setQuizFromTopic('Preview '+that.props.user.avatar+'\'s '+publishResponse.topic,that.state.currentQuestion);
+                console.log(['PUB RESP',publishResponse,that.state.currentQuestion]);
+                let previewQuestion = that.state.currentQuestion;
+                //if (publishResponse.questions && publishResponse.questions.length > that.state.currentQuestion && publishResponse.questions[that.state.currentQuestion] && publishResponse.questions[that.state.currentQuestion].hasOwnProperty('_id')) {
+                    //previewQuestion = publishResponse.questions[that.state.currentQuestion]._id;
+                //}
+                that.props.setQuizFromTopic('Preview '+that.props.user.avatar+'\'s '+publishResponse.topic,previewQuestion);
                 //let questions=0;
                 //if (publishResponse.questions) questions =publishResponse.questions.length;
                 //let message='Published '+questions+' questions.';
@@ -383,7 +425,10 @@ export default class TopicEditor extends Component {
        let question = this.state.questions.hasOwnProperty(this.state.currentQuestion) ? this.state.questions[this.state.currentQuestion] : {};
         return (
            <div id='topiceditor' className={this.state.topic}>
+                <ShareTopicDialog id="sharetopicdialog"  header="Share Topic"  question={question} shareQuestion={this.state.shareQuestion}/>
+                
                 <div id='topiceditorheader' className='row'>
+                    
                     <div className='col-12 col-lg-6'>
                         <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} ><ListAlt size={28}/>&nbsp;<span className="d-none d-sm-inline" >Topics</span></button>
                         {String(this.state._id).length > 0 && <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/>&nbsp;<span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions.length}</span></button>}
@@ -391,7 +436,7 @@ export default class TopicEditor extends Component {
                        
                     </div>
                     <div className='col-12  col-lg-6'>
-                    
+                           
                        
                             {String(this.state._id).length > 0 && <button  className='btn btn-danger'  onClick={() => this.askDeleteTopic(this.state._id)} style={{float:'right'}} ><Trash size={28}/>&nbsp;<span className="d-none d-sm-inline" >Delete Topic</span> </button>}
                             
@@ -400,12 +445,13 @@ export default class TopicEditor extends Component {
                              {String(this.state._id).length > 0 &&  this.state.questions.length >0 && !this.state.published && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Publish</span></button>}
                              {String(this.state._id).length > 0 && this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.unpublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Unpublish</span></button>}
                     </div>
-                    
+                </div>
+                <div className='row'>    
                     <div className='col-12'>
-                            <br/><br/>
+                            <br/><br/><br/><br/>
                            
                             {!this.state.showHelp &&  this.state.currentView==='search' &&
-                                <WikipediaSearchWizard topic={this.state.search}  addResultToQuestions={this.addResultToQuestions} />
+                                <WikipediaSearchWizard topic={this.state.search}  addResultToQuestions={this.addResultToQuestions} updateResultToQuestion={this.updateResultToQuestion}/>
                             }
                             {!this.state.showHelp && this.state.currentView==='topics' && 
                                 <TopicsList topicId={this.state._id} user={this.props.user._id} loadTopic={this.loadTopic} newTopic={this.newTopic} setTopic={this.setTopic} deleteTopic={this.deleteTopic} />
@@ -420,13 +466,12 @@ export default class TopicEditor extends Component {
                              
                                 {this.state.topic && <a href={'https://www.google.com.au/search?q='+this.state.topic} target="_new"  className='btn btn-info'   ><Google size={28} /><span className="d-none d-sm-inline" >Google</span></a>}
                              
-                                 { String(this.state._id).length > 0 && this.state.questions.length >0 && <button  className='btn btn-warning'  onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
+                                 {false && String(this.state._id).length > 0 && this.state.questions.length >0 && <button  className='btn btn-warning'  onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
                               
-                             
-                                <TopicQuestionsList validationErrors={this.state.validationErrors} editQuestion={this.editQuestion}  questions={this.state.questions} currentQuestion={this.state.currentQuestion} /></span>
+                                <TopicQuestionsList validationErrors={this.state.validationErrors} editQuestion={this.editQuestion}  questions={this.state.questions} moveQuestion={this.moveQuestion} currentQuestion={this.state.currentQuestion} /></span>
                             }
                             {!this.state.showHelp && this.state.currentView==='editor' &&
-                                <QuestionEditor showSearch={this.showSearch} previewTopic={this.previewTopic} createQuestion={this.createQuestion} deleteQuestion={this.deleteQuestion} updateQuestion={this.updateQuestion} mnemonic_techniques={this.props.mnemonic_techniques}  question={question} questions={this.state.questions} _id={this.state._id} currentQuestion={this.state.currentQuestion} />
+                                <QuestionEditor showSearch={this.showSearch} previewTopic={this.previewTopic} createQuestion={this.createQuestion} deleteQuestion={this.deleteQuestion} updateQuestion={this.updateQuestion} mnemonic_techniques={this.props.mnemonic_techniques}  question={question} questions={this.state.questions} _id={this.state._id} currentQuestion={this.state.currentQuestion} shareQuestion={this.shareQuestion} topic={this.state.topic} published={this.state.published}/>
                             }
                             {this.state.showHelp &&
                                 <div className="row">

@@ -7,6 +7,8 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import Edit from 'react-icons/lib/fa/edit';
 import Trash from 'react-icons/lib/fa/trash';
+import AngleUp from 'react-icons/lib/fa/angle-up';
+import AngleDown from 'react-icons/lib/fa/angle-down';
 
 export default class TopicQuestionsList extends Component {
     constructor(props) {
@@ -21,6 +23,21 @@ export default class TopicQuestionsList extends Component {
         
     }
 
+    moveDown(key,e) {
+        console.log(['down',key,e]);
+        this.props.moveQuestion(key,1);
+        e.preventDefault();
+        e.stopPropagation()
+        return false;
+    };
+
+    moveUp(key,e) {
+        console.log(['up',key,e]);
+        this.props.moveQuestion(key,-1);
+        e.preventDefault();
+        e.stopPropagation()
+        return false;
+    };
 
     
     render() {
@@ -31,7 +48,10 @@ export default class TopicQuestionsList extends Component {
                 if (this.props.validationErrors && this.props.validationErrors.hasOwnProperty(key) && this.props.validationErrors[key].length > 0) {
                     errors="Missing required information for "+this.props.validationErrors[key].join(" and ");
                 }
-                return <div className='list-group-item'  onClick={() => this.props.editQuestion(key)} key={key} ><span >{key+1}. {question.interrogative} {question.question} </span><div className="questionErrors">{errors}</div></div>
+                return <div className='list-group-item'  onClick={() => this.props.editQuestion(key)} key={key} >
+                <button className='btn btn-light'  onClick={(e) => this.moveUp(key,e)} ><AngleUp size={28} /></button>
+                <button className='btn btn-light'   onClick={(e) =>this.moveDown(key,e)} ><AngleDown size={28}  /></button>
+                &nbsp;&nbsp;<span >{key+1}. {question.interrogative} {question.question} </span><div className="questionErrors">{errors}</div></div>
             });
             return (
                 <div className='list-group' >

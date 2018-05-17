@@ -18,9 +18,10 @@ import ConnectDevelop from 'react-icons/lib/fa/connectdevelop';
 import Close from 'react-icons/lib/fa/close';
 //import Book from 'react-icons/lib/fa/book';
 import ShareAlt from 'react-icons/lib/fa/share-alt';
+import ShareDialog from './ShareDialog';
+
 import scrollToComponent from 'react-scroll-to-component';
 import MnemonicsList from './MnemonicsList';
-import ShareDialog from './ShareDialog';
 import Utils from './Utils';
 import ProblemReport from './ProblemReport';
 //import Swipe from 'react-swipe-component';
@@ -214,7 +215,7 @@ export default class SingleQuestion extends Component {
            return (
             <div className="questionwrap" >
             <ShareDialog id="sharedialog"  header={header}  question={question}/>
-             <ProblemReport user={this.props.user} question={this.props.question} />
+            <ProblemReport user={this.props.user} question={this.props.question} />
                                             
                 <div className="row buttons justify-content-between" >
                     <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} />&nbsp;</button>

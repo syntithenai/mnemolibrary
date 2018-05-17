@@ -575,7 +575,7 @@ router.get('/questions', (req, res) => {
             let topic = req.query.topic.trim(); //.toLowerCase(); 
             criteria.push({'quiz': {$eq:topic}});
           //  console.log(['topic search C    ',criteria]);
-            db.collection('questions').find({$and:criteria}).sort({question:1}).toArray(function(err, results) {
+            db.collection('questions').find({$and:criteria}).sort({sort:1}).toArray(function(err, results) {
               res.send({'questions':results});
             })
         // SEARCH BY tag
@@ -1207,6 +1207,7 @@ router.post('/publishusertopic', (req, res) => {
                         userTopic.questions.map(function(questionR,key) {
                             let question = JSON.parse(JSON.stringify(questionR));
           //                  console.log(['PUBLISH',question,key]);
+                            question.sort=key;
                             question.quiz=user.avatar+'\'s '+userTopic.topic;
                             if (question._id) {
                                 //delete questionsMap[question._id];

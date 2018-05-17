@@ -3,6 +3,8 @@ import React from "react";
 import 'whatwg-fetch'
 //import { findDOMNode } from ‘react-dom’;
 //import $ from ‘jquery’;
+import Plus from 'react-icons/lib/fa/plus';
+import Minus from 'react-icons/lib/fa/minus';
 
 export default  class WikipediaSearchWizard extends React.Component {
 	constructor(props) {
@@ -111,10 +113,11 @@ export default  class WikipediaSearchWizard extends React.Component {
                 return (
                     <div key={key}>
                     <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.props.addResultToQuestions(result)} >Create Question</button>
+                    {String(this.props.currentQuestion).length > 0 && <button  className='btn btn-info' style={{float:'right'}} onClick={() => this.props.updateResultToQuestion(result)} >Fill Question</button>}
+                        
                     
-                    
-                    {key!==this.state.currentResult && <button  className='btn btn-info' style={{float:'right'}}  ref={key} onClick={() => this.expandResult(key)} >Expand</button>}
-                    {key===this.state.currentResult && <button  className='btn btn-info' style={{float:'right'}}  ref={key} onClick={() => this.closeResult()} >Close</button>}
+                    {key!==this.state.currentResult && <button  className='btn btn-dark' style={{float:'right'}}  ref={key} onClick={() => this.expandResult(key)} ><Plus size={26} /></button>}
+                    {key===this.state.currentResult && <button  className='btn btn-dark' style={{float:'right'}}  ref={key} onClick={() => this.closeResult()} ><Minus size={26} /></button>}
                     
                     
                     <h3><a href={result.link} >{result.title}</a></h3>

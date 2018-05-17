@@ -5,6 +5,9 @@ body {
   padding-top: 8rem;
   padding-left: 1rem;
 }
+#sharetopicdialog {
+    z-index: 9999 !important;
+}
 .aboutpage div {
     padding-bottom: 1em;
 }
@@ -70,6 +73,7 @@ iframe#wikiiframe {
     background-color: white;
     min-height: 4em;
     width: 100%;
+    z-index:999;
 }
 #problemdialog {
     z-index:99999;

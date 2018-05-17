@@ -16,6 +16,7 @@ import Plus from 'react-icons/lib/fa/plus';
 import WikipediaW from 'react-icons/lib/fa/wikipedia-w';
 import Google from 'react-icons/lib/fa/google';
 import Camera from 'react-icons/lib/fa/camera';
+import ShareAlt from 'react-icons/lib/fa/share-alt';
 
 export default class QuestionEditor extends Component {
     constructor(props) {
@@ -245,7 +246,8 @@ export default class QuestionEditor extends Component {
                         <button  className='btn btn-success' style={{float:'right'}} onClick={this.props.createQuestion} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >New Question</span></button>
                          <button  className='btn btn-info' style={{float:'right'}}  onClick={()=>this.props.showSearch(this.props.question.question)} > <WikipediaW size={28} /><span className="d-none d-sm-inline" >Wikipedia</span></button>  
                          <a  style={{float:'right'}}  href={'https://www.google.com.au/search?q='+this.props.question.question} target="_new"  className='btn btn-info'   ><Google size={28} /><span className="d-none d-sm-inline" >Google</span></a>
-                         { String(this.props._id).length > 0 && this.props.questions.length >0 && <button  className='btn btn-warning'  style={{float:'right'}}  onClick={() => this.props.previewTopic(this.props._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
+                         { String(this.props._id).length > 0 && this.props.questions.length >0 && <button  className='btn btn-warning'  style={{float:'right'}}  onClick={() => this.props.previewTopic(this.props._id,this.props.currentQuestion)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
+                        {this.props.published===true && this.props.question.isPreview !==true &&  <button style={{float:'right'}}  data-toggle="modal" data-target="#sharetopicdialog" className='btn btn-primary' onClick={(e) => this.props.shareQuestion(this.props.question)}  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>}
                               
                         <br/><br/><div className='form-inline'>
                             <label htmlFor="interrogative">Interrogative </label>
