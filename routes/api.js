@@ -82,15 +82,22 @@ router.post('/import', (req, res) => {
                         // remove and restore id to allow update
                         let thePromise = null;
                         // convert to ObjectId or create new 
-                        if (json.questions[a].hasOwnProperty('_id')&& json.questions[a]._id.length > 0) {
-                            record._id = ObjectId(json.questions[a]._id);  
+                        if (json.questions[a].hasOwnProperty('_id')&& String(json.questions[a]._id).length > 0) {
+                            record._id = ObjectId(json.questions[a]._id); 
+                            if (record.question==="Le Verrier") {
+                                console.log(['USe ID',record._id]);
+                            } 
                         } else {
                              record._id = ObjectId();  
+                             console.log(['NEW ID',record._id]);
                         }
                         thePromise = new Promise(function(resolve,reject) {
+                            if (record.question==="Le Verrier") {
+                                console.log(['SAVE',record._id,record]);
+                            }
                             db.collection('questions').save(record).then(function(resy) {
                                 //console.log(['UPDATE']);
-                                let newRecord={_id:record._id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
+                                //let newRecord={_id:record._id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
                                 resolve(record._id);
                                 
                             }).catch(function(e) {
@@ -107,12 +114,11 @@ router.post('/import', (req, res) => {
                     //console.log(['del ids',ids]);
                     // delete all questions that are not in this updated set (except userTopic questions)
                     db.collection('questions').remove({$and:[{_id:{$nin:ids}},{userTopic:{$not:{$exists:true}}}]}).then(function(dresults) {
-                        console.log('DELETEd THESE');
-                        console.log(dresults.result);
+                       // console.log('DELETEd THESE');
+                       // console.log(ids);
                         // update tags
-                        console.log('UPDATE TAGS');
+                        //console.log('UPDATE TAGS');
                         //console.log(Object.keys(json.tags));
-                        
                         updateTags(json.tags);
                         // create indexes   
                         db.collection('questions').dropIndex();
@@ -1041,38 +1047,38 @@ router.get('/topics', (req, res) => {
 })
 
 function updateTags(tags) {
-    console.log(['UPDATETAGS']);
-    console.log(tags);
+    //console.log(['UPDATETAGS']);
+    //console.log(tags);
     Object.keys(tags).map(function(tag,key) {
-        console.log(['UPDATETAGS matching']);
+      //  console.log(['UPDATETAGS matching']);
         let criteria=[];
         criteria.push({'tags': {$in:[tag]}});
-        console.log(criteria);
+        //console.log(criteria);
         db.collection('questions').find({$and:criteria}).toArray().then(function(result) {
-                console.log(['UPDATETAGS found']);
-                console.log(result);
+                //console.log(['UPDATETAGS found']);
+                //console.log(result);
                 if (result.length > 0) {
-                    console.log('UPDATETAGS found questions');
+                    //console.log('UPDATETAGS found questions');
                     db.collection('words').findOne({text:{$eq:tag}}).then(function(word) {
-                        console.log('UPDATETAGS UPDATED WORD');
-                        console.log(word);
+                        //console.log('UPDATETAGS UPDATED WORD');
+                        //console.log(word);
                         if (word) {
-                            console.log('UPDATETAGS UPDATED');
+                            //console.log('UPDATETAGS UPDATED');
                             word.value=result.length;
                             db.collection('words').save(word).then(function(saveres) {
-                                    console.log('UPDATETAGS TAG');
+                              //      console.log('UPDATETAGS TAG');
                                     //console.log(saveres);
                             });                            
                         } else {
                             db.collection('words').save({'text':tag,value:result.length}).then(function(saveres) {
-                                    console.log('UPDATETAGS TAG NEW');
+                                //    console.log('UPDATETAGS TAG NEW');
                                    // console.log(saveres);
                             });                            
                         }
                     });
                 } else {
                     db.collection('words').remove({text:{$eq:tag}}).then(function(word) {
-                        console.log('UPDATETAGS REMOVED TAG');
+                        //console.log('UPDATETAGS REMOVED TAG');
                     });
                 }
          });

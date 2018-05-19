@@ -293,7 +293,7 @@ export default class TopicEditor extends Component {
     publishTopic(id) {
         let that=this;
         fetch("/api/publishusertopic", {
-          method: 'POST',
+        method: 'POST',
         headers: {
                 'Content-Type': 'application/json'
               },

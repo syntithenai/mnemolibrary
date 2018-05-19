@@ -105,6 +105,7 @@ export default  class WikipediaSearchWizard extends React.Component {
          let wikiResults = [];
          if (Array.isArray(this.state.lists) && this.state.lists.length===4) {
             // console.log(['render',this.state.lists]);
+            if (this.state.lists[1].length > 0) {
              wikiResults = this.state.lists[1].map((title,key) => {
                  //console.log(['renderi',title,key]);
                     
@@ -126,6 +127,10 @@ export default  class WikipediaSearchWizard extends React.Component {
                     </div>
                 )
             });
+                
+            } else {
+                wikiResults = (<div>No matching results</div>)
+            }
          }
 
 		return (

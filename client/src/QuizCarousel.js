@@ -51,9 +51,9 @@ export default class QuizCarousel extends Component {
       return (this.props.currentQuiz.length > 0 ? (this.props.currentQuestion/this.props.currentQuiz.length) : 0)*100 + '%';
   };
       
-  logStatus(status,question) {
+  logStatus(status,question,preview) {
      // console.log(['log status',status,question]);
-      if (this.props.user) {
+      if (this.props.user && !preview) {
           if (!question) question = this.props.questions[this.props.indexedQuestions[this.props.currentQuestion]]._id;
           let that = this;
            // central storage
@@ -110,20 +110,20 @@ export default class QuizCarousel extends Component {
             }
             //questions.success[id]=time;
             if (this.isQuizFinished()) {
-               this.logStatus('success',id);
+               this.logStatus('success',id,question.isPreview);
                this.finishQuiz(this.props.questions,this.state.success);
             }  else {
                 //questions.successTally[id] = questions.successTally.hasOwnProperty(id) ? questions.successTally[id] + 1 : 1;
                 this.setState({ 'success': success});
                 //console.log(['success',this.props.currentQuestion]);
                 this.props.setCurrentQuestion(parseInt(this.props.currentQuestion,10) + 1);
-                this.logStatus('success',id);
+                this.logStatus('success',id,question.isPreview);
             }
       } else if (response === "previous") {
           //if (!questions.seen.hasOwnProperty(id)) 
           //questions.seen[id] = time;
           //questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
-          this.logStatus('seen',id);
+          this.logStatus('seen',id,question.isPreview);
           let currentId =this.props.currentQuestion - 1;
           if (this.props.currentQuestion > 0 && this.props.currentQuiz.length > 0) {
               this.props.setCurrentQuestion(currentId);
@@ -133,7 +133,7 @@ export default class QuizCarousel extends Component {
           //if (!questions.seen.hasOwnProperty(id)) 
           //questions.seen[id] = time;
           //questions.seenTally[id] = questions.seenTally.hasOwnProperty(id) ? questions.seenTally[id] + 1 : 1;
-          this.logStatus('seen',id);
+          this.logStatus('seen',id,question.isPreview);
           if (this.props.currentQuiz.length > 0) {
             if (this.isQuizFinished()) {
               this.finishQuiz();

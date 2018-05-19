@@ -812,35 +812,49 @@ export default class AppLayout extends Component {
 
 
   setQuizFromQuestionId(questionId) {
-      //console.log(['SQFQid',questionId]);
+      console.log(['SQFQid',questionId]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
+      // load selected question
       fetch('/api/questions?question='+questionId )
       .then(function(response) {
         //console.log(['got response', response])
         return response.json()
-      }).then(function(json) {
-        //console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        let currentQuestion=0;
-        let j=0;
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-            if (questionId && questionId===id) {
-                currentQuestion=j;
-                console.log(['ID match',id, j])
-            }
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-            j++;
+      }).then(function(json1) {
+        let question=json1.questions[0];
+        console.log(['got response', json1])
+        if (question) {
+            // load questions in topic
+            fetch('/api/questions?topic='+question.quiz )
+            
+            .then(function(response) {
+                //console.log(['got response', response])
+                return response.json()
+            }).then(function(json) {
+               
+           
+                //console.log(['create indexes', json])
+                let currentQuiz = [];
+                let indexedQuestions= {};
+                let currentQuestion=0;
+                let j=0;
+                for (var questionKey in json['questions']) {
+                    const question = json['questions'][questionKey]
+                    var id = question._id;
+                    if (questionId && questionId===id) {
+                        currentQuestion=j;
+                        console.log(['ID match',id, j])
+                    }
+                    currentQuiz.push(id);
+                    indexedQuestions[id]=questionKey;
+                    j++;
+                }
+              //  console.log(currentQuiz);
+                that.analyticsEvent('discover question')
+                that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover'});
+                //console.log(['set state done', that.state])    
+            });
         }
-      //  console.log(currentQuiz);
-        that.analyticsEvent('discover question')
-        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover'});
-        //console.log(['set state done', that.state])
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })

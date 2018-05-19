@@ -35,9 +35,12 @@ export default class CreateHelp extends Component {
             <div className='list-group' >
                 
                 <div className='list-group-item' >
-                Question:  No question mark required. Enter (1) a question (eg 'Who was the Prime Minister of Australia in 1994', (2) a keyword (eg 'Darwin') with suitable entries above for interrogative (eg 'who is') and prefix (eg 'Charles'), OR (3) the title of the work in double quotation marks (eg “The Asian Century”) with ‘Can you explain:’ as the interrogative.
+                Question:  No question mark required. Enter (1) a question (eg 'Who was the Prime Minister of Australia in 1994', (2) a keyword (eg 'Darwin') with suitable entries above for interrogative (eg 'who is') and prefix (eg 'Charles')
                 </div>
+                
+            
                 <div className='list-group-item' >
+                
                 
                 Mnemonic: Square brackets for homonyms, round brackets for additional explanations: eg asinine: [I see none] (worth seeing); Choose ‘homonym’ if the mnemonic combines homonyms with other techniques.
                 </div>

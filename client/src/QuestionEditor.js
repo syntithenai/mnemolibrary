@@ -22,7 +22,7 @@ export default class QuestionEditor extends Component {
     constructor(props) {
         super(props);
         //let question = this.props.question ? this.props.question : {};
-        
+        this.questionInput = null;
         this.state={
             warning_message: '',
               tags: [
@@ -63,6 +63,11 @@ export default class QuestionEditor extends Component {
     
     componentDidMount() {
          let that = this;
+         if (this.questionInput) {
+            this.questionInput.focus()
+            this.questionInput.setSelectionRange(this.questionInput.value.length, this.questionInput.value.length) 
+         }
+            
          // set tags from question
          if (Array.isArray(this.props.question.tags)) {
              let tags=[];
@@ -192,6 +197,12 @@ export default class QuestionEditor extends Component {
         //this.setState({imageURL:"/api"+signResult.publicUrl})
     };
     
+    focusInput(component) {
+        if (component) {
+            React.findDOMNode(component).focus(); 
+        }
+    };
+    
     onMediaProgress(percent, message) {
         this.setState({'mediaProgress':percent});
         //console.log('Upload media progress: ' + percent + '% ' + message);
@@ -255,7 +266,6 @@ export default class QuestionEditor extends Component {
                               getItemValue={(item) => item.label}
                               items={[
                                 { label: ' ' },
-                                { label: 'Can you explain' },
                                 { label: 'What is' },
                                 { label: 'Who is' },
                               ]}
@@ -272,7 +282,7 @@ export default class QuestionEditor extends Component {
                          </div>
                         <div className='form-inline'>    
                            
-                            <label htmlFor="question" >*&nbsp;Question </label><input autoComplete="false" id="question" type='text' name='question' onChange={this.change} value={this.props.question.question} className='form-control' size="50"/>
+                            <label htmlFor="question" >*&nbsp;Question </label><input autoComplete="false" id="question" type='text' name='question' onChange={this.change} value={this.props.question.question} className='form-control' ref={(section) => { this.questionInput = section; }} size="50"/>
                         </div>
                         <div className='form-group'>    
                            <label htmlFor="mnemonic" >*&nbsp;Mnemonic </label><textarea autoComplete="false" id="mnemonic" type='text' name='mnemonic' onChange={this.change} value={this.props.question.mnemonic} className='form-control'></textarea>
@@ -301,6 +311,11 @@ export default class QuestionEditor extends Component {
                             />
                         </div>
                         
+                        <div className='form-group'>    
+                           <label htmlFor="attribution" >Source/Attribution </label><textarea autoComplete="false" id="attribution" type='text' name='attribution' onChange={this.change} value={this.props.question.attribution} className='form-control'></textarea>
+                            <br/>
+                        </div>
+
                         <div className='form-group'>     
                                 <label htmlFor="link" >Link </label><input autoComplete="false" id="link" type='text' name='link' onChange={this.change} value={this.props.question.link}  className='form-control' />
                         </div>
