@@ -13,18 +13,17 @@ MongoClient.connect(config.databaseConnection, (err, client) => {
   db = client.db(config.database) 
   // seed topicCollections
     db.collection('topicCollections').find().toArray().then(function(topicCollections) {
-            if (topicCollections!= null && topicCollections.length > 0) {
-                // OK
-                console.log('Topic collections exists');
-            } else {
-                console.log('Create Topic collections ');
-                db.collection ('topicCollections').insertMany(config.topicCollections);
-            }
-        }).catch(function(e) {
-            console.log('Error creating topic collections on init');
-            console.log(e);
-        });
-
+        if (topicCollections!= null && topicCollections.length > 0) {
+            // OK
+            console.log('Topic collections exists');
+        } else {
+            console.log('Create Topic collections ');
+            db.collection ('topicCollections').insertMany(config.topicCollections);
+        }
+    }).catch(function(e) {
+        console.log('Error creating topic collections on init');
+        console.log(e);
+    });
 })
 
 //arn:aws:s3:::mnemolibrary.com
@@ -41,6 +40,27 @@ router.use('/s3', require('react-s3-uploader/s3router')({
     uniquePrefix: false // (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
 }));
 
+
+router.get('/sitemap', (req, res) => {
+    var fs = require('fs');
+    ROOT_APP_PATH = fs.realpathSync('.'); console.log(ROOT_APP_PATH);
+    let criteria={access:{$eq:'public'}};
+    db.collection('questions').find(criteria).toArray().then(function(results) {
+         //console.log(['no user res',results ? results.length : 0]);  
+        let siteMap=[]; 
+        results.map(function(question,key) {
+             siteMap.push(config.protocol+'://'+config.host+'/?question='+question._id);
+        });  
+        fs.writeFile(ROOT_APP_PATH+"/client/public/sitemap.txt", siteMap.join("\n"), function(err) {
+            if(err) {
+                return console.log(err);
+            }
+            console.log("Wrote sitemap!");
+        }); 
+
+    })
+    
+});
 
 router.post('/reportproblem', (req, res) => {
     let content='Reported By ' + req.body.user.username + '<br/><br/>' + req.body.problem + '<br/><br/>Question: ' + JSON.stringify(req.body.question);
@@ -136,6 +156,11 @@ router.post('/import', (req, res) => {
                         //db.collection('words').createIndex({
                             //text: "text"                    
                         //}); 
+                        
+                        // sitemap
+                       
+
+                        
                         let unparsed = Papa.unparse(json.questions,{quotes: true});
                         res.send(unparsed);
                     });

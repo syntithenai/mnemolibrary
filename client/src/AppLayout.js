@@ -701,6 +701,7 @@ export default class AppLayout extends Component {
             var FileSaver = require('file-saver');
             var blob = new Blob([res], {type: "text/plain;charset=utf-8"});
             FileSaver.saveAs(blob, "questions.csv");
+            fetch('/api/sitemap');
         }).catch(function(err) {
             that.setState({'warning_message':'Not Saved'});
         });

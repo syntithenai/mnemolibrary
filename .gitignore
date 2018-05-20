@@ -4,7 +4,7 @@ package-lock.json
 node_modules
 # testing
 coverage
-
+client/public/sitemap.txt
 # production
 build
 
