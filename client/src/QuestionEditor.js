@@ -311,15 +311,12 @@ export default class QuestionEditor extends Component {
                             />
                         </div>
                         
-                        <div className='form-group'>    
-                           <label htmlFor="attribution" >Source/Attribution </label><textarea autoComplete="false" id="attribution" type='text' name='attribution' onChange={this.change} value={this.props.question.attribution} className='form-control'></textarea>
-                            <br/>
-                        </div>
-
                         <div className='form-group'>     
                                 <label htmlFor="link" >Link </label><input autoComplete="false" id="link" type='text' name='link' onChange={this.change} value={this.props.question.link}  className='form-control' />
                         </div>
-                        
+                        <div className='form-group'>     
+                                <label htmlFor="link" >Source/Attribution </label><input autoComplete="false" id="attribution" type='text' name='attribution' onChange={this.change} value={this.props.question.attribution}  className='form-control' />
+                        </div>
                         
                         
                         <div className='form-group'>  
@@ -342,7 +339,11 @@ export default class QuestionEditor extends Component {
                                 {this.props.question.image && !this.state.imageProgress &&  <img src={this.props.question.image} style={{width: 200}}/>}
                                 
                         </div>
-                        
+
+                        <div className='form-group'>     
+                                <label htmlFor="link" >Image Source/Attribution </label><input autoComplete="false" id="imageattribution" type='text' name='imageattribution' onChange={this.change} value={this.props.question.imageattribution}  className='form-control' />
+                        </div>
+                                                
                          <div className='form-group'>  
                                     <label htmlFor="link" >Media URL</label> <ReactS3Uploader
                                     signingUrl="/api/s3/sign"
@@ -368,6 +369,10 @@ export default class QuestionEditor extends Component {
                                     /></span> }
                                         
                         </div>
+                        
+                        <div className='form-group'>     
+                                <label htmlFor="link" >Media Source/Attribution </label><input autoComplete="false" id="mediaattribution" type='text' name='mediaattribution' onChange={this.change} value={this.props.question.mediaattribution}  className='form-control' />
+                        </div>                        
                         
                     </div>
                      

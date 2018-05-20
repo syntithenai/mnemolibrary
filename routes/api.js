@@ -519,7 +519,9 @@ router.get('/review', (req, res) => {
                     });
                     let orderedResults=[];
                     successAndDateOrderedIds.forEach(function(question) {
-                        orderedResults.push(questionIndex[question]);   
+                        if (questionIndex[question]) {
+                            orderedResults.push(questionIndex[question]);   
+                        }
                     });
                     //console.log(['q',err,orderedResults]);
                     //res.send({'currentQuestion':'0','currentQuiz':questionIds,'questions':results,indexedQuestions:indexedQuestions});

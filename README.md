@@ -30,8 +30,12 @@ Content Tech
 
 Content Kids
 
+# MONGO BACKUP/RESTORE TO S3
+https://gist.github.com/tokudu/1d2ecb7356aca631a984  
+https://gist.github.com/tokudu/e3424175e82488a077ca
 
-
+# AWS NOTIFICATION ON UPLOAD
+https://stackoverflow.com/questions/46670029/get-emails-whenever-a-file-is-uploaded-on-s3-bucket-using-serverless
 
 
 # LINKS

@@ -224,7 +224,7 @@ export default class SingleQuestion extends Component {
                     <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block"> Next</span></button>
                     {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block"> Recall</span></button>}
                     <div className='col-1'>&nbsp;</div>
-                    {<button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Bin</span></button>}
+                    {<button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Block</span></button>}
                     <div className="scrollbuttons col-sm-12" >
                              <button style={{float:'right'}} data-toggle="modal" data-target="#problemdialog" className='btn btn-primary'><ExclamationTriangle size={26} /><span className="d-none d-md-inline-block">&nbsp;Report Problem&nbsp;</span></button>
                     &nbsp;
@@ -256,7 +256,9 @@ export default class SingleQuestion extends Component {
                     <Swipeable onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')}   >  
                         <h4 className="card-title">{header}?</h4>
                         <div className="card-block">
-                        
+                            {(this.isVisible('media') ) && question.mediaattribution  && <div className="card-block mediaattribution">
+                            <div  className='card-text'><b>Media Attribution/Source</b> <span><pre>{question.mediaattribution}</pre></span></div>
+                        </div>}
                         <div ref={(section) => { this.scrollTo.media = section; }} ></div>
                         {((this.isVisible('media')) && question.media) && <span>
                             <Player
@@ -275,6 +277,10 @@ export default class SingleQuestion extends Component {
                         <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
                         {(this.isVisible('answer') || !showRecallButton) && question.answer && <div className="card-block answer">
                             <div  className='card-text'><b>Answer</b> <span><pre>{question.answer}</pre></span></div>
+                        </div>}
+                        
+                        {(this.isVisible('answer') || !showRecallButton) && question.attribution && <div className="card-block answer">
+                            <div  className='card-text'><b>Attribution/Source</b> <span><pre>{question.attribution}</pre></span></div>
                         </div>}
                         
                         <div ref={(section) => { this.scrollTo.tags = section; }} ></div>
@@ -303,10 +309,13 @@ export default class SingleQuestion extends Component {
                     <br/>
                     <div className="card-block">
                         <div ref={(section) => { this.scrollTo.moreinfo = section; }} ></div>
-                        {(this.isVisible('moreinfo') && !target) && <div className="holds-the-iframe"><iframe className='wikiiframe'  src={link} style={{width:"98%", height: "1200px", border: "0px"}}/></div> }
-                
+                        {(this.isVisible('moreinfo') && !target) && <div className="holds-the-iframe"><iframe className='wikiiframe'  src={link} style={{width:"98%", height: "1200px", border: "0px"}}/></div> }                
                     </div>
                     <div className="card-block">
+                        {(this.isVisible('image') || !showRecallButton) && question.imageattribution && <div className="card-block imageattribution">
+                            <div  className='card-text'><b>Image Attribution/Source</b> <span><pre>{question.imageattribution}</pre></span></div>
+                        </div>}
+
                         <div ref={(section) => { this.scrollTo.image = section; }} ></div>
                         {((this.isVisible('image') || !showRecallButton) && question.image) && <span><img  className="d-lg-none"   alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></span> }
                     </div>
