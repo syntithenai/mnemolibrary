@@ -60,7 +60,8 @@ export default class SingleQuestion extends Component {
       handleStateChange(state, prevState) {
         // copy player state to this component's state
         console.log(['statechange',state,prevState]);
-       
+        var {Platform} = React;
+
         if (state.ended && Platform.OS !== 'ios') {
             this.toggleMedia();
         }
