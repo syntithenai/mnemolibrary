@@ -60,8 +60,8 @@ export default class SingleQuestion extends Component {
       handleStateChange(state, prevState) {
         // copy player state to this component's state
         console.log(['statechange',state,prevState]);
-        
-        if (state.ended) {
+       
+        if (state.ended && Platform.OS !== 'ios') {
             this.toggleMedia();
         }
         if (state.videoHeight > 0) {
@@ -211,6 +211,28 @@ export default class SingleQuestion extends Component {
                       // (!this.isVisible('tags')) && 
             
             }
+            
+            var {Platform} = React;
+
+
+            let media='';
+            //if (Platform.OS === 'ios')
+              //return (
+                //media=<a href={question.media} target='_new' >Play</a>
+            //)
+            //else
+              //return (
+                media=<Player
+                              ref={this.setPlayerRef}
+                              playsInline
+                              autoPlay={true}
+                              src={question.media}
+                              height={this.state.playerHeight}
+                              width={this.state.playerWidth}
+                              fluid={false}
+                            />
+            //)
+            
                    
            return (
             <div className="questionwrap" >
@@ -261,15 +283,7 @@ export default class SingleQuestion extends Component {
                         </div>}
                         <div ref={(section) => { this.scrollTo.media = section; }} ></div>
                         {((this.isVisible('media')) && question.media) && <span>
-                            <Player
-                              ref={this.setPlayerRef}
-                              playsInline
-                              autoPlay={true}
-                              src={question.media}
-                              height={this.state.playerHeight}
-                              width={this.state.playerWidth}
-                              fluid={false}
-                            /></span> }
+                            {media}</span> }
                         </div>
                         
                        {(this.isVisible('mnemonic')|| !showRecallButton) &&<MnemonicsList isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
