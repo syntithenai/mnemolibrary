@@ -96,7 +96,7 @@ router.get('/sitemap', (req, res) => {
                             
                             setTimeout(function() {
                                 document.location='http://mnemolibrary.com?question={{id}}'
-                            },2000);
+                            },5000);
                             
                             </script>
                     </div>
