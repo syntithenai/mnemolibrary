@@ -128,7 +128,7 @@ router.get('/sitemap', (req, res) => {
         
         console.log(['queryids',req.query.ids]);
         results.map(function(question,key) {
-             siteMap.push(config.protocol+'://'+config.host+'/cache/question_'+question._id+'.html');
+             siteMap.push(config.protocol+'://'+config.host+'/cache/page_'+question._id+'.html');
              let page = mustache.render(questionTemplate,{id:question._id,header:question.interrogative + ' ' + question.question,answer:question.answer,mnemonic:question.mnemonic,attribution:question.attribution,quiz:question.quiz,tags:question.tags});
              if (req.query.ids) {
                  
