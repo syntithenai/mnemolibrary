@@ -1,12 +1,72 @@
-# Mnemos Library
+# Mnemos' Library
 
-Mnemos library is a web application that ties mnemonics to collections of questions to help you learn.
+Mnemos' Library is learning software based on mnemonics with flashcards, staged review and novel content creation tools integrating Wikipedia.
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
-It is deployed using Docker compose for a suite of containers running
-- mongodb
-- nodejs (with two server processes/ports - internal and public)
+Future goals include 
+- support for voice platforms including Google Home, Alexa, Snips and Mycroft.
+- using the ntlk/spacey frameworks to further enhance content creation and gain additional data to support gamification outcomes like crosswords.
+
+For a working example see https://mnemolibrary.com
+
+
+## Technology
+
+Mnemos' Library uses react for front end development, node.js (using create-react-app) for web services and MongoDB as a persistence layer.
+
+The library integrates an oauth server into it's web services to support login in anticipation of third party integration including voice platforms.
+
+The library relies on Amazon S3 for storage of uploaded media files and backups.
+
+
+## Quickstart
+The services are easily deployed using docker. An example docker-compose.yml is available in this repository.
+
+
+## Model
+
+The primary collections in the MongoDB store are questions and words(tags).
+
+To support tracking user progress there are
+- seen
+- successes
+- userquestionprogress
+
+Other collections include
+- users
+- oauth*
+- reportedproblems
+- userTopics for staging user created questions before publishing into the questions table
+- topicCollections for manual control of the Search page layout.
+
+
+The application supports import of questions from a Google spreadsheet. Administrators of the application can click the Import button to update questions from the spreadsheet. When complete a spreadsheet is downloaded that includes ids for any new questions. !!IT IS IMPORTANT TO COPY AND PASTE THE CONTENT OF THIS FILE BACK TO THE GOOGLE SHEET OR THE IDS OF THE NEW QUESTIONS WILL CHANGE AT EVERY IMPORT AFFECTING LINKING.
+
+
+
+
+
+
+
+## Backup
+
+A backup script is included in this repository that will create a backup and upload it to Amazon S3.
+
+The script needs to be run inside the MongoDB container so it has access to mongodump.
+
+```docker exec <containername>  
+
+## Links
+
+- crosswords
+
+https://github.com/jasonphillips/react-crossword-generator THIS ONE also no editing
+
+https://github.com/satchamo/Crossword-Generator - nice software but no editing
+
+
+
 - mongo-express for developers to manipulate the databse
 
 The login system is provided using an Open Auth server based on https://github.com/oauthjs/node-oauth2-server and the excellent v3 example https://github.com/slavab89/oauth2-server-example-mongodb for using mongodb as a back end.
@@ -19,6 +79,11 @@ The login system is provided using an Open Auth server based on https://github.c
 
 // to insteall npm packages on live sserver (when non starting)
 docker run -v /var/docker/mnemolibrary:/usr/src/app --entrypoint=/bin/bash -it syntithenai/nemo
+
+
+
+# crosswords JS
+https://github.com/richardrulach/js-xwords
 
 
 Content AI

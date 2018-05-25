@@ -5,6 +5,7 @@ var config = require("../config")
 const Papa = require('papaparse')
 var ObjectId = require('mongodb').ObjectID;
 const get = require('simple-get');
+const mustache = require('mustache');
 
 const MongoClient = require('mongodb').MongoClient
 let db;
@@ -41,15 +42,120 @@ router.use('/s3', require('react-s3-uploader/s3router')({
 }));
 
 
+
+
+
+
 router.get('/sitemap', (req, res) => {
     var fs = require('fs');
     ROOT_APP_PATH = fs.realpathSync('.'); console.log(ROOT_APP_PATH);
+    
+    var questionTemplate =  `
+            <html>
+                <head>
+                  <title>{{header}}? - Mnemos' Library</title>
+                  <meta charset="UTF-8">
+                  <meta name="description" content="{{mnemonic}}">
+                  <meta name="keywords" content="{{tags}}">
+                  <meta name="author" content="Captain Mnemo">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                </head>
+                <body>
+                    <div className="card question container" >
+                        <h1>Mnemos' Library Loading</h1>
+                            <div  style='float: right;' >
+                            <br/><br/><br/>
+                            <img src='../loading.gif' style="opacity: 0.1"/>
+                            
+                            </div>
+                            <h4 className="card-title">{{header}}?</h4>
+                            
+                            <div className="card-block answer">
+                                <div  className='card-text'><b>Answer</b> <span><pre>{{answer}}</pre></span></div>
+                            </div>
+                            <div className="card-block mnemonic">
+                                <div  className='card-text'><b>Mnemonic</b> <span><pre>{{mnemonic}}</pre></span></div>
+                            </div>
+                            <div className="card-block link">
+                                <a href={question.link} target='_new' >{{link}}</a>
+                            </div>
+                            <div className="card-block attribution">
+                                <div  className='card-text'><b>Attribution/Source</b> <span>{{attribution}}</span></div>
+                            </div>}
+                            
+                           <div className="card-block topic">
+                                <b>Topic&nbsp;&nbsp;&nbsp;</b> <span>{{quiz}}</span><br/>
+                            </div>
+                            
+                            <div   className="card-block tags" >
+                              <b>Tags&nbsp;&nbsp;&nbsp;</b>
+                               {{tags}}
+                            </div>
+                            
+                             <script>
+                            
+                            setTimeout(function() {
+                                document.location='http://mnemolibrary.com?question={{id}}'
+                            },2000);
+                            
+                            </script>
+                    </div>
+                </body>
+                </html>
+                `;
+                
+    //var deleteFolderRecursive = function(path) {
+      //if (fs.existsSync(path)) {
+        //fs.readdirSync(path).forEach(function(file, index){
+          //var curPath = path + "/" + file;
+          //if (fs.lstatSync(curPath).isDirectory()) { // recurse
+            //deleteFolderRecursive(curPath);
+          //} else { // delete file
+            //fs.unlinkSync(curPath);
+          //}
+        //});
+        //fs.rmdirSync(path);
+      //}
+    //};
     let criteria={access:{$eq:'public'}};
     db.collection('questions').find(criteria).toArray().then(function(results) {
          //console.log(['no user res',results ? results.length : 0]);  
         let siteMap=[]; 
+        //deleteFolderRecursive(ROOT_APP_PATH+"/client/public/cache");
+        if (!fs.existsSync(ROOT_APP_PATH+"/client/public/cache")) {
+            fs.mkdirSync(ROOT_APP_PATH+"/client/public/cache");
+        }
+        
+        console.log(['queryids',req.query.ids]);
         results.map(function(question,key) {
-             siteMap.push(config.protocol+'://'+config.host+'/?question='+question._id);
+             siteMap.push(config.protocol+'://'+config.host+'/question_'+question._id+'.html');
+             let page = mustache.render(questionTemplate,{id:question._id,header:question.interrogative + ' ' + question.question,answer:question.answer,mnemonic:question.mnemonic,attribution:question.attribution,quiz:question.quiz,tags:question.tags});
+             if (req.query.ids) {
+                 
+                let ids = req.query.ids.split(","); 
+                //console.log(ids);
+                if (ids.indexOf(String(question._id))!=-1) {
+                    console.log(['queryids match',question._id]);
+                    if (fs.existsSync(ROOT_APP_PATH+"/client/public/cache/page_"+question._id+'.html')) {
+                        fs.unlinkSync(ROOT_APP_PATH+"/client/public/cache/page_"+question._id+'.html');
+                    }
+                    fs.writeFileSync(ROOT_APP_PATH+"/client/public/cache/page_"+question._id+'.html', page, function(err) {
+                        if(err) {
+                            return console.log(err);
+                        }
+                    });                  
+                }
+             } else {
+                 if (fs.existsSync(ROOT_APP_PATH+"/client/public/cache/page_"+question._id+'.html')) {
+                        fs.unlinkSync(ROOT_APP_PATH+"/client/public/cache/page_"+question._id+'.html');
+                    }
+                
+                 fs.writeFile(ROOT_APP_PATH+"/client/public/cache/page_"+question._id+'.html', page, function(err) {
+                    if(err) {
+                        return console.log(err);
+                    }
+                });                  
+             }
         });  
         fs.writeFile(ROOT_APP_PATH+"/client/public/sitemap.txt", siteMap.join("\n"), function(err) {
             if(err) {
@@ -445,7 +551,7 @@ router.post('/discover', (req, res) => {
 router.get('/review', (req, res) => {
     //console.log('review');
     let limit=20;
-     let orderBy = (req.body.orderBy == 'successRate') ? 'successRate' : 'timeScore'
+     let orderBy = (req.query.orderBy == 'successRate') ? 'successRate' : 'timeScore'
      let orderMeBy = {};
      orderMeBy[orderBy] = 1;          
      let criteria=[];

@@ -12,6 +12,7 @@
     "npm": "^5.7.1",
     "popper": "^1.0.1",
     "popper.js": "^1.12.9",
+    "pug": "^2.0.3",
     "react": "^16.2.0",
     "react-adsense": "0.0.5",
     "react-d3-cloud": "^0.6.0",

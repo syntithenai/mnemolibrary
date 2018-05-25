@@ -310,7 +310,14 @@ export default class TopicEditor extends Component {
                 if (publishResponse.questions) questions =publishResponse.questions.length;
                 let message='Published '+questions+' questions.';
                 that.setState({published:true,validationErrors:{},message:message,_id:publishResponse._id,topic:publishResponse.topic,questions:publishResponse.questions});
-                fetch('/api/sitemap');
+                let questionIds=[];
+                publishResponse.questions.map(function(val,key) {
+                    questionIds.push(val._id);
+                });
+                setTimeout(function() {
+                    fetch('/api/sitemap?ids='+questionIds.join(","));
+                },2000);
+                
             }
             //console.log(['published topic',topic]);
             //res.send({user:user,token:token});
