@@ -81,7 +81,7 @@ router.get('/sitemap', (req, res) => {
                             </div>
                             <div className="card-block attribution">
                                 <div  className='card-text'><b>Attribution/Source</b> <span>{{attribution}}</span></div>
-                            </div>}
+                            </div>
                             
                            <div className="card-block topic">
                                 <b>Topic&nbsp;&nbsp;&nbsp;</b> <span>{{quiz}}</span><br/>
@@ -157,6 +157,10 @@ router.get('/sitemap', (req, res) => {
                 });                  
              }
         });  
+        if (fs.existsSync(ROOT_APP_PATH+"/client/public/sitemap.txt")) {
+            fs.unlinkSync(ROOT_APP_PATH+"/client/public/sitemap.txt");
+        }
+                   
         fs.writeFile(ROOT_APP_PATH+"/client/public/sitemap.txt", siteMap.join("\n"), function(err) {
             if(err) {
                 return console.log(err);
