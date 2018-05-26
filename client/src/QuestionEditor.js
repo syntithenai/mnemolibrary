@@ -225,7 +225,7 @@ export default class QuestionEditor extends Component {
         
     deleteQuestion(key) {
         confirmAlert({
-          title: 'Block Question',
+          title: 'Delete Question',
           message: 'Are you sure?',
           buttons: [
             {

@@ -110,7 +110,7 @@ export default class TopicEditor extends Component {
             }
         let questions = this.state.questions;
         questions.push(question);
-        this.setState({questions:questions,currentQuestion:questions.length-1,validationErrors:{},message:' '});
+        this.setState({questions:questions,currentQuestion:questions.length-1,validationErrors:{},message:' ',currentView:'editor'});
         this.saveTopic();
     };    
     
@@ -459,7 +459,7 @@ export default class TopicEditor extends Component {
                             <br/><br/><br/><br/>
                            
                             {!this.state.showHelp &&  this.state.currentView==='search' &&
-                                <WikipediaSearchWizard topic={this.state.search}  addResultToQuestions={this.addResultToQuestions} updateResultToQuestion={this.updateResultToQuestion}/>
+                                <WikipediaSearchWizard topic={this.state.search}  addResultToQuestions={this.addResultToQuestions} updateResultToQuestion={this.updateResultToQuestion} currentQuestion={this.state.currentQuestion} questions={this.state.questions} />
                             }
                             {!this.state.showHelp && this.state.currentView==='topics' && 
                                 <TopicsList topicId={this.state._id} user={this.props.user._id} loadTopic={this.loadTopic} newTopic={this.newTopic} setTopic={this.setTopic} deleteTopic={this.deleteTopic} />

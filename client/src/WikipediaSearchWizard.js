@@ -103,6 +103,14 @@ export default  class WikipediaSearchWizard extends React.Component {
 
 	render() {
          let wikiResults = [];
+         //let question='';
+         ////if (this.props.currentQuestion && this.props.questions[this.props.currentQuestion]) {
+            //question =  this.props.questions[this.props.currentQuestion];
+         ////s}
+         //console.log(['WS',question,this.props.currentQuestion,this.props.questions,this.props.questions[this.props.currentQuestion],question]);
+         //{String(question).length > 0 && <button  className='btn btn-info' style={{float:'right'}} onClick={() => this.props.updateResultToQuestion(result)} >Fill Question</button>}
+                    
+         
          if (Array.isArray(this.state.lists) && this.state.lists.length===4) {
             // console.log(['render',this.state.lists]);
             if (this.state.lists[1].length > 0) {
@@ -114,7 +122,6 @@ export default  class WikipediaSearchWizard extends React.Component {
                 return (
                     <div key={key}>
                     <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.props.addResultToQuestions(result)} >Create Question</button>
-                    {String(this.props.currentQuestion).length > 0 && <button  className='btn btn-info' style={{float:'right'}} onClick={() => this.props.updateResultToQuestion(result)} >Fill Question</button>}
                         
                     
                     {key!==this.state.currentResult && <button  className='btn btn-dark' style={{float:'right'}}  ref={key} onClick={() => this.expandResult(key)} ><Plus size={26} /></button>}
