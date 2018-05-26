@@ -225,7 +225,7 @@ export default class QuestionEditor extends Component {
         
     deleteQuestion(key) {
         confirmAlert({
-          title: 'Delete Question',
+          title: 'Block Question',
           message: 'Are you sure?',
           buttons: [
             {
@@ -320,7 +320,6 @@ export default class QuestionEditor extends Component {
                         
                         
                         <div className='form-group'>  
-                                
                                 <label htmlFor="link" >Image URL</label> <ReactS3Uploader
                                     signingUrl="/api/s3/sign"
                                     signingUrlMethod="GET"

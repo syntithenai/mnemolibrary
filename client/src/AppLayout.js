@@ -19,6 +19,7 @@ import SearchPage from './SearchPage';
 import QuizCarousel from './QuizCarousel';
 import Footer from './Footer';
 import FindQuestions from './FindQuestions';
+import CreateHelp from './CreateHelp';
 import FAQ from './FAQ';
 import ReactGA from 'react-ga';
 //import { BrowserRouter as Router, Route, Link } from "react-router-dom";
@@ -1044,6 +1045,8 @@ export default class AppLayout extends Component {
             {this.isCurrentPage('termsofuse') && <TermsOfUse  setCurrentPage={this.setCurrentPage} />
             }
             {this.isCurrentPage('faq') && <FAQ  setCurrentPage={this.setCurrentPage} />
+            }
+            {this.isCurrentPage('createhelp') && <CreateHelp  />
             }
             {showProfile && <ProfilePage isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
             }

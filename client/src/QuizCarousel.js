@@ -151,7 +151,7 @@ export default class QuizCarousel extends Component {
       //    console.log(['block',id]);
           if (id.length > 0) { 
               confirmAlert({
-                  title: 'Delete Question',
+                  title: 'Block Question',
                   message: 'Are you sure?',
                   buttons: [
                     {

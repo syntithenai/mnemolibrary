@@ -233,6 +233,35 @@ export default class SingleQuestion extends Component {
                               fluid={false}
                             />
             //)
+            let attribution=question.attribution;
+            if (attribution && attribution.indexOf('http')===0) {
+                let endAttribution=question.attribution.indexOf("/",9);
+                let shortAttribution=question.attribution.slice(0,endAttribution);
+                attribution=(<a href={question.attribution} >{shortAttribution}</a>)
+            }
+            let imageAttribution=question.imageattribution;
+            let imageLink=question.image
+            if (imageAttribution && imageAttribution.indexOf('http')===0) {
+                let endAttribution=question.imageattribution.indexOf("/",9);
+                let shortAttribution=question.imageattribution.slice(0,endAttribution);
+                imageAttribution=(<a href={question.imageattribution} >{shortAttribution}</a>)
+                imageLink=question.imageattribution
+            }
+            
+            let mediaAttribution=question.mediaattribution;
+            if (mediaAttribution && mediaAttribution.indexOf('http')===0) {
+                let endAttribution=mediaAttribution.indexOf("/",9);
+                let shortAttribution=mediaAttribution.slice(0,endAttribution);
+                attribution=(<a href={mediaAttribution} >{shortAttribution}</a>)
+            }
+
+
+
+            let shortLink = ""
+            if (question.link) {
+                let endDomain=question.link.indexOf("/",9);
+                shortLink = question.link.slice(0,endDomain);
+            }
             
                    
            return (
@@ -280,7 +309,7 @@ export default class SingleQuestion extends Component {
                         <h4 className="card-title">{header}?</h4>
                         <div className="card-block">
                             {(this.isVisible('media') ) && question.mediaattribution  && <div className="card-block mediaattribution">
-                            <div  className='card-text'><b>Media Attribution/Source</b> <span><pre>{question.mediaattribution}</pre></span></div>
+                            <div  className='card-text'><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
                         </div>}
                         <div ref={(section) => { this.scrollTo.media = section; }} ></div>
                         {((this.isVisible('media')) && question.media) && <span>
@@ -293,11 +322,11 @@ export default class SingleQuestion extends Component {
                         {(this.isVisible('answer') || !showRecallButton) && question.answer && <div className="card-block answer">
                             <div  className='card-text'><b>Answer</b> <span><pre>{question.answer}</pre></span></div>
                         </div>}
-                        {(this.isVisible('answer') || !showRecallButton) && question.link && <b>From <a href={question.link} target='_new' >{question.link}</a></b>}
+                        {(this.isVisible('answer') || !showRecallButton) && question.link && <b>From <a href={question.link} target='_new' >{shortLink}</a></b>}
                         <div ref={(section) => { this.scrollTo.moreinfo = section; }} ><br/></div>
                        
                         {(this.isVisible('answer') || !showRecallButton) && question.attribution && <div className="card-block answer">
-                            <div  className='card-text'><b>Attribution/Source</b> <span><pre>{question.attribution}</pre></span></div>
+                            <div  className='card-text'><b>Attribution/Source</b> <span>{attribution}</span></div>
                         </div>}
                         
                         <div ref={(section) => { this.scrollTo.tags = section; }} ></div>
@@ -330,11 +359,11 @@ export default class SingleQuestion extends Component {
                     
                     <div className="card-block">
                         {(this.isVisible('image') || !showRecallButton) && question.imageattribution && <div className="card-block imageattribution">
-                            <div  className='card-text'><b>Image Attribution/Source</b> <span><pre>{question.imageattribution}</pre></span></div>
+                            <div  className='card-text'><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div>
                         </div>}
 
                         <div ref={(section) => { this.scrollTo.image = section; }} ></div>
-                        {((this.isVisible('image') || !showRecallButton) && question.image) && <span><img  className="d-lg-none"   alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></span> }
+                        {((this.isVisible('image') || !showRecallButton) && question.image) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></a></span> }
                     </div>
 
                 </div>

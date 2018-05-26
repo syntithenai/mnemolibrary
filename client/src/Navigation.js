@@ -39,7 +39,7 @@ export default class Navigation extends Component {
     render() {
         return  (
         <div className="navbar-dark fixed-top bg-dark" >
-        <div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title} &nbsp;&nbsp;&nbsp;{!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('splash')} className='btn btn-outline btn-warning' style={{display:'inline'}}>
+        <div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title} &nbsp;&nbsp;&nbsp;{!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('splash')} href='#firstvideo' className='btn btn-outline btn-warning' style={{display:'inline'}}>
                    Tutorial
                   </a>}</div>
         
@@ -75,6 +75,10 @@ export default class Navigation extends Component {
               {this.props.isLoggedIn() && 
               <li className="nav-item">
                 <a className="nav-link"  href="#" onClick={() => this.props.setCurrentPage('create')}>Create</a>
+              </li>}
+              {!this.props.isLoggedIn() && 
+              <li className="nav-item">
+                <a className="nav-link"  href="#" onClick={() => this.props.setCurrentPage('createhelp')}>Create</a>
               </li>}
             
               <li className="nav-item">

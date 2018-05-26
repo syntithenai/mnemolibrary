@@ -63,9 +63,9 @@ router.get('/sitemap', (req, res) => {
                 <body>
                     <div className="card question container" >
                         <h1>Mnemos' Library Loading</h1>
-                            <div  style='float: right;' >
+                            <div  style='float: left;' >
                             <br/><br/><br/>
-                            <img src='../loading.gif' style="opacity: 0.1"/>
+                            <img src='../loading.gif' style="opacity: 0.2"/>
                             
                             </div>
                             <h4 className="card-title">{{header}}?</h4>
@@ -208,7 +208,7 @@ router.post('/import', (req, res) => {
                  //  console.log([a]); //,json[collection][a]]);
                     if (json.questions[a]) {
                         let record =  json.questions[a];
-                        record.successRate = Math.random()/100; // randomisation to get started
+                        if (!record.successRate) record.successRate = Math.random()/100; // randomisation to get started
                         // remove and restore id to allow update
                         let thePromise = null;
                         // convert to ObjectId or create new 

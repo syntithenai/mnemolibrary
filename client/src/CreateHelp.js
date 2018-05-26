@@ -5,6 +5,9 @@ export default class CreateHelp extends Component {
     render() {
         return (<div id='createhelp'>
         <div>Extracting key points of encyclopedic, news, or academic articles focuses your reading and we find that the challenge of making mnemonic puns and rhymes is fun and addictive. 
+        <br/><br/>
+        <b>To add your own questions&nbsp;<button className="btn btn-info" onClick={() => this.props.setCurrentPage('login')}    >Join The Library</button> </b>
+        <br/>
         </div>
         
         <iframe width="560" height="315" src="https://www.youtube.com/embed/NV5dbVpZFXE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
