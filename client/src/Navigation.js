@@ -48,7 +48,7 @@ export default class Navigation extends Component {
         <nav className="navbar navbar-expand-md" >
        <div className="navbar-brand" >
           
-          <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemos' Library" src="/mnemoicon.jpg" height="80%" data-toggle="collapse" data-target="#navbarCollapse" style={{clear:'right', width: '100px'}}/></a>
+          <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemos' Library" src="/mnemoicon.jpg" width='100px' data-toggle="collapse" data-target="#navbarCollapse" style={{clear:'right' }}/></a>
              
 
             {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='loginbutton btn btn-outline btn-warning' style={{verticalAlign: 'top',marginLeft: '1em'}}>
