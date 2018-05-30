@@ -39,7 +39,7 @@ export default class Navigation extends Component {
     render() {
         return  (
         <div className="navbar-dark fixed-top bg-dark" >
-        <div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title} &nbsp;&nbsp;&nbsp;{!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('splash')} href='#firstvideo' className='btn btn-outline btn-warning' style={{display:'inline'}}>
+        <div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title} &nbsp;&nbsp;&nbsp;{!this.props.isLoggedIn() && <a   onClick={() => this.props.setCurrentPage('splash')} href='#firstvideo' className='btn btn-outline btn-warning' style={{display:'inline'}}>
                    Tutorial
                   </a>}</div>
         
@@ -48,7 +48,7 @@ export default class Navigation extends Component {
         <nav className="navbar navbar-expand-md" >
        <div className="navbar-brand" >
           
-          <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemonikas" src="/mnemoicon.jpg" height="80%" data-toggle="collapse" data-target="#navbarCollapse" style={{clear:'right'}}/></a>
+          <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemos' Library" src="/mnemoicon.jpg" height="80%" data-toggle="collapse" data-target="#navbarCollapse" style={{clear:'right', width: '100px'}}/></a>
              
 
             {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='loginbutton btn btn-outline btn-warning' style={{verticalAlign: 'top',marginLeft: '1em'}}>
@@ -101,4 +101,4 @@ export default class Navigation extends Component {
     };
     
 }
-Navigation.pageTitles= {'splash':'Mnemo\'s Library', 'home':'Mnemo\'s Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','about':'About Mnemo','info':'Getting Started','login':'','intro':'Getting Started','termsofuse':'Terms of Use','faq':'Frequently Asked Questions'}
+Navigation.pageTitles= {'splash':'Mnemo\'s Library', 'home':'Mnemo\'s Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','createhelp':'Create','about':'About Mnemo','info':'Getting Started','login':'','intro':'Getting Started','termsofuse':'Terms of Use','faq':'Frequently Asked Questions'}
