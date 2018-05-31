@@ -48,7 +48,7 @@ export default class ReviewPage extends Component {
             },
             {
               label: 'Profile',
-              onClick: () => this.props.setCurrentPage('login')
+              onClick: () => this.props.setCurrentPage('profile')
             }
           ]
         })

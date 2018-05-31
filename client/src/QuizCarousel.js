@@ -203,7 +203,7 @@ export default class QuizCarousel extends Component {
                 },
                 {
                   label: 'Profile',
-                  onClick: () => this.props.setCurrentPage('login')
+                  onClick: () => this.props.setCurrentPage('profile')
                 }
               ]
             })
