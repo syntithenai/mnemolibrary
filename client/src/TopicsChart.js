@@ -33,12 +33,13 @@ export default class TopicsChart extends React.Component {
                     }
                     let completion=val.questions/val.total;
                     // completion approaches 1, successRate approaches 1 so divide by 2 to limit to 1
-                    let score=(((val.successRate)*(completion)*3) + (completion))/4
+                    //let score=(((val.successRate)*(completion)*3) + (completion))/4
+                    let score=(val.successRate + completion)/2
                     let color=getGreenToRed(score*100);
                    // console.log(['score',score,color,val.topic,val.questions,val.total,val.successRates]);
                     //+ ' (' + val.questions + '/' + val.total+')'
                     let point={"topic": val.topic,"id": val.topic ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color};
-                    if (point.successRate < 0.7) {
+                    if (point.score < 0.7) {
                         series.push(point);
                     }
                     
