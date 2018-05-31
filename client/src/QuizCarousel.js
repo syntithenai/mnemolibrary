@@ -51,7 +51,7 @@ export default class QuizCarousel extends Component {
       return (this.props.currentQuiz.length > 0 ? (this.props.currentQuestion/this.props.currentQuiz.length) : 0)*100 + '%';
   };
       
-  logStatus(status,question,preview) {
+  logStatus(status,question,preview,topic) {
      // console.log(['log status',status,question]);
       if (this.props.user && !preview) {
           if (!question) question = this.props.questions[this.props.indexedQuestions[this.props.currentQuestion]]._id;
@@ -62,16 +62,16 @@ export default class QuizCarousel extends Component {
               headers: {
                 'Content-Type': 'application/json'
               },
-              body: JSON.stringify({'user':this.props.user._id,'question':question})
+              body: JSON.stringify({'user':this.props.user._id,'question':question,topic:topic})
             }).catch(function(err) {
                 that.setState({'message':'Not Saved'});
             });
         }
   };    
 
-  banQuestion(questions,id,time) {
+  banQuestion(questions,id,time,topic) {
       questions.block[id] = time;
-       this.logStatus('block',id);
+       this.logStatus('block',id,false,topic);
        // quiz complete ?
           if (this.props.currentQuiz.length > 0) {
             if (this.isQuizFinished()) {
@@ -156,7 +156,7 @@ export default class QuizCarousel extends Component {
                   buttons: [
                     {
                       label: 'Yes',
-                      onClick: () => this.banQuestion(questions,id,time)
+                      onClick: () => this.banQuestion(questions,id,time,question.quiz)
                     },
                     {
                       label: 'No'

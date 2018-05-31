@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pie } from '@nivo/pie'
+import { ResponsivePie } from '@nivo/pie'
 
 export default class TopicsChart extends React.Component {
  
@@ -33,7 +33,7 @@ export default class TopicsChart extends React.Component {
                     }
                     let completion=val.questions/val.total;
                     // completion approaches 1, successRate approaches 1 so divide by 2 to limit to 1
-                    let score=(((val.successRate)*(completion)) + (2* completion))/3
+                    let score=(((val.successRate)*(completion)*3) + (completion))/4
                     let color=getGreenToRed(score*100);
                    // console.log(['score',score,color,val.topic,val.questions,val.total,val.successRates]);
                     //+ ' (' + val.questions + '/' + val.total+')'
@@ -80,20 +80,19 @@ export default class TopicsChart extends React.Component {
     render() {
         if (this.state.series && this.state.series.length > 0) {
             
-            return <div id="activetopics"  style={{width: '100%',height: '430px',zIndex:'9999'}}>
+            return <div id="activetopics"  style={{height: '280px',zIndex:'9999'}}>
                    <br/><br/>
                    <h4 className='graphTitle' id="topics" >Active Topics</h4>
                    <b>Click to continue a topic</b>
-                <Pie
+                <ResponsivePie
                 data={this.state.series}
-                height={420}
-                width={750}
                 margin={{
                     "top": 40,
                     "right": 80,
                     "bottom": 80,
                     "left": 80
                 }}
+                height={280}
                 innerRadius={0.5}
                 padAngle={0.7}
                 cornerRadius={3}

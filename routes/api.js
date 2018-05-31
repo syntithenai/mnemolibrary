@@ -40,7 +40,8 @@ router.get('/recenttopics', (req, res) => {
         let collatedTopics={};
         db.collection('userquestionprogress').aggregate([
             { $match: {
-                'user': req.query.user 
+                    'user': req.query.user 
+                
             }},
             { $group: {'_id': "$topic",
                 'questions': { $sum: 1 },
@@ -66,7 +67,7 @@ router.get('/recenttopics', (req, res) => {
                     topicCriteria={$or : topics};
                 }
                 let criteria={$and:[{access:{$eq:'public'}},topicCriteria]};
-                    
+                
                 db.collection('questions').aggregate([
                     { $match: criteria
                     },
@@ -81,6 +82,7 @@ router.get('/recenttopics', (req, res) => {
                     }
                     questionResult.toArray().then(function(questionFinal) {
                         questionFinal.map(function(val,key) {
+                            
                             collatedTopics[val.topic].total=val.questions;
                         });
                         
@@ -566,8 +568,13 @@ router.get('/review', (req, res) => {
      let orderMeBy = {};
      orderMeBy[orderBy] = 1;          
      let criteria=[];
-     if (req.query.band) {
-         criteria.push({successTally:{$eq:parseInt(req.query.band,10)}});
+     if (req.query.band && req.query.band.length > 0) {
+         if (parseInt(req.query.band,10) > 0) {
+             criteria.push({successTally:{$eq:parseInt(req.query.band,10)}});
+         } else {
+             criteria.push({$or:[{successTally:{$eq:0}},{successTally:{$exists:false}}]});
+         }
+         
      } 
      //else {
         criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
@@ -827,6 +834,7 @@ router.post('/block', (req, res) => {
             if (progress) {
                 // OK
                 progress.block = new Date().getTime();
+                progress.topic = req.body.topic;
                 db.collection('userquestionprogress').update({_id:progress._id},progress).then(function() {
           //          console.log(['set block time',progress]);
                     res.send({});
@@ -835,6 +843,7 @@ router.post('/block', (req, res) => {
             } else {
                   progress = {'user':user,question:req.body.question};
                   progress.block = new Date().getTime();
+                  progress.topic = req.body.topic;
                   db.collection('userquestionprogress').save(progress).then(function() {
           //          console.log(['set block time',progress]);
                     res.send({});
