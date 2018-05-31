@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import QuizList from './QuizList';
-import QuizCollection from './QuizCollection';
-import Utils from './Utils';
+import ReactDOM from 'react-dom';
+//import QuizList from './QuizList';
+//import QuizCollection from './QuizCollection';
+//import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
-import CreateHelp from './CreateHelp';
+//import CreateHelp from './CreateHelp';
 import Autocomplete from 'react-autocomplete';
 const ReactTags = require('react-tag-autocomplete')
 import ReactS3Uploader  from 'react-s3-uploader';
@@ -75,6 +76,7 @@ export default class QuestionEditor extends Component {
              this.props.question.tags.map(function(val,key) {
                  console.log(val,key);
                  tags.push({id:val,name:val});
+                 return null;
              });
              that.setState({tags:tags});
          }
@@ -86,6 +88,7 @@ export default class QuestionEditor extends Component {
               let suggestions=[];
               json.map(function(val,key) {
                   suggestions.push({id:val._id,name:val.text});
+                  return null;
               });
               //console.log(['SET TAGS', json])
             that.setState({'suggestions':suggestions});
@@ -101,6 +104,7 @@ export default class QuestionEditor extends Component {
         let cleanTags=[];
         tags.map(function(val,key) {
             cleanTags.push(val.name);
+            return null;
         });
         state.tags =  cleanTags;
         this.props.updateQuestion(state);
@@ -199,7 +203,7 @@ export default class QuestionEditor extends Component {
     
     focusInput(component) {
         if (component) {
-            React.findDOMNode(component).focus(); 
+            ReactDOM.findDOMNode(component).focus(); 
         }
     };
     
@@ -335,7 +339,7 @@ export default class QuestionEditor extends Component {
                                     onProgress={this.onImageProgress}
                                     /><input autoComplete="false" id="image" type='text' name='image' onChange={this.changeImage} value={this.props.question.image}  className='form-control' />
                                 {this.state.imageProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.imageProgress)+'%'}} >&nbsp;</div></div>}
-                                {this.props.question.image && !this.state.imageProgress &&  <img src={this.props.question.image} style={{width: 200}}/>}
+                                {this.props.question.image && !this.state.imageProgress &&  <img alt='progress' src={this.props.question.image} style={{width: 200}}/>}
                                 
                         </div>
 

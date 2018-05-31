@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import QuizList from './QuizList';
-import QuizCollection from './QuizCollection';
-import Utils from './Utils';
+//import QuizList from './QuizList';
+//import QuizCollection from './QuizCollection';
+//import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import Edit from 'react-icons/lib/fa/edit';
-import Trash from 'react-icons/lib/fa/trash';
+//import { confirmAlert } from 'react-confirm-alert'; // Import
+//import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+//import Edit from 'react-icons/lib/fa/edit';
+//import Trash from 'react-icons/lib/fa/trash';
 import Plus from 'react-icons/lib/fa/plus';
 
 

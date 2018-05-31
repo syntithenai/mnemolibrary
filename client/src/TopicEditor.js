@@ -22,7 +22,7 @@ import Question from 'react-icons/lib/fa/question';
 
 import Trash from 'react-icons/lib/fa/trash';
 
-import ShareAlt from 'react-icons/lib/fa/share-alt';
+//import ShareAlt from 'react-icons/lib/fa/share-alt';
 import ShareTopicDialog from './ShareTopicDialog';
 
  
@@ -118,7 +118,7 @@ export default class TopicEditor extends Component {
     moveQuestion(index, delta) {
       let array = this.state.questions;
       var newIndex = index + delta;
-      if (newIndex < 0  || newIndex == array.length) return; //Already at the top or bottom.
+      if (newIndex < 0  || newIndex === array.length) return; //Already at the top or bottom.
       var indexes = [index, newIndex].sort(); //Sort the indixes
       array.splice(indexes[0], 2, array[indexes[1]], array[indexes[0]]); //Replace from lowest index, two elements, reverting the order
         this.setState({questions:array});
@@ -313,6 +313,7 @@ export default class TopicEditor extends Component {
                 let questionIds=[];
                 publishResponse.questions.map(function(val,key) {
                     questionIds.push(val._id);
+                    return null;
                 });
                 setTimeout(function() {
                     fetch('/api/sitemap?ids='+questionIds.join(","));

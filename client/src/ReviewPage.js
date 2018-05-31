@@ -45,6 +45,10 @@ export default class ReviewPage extends Component {
             {
               label: 'Discover',
               onClick: () => this.props.setQuizFromDiscovery()
+            },
+            {
+              label: 'Profile',
+              onClick: () => this.props.setCurrentPage('login')
             }
           ]
         })

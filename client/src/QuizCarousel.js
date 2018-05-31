@@ -200,6 +200,10 @@ export default class QuizCarousel extends Component {
                 {
                   label: 'Continue',
                   onClick: () => this.discoverQuestions()
+                },
+                {
+                  label: 'Profile',
+                  onClick: () => this.props.setCurrentPage('login')
                 }
               ]
             })
@@ -239,7 +243,7 @@ export default class QuizCarousel extends Component {
     };
     
     render() {
-        let questions = this.props.currentQuiz;
+        //let questions = this.props.currentQuiz;
         //console.log(['RENDER CAROUS',questions]);
         //if (Array.isArray(questions) && questions.length > 0) {
             

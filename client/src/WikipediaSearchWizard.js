@@ -153,7 +153,7 @@ export default  class WikipediaSearchWizard extends React.Component {
 				<br/>
                 {wikiResults}
 				{this.state.showLoader && <div id="loader">
-					<img src="/loading.gif" width="70px"/>
+					<img alt='Loading' src="/loading.gif" width="70px"/>
 				</div>}
 
 			</div>

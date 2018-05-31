@@ -32,6 +32,159 @@ MongoClient.connect(config.databaseConnection, (err, client) => {
 //const database = require('../../oauth/database');
 
 
+
+    // 'successTally':{$lt : 4}}  // retire topics after all questions have successTally 4
+           
+router.get('/recenttopics', (req, res) => {
+    if (req.query.user && req.query.user.length > 0) {
+        let collatedTopics={};
+        db.collection('userquestionprogress').aggregate([
+            { $match: {
+                'user': req.query.user 
+            }},
+            { $group: {'_id': "$topic",
+                'questions': { $sum: 1 },
+                'topic': { $last: "$topic" },
+                'successRate': { $avg: "$successRate" },
+            }},
+            {$sort:{"successRate":1}}
+        ], function (err, result) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            result.toArray().then(function(final) {
+                let topics=[];
+                final.map(function(val,key) {
+                    collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate}
+                    if (val.topic) topics.push({quiz:{$eq:val.topic}});
+                });
+                console.log(['topics',topics]);
+                    //'quiz': {$in:[topics]} ,
+                let topicCriteria={}
+                if (topics.length > 0) {
+                    topicCriteria={$or : topics};
+                }
+                let criteria={$and:[{access:{$eq:'public'}},topicCriteria]};
+                    
+                db.collection('questions').aggregate([
+                    { $match: criteria
+                    },
+                    { $group: {'_id': "$quiz",
+                        'questions': { $sum: 1 },
+                        'topic': { '$last': "$quiz" },
+                    }}
+                ], function (qerr, questionResult) {
+                    if (qerr) {
+                        console.log(qerr);
+                        return;
+                    }
+                    questionResult.toArray().then(function(questionFinal) {
+                        questionFinal.map(function(val,key) {
+                            collatedTopics[val.topic].total=val.questions;
+                        });
+                        
+                        console.log(['aggq',collatedTopics]);
+                        res.send(Object.values(collatedTopics));
+                    });
+                })
+                
+                
+            });
+            
+        });
+    } else {
+        res.send({});
+    }
+})
+
+router.get('/usersuccessprogress', (req, res) => {
+    if (req.query.user && req.query.user.length > 0) {
+        db.collection('userquestionprogress').aggregate([
+            { $match: {'user': req.query.user}},
+            { $group: {'_id': "$successTally",
+                'questions': { $sum: 1 }}},
+            
+        ], function (err, result) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            result.toArray().then(function(final) {
+                res.send(final);
+            });
+            
+        });
+    } else {
+        res.send({});
+    }
+})
+
+//    month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, year: { $year: "$timestamp" } 
+                
+
+router.get('/useractivity', (req, res) => {
+    console.log('UA',req.query.user);
+    if (req.query.user && req.query.user.length > 0) {
+        db.collection('seen').aggregate([
+            { $match: {'user': req.query.user}},
+            { $project: {
+                    "timestamp": {
+                        "$add": [ new Date(0), "$timestamp" ]
+                    },
+                 } 
+            },
+            { $group: {
+                _id : {
+                   "year": { "$year": "$timestamp" },
+                   "month": { "$month": "$timestamp" },
+                   "day": { "$dayOfMonth": "$timestamp" },
+                },
+                'tally': { $sum: 1 }}
+            },
+            
+        ], function (err, result) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            result.toArray().then(function(seen) {
+                // now success
+                db.collection('successes').aggregate([
+                    { $match: {'user': req.query.user}},
+                    { $project: {
+                            "timestamp": {
+                                "$add": [ new Date(0), "$timestamp" ]
+                            },
+                         } 
+                    },
+                    { $group: {
+                        _id : {
+                           "year": { "$year": "$timestamp" },
+                           "month": { "$month": "$timestamp" },
+                           "day": { "$dayOfMonth": "$timestamp" },
+                        },
+                        'tally': { $sum: 1 }}
+                    },
+                    
+                ], function (err, successresult) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                successresult.toArray().then(function(success) {
+                    res.send({seen:seen,success:success});
+                });
+            });
+        });
+    })
+    } else {
+        
+    }
+})
+
+
+
 router.use('/s3', require('react-s3-uploader/s3router')({
     bucket: "mnemolibrary.com",
     region: 'us-west-2', //optional
@@ -53,7 +206,7 @@ router.get('/sitemap', (req, res) => {
     var questionTemplate =  `
             <html>
                 <head>
-                  <title>{{header}}? - Mnemos' Library</title>
+                  <title>{{header}}? - Mnemo's Library</title>
                   <meta charset="UTF-8">
                   <meta name="description" content="{{mnemonic}}">
                   <meta name="keywords" content="{{tags}},mnemonics,trivia,learn,dementia,brain">
@@ -62,7 +215,7 @@ router.get('/sitemap', (req, res) => {
                 </head>
                 <body>
                     <div className="card question container" >
-                        <h1>Mnemos' Library Loading</h1>
+                        <h1>Mnemo's Library Loading</h1>
                             <div  style='float: left;' >
                             <br/><br/><br/>
                             <img src='../loading.gif' style="opacity: 0.2"/>
@@ -96,7 +249,7 @@ router.get('/sitemap', (req, res) => {
                             
                             setTimeout(function() {
                                 document.location='http://mnemolibrary.com?question={{id}}'
-                            },1500);
+                            },2500);
                             
                             </script>
                     </div>
@@ -285,156 +438,6 @@ router.post('/import', (req, res) => {
                 
 });
 
-//router.post('/import', (req, res) => {
-  ////  console.log(['import']);
-    //let that = this;
-    //let url = config.masterSpreadsheet;
-    //// load mnemonics and collate tags, topics
-    //var request = get(url, function(err,response) {
-        //if (err) {
-            //console.log(['e',err]);
-            //return;
-        //}
-        //// clear and reimport topicCollections
-        
-        ////console.log(['response',response]);
-        //Papa.parse(response, {
-            //'header': true, 
-            //'complete': function(data) {
-                //// console.log(['parse',data]);
-                //const toImport = {'questions':data.data};
-                //let json = utils.createIndexes(toImport);
-                ////console.log(['parsed',data.errors,json]);
-                       
-                //for (collection in json) {
-                    ////console.log(['save collection',collection,Array.isArray(json[collection]),json[collection]]);
-                    //if (Array.isArray(json[collection])) {
-                        ////console.log(['IMPORT AS ARRAY '+collection ]);
-                        ////if (collection=="words") {
-                            ////console.log(json[collection]);
-                        ////}
-                       
-                      //// console.log(['STARTED UPDATES',promises,questionPromises]);
-                        //// cleanup 
-                            //// TODO warning problem here if ever loading multiple sheets
-                        //let b = function (collection) {
-                            //if (promises.length > 0) {
-                              ////  console.log('othr promises' + collection);
-                                //Promise.all(promises).then((dresults) => {
-                                    //let ids = [];
-                                    //dresults.forEach(function(result) {
-                                        //ids.push(result._id);
-                                    //});
-                                    
-                                 ////   console.log(['del ids',collection,ids]);
-                                    //db.collection(collection).find({_id:{$nin:ids}}).toArray().then(function(dresults) {
-                                      ////  console.log('DELETE THESE');
-                                       //// console.log(dresults);
-                                        //if (Array.isArray(dresults)) {
-                                            //dresults.forEach(function(toDelete) {
-                                                //db.collection(collection).deleteOne({_id:toDelete._id}).then(function(ok) {
-                                         ////           console.log('deleted');
-                                                //}).catch(function(e) {
-                                                    //console.log(['err',e ]);
-                                                //});
-                                            //});
-                                        //}
-                                    //});
-                                //});
-                            //}
-                        //}
-                        //b(collection);
-                        
-
-                        //// question promises - delete and download
-                        //if (questionPromises.length > 0) {
-                             //Promise.all(questionPromises)
-                              //.then((results) => {
-                          ////      console.log("All prom done", results);
-                                //let ids = [];
-                                //results.forEach(function(result) {
-                                    //ids.push(result._id);
-                                //});
-                                 //// cleanup 
-                                //// TODO warning problem here if ever loading multiple sheets
-                                ////db.collection(collection).find({$and:[{_id:{$nin:ids}},{userQuestion:{$ne:true}}]}).toArray().then(function(dresults) {
-                                    ////console.log('DELETE THESE');
-                                    ////console.log(dresults);
-                                    ////if (Array.isArray(dresults)) {
-                                        ////dresults.forEach(function(toDelete) {
-                                            ////db.collection(collection).deleteOne({_id:toDelete._id}).then(function(ok) {
-                                                ////console.log('deleted');
-                                            ////}).catch(function(e) {
-                                                ////console.log(['err',e ]);
-                                            ////});
-                                        ////});
-                                    ////}
-                                ////});
-
-                                
-                                ////res.set({"Content-Disposition":"attachment; filename=questions2.csv"});
-                                //let unparsed = Papa.unparse(results,{quotes: true});
-                                ////unparsed='sssss';
-                            ////    console.log('papa');
-                               //// console.log(csvQuestions);
-                              ////  console.log(unparsed);
-                                //res.send(unparsed);
-                              //})
-                              //.catch((e) => {
-                                  //console.log(e);
-                                  //// Handle errors here
-                              //});   
-                        //}
-                      
-
-                    
-                      
-                  
-                        
-                    //} else {
-                       //// console.log('IMPORT AS SINGLE'+collection);
-                        //db.collection(collection).update({_id:json[collection]._id},json[collection],{upsert:true}).then(function(res) {
-                                //if (res.result && res.result.upserted && Array.isArray(res.result.upserted) && res.result.upserted.length > 0) {
-                                ////    console.log(['done array update',res.result.upserted[0]._id]);
-                                    ////csvQuestions.push({_id:res.result.upserted[0]._id}.assign(json[collection]));
-                                    ////let data = json[collection];
-                                    ////data._id = res.result.upserted[0]._id;
-                                    ////let thePromise = new Promise((resolve) => {resolve(data)});
-                                    ////allPromises.push(thePromise);
-                                //}
-                                
-                            //}).catch(function(e) {
-                                //console.log(['obj update err',e]);
-                            //});;   
-                    //}
-                //}
-              ////  console.log('NOW CREATE INDEXES FOR QUESTIONS TEXT');
-                  
-                //db.collection('questions').dropIndex();
-                //db.collection('questions').createIndex({
-                    //question: "text",
-                    //prefix: "text",
-                    //postfix: "text",
-                    //interrogative: "text",
-                    //answer:"text",
-                    ////mnemonic: "text",
-                    ////answer: "text"
-                //});
-                
-               ////db.collection('tags').dropIndex();
-                ////db.collection('tags').createIndex({
-                    ////title: "text"                    
-                ////});  
-               
-               //db.collection('words').dropIndex();
-                //db.collection('words').createIndex({
-                    //text: "text"                    
-                //});   
-                ////res.send({'message':'Import complete'});
-            //}
-        //}) 
-    //})  
-//})
 router.get('/topiccollections', (req, res) => {
     db.collection('topicCollections').find({}).sort({sort:1}).toArray().then(function(collections) {
         db.collection('userTopics').find({published:{$eq:true}}).sort({updated:-1}).limit(10).toArray().then(function(userTopics) {
@@ -480,6 +483,10 @@ router.post('/discover', (req, res) => {
         criteria.push({$or:[{access:{$eq:req.body.user}},{access :{$eq:'public'}}]})
     } else {
         criteria.push({access :{$eq:'public'}});
+    }
+    if (req.body.topic) {
+        criteria.push({quiz:{$eq:req.body.topic}});
+        orderBy = 'sort';
     }
     criteria.push({discoverable :{$ne:'no'}});
     // question block
@@ -553,21 +560,27 @@ router.post('/discover', (req, res) => {
 })
 
 router.get('/review', (req, res) => {
-    //console.log('review');
+    console.log('review');
     let limit=20;
      let orderBy = (req.query.orderBy == 'successRate') ? 'successRate' : 'timeScore'
      let orderMeBy = {};
      orderMeBy[orderBy] = 1;          
      let criteria=[];
+     if (req.query.band) {
+         criteria.push({successTally:{$eq:parseInt(req.query.band,10)}});
+     } 
+     //else {
+        criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
+         let oneHourBack = new Date().getTime() - 1800000;
+         //criteria.push({seen:{$lt:oneHourBack}});   
+         criteria.push({$or:[{seen:{$lt:oneHourBack}},{successTally:{$not:{$gt:0}}}]});   
+         
+     //}
      criteria.push({user:req.query.user});
-     criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
-     let oneHourBack = new Date().getTime() - 1800000;
-     //criteria.push({seen:{$lt:oneHourBack}});   
-     criteria.push({$or:[{seen:{$lt:oneHourBack}},{successTally:{$not:{$gt:0}}}]});   
      //console.log({seen:{$lt:oneHourBack}});
      if (req.query.user && req.query.user.length > 0) {
          // sort by successTally and then most recently seen first
-      //   console.log(JSON.stringify(criteria));
+         console.log(JSON.stringify(criteria));
         db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(limit).toArray().then(function(questions) {
       //      console.log(questions);
             //let questions=[];
@@ -644,7 +657,7 @@ router.get('/review', (req, res) => {
  //               }
                 
                 
-                //console.log(['REVItEW',successAndDateOrderedIds]);
+                console.log(['REVItEW',successAndDateOrderedIds]);
                 db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).toArray(function(err,results) {
                    // console.log([err,results]);
                     let questionIndex={};
@@ -658,7 +671,7 @@ router.get('/review', (req, res) => {
                             orderedResults.push(questionIndex[question]);   
                         }
                     });
-                    //console.log(['q',err,orderedResults]);
+                    console.log(['q',err,orderedResults]);
                     //res.send({'currentQuestion':'0','currentQuiz':questionIds,'questions':results,indexedQuestions:indexedQuestions});
                     res.send({'questions':orderedResults});
                     //res.send({'questions':results});
@@ -846,7 +859,7 @@ function updateQuestionTallies(user,question,tallySuccess=false) {
                 db.collection('questions').update({_id: question},{$set:data}).then(function(qres) {
                    // console.log(['saved question',qres]);
                 });
-                updateUserQuestionProgress(user,question,tallySuccess);
+                updateUserQuestionProgress(user,question,result.quiz,tallySuccess);
             }
     }).catch(function(e) {
         console.log(['update q err',e]);
@@ -856,9 +869,10 @@ function updateQuestionTallies(user,question,tallySuccess=false) {
 }
 
 // update per user progress stats into the userquestionprogress collection
-function updateUserQuestionProgress(user,question,tallySuccess) {
+function updateUserQuestionProgress(user,question,quiz,tallySuccess) {
     db.collection('userquestionprogress').findOne({user:user,question:question}).then(function(progress) {
         if (!progress) progress = {user:user,question:question};
+        progress.topic=quiz;
         progress.seenTally = progress.seenTally ? parseInt(progress.seenTally,10) + 1 : 1;
         progress.seen = new Date().getTime();
         if (tallySuccess) {
@@ -914,18 +928,18 @@ router.post('/seen', (req, res) => {
       //  console.log(['seen ok']);
         let user = req.body.user;
         let question = req.body.question;
-        db.collection('seen').find({user:user,question:question}).toArray(function(err, result) {
-        //    console.log(['seen found',result]);
-            if (result.length > 0) {
-          //      console.log(['seen update']);
-                let ts = new Date().getTime();
-                db.collection('seen').update({_id:ObjectId(result[0]._id)},{$set:{timestamp: ts}}).then(function(updated) {
-                    updateQuestionTallies(user,question);    
-                                    res.send('updated');
-                }).catch(function(e) {
-                    res.send('error on update');
-                });
-            } else {
+        //db.collection('seen').find({user:user,question:question}).toArray(function(err, result) {
+        ////    console.log(['seen found',result]);
+            //if (result.length > 0) {
+          ////      console.log(['seen update']);
+                //let ts = new Date().getTime();
+                //db.collection('seen').update({_id:ObjectId(result[0]._id)},{$set:{timestamp: ts}}).then(function(updated) {
+                    //updateQuestionTallies(user,question);    
+                    //res.send('updated');
+                //}).catch(function(e) {
+                    //res.send('error on update');
+                //});
+            //} else {
                 // create a seen record
             //    console.log(['seen insert']);
                 let ts = new Date().getTime();
@@ -937,11 +951,11 @@ router.post('/seen', (req, res) => {
                 }).catch(function(e) {
                     res.send('error on insert');
                 });
-            }
+         //   }
            
             
             
-        });
+       // });
     } else {
         res.send({message:'Invalid request'});
     }
@@ -954,22 +968,22 @@ router.post('/success', (req, res) => {
         let user = req.body.user;
         let question = req.body.question;
       //  console.log(['success']);
-        db.collection('successes').findOne({user:user,question:question}).then(function(result) {
+       // db.collection('successes').findOne({user:user,question:question}).then(function(result) {
         //    console.log(['found success',result]);
-            if (result && result._id) {
-          //      console.log(['success update']);
-                let ts = new Date().getTime();
-                db.collection('successes').update({_id:ObjectId(result._id)},{$set:{timestamp: ts}}).then(function() {
-                    updateQuestionTallies(user,question,true);
-            //        console.log(['updated']);
-                    res.send('updated');
+            //if (result && result._id) {
+          ////      console.log(['success update']);
+                //let ts = new Date().getTime();
+                //db.collection('successes').update({_id:ObjectId(result._id)},{$set:{timestamp: ts}}).then(function() {
+                    //updateQuestionTallies(user,question,true);
+            ////        console.log(['updated']);
+                    //res.send('updated');
 
-                }).catch(function(e) {
-                    console.log(e);
-                    res.send('err on update');
-                });
+                //}).catch(function(e) {
+                    //console.log(e);
+                    //res.send('err on update');
+                //});
                 
-            } else {
+            //} else {
               //  console.log(['success insert']);
                 let ts = new Date().getTime();
                 db.collection('successes').insert({user:user,question:question,timestamp:ts}).then(function(inserted) {
@@ -979,11 +993,11 @@ router.post('/success', (req, res) => {
                     console.log(e);
                     res.send('err on insert');
                 });;
-            }
-        }).catch(function(e) {
-            console.log(e);
-            res.send('err on find');
-        });
+          //  }
+        //}).catch(function(e) {
+            //console.log(e);
+            //res.send('err on find');
+        //});
     } else {
         res.send({message:'Invalid request'});
     }

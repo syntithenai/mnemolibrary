@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
-import QuizList from './QuizList';
-import QuizCollection from './QuizCollection';
-import Utils from './Utils';
-//import FaClose from 'react-icons/lib/fa/close';
-import CreateHelp from './CreateHelp';
-import Autocomplete from 'react-autocomplete';
-
+//import CreateHelp from './CreateHelp';
+ 
 
 export default class ProblemReport extends Component {
     constructor(props) {

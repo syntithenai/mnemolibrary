@@ -198,7 +198,7 @@ export default class MnemonicsList extends Component {
                         return  <div className='row' key={mnemonicId} >
                            <div className='col-12' >
                             <hr/>
-                            {(this.props.isAdmin() || (this.props.user && this.props.user._id == mnemonic.user)) && mnemonic._id && mnemonic._id.length > 0 && <span>
+                            {(this.props.isAdmin() || (this.props.user && this.props.user._id === mnemonic.user)) && mnemonic._id && mnemonic._id.length > 0 && <span>
 
                                 <button style={{float:'right'}}   onClick={() => this.askDeleteSuggestion(mnemonic)} className='btn btn-danger'><Trash size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Delete&nbsp;</span></button>
                                 <button style={{float:'right'}} data-toggle="modal" data-target="#suggestdialog" onClick={() => this.editSuggestion(mnemonic)} className='btn btn-primary'><Edit size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Edit&nbsp;</span></button>
@@ -267,7 +267,7 @@ export default class MnemonicsList extends Component {
                     
                     <div className='row' >
                         <pre  className='mnemonic col-12 col-lg-8' >{this.state.mnemonics[this.state.defaultMnemonic].mnemonic}</pre>
-                         {this.state.defaultMnemonic !=="default" && (this.props.isAdmin() || this.props.user._id == selectedMnemonic.user) && selectedMnemonic._id && selectedMnemonic._id.length > 0 && <span>
+                         {this.state.defaultMnemonic !=="default" && (this.props.isAdmin() || this.props.user._id === selectedMnemonic.user) && selectedMnemonic._id && selectedMnemonic._id.length > 0 && <span>
 
                                 <button style={{float:'right'}}   onClick={() => this.askDeleteSuggestion(selectedMnemonic)} className='btn btn-danger'><Trash size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Delete&nbsp;</span></button>
                                 <button style={{float:'right'}} data-toggle="modal" data-target="#suggestdialog" onClick={() => this.editSuggestion(selectedMnemonic)} className='btn btn-primary'><Edit size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Edit&nbsp;</span></button>

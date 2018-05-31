@@ -30,15 +30,15 @@ export default class ShareDialog extends Component {
         // use the question link as the main link if available (so article images show on social network)
         // fallback to generated link back to nemo
         let shareLink=window.location.protocol+'//'+window.location.host+"/?question="+question._id;          
-        let mainLink=question.link ? question.link : shareLink;
+        //let mainLink=question.link ? question.link : shareLink;
         // where we haven't used the link as the main link, 
-        let otherLink=question.link ? shareLink : "";
-        let bothLinks = mainLink + "  \n\n" + otherLink;
+        //let otherLink=question.link ? shareLink : "";
+       // let bothLinks = mainLink + "  \n\n" + otherLink;
         
         
         let title="Mnemo's Library -"+(this.props.question.mnemonic ? this.props.question.mnemonic : '') + " - \n" + question.interrogative+ ' ' +question.question + '?';
         let longTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + '?' ;
-        let twitterTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + '?' + "\n" +question.link  ;
+        let twitterTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + "?\n" +question.link  ;
         
         
         //let allTogether = title + "  \n" + otherLink  + "  \n" + mainLink ;

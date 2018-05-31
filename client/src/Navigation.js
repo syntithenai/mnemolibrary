@@ -87,7 +87,7 @@ export default class Navigation extends Component {
               </li>
               <li className="nav-item">
                 
-                {this.props.isLoggedIn() && <a href='#' onClick={() => this.props.setCurrentPage('login')} className='nav-link'>
+                {this.props.isLoggedIn() && <a href='#' onClick={() => this.props.setCurrentPage('profile')} className='nav-link'>
                    Profile
                   </a>}
               </li>
@@ -101,4 +101,4 @@ export default class Navigation extends Component {
     };
     
 }
-Navigation.pageTitles= {'splash':'Mnemo\'s Library', 'home':'Mnemo\'s Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','createhelp':'Create','about':'About Mnemo','info':'Getting Started','login':'','intro':'Getting Started','termsofuse':'Terms of Use','faq':'Frequently Asked Questions'}
+Navigation.pageTitles= {'splash':'Mnemo\'s Library', 'home':'Mnemo\'s Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','createhelp':'Create','about':'About Mnemo','info':'Getting Started','login':'','profile':'Profile','intro':'Getting Started','termsofuse':'Terms of Use','faq':'Frequently Asked Questions'}

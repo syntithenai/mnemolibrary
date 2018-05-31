@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import QuizList from './QuizList';
 import QuizCollection from './QuizCollection';
-import Utils from './Utils';
+//import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
 
 export default class TopicsPage extends Component {

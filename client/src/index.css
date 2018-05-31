@@ -140,6 +140,20 @@ pre.mnemonicalternative {
 
 
 
+h4.graphTitle::before { 
+  display: block; 
+  content: " "; 
+  margin-top: -175px; 
+  height: 175px; 
+  visibility: hidden; 
+  pointer-events: none;
+}
+
+
+
+
+
+
 
 
 .react-tags {

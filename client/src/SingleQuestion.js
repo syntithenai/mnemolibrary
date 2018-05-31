@@ -66,7 +66,7 @@ export default class SingleQuestion extends Component {
             this.toggleMedia();
         }
         if (state.videoHeight > 0) {
-            if (this.state.playerHeight != state.videoHeight) {
+            if (this.state.playerHeight !== state.videoHeight) {
                 this.setState({'playerHeight':state.videoHeight});   
                 this.setState({'playerWidth':state.videoWidth});   
             }
@@ -213,7 +213,7 @@ export default class SingleQuestion extends Component {
             
             }
             
-            var {Platform} = React;
+           // var {Platform} = React;
 
 
             let media='';
@@ -358,12 +358,13 @@ export default class SingleQuestion extends Component {
                     </div>
                     
                     <div className="card-block">
+                        
+                        <div ref={(section) => { this.scrollTo.image = section; }} ></div>
+                        {((this.isVisible('image') || !showRecallButton) && question.image) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></a></span> }
                         {(this.isVisible('image') || !showRecallButton) && question.imageattribution && <div className="card-block imageattribution">
                             <div  className='card-text'><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div>
                         </div>}
 
-                        <div ref={(section) => { this.scrollTo.image = section; }} ></div>
-                        {((this.isVisible('image') || !showRecallButton) && question.image) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></a></span> }
                     </div>
 
                 </div>
