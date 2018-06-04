@@ -55,6 +55,7 @@ export default class SingleQuestion extends Component {
       componentDidMount() {
         // subscribe state change
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
+        scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
       }
 
       handleStateChange(state, prevState) {
@@ -268,14 +269,14 @@ export default class SingleQuestion extends Component {
             <div className="questionwrap" >
             <ShareDialog id="sharedialog"  header={header}  question={question}/>
             <ProblemReport user={this.props.user} question={this.props.question} />
-                                            
+                <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                 <div className="row buttons justify-content-between" >
                     <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} />&nbsp;</button>
                     <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Prev&nbsp;</span></button>
-                    <div className='col-1'>&nbsp;</div>
+                    <span >&nbsp;</span>
                     <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block"> Next</span></button>
                     {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block"> Recall</span></button>}
-                    <div className='col-1'>&nbsp;</div>
+                    <span >&nbsp;</span>
                     {<button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Block</span></button>}
                     <div className="scrollbuttons col-sm-12" >
                              <button style={{float:'right'}} data-toggle="modal" data-target="#problemdialog" className='btn btn-primary'><ExclamationTriangle size={26} /><span className="d-none d-md-inline-block">&nbsp;Report Problem&nbsp;</span></button>

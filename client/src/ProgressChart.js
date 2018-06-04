@@ -18,13 +18,27 @@ export default class ProgressChart extends React.Component {
             return response.json()
         }).then(function(json) {
             console.log(['got response', json]);
-            let data = json.map(function(val,key) {
+            let max=0;
+            
+            let dataObject = {}
+            json.map(function(val,key) {
                 let id=0;
                 if ((parseInt(val._id,10) > 0)) id=parseInt(val._id,10);
+                if (id > max) max=id;
                 let point={y:val.questions,x:id,yColor:'blue'}
                // val.questionsColor = "lightblue";
-                return point;
+                dataObject[id]=point;
+                return null;
+                //return point;
             });
+            for (var i=0; i <= max; i++) {
+                if (dataObject.hasOwnProperty(i)) {
+                    
+                } else {
+                    dataObject[i]={y:0,x:i,yColor:'blue'}
+                }
+            }
+            let data = Object.values(dataObject);
             data.sort(function(a,b) {
                 if (a.x < b.x) return -1
                 else return 1;
@@ -48,8 +62,8 @@ export default class ProgressChart extends React.Component {
     // otherwise height will be 0 and no chart will be rendered.
     render() {
         if (this.state.series && this.state.series.length > 0) {
-            return <div style={{height: '400px'}}>
-               <br/><br/><br/><br/>
+            return <div style={{height: '450px'}}>
+               
                 <h4 id="progress"  className='graphTitle' >Recall Distribution</h4>
                  <b>Click to review a success band</b>
                 <ResponsiveBar
@@ -128,6 +142,7 @@ export default class ProgressChart extends React.Component {
                 onClick={this.clickPie.bind(this)}
                     
                 />  
+                
             </div>
             
         } else {

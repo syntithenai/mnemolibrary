@@ -971,9 +971,9 @@ export default class AppLayout extends Component {
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
-      let url='/api/questions?topic='+topic ;
+      let url='/api/review?topic='+topic ;
       if (this.state.user) {
-          url=url+'&user='+this.state.user.username;
+          url=url+'&user='+this.state.user._id;
       }
       fetch(url)
       .then(function(response) {
@@ -1085,7 +1085,6 @@ export default class AppLayout extends Component {
     
     return (
         <div className="mnemo">
-            
             {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
             <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
             
@@ -1166,7 +1165,7 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('createhelp') && <CreateHelp  />
             }
-            {(this.isCurrentPage('profile') || (this.isCurrentPage('')) && this.isLoggedIn()) && <ProfilePage reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
+            {(this.isCurrentPage('profile') || (this.isCurrentPage('')) && this.isLoggedIn()) && <ProfilePage reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
             }
             {(showLogin) && <LoginPage token={this.state.token} login={this.login}/>
             }<br/>

@@ -1,5 +1,7 @@
 import React from 'react';
 import { ResponsivePie } from '@nivo/pie'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 
 export default class TopicsChart extends React.Component {
  
@@ -8,18 +10,74 @@ export default class TopicsChart extends React.Component {
         super(props);
         this.state = {
                 labels:[],
-                series:[]
+                series:[],
+                show: 'list'
         } 
+        this.loadData = this.loadData.bind(this);
+        this.blockTopic = this.blockTopic.bind(this);
+        this.unblockTopic = this.unblockTopic.bind(this);
+        this.blockTopicReal = this.blockTopicReal.bind(this);
+        this.showCurrent = this.showCurrent.bind(this);
+        this.showArchive = this.showArchive.bind(this);
+        this.showBlocks = this.showBlocks.bind(this);
+        this.showChart = this.showChart.bind(this);
     }
+    
+    //handleChange {
+        //var self = this;          // Store `this` component outside the callback
+        //if ('onorientationchange' in window) {
+            //window.addEventListener("orientationchange", function() {
+                //// `this` is now pointing to `window`, not the component. So use `self`.
+                //self.setState({   
+                    //orientation: !self.state.orientation
+                //})
+                //console.log("onorientationchange");
+            //}, false);
+        //}
+    //}
+    
+    
+    /**
+   * Calculate & Update state of new dimensions
+   */
+  updateDimensions() {
+    if (window.innerWidth < 700) {
+          this.showCurrent(); 
+    } else {
+        this.showChart(); 
+    }
+  }
+
+  
+  /**
+   * Remove event listener
+   */
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateDimensions.bind(this));
+  }
+    
     componentDidMount() {
-           let that = this;
+       this.loadData();
+       this.updateDimensions();
+       window.addEventListener("resize", this.updateDimensions.bind(this));
+  
+    };
+    
+    loadData(type) {
+        let that = this;
         //usersuccessprogress
         //useractivity
-        fetch('/api/recenttopics?user='+this.props.user._id)
+        let url='/api/recenttopics?user='+this.props.user._id;
+        if (type==='blocks')  {
+            url='/api/blockedtopics?user='+this.props.user._id;
+        } else if (type==='archive')  {
+            url='/api/archivedtopics?user='+this.props.user._id;
+        }
+        fetch(url)
         .then(function(response) {
             return response.json()
         }).then(function(json) {
-          //  console.log(['got response', json]);
+           console.log(['got CORE response', json]);
 
             let series=[];
             json.map(function(val,key) {
@@ -36,30 +94,42 @@ export default class TopicsChart extends React.Component {
                     //let score=(((val.successRate)*(completion)*3) + (completion))/4
                     let score=(val.successRate + completion)/2
                     let color=getGreenToRed(score*100);
-                   // console.log(['score',score,color,val.topic,val.questions,val.total,val.successRates]);
+                   console.log(['score',score,color,val.topic,val.questions,val.total,val.successRates]);
                     //+ ' (' + val.questions + '/' + val.total+')'
-                    let point={"topic": val.topic,"id": val.topic ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color};
-                    if (point.score < 0.7) {
+                    let point={"topic": val.topic,"id": val.topic ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color,blocks:val.blocks};
+                    //if (point.score < 0.7) {
                         series.push(point);
-                    }
+                    //}
+                    series.sort(function(a,b) {
+                        if (a.topic < b.topic) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    });
                     
                 }
                 return null;
             });
-            //console.log(['SET DATA',series]);
+            console.log(['SET DATA',series]);
             that.setState({series:series});
        
                 
         }).catch(function(ex) {
             console.log(['test request failed', ex])
         })        
-    };
-      
-    clickPie(a,b) {
+    }
+    
+    
+    clickPie(a,force=false,search=false) {
         console.log(['click ',a]);
-        if (a.questions === a.total) {
+      //  return;
+        if (search===true) {
+             console.log(['SEARCH ',a.topic,a]);
+            this.props.searchQuizFromTopic(a.topic);
+        } else if (a.questions === a.total || force===true) {
             // review
-            console.log(['REVIEW ',a]);
+            console.log(['REVIEW ',a.topic,a]);
             this.props.setReviewFromTopic(a.topic);
         } else {
             // discover
@@ -69,6 +139,73 @@ export default class TopicsChart extends React.Component {
         
         
     }; 
+    blockTopic(a) {
+        confirmAlert({
+          title: 'Block Topic',
+          message: 'Are you sure you want to block all the questions in the topic - '+a.topic+'?',
+          buttons: [
+            {
+              label: 'Yes',
+              onClick: () => this.blockTopicReal(a)
+            },
+            {
+              label: 'No'
+            }
+          ]
+        })
+    }    
+    
+    blockTopicReal(a) {
+        let that = this;
+        fetch('/api/blocktopic?topic='+a.topic+'&user='+this.props.user._id)
+        .then(function(response) {
+            return response.json()
+        }).then(function(json) {
+            console.log(['got response', json]);
+            that.loadData();
+        }).catch(function(ex) {
+            console.log(['test request failed', ex])
+        })        
+    };
+    
+    showArchive() {
+        this.setState({series:[]});
+        this.loadData('archive');
+        this.setState({show:'archive'});
+    };
+    showChart() {
+        this.setState({series:[]});
+        this.loadData();
+        this.setState({show:'chart'});
+    };
+    showBlocks() {
+        this.setState({series:[]});
+        this.loadData('blocks');
+        this.setState({show:'blocks'});
+    };
+    showCurrent() {
+        this.setState({series:[]});
+        this.loadData();
+        this.setState({show:'list'});
+    };
+    unblockTopic(topic) {
+        console.log('unblock' + topic);
+         let url='/api/unblocktopic?user='+this.props.user._id+'&topic='+topic;
+        let that=this;
+        fetch(url)
+        .then(function(response) {
+            return response.json()
+        }).then(function(json) {
+           console.log(['got unblock response', json]);
+           that.loadData('blocks');
+        });
+      //  this.setState({showList:!this.state.showList});
+    };
+    
+    toggleList() {
+        this.setState({showList:!this.state.showList});
+    };
+    
     //clickTopic(e) {
         //console.log(['REDISCOVER ', e.target.textContent]);
        //// this.props.setQuizFromTopic(e.target.textContent);
@@ -79,43 +216,138 @@ export default class TopicsChart extends React.Component {
     //tooltip={function(e) {console.log(['TT',e]); return (<b>dddd</b>);}}
                 //onClick={this.clickTopic.bind(this)}
     render() {
-        if (this.state.series && this.state.series.length > 0) {
             
-            return <div id="activetopics"  style={{height: '280px',zIndex:'9999'}}>
+        let that = this;
+        if (this.state.series) {
+            if (this.state.show==="list") {
+                let topicsList = '';
+                if (this.state.series.length > 0) {
+                    let topicsItems = this.state.series.map(function(val,key) {
+                        let continueButton='';
+                        if (val.total > val.questions) {
+                            continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val)}>Continue</a>);
+                        } else {
+                            continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,false,true)}>Rediscover</a>);
+                        }
+                        let reviewButton=''
+                        if (val.questions > 0) {
+                            reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;&nbsp;</a>);
+                        }
+                        let successRate =val.successRate ? val.successRate.toFixed(2) : 0;
+                        return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a className='btn btn-outline-secondary' style={{color:'black'}}>{val.questions}/{val.total}</a><a className='btn btn-outline-secondary' >{successRate}%</a>{continueButton}{reviewButton}<a style={{color:'white'}} className='btn btn-danger' onClick={() => that.blockTopic.bind(that)(val)}>Block</a></span></div>)
+                    });
+                    
+                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
+                    
+                } else {
+                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >No progress yet</div>);
+                }
+                return (<div style={{width: '100%',height: '100%'}} >
                    <br/><br/>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} >Blocks</a>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} >Archive</a>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
                    <h4 className='graphTitle' id="topics" >Active Topics</h4>
-                   <b>Click to continue a topic</b>
-                <ResponsivePie
-                data={this.state.series}
-                margin={{
-                    "top": 40,
-                    "right": 80,
-                    "bottom": 80,
-                    "left": 80
-                }}
-                height={280}
-                innerRadius={0.5}
-                padAngle={0.7}
-                cornerRadius={3}
-                colorBy={function(e){return e.color}}
-                borderColor="inherit:darker(0.6)"
-                radialLabelsSkipAngle={10}
-                radialLabelsTextXOffset={6}
-                radialLabelsTextColor="#333333"
-                radialLabelsLinkOffset={0}
-                radialLabelsLinkDiagonalLength={16}
-                radialLabelsLinkHorizontalLength={24}
-                radialLabelsLinkStrokeWidth={1}
-                radialLabelsLinkColor="inherit"
-                slicesLabelsSkipAngle={10}
-                slicesLabelsTextColor="#333333"
-                sliceLabel={function(e){return e.questions+"/"+e.total}}
-                animate={true}
-                motionStiffness={90}
-                motionDamping={15}
-                onClick={this.clickPie.bind(this)}
-                />
-            </div>
+                   <br/>
+                    {topicsList}
+                </div>);
+                
+                    
+            } else if (this.state.show==="archive") {
+                let topicsList = '';
+                if (this.state.series.length > 0) {
+                    let topicsItems = this.state.series.map(function(val,key) {
+                        let reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;&nbsp;</a>);
+                        
+                        let successRate =val.successRate ? val.successRate.toFixed(2) : 0;
+                        return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a className='btn btn-outline-secondary' style={{color:'black'}}>{val.questions}/{val.total}</a><a className='btn btn-outline-secondary' >{successRate}%</a>{reviewButton}</span></div>)
+                    });
+                    
+                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
+                } else {
+                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >No archived questions yet. Keep up the review.</div>);
+                }
+                return (<div style={{width: '100%',height: '100%'}} >
+                   <br/><br/>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} >Blocks</a>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} >Current</a>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
+                   
+                   <h4 className='graphTitle' id="topics" >Archived Topics</h4>
+                   <br/>
+                    {topicsList}
+                </div>);
+            } else if (this.state.show==="blocks") {
+                let topicsList = '';
+                if (this.state.series.length > 0) {
+                   let topicsItems = this.state.series.map(function(val,key) {
+                        let successRate =val.successRate ? val.successRate.toFixed(2) : 0;
+                        return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a style={{color:'white'}} className='btn btn-danger' onClick={() => that.unblockTopic.bind(that)(val.topic)}>Unblock</a></span></div>)
+                    });
+                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
+                
+                } else {
+                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >No blocked questions</div>);
+                }
+                    
+                return (<div style={{width: '100%',height: '100%'}} >
+                   <br/><br/>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} >Archive</a>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} >Current</a>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
+                   <h4 className='graphTitle' id="topics" >Blocked Topics</h4>
+                   <br/>
+                    {topicsList}
+                </div>);
+            } else {
+                
+                let chart=(<ResponsivePie
+                    data={this.state.series}
+                    margin={{
+                        "top": 40,
+                        "right": 80,
+                        "bottom": 80,
+                        "left": 80
+                    }}
+                    height={380}
+                    innerRadius={0.5}
+                    padAngle={0.7}
+                    cornerRadius={3}
+                    colorBy={function(e){return e.color}}
+                    borderColor="inherit:darker(0.6)"
+                    radialLabelsSkipAngle={10}
+                    radialLabelsTextXOffset={6}
+                    radialLabelsTextColor="#333333"
+                    radialLabelsLinkOffset={0}
+                    radialLabelsLinkDiagonalLength={16}
+                    radialLabelsLinkHorizontalLength={24}
+                    radialLabelsLinkStrokeWidth={2}
+                    radialLabelsLinkColor="inherit"
+                    slicesLabelsSkipAngle={10}
+                    slicesLabelsTextColor="#333333"
+                    sliceLabel={function(e){return e.questions+"/"+e.total}}
+                    animate={true}
+                    motionStiffness={90}
+                    motionDamping={15}
+                    onClick={this.clickPie.bind(this)}
+                    />)
+                    
+                return (<div style={{width: '100%',height: '100%'}} >
+                   <br/><br/>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} >Blocks</a>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} >Archive</a>
+                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} >List</a>
+
+                   <h4 className='graphTitle' id="topics" >Active Topics</h4>
+                   <br/>
+                   {<div id="activetopics"  style={{height: '380px',zIndex:'9999'}}> <b>Click a slice to continue topic</b>
+                  {chart}</div>}
+                   
+                </div>);
+                    
+            }
+                    
+    
         } else {
             return '';
         }

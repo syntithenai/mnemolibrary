@@ -137,10 +137,15 @@ pre.mnemonicalternative {
     margin-top: 3em;
 }
 
-
-
+.btn {
+    border: 1px solid black;
+    border-radius: 10px;
+    box-shadow: 2px 2px #888888;
+    margin-right: 3px;
+}
 
 h4.graphTitle::before { 
+  z-index: 0;
   display: block; 
   content: " "; 
   margin-top: -175px; 
@@ -149,11 +154,15 @@ h4.graphTitle::before {
   pointer-events: none;
 }
 
+.topmenu {
+    margin-top: 1.2em;
+}
 
-
-
-
-
+.topmenu .nav-link {
+    color: lightgrey;
+    font-size: large;
+    padding-bottom: 5px;
+}
 
 
 .react-tags {
@@ -290,4 +299,36 @@ h4.graphTitle::before {
 .react-tags__suggestions li.is-disabled {
   opacity: 0.5;
   cursor: auto;
+}
+
+
+
+
+#voicerecognitionbutton img {
+  position: absolute;
+}
+#voicerecognitionbutton {
+  position: relative;
+  z-index:999;
+  font-weight: bold;
+  font-size: 1.5em;
+  border-radius: 33px;
+  padding: 0.4em;
+  padding-left: 0.7em;
+  padding-right: 0.7em;
+  margin-top: 0px ;
+  color: black;
+  border: 2px solid black;
+}
+#voicerecognitionbutton.stopped {
+  background-color: pink;
+    border: 2px solid red;
+}
+#voicerecognitionbutton.active {
+	background-color: lightgreen;
+	  border: 2px solid green;
+}
+#voicerecognitionbutton.pending {
+	background-color: orange;
+	  border: 2px solid red;
 }

@@ -34,7 +34,7 @@ router.get('/me',function(req,res) {
                 //console.log(['token',token]);
                 let now = new Date();
                 let expire = 0;
-                if (token.accessTokenExpiresAt)  expire = new Date(token.accessTokenExpiresAt);
+                if (token && token.accessTokenExpiresAt)  expire = new Date(token.accessTokenExpiresAt);
                 if (now >= expire) {
                     res.send('token expired' );
                 } else {

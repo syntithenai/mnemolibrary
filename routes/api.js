@@ -31,6 +31,41 @@ MongoClient.connect(config.databaseConnection, (err, client) => {
 
 //const database = require('../../oauth/database');
 
+router.get('/blocktopic', (req, res) => {
+    if (req.query.user && req.query.user.length > 0 && req.query.topic && req.query.topic.length > 0) {
+        let criteria=[];
+        if (req.query.user) {
+            criteria.push({$or:[{access:{$eq:req.query.user}},{access:{$eq:'public'}}]})
+        } else {
+            criteria.push({access :{$eq:'public'}});
+        }
+        let topic = req.query.topic.trim(); //.toLowerCase(); 
+        criteria.push({'quiz': {$eq:topic}});
+      //  console.log(['topic search C    ',criteria]);
+        db.collection('questions').find({$and:criteria}).sort({sort:1}).toArray(function(err, results) {
+          if (results) {
+              results.map(function(val,key) {
+                  blockQuestion(req.query.user,val._id,topic);
+              });
+              res.send({'blocked':true});
+          } else {
+              res.send({'noqtoblock':true});
+          }
+        })
+    }
+});
+
+router.get('/unblocktopic', (req, res) => {
+    if (req.query.user && req.query.user.length > 0 && req.query.topic && req.query.topic.length > 0) {
+        let criteria=[];
+        criteria.push({user :{$eq:req.query.user}});
+        criteria.push({topic :{$eq:req.query.topic}});
+        // delete all userquestionprogress with matching topic
+        db.collection('userquestionprogress').remove({$and:criteria});
+        res.send({'blocked':true});
+        
+    }
+});
 
 
     // 'successTally':{$lt : 4}}  // retire topics after all questions have successTally 4
@@ -40,13 +75,13 @@ router.get('/recenttopics', (req, res) => {
         let collatedTopics={};
         db.collection('userquestionprogress').aggregate([
             { $match: {
-                    'user': req.query.user 
-                
-            }},
+                    $and:[{'user': {$eq:req.query.user}},{$or:[{'successTally':{$lt : 3}},{'successTally':{$exists : false}}]}]
+           }},
             { $group: {'_id': "$topic",
                 'questions': { $sum: 1 },
                 'topic': { $last: "$topic" },
                 'successRate': { $avg: "$successRate" },
+                'blocks' : {$sum:"$block"}
             }},
             {$sort:{"successRate":1}}
         ], function (err, result) {
@@ -55,16 +90,19 @@ router.get('/recenttopics', (req, res) => {
                 return;
             }
             result.toArray().then(function(final) {
+                console.log(['RECENT TOPICS',final]);
                 let topics=[];
                 final.map(function(val,key) {
-                    collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate}
+                    collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
                     if (val.topic) topics.push({quiz:{$eq:val.topic}});
                 });
-                console.log(['topics',topics]);
+               // console.log(['topics',topics]);
                     //'quiz': {$in:[topics]} ,
                 let topicCriteria={}
                 if (topics.length > 0) {
                     topicCriteria={$or : topics};
+                } else {
+                    topicCriteria={'magicfield' : {$eq:'neverfound'}};
                 }
                 let criteria={$and:[{access:{$eq:'public'}},topicCriteria]};
                 
@@ -73,7 +111,7 @@ router.get('/recenttopics', (req, res) => {
                     },
                     { $group: {'_id': "$quiz",
                         'questions': { $sum: 1 },
-                        'topic': { '$last': "$quiz" },
+                        'topic': { '$last': "$quiz" }
                     }}
                 ], function (qerr, questionResult) {
                     if (qerr) {
@@ -81,13 +119,24 @@ router.get('/recenttopics', (req, res) => {
                         return;
                     }
                     questionResult.toArray().then(function(questionFinal) {
-                        questionFinal.map(function(val,key) {
-                            
-                            collatedTopics[val.topic].total=val.questions;
-                        });
+                        console.log(['QUESTION FINAL',questionFinal]);
+                        // include total questions for each topic
+                        for (key in questionFinal) {
+                            let val=questionFinal[key];
+//                        questionFinal.values().map(function(val) {
+                            if (collatedTopics[val.topic]) collatedTopics[val.topic].total=val.questions;
+                        };
+                        let finalTopics={};
+                        // filter fully blocked topics
                         
-                        console.log(['aggq',collatedTopics]);
-                        res.send(Object.values(collatedTopics));
+                        Object.keys(collatedTopics).map(function(key) {
+                            let val = collatedTopics[key];
+                            if (val.blocks < val.total) {
+                                finalTopics[key]=val;
+                            }
+                        });
+                        //console.log(['aggq',finalTopics]);
+                        res.send(Object.values(finalTopics));
                     });
                 })
                 
@@ -100,10 +149,132 @@ router.get('/recenttopics', (req, res) => {
     }
 })
 
+
+           
+router.get('/archivedtopics', (req, res) => {
+    if (req.query.user && req.query.user.length > 0) {
+        let collatedTopics={};
+        db.collection('userquestionprogress').aggregate([
+            { $match: {
+                    $and:[{'user': {$eq:req.query.user}},{'successTally':{$gte : 3}},{'block':{$ne : 1}}]
+           }},
+            { $group: {'_id': "$topic",
+                'questions': { $sum: 1 },
+                'topic': { $last: "$topic" },
+                'successRate': { $avg: "$successRate" },
+                'blocks' : {$sum:"$block"}
+            }},
+            {$sort:{"successRate":1}}
+        ], function (err, result) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            result.toArray().then(function(final) {
+                let topics=[];
+                final.map(function(val,key) {
+                    collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
+                    if (val.topic) topics.push({quiz:{$eq:val.topic}});
+                });
+               // console.log(['topics',topics]);
+                    //'quiz': {$in:[topics]} ,
+                let topicCriteria={}
+                if (topics.length > 0) {
+                    topicCriteria={$or : topics};
+                } else {
+                    topicCriteria={'magicfield' : {$eq:'neverfound'}};
+                }
+                let criteria={$and:[{access:{$eq:'public'}},topicCriteria]};
+                
+                db.collection('questions').aggregate([
+                    { $match: criteria
+                    },
+                    { $group: {'_id': "$quiz",
+                        'questions': { $sum: 1 },
+                        'topic': { '$last': "$quiz" }
+                    }}
+                ], function (qerr, questionResult) {
+                    if (qerr) {
+                        console.log(qerr);
+                        return;
+                    }
+                    questionResult.toArray().then(function(questionFinal) {
+                        // include total questions for each topic
+                        for (key in questionFinal) {
+                            let val=questionFinal[key];
+//                        questionFinal.values().map(function(val) {
+                            collatedTopics[val.topic].total=val.questions;
+                        };
+                        let finalTopics={};
+                        // filter fully blocked topics
+                        
+                        Object.keys(collatedTopics).map(function(key) {
+                            let val = collatedTopics[key];
+                            if (val.blocks < val.total && val.total <= val.questions) {
+                                finalTopics[key]=val;
+                            }
+                        });
+                        //console.log(['aggq',finalTopics]);
+                        res.send(Object.values(finalTopics));
+                    });
+                })
+                
+                
+            });
+            
+        });
+    } else {
+        res.send({});
+    }
+})
+
+
+
+           
+router.get('/blockedtopics', (req, res) => {
+    console.log('get blocked');
+    if (req.query.user && req.query.user.length > 0) {
+        let collatedTopics={};
+        db.collection('userquestionprogress').aggregate([
+            { $match: {
+                    $and:[{'user': {$eq:req.query.user}},{'block':{$eq : 1}}]
+           }},
+            { $group: {'_id': "$topic",
+                'questions': { $sum: 1 },
+                'topic': { $last: "$topic" },
+                'successRate': { $avg: "$successRate" },
+                'blocks' : {$sum:"$block"}
+            }},
+            {$sort:{"successRate":1}}
+        ], function (err, result) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            result.toArray().then(function(final) {
+                console.log(['get blocked',final]);
+                //let topics=[];
+                final.map(function(val,key) {
+                    collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
+                });
+            
+                 res.send(Object.values(collatedTopics));
+            });
+            
+           
+        });
+    } else {
+        res.send({});
+    }
+})
+
+
+
+
 router.get('/usersuccessprogress', (req, res) => {
     if (req.query.user && req.query.user.length > 0) {
         db.collection('userquestionprogress').aggregate([
-            { $match: {'user': req.query.user}},
+            { $match: {$and:[{'user': {$eq:req.query.user}} , {block:{ $not: { $gt: 0 } }}]}},
             { $group: {'_id': "$successTally",
                 'questions': { $sum: 1 }}},
             
@@ -492,7 +663,7 @@ router.post('/discover', (req, res) => {
     }
     criteria.push({discoverable :{$ne:'no'}});
     // question block
-    criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
+    //criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
     // filtering
     let blockCriteria=[];
     if (req.body.blocks) {
@@ -526,10 +697,17 @@ router.post('/discover', (req, res) => {
     sortFilter[orderBy]=-1;
     
     let user = req.body.user ? req.body.user : null;
-   // console.log(['discover',orderBy]);
-    db.collection('userquestionprogress').find({user:user}).toArray().then(function(progress) {
+    console.log(['discover',user]);
+    db.collection('userquestionprogress').find({
+            $and:[
+                {'user': {$eq:user}} , 
+                {$or:[
+                    {block: {$gt:0}}, 
+                    {seen: {$gt:0}}, 
+                ]}
+                ]}).toArray().then(function(progress) {
          if (progress) {
-             //console.log(['progress res',progress]);
+             console.log(['progress res',progress]);
             let notThese = [];
             for (var seenId in progress) {
                 notThese.push(ObjectId(progress[seenId].question));
@@ -538,7 +716,7 @@ router.post('/discover', (req, res) => {
             //for (var seenId in progress.block) {
                 //notThese.push(ObjectId(seenId));
             //};
-          //  console.log(['disco NOTHTES',notThese]);
+            console.log(['disco NOTHTES',notThese]);
             criteria.push({'_id': {$nin: notThese}});
             //console.log(['disco criteria',criteria]);
             db.collection('questions').find({$and:criteria})
@@ -576,20 +754,31 @@ router.get('/review', (req, res) => {
          }
          
      } 
-     //else {
-        criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
+     if (req.query.topic && req.query.topic.length > 0) {
+        criteria.push({topic:{$eq:req.query.topic}});
+     }
+     if ((req.query.topic && req.query.topic.length > 0) || (req.query.band && req.query.band.length > 0)) {
+         // no time filter for search based
+     } else {
          let oneHourBack = new Date().getTime() - 1800000;
          //criteria.push({seen:{$lt:oneHourBack}});   
-         criteria.push({$or:[{seen:{$lt:oneHourBack}},{successTally:{$not:{$gt:0}}}]});   
+         criteria.push({$or:[{seen:{$lt:oneHourBack}},{successTally:{$not:{$gt:0}}}]});    
+     }
+     //else {
+        criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
+        
          
      //}
+    // criteria.push({block:{ $not: { $gt: 0 }}});
      criteria.push({user:req.query.user});
      //console.log({seen:{$lt:oneHourBack}});
      if (req.query.user && req.query.user.length > 0) {
          // sort by successTally and then most recently seen first
          console.log(JSON.stringify(criteria));
-        db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(limit).toArray().then(function(questions) {
-      //      console.log(questions);
+        db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(limit).toArray().then(function(questions,error) {
+            console.log('llll');
+            console.log(questions);
+            console.log(error);
             //let questions=[];
             if (questions) {
                 //for (var questionId in progress.seen) {
@@ -823,34 +1012,38 @@ router.post('/like', (req, res) => {
 })
 
 
+function blockQuestion(user,question,topic) {
+    console.log(['block',user,question,topic]);
+    db.collection('userquestionprogress').findOne({$and:[{'user': {$eq:String(user)}},{question:{$eq:String(question)}} ]}).then(function(progress) {
+            if (progress) {
+                // OK
+                progress.block = 1; //new Date().getTime();
+                progress.topic = topic;
+                db.collection('userquestionprogress').update({_id:progress._id},progress).then(function() {
+                    console.log(['update',progress]);
+            
+                });
+                
+            } else {
+                  progress = {'user':String(user),question:String(question)};
+                  progress.block = 1; //new Date().getTime();
+                  progress.topic = topic;
+                  db.collection('userquestionprogress').save(progress).then(function() {
+                      console.log(['insert',progress]);
+            
+                });
+            } 
+        })
+}
+
 router.post('/block', (req, res) => {
     //console.log(['block']);
     if (req.body.user && req.body.user.length > 0 && req.body.question && String(req.body.question).length > 0 ) {
       //  console.log(['block ok']);
         let user = req.body.user;
         let question = req.body.question;
-        db.collection('userquestionprogress').findOne({'user':user,question:req.body.question}).then(function(progress) {
-        //    console.log(['block',progress]);
-            if (progress) {
-                // OK
-                progress.block = new Date().getTime();
-                progress.topic = req.body.topic;
-                db.collection('userquestionprogress').update({_id:progress._id},progress).then(function() {
-          //          console.log(['set block time',progress]);
-                    res.send({});
-                });
-                
-            } else {
-                  progress = {'user':user,question:req.body.question};
-                  progress.block = new Date().getTime();
-                  progress.topic = req.body.topic;
-                  db.collection('userquestionprogress').save(progress).then(function() {
-          //          console.log(['set block time',progress]);
-                    res.send({});
-                });
-//                  res.send({message:'Invalid request error'});  
-            } 
-        })
+        blockQuestion(user,question,req.body.topic);
+          res.send({});
     } else {
         res.send({message:'Invalid request'});
     }
@@ -879,7 +1072,7 @@ function updateQuestionTallies(user,question,tallySuccess=false) {
 
 // update per user progress stats into the userquestionprogress collection
 function updateUserQuestionProgress(user,question,quiz,tallySuccess) {
-    db.collection('userquestionprogress').findOne({user:user,question:question}).then(function(progress) {
+    db.collection('userquestionprogress').findOne({$and:[{'user': {$eq:user}},{question:question} , {block:{ $not: { $gt: 0 } }}]}).then(function(progress) {
         if (!progress) progress = {user:user,question:question};
         progress.topic=quiz;
         progress.seenTally = progress.seenTally ? parseInt(progress.seenTally,10) + 1 : 1;

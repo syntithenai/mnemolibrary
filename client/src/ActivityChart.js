@@ -29,7 +29,7 @@ export default class ActivityChart extends React.Component {
             let successDateKeys={};
             let now = new Date();
             let seriesObject=[];
-            for (var i=0; i <= 30; i++) {
+            for (var i=0; i <=30 ; i++) {
                 let key=now.getDate()+"/"+(now.getMonth()+1);
                 seenDateKeys[key]=0;
                 successDateKeys[key]=0;
@@ -66,7 +66,7 @@ export default class ActivityChart extends React.Component {
             //json.seen//
             console.log(['ACT CHART MOUNT',seriesObject]);
             
-            that.setState({series:Object.values(seriesObject)});
+            that.setState({series:Object.values(seriesObject).reverse()});
                 
         }).catch(function(ex) {
             console.log(['test request failed', ex])
@@ -78,11 +78,10 @@ export default class ActivityChart extends React.Component {
     render() {
         if (this.state.series && this.state.series.length > 0) {
         
-            return <div style={{height: '300px'}}>
+            return <div style={{height: '600px'}}>
                   <br/><br/>
                   <br/><br/>
                    <h4 id="activity" className='graphTitle' >Recent Activity</h4>
-                   
                 <ResponsiveBar
                 data={this.state.series}
                 keys={[
@@ -122,21 +121,21 @@ export default class ActivityChart extends React.Component {
 
                 borderWidth={1}
                 borderColor="inherit:darker(1.6)"
-                axisBottom={{
+                axisTop={{
                     "orient": "bottom",
                     "tickSize": 5,
                     "tickPadding": 5,
-                    "tickRotation": 0,
-                    "legend": "Date",
+                    "tickRotation": 90,
+                    "legend": "Tally",
                     "legendPosition": "center",
-                    "legendOffset": 36
+                    "legendOffset": 46
                 }}
                 axisLeft={{
                     "orient": "left",
-                    "tickSize": 5,
+                    "tickSize": 20,
                     "tickPadding": 5,
                     "tickRotation": 0,
-                    "legend": "Tally",
+                    "legend": "Date",
                     "legendPosition": "center",
                     "legendOffset": -40
                 }}
@@ -144,6 +143,7 @@ export default class ActivityChart extends React.Component {
                 labelSkipHeight={12}
                 labelTextColor="inherit:darker(1.6)"
                 animate={true}
+                layout="horizontal"
                 motionStiffness={90}
                 motionDamping={15}
                 theme={{
