@@ -81,6 +81,8 @@ export default class ActivityChart extends React.Component {
             return <div style={{height: '600px'}}>
                   <br/><br/>
                   <br/><br/>
+                  <br/><br/>
+                  <br/><br/>
                    <h4 id="activity" className='graphTitle' >Recent Activity</h4>
                 <ResponsiveBar
                 data={this.state.series}
