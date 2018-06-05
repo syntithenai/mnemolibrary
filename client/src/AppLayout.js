@@ -1165,7 +1165,7 @@ export default class AppLayout extends Component {
             }
             {this.isCurrentPage('createhelp') && <CreateHelp  />
             }
-            {(this.isCurrentPage('profile') || (this.isCurrentPage('')) && this.isLoggedIn()) && <ProfilePage reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
+            {(this.isCurrentPage('profile') || (this.isCurrentPage('')) && this.isLoggedIn()) && <ProfilePage setCurrentPage={this.setCurrentPage} setQuizFromDiscovery={this.setQuizFromDiscovery} reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
             }
             {(showLogin) && <LoginPage token={this.state.token} login={this.login}/>
             }<br/>

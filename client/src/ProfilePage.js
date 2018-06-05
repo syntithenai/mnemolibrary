@@ -86,7 +86,7 @@ export default class ProfilePage extends Component {
                           
                     <br/><br/>
                     <div className="col-12">
-                          <TopicsChart setReviewFromTopic={this.props.setReviewFromTopic} setQuizFromTopic={this.props.setQuizFromTopic} searchQuizFromTopic={this.props.searchQuizFromTopic}  user={this.props.user} />
+                          <TopicsChart setCurrentPage={this.props.setCurrentPage} setQuizFromDiscovery={this.props.setQuizFromDiscovery} setReviewFromTopic={this.props.setReviewFromTopic} setQuizFromTopic={this.props.setQuizFromTopic} searchQuizFromTopic={this.props.searchQuizFromTopic}  user={this.props.user} />
                           <br/><br/>
                             <br/><br/>
                             <br/><br/>

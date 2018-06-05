@@ -211,6 +211,19 @@ export default class TopicsChart extends React.Component {
         this.setState({showList:!this.state.showList});
     };
     
+    
+    setCurrentPage(page) {
+        console.log(page);
+        this.props.setCurrentPage(page);
+        return false;
+    };
+    
+    setQuizFromDiscovery() {
+        console.log('setQuizFromDiscovery');
+        this.props.setQuizFromDiscovery();
+        return false;
+    };
+    
     //clickTopic(e) {
         //console.log(['REDISCOVER ', e.target.textContent]);
        //// this.props.setQuizFromTopic(e.target.textContent);
@@ -343,11 +356,13 @@ export default class TopicsChart extends React.Component {
                    <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} >Archive</a>
                    <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} >List</a>
 
-                   <h4 className='graphTitle' id="topics" >Active Topics</h4>
+                   {this.state.series.length > 0 && <div id="activetopics"  style={{height: '380px',zIndex:'9999'}}><h4 className='graphTitle' id="topics" >Active Topics</h4>
                    <br/>
-                   {<div id="activetopics"  style={{height: '380px',zIndex:'9999'}}> <b>Click a slice to continue topic</b>
+                    <b>Click a slice to continue topic</b>
                   {chart}</div>}
-                   
+                  
+                   {this.state.series.length == 0 && <div id="activetopics"  style={{height: '380px',zIndex:'9999'}}> <h4 className='graphTitle' id="topics" >Welcome to Mnemos Library</h4><b>To get started you can <button onClick={() => this.setQuizFromDiscovery()} className='btn btn-info' >Discover</button> random questions or <button onClick={() => this.setCurrentPage('topics')} className='btn btn-info' >Search</button> topics or tags.</b>
+                  </div>}
                 </div>);
                     
             }
