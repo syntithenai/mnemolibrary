@@ -11,7 +11,7 @@ export default class TopicsChart extends React.Component {
         this.state = {
                 labels:[],
                 series:[],
-                show: 'list'
+                show: 'chart'
         } 
         this.loadData = this.loadData.bind(this);
         this.blockTopic = this.blockTopic.bind(this);
@@ -41,7 +41,7 @@ export default class TopicsChart extends React.Component {
    * Calculate & Update state of new dimensions
    */
   updateDimensions() {
-    if (window.innerWidth < 700) {
+    if (window.innerWidth < 700 || this.state.series.length > 17) {
         this.setState({show:'list'});
     } else {
         this.setState({show:'chart'});
@@ -57,9 +57,13 @@ export default class TopicsChart extends React.Component {
   }
     
     componentDidMount() {
-       this.loadData();
-       this.updateDimensions();
-       window.addEventListener("resize", this.updateDimensions.bind(this));
+        let that=this;
+       this.loadData().then(function() {
+            that.updateDimensions();
+            window.addEventListener("resize", that.updateDimensions.bind(that));
+       });
+       
+       
   
     };
     
@@ -187,11 +191,7 @@ export default class TopicsChart extends React.Component {
         let that = this;
         this.setState({series:[]});
         this.loadData().then(function() {
-            if (that.state.series.length > 17) {
-                that.setState({show:'list'});
-            } else {
-                that.setState({show:'chart'});
-            }
+            that.setState({show:'chart'});
         });
     };
     showBlocks() {
@@ -266,7 +266,7 @@ export default class TopicsChart extends React.Component {
                         if (val.questions > 0) {
                             reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;&nbsp;</a>);
                         }
-                        let successRate =val.successRate ? parseInt(val*100,10) : 0;
+                        let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0;
                         return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a className='btn btn-outline-secondary' style={{color:'black'}}>{val.questions}/{val.total}</a><a className='btn btn-outline-secondary' >{successRate}%</a>{continueButton}{reviewButton}<a style={{color:'white'}} className='btn btn-danger' onClick={() => that.blockTopic.bind(that)(val)}>Block</a></span></div>)
                     });
                     
@@ -282,7 +282,7 @@ export default class TopicsChart extends React.Component {
                    <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
                    <h4 className='graphTitle' id="topics" >Active Topics</h4>
                    <br/>
-                    {topicsList}<br/><br/><br/><br/>
+                    {topicsList}<br/><br/><br/><br/><br/><br/><br/><br/>
                 </div>);
                 
                     
@@ -292,7 +292,7 @@ export default class TopicsChart extends React.Component {
                     let topicsItems = this.state.series.map(function(val,key) {
                         let reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;&nbsp;</a>);
                         
-                        let successRate =val.successRate ? val.successRate.toFixed(2) : 0;
+                        let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0; 
                         return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a className='btn btn-outline-secondary' style={{color:'black'}}>{val.questions}/{val.total}</a><a className='btn btn-outline-secondary' >{successRate}%</a>{reviewButton}</span></div>)
                     });
                     
@@ -309,13 +309,13 @@ export default class TopicsChart extends React.Component {
                    <h4 className='graphTitle' id="topics" >Archived Topics</h4>
                    <br/>
                     {topicsList}
-                    <br/><br/><br/><br/>
+                    <br/><br/><br/><br/><br/><br/><br/><br/>
                 </div>);
             } else if (this.state.show==="blocks") {
                 let topicsList = '';
                 if (this.state.series.length > 0) {
                    let topicsItems = this.state.series.map(function(val,key) {
-                        let successRate =val.successRate ? parseInt(val*100,10) : 0;
+                        let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0;
                         return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a style={{color:'white'}} className='btn btn-danger' onClick={() => that.unblockTopic.bind(that)(val.topic)}>Unblock</a></span></div>)
                     });
                     topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
@@ -332,7 +332,7 @@ export default class TopicsChart extends React.Component {
                    <h4 className='graphTitle' id="topics" >Blocked Topics</h4>
                    <br/>
                     {topicsList}
-                    <br/><br/><br/><br/>
+                    <br/><br/><br/><br/><br/><br/><br/><br/>
                 </div>);
             } else {
                 
