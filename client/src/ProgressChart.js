@@ -62,7 +62,7 @@ export default class ProgressChart extends React.Component {
     // otherwise height will be 0 and no chart will be rendered.
     render() {
         if (this.state.series && this.state.series.length > 0) {
-            return <div style={{height: '500px'}}>
+            return <div style={{height: '500px',marginBottom:'200px'}}>
                
                 <h4 id="progress"  className='graphTitle' >Recall Distribution</h4>
                  <b>Click to review a success band</b>

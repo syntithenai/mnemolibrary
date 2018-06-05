@@ -78,7 +78,7 @@ export default class ActivityChart extends React.Component {
     render() {
         if (this.state.series && this.state.series.length > 0) {
         
-            return <div style={{height: '600px',marginTop:'200px'}}>
+            return <div style={{height: '600px'}}>
                   <br/><br/>
                    <h4 id="activity" className='graphTitle' >Recent Activity</h4>
                 <ResponsiveBar
