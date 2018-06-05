@@ -361,7 +361,7 @@ export default class TopicsChart extends React.Component {
                     <b>Click a slice to continue topic</b>
                   {chart}</div>}
                   
-                   {this.state.series.length == 0 && <div id="activetopics"  style={{height: '380px',zIndex:'9999'}}> <h4 className='graphTitle' id="topics" >Welcome to Mnemos Library</h4><b>To get started you can <button onClick={() => this.setQuizFromDiscovery()} className='btn btn-info' >Discover</button> random questions or <button onClick={() => this.setCurrentPage('topics')} className='btn btn-info' >Search</button> topics or tags.</b>
+                   {this.state.series.length == 0 && <div id="activetopics"  style={{height: '380px',zIndex:'9999'}}> <h4 className='graphTitle' id="topics" >Welcome to Mnemo's Library</h4><b>To get started you can <button onClick={() => this.setQuizFromDiscovery()} className='btn btn-info' >Discover</button> random questions or <button onClick={() => this.setCurrentPage('topics')} className='btn btn-info' >Search</button> topics or tags.</b>
                   </div>}
                 </div>);
                     
