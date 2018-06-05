@@ -41,6 +41,7 @@ export default class TopicsChart extends React.Component {
    * Calculate & Update state of new dimensions
    */
   updateDimensions() {
+      console.log(['U',window.innerWidth,this.state.series.length]);
     if (window.innerWidth < 700 || this.state.series.length > 17) {
         this.setState({show:'list'});
     } else {
