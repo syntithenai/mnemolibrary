@@ -73,7 +73,7 @@ export default class TopicsChart extends React.Component {
         } else if (type==='archive')  {
             url='/api/archivedtopics?user='+this.props.user._id;
         }
-        fetch(url)
+        return fetch(url)
         .then(function(response) {
             return response.json()
         }).then(function(json) {
@@ -180,8 +180,13 @@ export default class TopicsChart extends React.Component {
     };
     showChart() {
         this.setState({series:[]});
-        this.loadData();
-        this.setState({show:'chart'});
+        this.loadData().then(function() {
+            if (this.state.series.length > 24) {
+                this.setState({show:'list'});
+            } else {
+                this.setState({show:'chart'});
+            }
+        });
     };
     showBlocks() {
         this.setState({series:[]});
@@ -251,7 +256,7 @@ export default class TopicsChart extends React.Component {
                         if (val.questions > 0) {
                             reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;&nbsp;</a>);
                         }
-                        let successRate =val.successRate ? val.successRate.toFixed(2) : 0;
+                        let successRate =val.successRate ? parseInt(val*100,10) : 0;
                         return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a className='btn btn-outline-secondary' style={{color:'black'}}>{val.questions}/{val.total}</a><a className='btn btn-outline-secondary' >{successRate}%</a>{continueButton}{reviewButton}<a style={{color:'white'}} className='btn btn-danger' onClick={() => that.blockTopic.bind(that)(val)}>Block</a></span></div>)
                     });
                     
@@ -299,7 +304,7 @@ export default class TopicsChart extends React.Component {
                 let topicsList = '';
                 if (this.state.series.length > 0) {
                    let topicsItems = this.state.series.map(function(val,key) {
-                        let successRate =val.successRate ? val.successRate.toFixed(2) : 0;
+                        let successRate =val.successRate ? parseInt(val*100,10) : 0;
                         return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a style={{color:'white'}} className='btn btn-danger' onClick={() => that.unblockTopic.bind(that)(val.topic)}>Unblock</a></span></div>)
                     });
                     topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
@@ -361,7 +366,7 @@ export default class TopicsChart extends React.Component {
                     <b>Click a slice to continue topic</b>
                   {chart}</div>}
                   
-                   {this.state.series.length == 0 && <div id="activetopics"  style={{height: '380px',zIndex:'9999'}}> <h4 className='graphTitle' id="topics" >Welcome to Mnemo's Library</h4><b>To get started you can <button onClick={() => this.setQuizFromDiscovery()} className='btn btn-info' >Discover</button> random questions or <button onClick={() => this.setCurrentPage('topics')} className='btn btn-info' >Search</button> topics or tags.</b>
+                   {this.state.series.length == 0 && <div id="activetopics"  style={{height: '580px',zIndex:'9999'}}> <h4 className='graphTitle' id="topics" >Welcome to Mnemo's Library</h4><b>To get started you can <button onClick={() => this.setQuizFromDiscovery()} className='btn btn-info' >Discover</button> random questions or <button onClick={() => this.setCurrentPage('topics')} className='btn btn-info' >Search</button> topics or tags.</b>
                   </div>}
                 </div>);
                     
