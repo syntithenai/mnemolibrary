@@ -134,7 +134,12 @@ export default class TopicsChart extends React.Component {
         } else {
             // discover
             console.log(['DISCO ',a]);
-            this.props.setQuizFromTopic(a.topic);
+            if (a.questions <= a.total) {
+                this.props.setQuizFromTopic(a.topic);
+            } else {
+                this.props.setReviewFromTopic(a.topic);
+            }
+            
         }
         
         
