@@ -42,9 +42,9 @@ export default class TopicsChart extends React.Component {
    */
   updateDimensions() {
     if (window.innerWidth < 700) {
-          this.showCurrent(); 
+        this.setState({show:'list'});
     } else {
-        this.showChart(); 
+        this.setState({show:'chart'});
     }
   }
 
@@ -73,51 +73,55 @@ export default class TopicsChart extends React.Component {
         } else if (type==='archive')  {
             url='/api/archivedtopics?user='+this.props.user._id;
         }
-        return fetch(url)
-        .then(function(response) {
-            return response.json()
-        }).then(function(json) {
-           console.log(['got CORE response', json]);
+        let promise = new Promise(function(resolve,reject) {
+            fetch(url)
+            .then(function(response) {
+                return response.json()
+            }).then(function(json) {
+               console.log(['got CORE response', json]);
 
-            let series=[];
-            json.map(function(val,key) {
-            //    console.log(['ssss map',key,val]);
-                if (val.topic && val.topic.length > 0) {
-                    
-                    function getGreenToRed(percent){
-                        let r = percent<50 ? 255 : Math.floor(255-(percent*2-100)*255/100);
-                        let g = percent>50 ? 255 : Math.floor((percent*2)*255/100);
-                        return 'rgb('+r+','+g+',0)';
-                    }
-                    let completion=val.questions/val.total;
-                    // completion approaches 1, successRate approaches 1 so divide by 2 to limit to 1
-                    //let score=(((val.successRate)*(completion)*3) + (completion))/4
-                    let score=(val.successRate + completion)/2
-                    let color=getGreenToRed(score*100);
-                   console.log(['score',score,color,val.topic,val.questions,val.total,val.successRates]);
-                    //+ ' (' + val.questions + '/' + val.total+')'
-                    let point={"topic": val.topic,"id": val.topic ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color,blocks:val.blocks};
-                    //if (point.score < 0.7) {
-                        series.push(point);
-                    //}
-                    series.sort(function(a,b) {
-                        if (a.topic < b.topic) {
-                            return -1;
-                        } else {
-                            return 1;
+                let series=[];
+                json.map(function(val,key) {
+                //    console.log(['ssss map',key,val]);
+                    if (val.topic && val.topic.length > 0) {
+                        
+                        function getGreenToRed(percent){
+                            let r = percent<50 ? 255 : Math.floor(255-(percent*2-100)*255/100);
+                            let g = percent>50 ? 255 : Math.floor((percent*2)*255/100);
+                            return 'rgb('+r+','+g+',0)';
                         }
-                    });
+                        let completion=val.questions/val.total;
+                        // completion approaches 1, successRate approaches 1 so divide by 2 to limit to 1
+                        //let score=(((val.successRate)*(completion)*3) + (completion))/4
+                        let score=(val.successRate + completion)/2
+                        let color=getGreenToRed(score*100);
+                       console.log(['score',score,color,val.topic,val.questions,val.total,val.successRates]);
+                        //+ ' (' + val.questions + '/' + val.total+')'
+                        let point={"topic": val.topic,"id": val.topic ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color,blocks:val.blocks};
+                        //if (point.score < 0.7) {
+                            series.push(point);
+                        //}
+                        series.sort(function(a,b) {
+                            if (a.topic < b.topic) {
+                                return -1;
+                            } else {
+                                return 1;
+                            }
+                        });
+                        
+                    }
+                    return null;
+                });
+                console.log(['SET DATA',series]);
+                that.setState({series:series});
+                resolve();
                     
-                }
-                return null;
-            });
-            console.log(['SET DATA',series]);
-            that.setState({series:series});
-       
-                
-        }).catch(function(ex) {
-            console.log(['test request failed', ex])
-        })        
+            }).catch(function(ex) {
+                console.log(['test request failed', ex])
+                reject();
+            })   
+        });
+        return promise;     
     }
     
     
@@ -139,11 +143,9 @@ export default class TopicsChart extends React.Component {
             } else {
                 this.props.setReviewFromTopic(a.topic);
             }
-            
         }
-        
-        
     }; 
+    
     blockTopic(a) {
         confirmAlert({
           title: 'Block Topic',
@@ -174,29 +176,37 @@ export default class TopicsChart extends React.Component {
     };
     
     showArchive() {
+        let that = this;
         this.setState({series:[]});
-        this.loadData('archive');
-        this.setState({show:'archive'});
+        this.loadData('archive').then(function() {
+            that.setState({show:'archive'});
+        });
+        
     };
     showChart() {
+        let that = this;
         this.setState({series:[]});
         this.loadData().then(function() {
-            if (this.state.series.length > 24) {
-                this.setState({show:'list'});
+            if (that.state.series.length > 17) {
+                that.setState({show:'list'});
             } else {
-                this.setState({show:'chart'});
+                that.setState({show:'chart'});
             }
         });
     };
     showBlocks() {
+        let that = this;
         this.setState({series:[]});
-        this.loadData('blocks');
-        this.setState({show:'blocks'});
+        this.loadData('blocks').then(function() {
+            that.setState({show:'blocks'});
+        });
     };
     showCurrent() {
+        let that = this;
         this.setState({series:[]});
-        this.loadData();
-        this.setState({show:'list'});
+        this.loadData().then(function() {
+            that.setState({show:'list'});
+        });
     };
     unblockTopic(topic) {
         console.log('unblock' + topic);
@@ -272,7 +282,7 @@ export default class TopicsChart extends React.Component {
                    <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
                    <h4 className='graphTitle' id="topics" >Active Topics</h4>
                    <br/>
-                    {topicsList}
+                    {topicsList}<br/><br/><br/><br/>
                 </div>);
                 
                     
@@ -299,6 +309,7 @@ export default class TopicsChart extends React.Component {
                    <h4 className='graphTitle' id="topics" >Archived Topics</h4>
                    <br/>
                     {topicsList}
+                    <br/><br/><br/><br/>
                 </div>);
             } else if (this.state.show==="blocks") {
                 let topicsList = '';
@@ -321,6 +332,7 @@ export default class TopicsChart extends React.Component {
                    <h4 className='graphTitle' id="topics" >Blocked Topics</h4>
                    <br/>
                     {topicsList}
+                    <br/><br/><br/><br/>
                 </div>);
             } else {
                 

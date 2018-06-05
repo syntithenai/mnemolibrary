@@ -85,22 +85,14 @@ export default class ProfilePage extends Component {
                     <div className='col-12 warning-message'>{this.state.warning_message}</div>
                           
                     <br/><br/>
-                    <div className="col-12">
+                    <div className="col-12" style={{minHeight: '700px'}}>
                           <TopicsChart setCurrentPage={this.props.setCurrentPage} setQuizFromDiscovery={this.props.setQuizFromDiscovery} setReviewFromTopic={this.props.setReviewFromTopic} setQuizFromTopic={this.props.setQuizFromTopic} searchQuizFromTopic={this.props.searchQuizFromTopic}  user={this.props.user} />
-                          <br/><br/>
-                            <br/><br/>
-                            <br/><br/>
                     </div>
-                    <div className="col-12">
+                    <div className="col-12" style={{height: '500px'}} >
                           <ProgressChart reviewBySuccessBand={this.props.reviewBySuccessBand} user={this.props.user} />
-                            <br/><br/>
                     </div>
-                    <div className="col-12">
-                          <ActivityChart user={this.props.user} />
-                            <br/><br/>
-                            <br/><br/>
-                            <br/><br/>
-                            <br/><br/>
+                    <div className="col-12" style={{height: '700px'}}>
+                          <ActivityChart user={this.props.user}  />
                     </div>
                     <div className="col-12">
                           <h3  className="card-title">Profile</h3>
