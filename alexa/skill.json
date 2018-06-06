@@ -1,0 +1,29 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "summary": "Mnemo's Library to feed your brain",
+          "examplePhrases": [
+            "Alexa open Mnemo's Library",
+            "Alexa tell Mnemo's Library to discover questions"
+          ],
+          "name": "Mnemo's Library",
+          "description": "Discover interesting facts and review them as a quiz"
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "",
+      "category": "EDUCATION_AND_REFERENCE",
+      "distributionCountries": []
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "sourceDir": "lambda/custom"
+        }
+      }
+    },
+    "manifestVersion": "1.0"
+  }
+}

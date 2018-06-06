@@ -1,0 +1,15 @@
+{
+  "name": "@syntithenai/mnemoalexa",
+  "version": "1.0.0",
+  "description": "alexa skill for mnemolibrary.com",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Steve Ryan <stever@syntithenai.com>",
+  "license": "MIT",
+  "dependencies": {
+    "alexa-app": "^4.2.2"
+  }
+}
