@@ -164,3 +164,30 @@ https://www.robinwieruch.de/conditional-rendering-react/
 
 https://hackernoon.com/building-a-serverless-rest-api-with-node-js-and-mongodb-2e0ed0638f47
 
+
+
+
+## Alexa Dialog
+Welcome to Mnemo's Library where you can discover the world through questions and mnemonics.
+.......
+Would you like to learn something new/discover new facts/hear a question?
+[Discover|Learn|new facts]
+Who was Le Verrier? .... {mnemonic}.....   Le verrier was ...... {shortanswer}
+.....
+Would you like another question?
+[Yes|Next Question]
+What is the capital of North Korea? .... {mnemonic}.  ..
+[Stop|Cancel]
+Would you like another question?
+[Previous Question]
+Who was Le Verrier? .... {mnemonic}.....   Le verrier was ...... {shortanswer}
+[More information?]
+{answer}
+[Give me questions about science]
+What is fission? .... {mnemonic} .....{shortanswer}
+[Next question]
+What is fusion? .... {mnemonic} .....{shortanswer}
+Quiz Me
+
+
+
