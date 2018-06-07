@@ -16,5 +16,5 @@ RUN npm install
 #COPY . .
 VOLUME /usr/src/app
 
-EXPOSE 8080
+EXPOSE 3000
 CMD [ "npm", "start" ]

@@ -4,7 +4,7 @@ var express = require("express");
 
 var express_app = express();
 let app = require('./mnemoslibrary')
-app.schemas.askcli("Mnemo's Library") ;
+//app.schemas.askcli("Mnemo's Library") ;
 
 
 
@@ -20,8 +20,8 @@ app.express({ expressApp: express_app,
   // sets up a GET route when set to true. This is handy for testing in
   // development, but not recommended for production. disabled by default
   debug: true
-} });
-
+});
+express_app.listen(3000, () => console.log('Mnemo listening on port 3000!'))
 
 
 //const http = require('http')

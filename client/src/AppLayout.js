@@ -131,6 +131,7 @@ export default class AppLayout extends Component {
         this.clearDiscoveryBlock = this.clearDiscoveryBlock.bind(this);
         this.clearDiscoveryBlocks = this.clearDiscoveryBlocks.bind(this);
         this.setQuizFromTechnique = this.setQuizFromTechnique.bind(this);
+         this.openAuth = this.openAuth.bind(this);
         
         // listen to messages from child iframe
         //window.addEventListener('message', function(e) {
@@ -143,6 +144,19 @@ export default class AppLayout extends Component {
         //});
   };
   
+  getQueryStringValue (key) {  
+          return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+  } 
+          
+      
+  openAuth(service) {
+      console.log(['oauth '+service]);
+      let authRequest={response_type:'code',redirect_uri:this.getQueryStringValue('redirect_uri'),response_type:this.getQueryStringValue('response_type'),scope:this.getQueryStringValue('scope'),state:this.getQueryStringValue('state')}
+    
+      this.setCurrentPage('login');
+      localStorage.setItem('oauth',service);
+      localStorage.setItem('oauth_request',JSON.stringify(authRequest));
+  };
 
   componentDidMount() {
       let that = this;
@@ -189,7 +203,9 @@ export default class AppLayout extends Component {
           parts.forEach(function(part) {
               let iParts=part.split("=");
               // load by token ?
-              if (iParts[0]==="confirm") {
+              if (iParts[0]==="oauth") {
+                  that.openAuth(iParts[1]);
+              } else if (iParts[0]==="confirm") {
                   that.loginByConfirm(window.location.search.slice(9));
               } else if (iParts[0]==="recovery") {
                   that.loginByRecovery(window.location.search.slice(10));
@@ -1083,97 +1099,105 @@ export default class AppLayout extends Component {
     const showLogin = this.isCurrentPage('login') && !this.isLoggedIn();
     let title=decodeURIComponent(this.state.title);
     
-    return (
-        <div className="mnemo">
-            {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
-            <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
-            
-            {((this.isCurrentPage('splash')) || (this.isCurrentPage('') && !this.isLoggedIn())) && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} title={title}/></div>}
-            
-            {this.isCurrentPage('home') && <QuizCarousel 
-                isAdmin={this.isAdmin}  
-                setCurrentPage={this.setCurrentPage}  
-                setCurrentQuestion={this.setCurrentQuestion}   
-                setCurrentQuiz={this.setCurrentQuiz} 
-                saveSuggestion={this.saveSuggestion} 
-                setQuizFromTechnique={this.setQuizFromTechnique} 
-                setQuizFromTopic={this.setQuizFromTopic} 
-                setDiscoveryBlock={this.setDiscoveryBlock}  
-                setQuizFromDiscovery={this.setQuizFromDiscovery} 
-                setQuizFromTag={this.setQuizFromTag} 
-                clearDiscoveryBlock={this.clearDiscoveryBlock} 
-                blocks={this.state.discoveryBlocks}  
-                discoverQuestions={this.discoverQuestions}  
-                questions={this.state.questions} 
-                currentQuestion={this.state.currentQuestion} 
-                currentQuiz={this.state.currentQuiz} 
-                indexedQuestions={this.state.indexedQuestions} 
-                user={this.state.user} 
-                progress={progress}  
-                updateProgress={this.updateProgress} 
-                like={this.like} 
-                isLoggedIn={this.isLoggedIn} 
-                mnemonic_techniques={this.state.mnemonic_techniques} 
-                setMessage={this.setMessage} 
-                isReview={false} /> }
-            
-            {this.isCurrentPage('topics') && <TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage}/>
-            }
-            {this.isCurrentPage('tags') && <TagsPage  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
-            }
-            {this.isCurrentPage('search') && <SearchPage mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
-            }
-            {this.isCurrentPage('review') && <ReviewPage 
-                isAdmin={this.isAdmin}  
-                saveSuggestion={this.saveSuggestion} 
-                setCurrentQuestion={this.setCurrentQuestion} 
-                setCurrentPage={this.setCurrentPage} 
-                setCurrentQuiz={this.setCurrentQuiz} 
-                setQuizFromTechnique={this.setQuizFromTechnique} 
-                setQuizFromDiscovery={this.setQuizFromDiscovery} 
-                setQuizFromTopic={this.setQuizFromTopic} 
-                setDiscoveryBlock={this.setDiscoveryBlock} 
-                setQuizFromTag={this.setQuizFromTag}  
-                clearDiscoveryBlock={this.clearDiscoveryBlock} 
-                blocks={this.state.discoveryBlocks} 
-                discoverQuestions={this.discoverQuestions}  
-                getQuestionsForReview={this.getQuestionsForReview} 
-                mnemonic_techniques={this.state.mnemonic_techniques} 
-                questions={this.state.questions} 
-                currentQuiz={this.state.currentQuiz} 
-                currentQuestion={this.state.currentQuestion} 
-                indexedQuestions={this.state.indexedQuestions} 
-                topicTags={this.state.topicTags} 
-                updateProgress={this.updateProgress} 
-                finishQuiz={this.finishReview}  
-                isReview={true} 
-                setMessage={this.setMessage} 
-                like={this.like} user={this.state.user} 
-                progress={progress} 
-                isLoggedIn={this.isLoggedIn}  
-            />
-            }
-            {this.isCurrentPage('create') && <CreatePage  user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
-            }
-            {this.isCurrentPage('about') && <AboutPage setCurrentPage={this.setCurrentPage} />
-            }
-            {this.isCurrentPage('intro') && <IntroPage setCurrentPage={this.setCurrentPage} />
-            }
-            {this.isCurrentPage('termsofuse') && <TermsOfUse  setCurrentPage={this.setCurrentPage} />
-            }
-            {this.isCurrentPage('faq') && <FAQ  setCurrentPage={this.setCurrentPage} />
-            }
-            {this.isCurrentPage('createhelp') && <CreateHelp  />
-            }
-            {(this.isCurrentPage('profile') || (this.isCurrentPage('')) && this.isLoggedIn()) && <ProfilePage setCurrentPage={this.setCurrentPage} setQuizFromDiscovery={this.setQuizFromDiscovery} reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
-            }
-            {(showLogin) && <LoginPage token={this.state.token} login={this.login}/>
-            }<br/>
-            <Footer/>
-            
-        </div>
+    if (this.isCurrentPage('disabled')) {
+        return (<div>DIS</div>);
+    } else {
+                
         
-    );
+        return (
+            <div className="mnemo">
+            
+                {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
+                <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
+                
+                {((this.isCurrentPage('splash')) || (this.isCurrentPage('') && !this.isLoggedIn())) && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} title={title}/></div>}
+                
+                {this.isCurrentPage('home') && <QuizCarousel 
+                    isAdmin={this.isAdmin}  
+                    setCurrentPage={this.setCurrentPage}  
+                    setCurrentQuestion={this.setCurrentQuestion}   
+                    setCurrentQuiz={this.setCurrentQuiz} 
+                    saveSuggestion={this.saveSuggestion} 
+                    setQuizFromTechnique={this.setQuizFromTechnique} 
+                    setQuizFromTopic={this.setQuizFromTopic} 
+                    setDiscoveryBlock={this.setDiscoveryBlock}  
+                    setQuizFromDiscovery={this.setQuizFromDiscovery} 
+                    setQuizFromTag={this.setQuizFromTag} 
+                    clearDiscoveryBlock={this.clearDiscoveryBlock} 
+                    blocks={this.state.discoveryBlocks}  
+                    discoverQuestions={this.discoverQuestions}  
+                    questions={this.state.questions} 
+                    currentQuestion={this.state.currentQuestion} 
+                    currentQuiz={this.state.currentQuiz} 
+                    indexedQuestions={this.state.indexedQuestions} 
+                    user={this.state.user} 
+                    progress={progress}  
+                    updateProgress={this.updateProgress} 
+                    like={this.like} 
+                    isLoggedIn={this.isLoggedIn} 
+                    mnemonic_techniques={this.state.mnemonic_techniques} 
+                    setMessage={this.setMessage} 
+                    isReview={false} /> }
+                
+                {this.isCurrentPage('topics') && <TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage}/>
+                }
+                {this.isCurrentPage('tags') && <TagsPage  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
+                }
+                {this.isCurrentPage('search') && <SearchPage mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
+                }
+                {this.isCurrentPage('review') && <ReviewPage 
+                    isAdmin={this.isAdmin}  
+                    saveSuggestion={this.saveSuggestion} 
+                    setCurrentQuestion={this.setCurrentQuestion} 
+                    setCurrentPage={this.setCurrentPage} 
+                    setCurrentQuiz={this.setCurrentQuiz} 
+                    setQuizFromTechnique={this.setQuizFromTechnique} 
+                    setQuizFromDiscovery={this.setQuizFromDiscovery} 
+                    setQuizFromTopic={this.setQuizFromTopic} 
+                    setDiscoveryBlock={this.setDiscoveryBlock} 
+                    setQuizFromTag={this.setQuizFromTag}  
+                    clearDiscoveryBlock={this.clearDiscoveryBlock} 
+                    blocks={this.state.discoveryBlocks} 
+                    discoverQuestions={this.discoverQuestions}  
+                    getQuestionsForReview={this.getQuestionsForReview} 
+                    mnemonic_techniques={this.state.mnemonic_techniques} 
+                    questions={this.state.questions} 
+                    currentQuiz={this.state.currentQuiz} 
+                    currentQuestion={this.state.currentQuestion} 
+                    indexedQuestions={this.state.indexedQuestions} 
+                    topicTags={this.state.topicTags} 
+                    updateProgress={this.updateProgress} 
+                    finishQuiz={this.finishReview}  
+                    isReview={true} 
+                    setMessage={this.setMessage} 
+                    like={this.like} user={this.state.user} 
+                    progress={progress} 
+                    isLoggedIn={this.isLoggedIn}  
+                />
+                }
+                {this.isCurrentPage('create') && <CreatePage  user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
+                }
+                {this.isCurrentPage('about') && <AboutPage setCurrentPage={this.setCurrentPage} />
+                }
+                {this.isCurrentPage('intro') && <IntroPage setCurrentPage={this.setCurrentPage} />
+                }
+                {this.isCurrentPage('termsofuse') && <TermsOfUse  setCurrentPage={this.setCurrentPage} />
+                }
+                {this.isCurrentPage('faq') && <FAQ  setCurrentPage={this.setCurrentPage} />
+                }
+                {this.isCurrentPage('createhelp') && <CreateHelp  />
+                }
+                {(this.isCurrentPage('profile') || (this.isCurrentPage('')) && this.isLoggedIn()) && <ProfilePage token={this.state.token} setCurrentPage={this.setCurrentPage} setQuizFromDiscovery={this.setQuizFromDiscovery} reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
+                }
+                {(showLogin) && <LoginPage token={this.state.token} login={this.login}/>
+                }<br/>
+                <Footer/>
+                
+            </div>
+            
+        );
+        
+    }
   }
 }
 

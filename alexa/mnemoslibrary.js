@@ -5,7 +5,7 @@ var app = new alexa.app("mnemoslibrary");
 app.dictionary = {
   "names": ["matt", "joe", "bob", "bill", "mary", "jane", "dawn"]
 };
-app.invocationName="mnemo's library";
+app.invocationName="nemo's library";
 
 
 // CUSTOM INTENTS
@@ -46,8 +46,8 @@ app.intent("login", {
 
 // ENTRY/EXIT
 app.launch(function(request, response) {
-  response.say("Hello World");
-  response.card("Hello World", "This is an example card");
+  response.say("Hello me to");
+  response.card("Hello Worlddes", "This is an example card");
 });
 
 
@@ -90,6 +90,7 @@ app.intent("AMAZON.CancelIntent", {
 
 // PRE/POST 
 app.pre = function(request, response, type) {
+    console.log(['REQUEST',request.type,request.session,request.slots]);
   //if (request.applicationId != "amzn1.echo-sdk-ams.app.000000-d0ed-0000-ad00-000000d00ebe") {
     //// fail ungracefully
     //throw "Invalid applicationId";

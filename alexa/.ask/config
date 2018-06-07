@@ -8,7 +8,8 @@
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "https://alexa.mnemolibrary.com"
+                "uri": "https://alexa.syntithenai.com/mnemoslibrary",
+                "sslCertificateType": "Trusted"
               }
             }
           }

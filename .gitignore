@@ -1,4 +1,5 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
+namecheap_dyndns
 docker-images
 package-lock.json
 client/public/dev

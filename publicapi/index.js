@@ -12,4 +12,4 @@ app.use(bodyParser.json());
 
 app.use('/oauth',require('./routes/oauth'))
 app.use('/login',require('./routes/signup'))
-app.listen(config.port);
+app.listen(3000);

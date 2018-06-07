@@ -3,12 +3,39 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "summary": "Mnemo's Library to feed your brain",
+          "summary": "Nemo's Library to feed your brain",
           "examplePhrases": [
-            "Alexa open Mnemo's Library",
-            "Alexa tell Mnemo's Library to discover questions"
+            "Alexa open Nemo's Library",
+            "Alexa tell Nemo's Library to discover questions"
           ],
-          "name": "Mnemo's Library",
+          "name": "Nemo's Library",
+          "description": "Discover interesting facts and review them as a quiz"
+        },
+        "en-AU": {
+          "summary": "Nemo's Library to feed your brain",
+          "examplePhrases": [
+            "Alexa open Nemo's Library",
+            "Alexa tell Nemo's Library to discover questions"
+          ],
+          "name": "Nemo's Library",
+          "description": "Discover interesting facts and review them as a quiz"
+        },
+        "en-CA": {
+          "summary": "Nemo's Library to feed your brain",
+          "examplePhrases": [
+            "Alexa open Nemo's Library",
+            "Alexa tell Nemo's Library to discover questions"
+          ],
+          "name": "Nemo's Library",
+          "description": "Discover interesting facts and review them as a quiz"
+        },
+        "en-GB": {
+          "summary": "Nemo's Library to feed your brain",
+          "examplePhrases": [
+            "Alexa open Nemo's Library",
+            "Alexa tell Nemo's Library to discover questions"
+          ],
+          "name": "Nemo's Library",
           "description": "Discover interesting facts and review them as a quiz"
         }
       },

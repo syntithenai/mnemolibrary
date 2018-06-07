@@ -90,7 +90,7 @@ router.get('/recenttopics', (req, res) => {
                 return;
             }
             result.toArray().then(function(final) {
-                console.log(['RECENT TOPICS',final]);
+               // console.log(['RECENT TOPICS',final]);
                 let topics=[];
                 final.map(function(val,key) {
                     collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
@@ -119,7 +119,7 @@ router.get('/recenttopics', (req, res) => {
                         return;
                     }
                     questionResult.toArray().then(function(questionFinal) {
-                        console.log(['QUESTION FINAL',questionFinal]);
+                        //console.log(['QUESTION FINAL',questionFinal]);
                         // include total questions for each topic
                         for (key in questionFinal) {
                             let val=questionFinal[key];
@@ -232,7 +232,7 @@ router.get('/archivedtopics', (req, res) => {
 
            
 router.get('/blockedtopics', (req, res) => {
-    console.log('get blocked');
+    //console.log('get blocked');
     if (req.query.user && req.query.user.length > 0) {
         let collatedTopics={};
         db.collection('userquestionprogress').aggregate([
@@ -252,7 +252,7 @@ router.get('/blockedtopics', (req, res) => {
                 return;
             }
             result.toArray().then(function(final) {
-                console.log(['get blocked',final]);
+               // console.log(['get blocked',final]);
                 //let topics=[];
                 final.map(function(val,key) {
                     collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
@@ -297,7 +297,7 @@ router.get('/usersuccessprogress', (req, res) => {
                 
 
 router.get('/useractivity', (req, res) => {
-    console.log('UA',req.query.user);
+    //console.log('UA',req.query.user);
     if (req.query.user && req.query.user.length > 0) {
         db.collection('seen').aggregate([
             { $match: {'user': req.query.user}},
@@ -452,7 +452,7 @@ router.get('/sitemap', (req, res) => {
             fs.mkdirSync(ROOT_APP_PATH+"/client/public/cache");
         }
         
-        console.log(['queryids',req.query.ids]);
+        //console.log(['queryids',req.query.ids]);
         results.map(function(question,key) {
              siteMap.push(config.protocol+'://'+config.host+'/cache/page_'+question._id+'.html');
              let page = mustache.render(questionTemplate,{id:question._id,header:question.interrogative + ' ' + question.question,answer:question.answer,mnemonic:question.mnemonic,attribution:question.attribution,quiz:question.quiz,tags:question.tags});
@@ -461,7 +461,7 @@ router.get('/sitemap', (req, res) => {
                 let ids = req.query.ids.split(","); 
                 //console.log(ids);
                 if (ids.indexOf(String(question._id))!=-1) {
-                    console.log(['queryids match',question._id]);
+                   // console.log(['queryids match',question._id]);
                     if (fs.existsSync(ROOT_APP_PATH+"/client/public/cache/page_"+question._id+'.html')) {
                         fs.unlinkSync(ROOT_APP_PATH+"/client/public/cache/page_"+question._id+'.html');
                     }
@@ -540,17 +540,12 @@ router.post('/import', (req, res) => {
                         // convert to ObjectId or create new 
                         if (json.questions[a].hasOwnProperty('_id')&& String(json.questions[a]._id).length > 0) {
                             record._id = ObjectId(json.questions[a]._id); 
-                            if (record.question==="Le Verrier") {
-                                console.log(['USe ID',record._id]);
-                            } 
+                            
                         } else {
                              record._id = ObjectId();  
-                             console.log(['NEW ID',record._id]);
+                            // console.log(['NEW ID',record._id]);
                         }
                         thePromise = new Promise(function(resolve,reject) {
-                            if (record.question==="Le Verrier") {
-                                console.log(['SAVE',record._id,record]);
-                            }
                             db.collection('questions').save(record).then(function(resy) {
                                 //console.log(['UPDATE']);
                                 //let newRecord={_id:record._id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
@@ -615,7 +610,7 @@ router.get('/topiccollections', (req, res) => {
     db.collection('topicCollections').find({}).sort({sort:1}).toArray().then(function(collections) {
         db.collection('userTopics').find({published:{$eq:true}}).sort({updated:-1}).limit(10).toArray().then(function(userTopics) {
             let topics=[];//sort({updated:-1}).
-            console.log(['TOPICCOLLES',userTopics]);
+           // console.log(['TOPICCOLLES',userTopics]);
             userTopics.map(function(key,val) {
                     topics.push(key.publishedTopic);
             });
@@ -676,13 +671,13 @@ router.post('/discover', (req, res) => {
         }
         if (blocks.topic && Array.isArray(blocks.topic)) {
             blocks.topic.forEach(function(topic) {
-                console.log({$ne: topic});
+                //console.log({$ne: topic});
                 blockCriteria.push({quiz: {$ne: topic}});
             });
         }
         if (blocks.technique && Array.isArray(blocks.technique)) {
             blocks.technique.forEach(function(technique) {
-                console.log({$ne: technique});
+                //console.log({$ne: technique});
                 blockCriteria.push({mnemonic_technique: {$ne: technique}});
             });
         }
@@ -716,7 +711,7 @@ router.post('/discover', (req, res) => {
             //for (var seenId in progress.block) {
                 //notThese.push(ObjectId(seenId));
             //};
-            console.log(['disco NOTHTES',notThese]);
+           // console.log(['disco NOTHTES',notThese]);
             criteria.push({'_id': {$nin: notThese}});
             //console.log(['disco criteria',criteria]);
             db.collection('questions').find({$and:criteria})
@@ -740,7 +735,7 @@ router.post('/discover', (req, res) => {
 })
 
 router.get('/review', (req, res) => {
-    console.log('review');
+    //console.log('review');
     let limit=20;
      let orderBy = (req.query.orderBy == 'successRate') ? 'successRate' : 'timeScore'
      let orderMeBy = {};
@@ -774,11 +769,11 @@ router.get('/review', (req, res) => {
      //console.log({seen:{$lt:oneHourBack}});
      if (req.query.user && req.query.user.length > 0) {
          // sort by successTally and then most recently seen first
-         console.log(JSON.stringify(criteria));
+      //   console.log(JSON.stringify(criteria));
         db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(limit).toArray().then(function(questions,error) {
-            console.log('llll');
-            console.log(questions);
-            console.log(error);
+            //console.log('llll');
+            //console.log(questions);
+            //console.log(error);
             //let questions=[];
             if (questions) {
                 //for (var questionId in progress.seen) {
@@ -853,7 +848,7 @@ router.get('/review', (req, res) => {
  //               }
                 
                 
-                console.log(['REVItEW',successAndDateOrderedIds]);
+         //       console.log(['REVItEW',successAndDateOrderedIds]);
                 db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).toArray(function(err,results) {
                    // console.log([err,results]);
                     let questionIndex={};
@@ -867,7 +862,7 @@ router.get('/review', (req, res) => {
                             orderedResults.push(questionIndex[question]);   
                         }
                     });
-                    console.log(['q',err,orderedResults]);
+           //         console.log(['q',err,orderedResults]);
                     //res.send({'currentQuestion':'0','currentQuiz':questionIds,'questions':results,indexedQuestions:indexedQuestions});
                     res.send({'questions':orderedResults});
                     //res.send({'questions':results});
@@ -884,8 +879,8 @@ router.get('/review', (req, res) => {
 
 // search questions
 router.get('/questions', (req, res) => {
-    console.log('search questions');
-    console.log(req.query);
+    //console.log('search questions');
+    //console.log(req.query);
     let limit = 20;
     let skip = 0;
     if (req.query.limit && req.query.limit > 0) {
@@ -1020,7 +1015,7 @@ function blockQuestion(user,question,topic) {
                 progress.block = 1; //new Date().getTime();
                 progress.topic = topic;
                 db.collection('userquestionprogress').update({_id:progress._id},progress).then(function() {
-                    console.log(['update',progress]);
+                  //  console.log(['update',progress]);
             
                 });
                 
@@ -1029,7 +1024,7 @@ function blockQuestion(user,question,topic) {
                   progress.block = 1; //new Date().getTime();
                   progress.topic = topic;
                   db.collection('userquestionprogress').save(progress).then(function() {
-                      console.log(['insert',progress]);
+                    //  console.log(['insert',progress]);
             
                 });
             } 
@@ -1293,7 +1288,7 @@ router.post('/saveusertopic', (req, res) => {
         });
         if (req.body.deleteQuestion && String(req.body.deleteQuestion).length > 0) {
             db.collection('questions').remove({_id:ObjectId(req.body.deleteQuestion)}).then(function(result) {
-                console.log(['deleted question',result]);
+                //console.log(['deleted question',result]);
                 
             }).catch(function(err) {
 //                console.log(['save usertopic ERR',err]);
@@ -1304,7 +1299,7 @@ router.post('/saveusertopic', (req, res) => {
 //            console.log(['saved usertopic',result]);
             res.send({id:id,errors:errors});
         }).catch(function(err) {
-            console.log(['save usertopic ERR',err]);
+          //  console.log(['save usertopic ERR',err]);
             res.send({message:'Invaddlid request ERR'});
         });
         
@@ -1632,7 +1627,7 @@ router.post('/publishusertopic', (req, res) => {
                             let    deleteCriteria={$and:[{userTopic:{$eq:req.body._id}},{isPreview:{$eq:true}}]};
                             //}
                             db.collection('questions').remove(deleteCriteria).then(function() {
-                                console.log('CLEANED UP PREVIEW QUESTIONS');
+                               // console.log('CLEANED UP PREVIEW QUESTIONS');
                                 promises.push(newQuestions.map(function(question,key) {
                                     if (preview) {
                                         question.quiz = "Preview "+question.quiz;
@@ -1641,7 +1636,7 @@ router.post('/publishusertopic', (req, res) => {
                                         question.access=user.username;
                                     }
                                     db.collection('questions').save(question).then(function() {
-                                        console.log(['saved q',question]);
+                                        //console.log(['saved q',question]);
                                             //if (preview) {
                                                 //db.collection('questions').remove({$and:[{userTopic:{$eq:req.body._id}},{isPreview:true}]});  
                                             //} else {
@@ -1658,7 +1653,7 @@ router.post('/publishusertopic', (req, res) => {
                                 });  
                                 // save usertopic
                                 db.collection('userTopics').save(userTopic).then(function(result) {
-                                    console.log(['saved r',result]);
+                                    //console.log(['saved r',result]);
                                 }).catch(function(e) {
                                     console.log(['failed saved r',e]);
                                 });

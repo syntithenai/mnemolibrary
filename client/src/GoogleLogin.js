@@ -259,7 +259,7 @@ export default class GoogleLogin extends Component {
 	
 	googleSignOut() {
 	//	console.log('sign ut');
-		this.GoogleAuth.disconnect();
+		if (this.GoogleAuth) this.GoogleAuth.disconnect();
 	}
 	
 

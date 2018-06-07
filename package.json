@@ -2,7 +2,7 @@
   "name": "mnemo-express",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently --kill-others-on-fail  \"npm run server\" \"npm run client\" \"npm run publicapi\"",
+    "start": "concurrently --kill-others-on-fail  \"npm run server\" \"npm run client\" ",
     "server": "nodemon server.js",
     "client": "cd client && react-scripts start",
     "publicapi": "cd publicapi && nodemon app.js"

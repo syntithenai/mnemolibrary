@@ -37,14 +37,14 @@ router.all('/token', oauthMiddlewares.token);
 router.get('/authorize', oauthMiddlewares.authorize);
 router.post('/authorize', oauthMiddlewares.authorize);
 
-router.get('/secure', oauthMiddlewares.authenticate, (req, res) => {
-res.json({ message: 'Secure data' });
-});
+//router.get('/secure', oauthMiddlewares.authenticate, (req, res) => {
+//res.json({ message: 'Secure data' });
+//});
 
-router.post('/users', usersController.createUser);
-router.get('/users', usersController.getUsers);
-router.post('/clients', clientsController.createClient);
-router.get('/clients', clientsController.getClient);
+//router.post('/users', usersController.createUser);
+//router.get('/users', usersController.getUsers);
+//router.post('/clients', clientsController.createClient);
+//router.get('/clients', clientsController.getClient);
 
 
 router.use((req, res, next) => {

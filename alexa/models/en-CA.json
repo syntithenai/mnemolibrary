@@ -1,0 +1,38 @@
+{
+   "interactionModel": {
+      "languageModel": {
+         "intents": [
+            {
+               "name": "get_question",
+               "samples": [
+                  "Discover"
+               ]
+            },
+            {
+               "name": "test",
+               "samples": []
+            },
+            {
+               "name": "login",
+               "samples": [
+                  "Login"
+               ]
+            },
+            {
+               "name": "AMAZON.HelpIntent",
+               "samples": []
+            },
+            {
+               "name": "AMAZON.StopIntent",
+               "samples": []
+            },
+            {
+               "name": "AMAZON.CancelIntent",
+               "samples": []
+            }
+         ],
+         "types": [],
+         "invocationName": "mnemo's library"
+      }
+   }
+}
