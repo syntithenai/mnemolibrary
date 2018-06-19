@@ -12,6 +12,8 @@ RUN npm install
 # If you are building your code for production
 # RUN npm install --only=production
 
+RUN npm install --unsafe-perm -g ask-cli 
+
 # Bundle app source
 #COPY . .
 VOLUME /usr/src/app

@@ -178,7 +178,13 @@ server {
 	{{ end }}
 
 	location / {
-		{{ if eq $proto "uwsgi" }}
+		 # enables WS support
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_read_timeout 999999999;
+        {{ if eq $proto "uwsgi" }}
 		include uwsgi_params;
 		uwsgi_pass {{ trim $proto }}://{{ trim $host }};
 		{{ else }}

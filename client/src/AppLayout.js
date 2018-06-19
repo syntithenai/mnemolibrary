@@ -1,6 +1,8 @@
 /* global gapi */
+/* global Paho */
 import React, { Component } from 'react';
 //import AdSense from 'react-adsense';
+//let Paho = require('paho-mqtt')
  
 import Navigation from './Navigation';
 //import SingleQuestion from './SingleQuestion';
@@ -50,6 +52,9 @@ export default class AppLayout extends Component {
         }};
         let users = null;
       this.GoogleAuth = null; // Google Auth object.
+      this.mqttClient = null;
+      this.mqttClientId = null;
+      
       let userString = localStorage.getItem('users');
       if (userString) {
           let data = JSON.parse(userString);
@@ -132,7 +137,7 @@ export default class AppLayout extends Component {
         this.clearDiscoveryBlocks = this.clearDiscoveryBlocks.bind(this);
         this.setQuizFromTechnique = this.setQuizFromTechnique.bind(this);
          this.openAuth = this.openAuth.bind(this);
-        
+        this.shout=this.shout.bind(this);
         // listen to messages from child iframe
         //window.addEventListener('message', function(e) {
         //// check message origin
@@ -158,10 +163,93 @@ export default class AppLayout extends Component {
       localStorage.setItem('oauth_request',JSON.stringify(authRequest));
   };
 
+  shout(action,params) {
+      console.log('shout');
+    try {
+       let messageO={'from':this.mqttClientId,action:action,params:params}; 
+        
+       let message = new Paho.MQTT.Message(JSON.stringify(messageO));
+        message.destinationName = "presence";
+       this.mqttClient.send(message) 
+    } catch (e) {
+        console.log(e);
+    }
+  };
+
   componentDidMount() {
       let that = this;
       ReactGA.initialize(config.analyticsKey);
-      
+     
+        // MQTT
+        this.mqttClientId=  'nemo_'+Math.random().toString(16).substr(2, 8);
+        // Create a client instance
+        let client =  new Paho.MQTT.Client('mqtt.syntithenai.com', Number(9001), this.mqttClientId);
+        this.mqttClient=client;
+        // set callback handlers
+        this.mqttClient.onConnectionLost = onConnectionLost;
+        this.mqttClient.onMessageArrived = onMessageArrived;
+         
+        // connect the client
+        this.mqttClient.connect({onSuccess:onConnect,useSSL:true,keepAliveInterval:60,timeout:3000});  //
+         
+        // called when the client connects
+        function onConnect() {
+          // Once a connection has been made, make a subscription and send a message.
+          console.log("onConnect");
+          that.mqttClient.subscribe("presence");
+        }
+         
+        // called when the client loses its connection
+        function onConnectionLost(responseObject) {
+          if (responseObject && responseObject.errorCode !== 0) {
+            console.log("onConnectionLost:"+responseObject.errorMessage);
+          }
+        }
+         
+        // called when a message arrives
+        function onMessageArrived(message) {
+            console.log('onmessage');
+            try {
+                if (message) {
+                    let json = {}
+                    try {
+                       json = JSON.parse(message.payloadString);  
+                    } catch (e) {
+                         console.log(['NOTJSON',message.payloadString]);
+                    }  
+                    console.log(json);
+            
+                    if (json && json.from && json.from.length > 0 && json.from !== that.mqttClientId ) {
+                        console.log('onmessage');
+                        if (json.action==="page" ) {
+                            //if (json.page==="discover") {
+                                ////that.setQuizFromDiscovery();
+                            //} else if (json.page==="review") {
+                               //// that.getQuestionsForReview();
+                               //// that.setState({'message':null,'currentPage': json.page,title: Navigation.pageTitles[json.page]});
+                            //} else {
+                                //that.setCurrentPage(json.params);
+                            //}
+                            
+                        }  else if (json.action==="discover") {
+                            that.discoverFromQuestionId(json.question);
+                        }  else if (json.action==="review") {
+                            that.reviewFromQuestionId(json.question);
+                        }
+                        console.log(json);
+                     } else {
+                        console.log('bad json in message');
+            
+                     }
+                }
+            }  catch (e) {
+                 console.log(['onmttmessage error',e]);
+            }  
+
+        }
+
+
+        
         const script = document.createElement("script");
         script.src = "https://apis.google.com/js/platform.js";
         script.onload = () => {
@@ -228,7 +316,9 @@ export default class AppLayout extends Component {
               let iParts=part.split("=");
 
               // search on load
-              if (iParts[0]==="question") {
+              if (iParts[0]==="page") {
+                  that.setCurrentPage(iParts[1]);
+              } else if (iParts[0]==="question") {
                   that.setQuizFromQuestionId(iParts[1]);
               } else if (iParts[0]==="tag") {
                   that.setQuizFromTag({text:iParts[1]});
@@ -367,21 +457,22 @@ export default class AppLayout extends Component {
                 localStorage.setItem('token',JSON.stringify(res));
                 localStorage.setItem('user',JSON.stringify(that.state.user));
                 // load progress
-                fetch('/api/progress')
-                  .then(function(response) {
-                //    console.log(['got response', response])
-                    return response.json()
-                  }).then(function(json) {
-                  //  console.log(['set progress', json])
-                    that.setState(state);
-                    that.updateProgress(json);
+                //fetch('/api/progress')
+                  //.then(function(response) {
+                ////    console.log(['got response', response])
+                    //return response.json()
+                  //}).then(function(json) {
+                  ////  console.log(['set progress', json])
+                    //that.setState(state);
+                    //that.updateProgress(json);
+
+                  //}).catch(function(ex) {
+                    //console.log(['parsing failed', ex])
+                  //})
                     setInterval(function() {
                        // console.log('toke ref');
                         that.refreshLogin(state.token)
                     },(parseInt(this.state.token.expires_in,10)-1)*1000);
-                  }).catch(function(ex) {
-                    console.log(['parsing failed', ex])
-                  })
             })
             .catch(function(err) {
                 console.log(['ERR',err]);
@@ -543,7 +634,11 @@ export default class AppLayout extends Component {
       this.analyticsEvent(page);
       if (page==="review") {
           this.getQuestionsForReview();
-      }
+      } 
+      //else if (page==="discover") {
+         //this.setQuizFromDiscovery();
+         //page='home'
+      //}
       this.setState({'message':null,'currentPage': page,title: Navigation.pageTitles[page]});
   };  
  
@@ -767,6 +862,53 @@ export default class AppLayout extends Component {
   };
 
 
+  discoverFromQuestionId(questionId) {
+      let that = this;
+      // load selected question
+      fetch('/api/questions?question='+questionId )
+      .then(function(response) {
+        return response.json()
+      }).then(function(json1) {
+//            console.log(['got response', json1])
+          if (json1.questions && json1.questions.length > 0) {
+            let question=json1.questions[0];
+            if (question) {
+                let id=question._id
+                let currentQuiz=[id];
+                let indexedQuestions={};
+                indexedQuestions[id]=0;
+                let questions=[question];
+                let state={currentPage:"home",'currentQuestion':0,'currentQuiz':currentQuiz, 'questions':questions,'indexedQuestions':indexedQuestions,title: 'Discover'};
+                that.setState(state);
+            }              
+          }
+      });
+  };
+  
+  reviewFromQuestionId(questionId) {
+      console.log(['SQFQid',questionId]);
+      let that = this;
+      // load selected question
+      fetch('/api/questions?question='+questionId )
+      .then(function(response) {
+        return response.json()
+      }).then(function(json1) {
+      //      console.log(['got response', json1])
+          if (json1.questions && json1.questions.length > 0) {
+            let question=json1.questions[0];
+            if (question) {
+                let id=question._id
+                let currentQuiz=[id];
+                let indexedQuestions={};
+                indexedQuestions[id]=0;
+                let questions=[question];
+                let state={currentPage:"review",'currentQuestion':0,'currentQuiz':currentQuiz, 'questions':questions,'indexedQuestions':indexedQuestions,title: 'Review'};
+                that.setState(state);
+            }              
+          }
+      });
+  };
+
   setQuizFromQuestionId(questionId) {
       console.log(['SQFQid',questionId]);
       let that = this;
@@ -824,7 +966,7 @@ export default class AppLayout extends Component {
       // load initial questions
       let url='/api/questions?topic='+topic ;
       if (this.state.user) {
-          url=url+'&user='+this.state.user.username;
+          url=url+'&user='+this.state.user._id;
       }
       fetch(url)
       .then(function(response) {
@@ -864,7 +1006,7 @@ export default class AppLayout extends Component {
       // load initial questions
       let url='/api/questions?topic='+topic ;
       if (this.state.user) {
-          url=url+'&user='+this.state.user.username;
+          url=url+'&user='+this.state.user._id;
       }
       fetch(url)
       .then(function(response) {
@@ -1108,7 +1250,7 @@ export default class AppLayout extends Component {
             <div className="mnemo">
             
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
-                <Navigation user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
+                <Navigation shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
                 
                 {((this.isCurrentPage('splash')) || (this.isCurrentPage('') && !this.isLoggedIn())) && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} title={title}/></div>}
                 
@@ -1189,7 +1331,7 @@ export default class AppLayout extends Component {
                 }
                 {(this.isCurrentPage('profile') || (this.isCurrentPage('')) && this.isLoggedIn()) && <ProfilePage token={this.state.token} setCurrentPage={this.setCurrentPage} setQuizFromDiscovery={this.setQuizFromDiscovery} reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
                 }
-                {(showLogin) && <LoginPage token={this.state.token} login={this.login}/>
+                {(showLogin) && <LoginPage token={this.state.token} login={this.login} setCurrentPage={this.setCurrentPage}/>
                 }<br/>
                 <Footer/>
                 

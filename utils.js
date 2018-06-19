@@ -3,29 +3,109 @@ const nodemailer = require('nodemailer');
 const template= require('./template');
 const config=require('./config');
 var ObjectId = require('mongodb').ObjectID;
+var removeDiacritics=require('./diacritics');
+    
+let utilFunctions =  {
+    //munge:function (val) {
+        //if (val) {
+            //val = val.trim().toLowerCase().replace(/\//g, " ").replace("["," ").replace("]"," ").replace("{"," ").replace("}"," ").replace("("," ").replace(")"," ").replace("|"," ").replace("&"," ").replace("*"," ").replace(":"," ").replace(";"," ").replace("~"," ").replace("@"," ").replace("#"," ").replace("="," ").replace("\r\n"," ").replace("\n"," ");
+            //// strip
+            //val = val.trim().replace(/[^0-9 'a-z]/gi, '');
+            //val = removeDiacritics(val);
+            //val = val.slice(0,139).trim();
+            //if (val.indexOf("mnemo's")==0) val = val.replace("mnemo's","nemo's");
+            //return val;
+        //} else {
+            //return ''
+        //}
+    //},
+    //mungeLong:function (val) {
+        //if (val) {
+             //val = val.trim().toLowerCase().replace(/\//g, " ").replace("["," ").replace("]"," ").replace("{"," ").replace("}"," ").replace("("," ").replace(")"," ").replace("|"," ").replace("&"," ").replace("*"," ").replace(":"," ").replace(";"," ").replace("~"," ").replace("@"," ").replace("#"," ").replace("="," ").replace("\r\n"," ").replace("\n"," ");
+            //// strip
+            //val = val.trim().replace(/[^0-9 'a-z]/gi, '');
+            //val = removeDiacritics(val);
+            //val = val.trim();
+            //return val;
+        //} else {
+            //return ''
+        //}
+    //},
+    //similarity : function(s1, s2) {
+      //var longer = s1;
+      //var shorter = s2;
+      //if (s1.length < s2.length) {
+        //longer = s2;
+        //shorter = s1;
+      //}
+      //var longerLength = longer.length;
+      //if (longerLength == 0) {
+        //return 1.0;
+      //}
+      //return (longerLength - utilFunctions.editDistance(longer, shorter)) / parseFloat(longerLength);
+    //},
 
-module.exports = {
+    //editDistance : function(s1, s2) {
+      //s1 = s1.toLowerCase();
+      //s2 = s2.toLowerCase();
+
+      //var costs = new Array();
+      //for (var i = 0; i <= s1.length; i++) {
+        //var lastValue = i;
+        //for (var j = 0; j <= s2.length; j++) {
+          //if (i == 0)
+            //costs[j] = j;
+          //else {
+            //if (j > 0) {
+              //var newValue = costs[j - 1];
+              //if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                //newValue = Math.min(Math.min(newValue, lastValue),
+                  //costs[j]) + 1;
+              //costs[j - 1] = lastValue;
+              //lastValue = newValue;
+            //}
+          //}
+        //}
+        //if (i > 0)
+          //costs[s2.length] = lastValue;
+      //}
+      //return costs[s2.length];
+    //},
+    //intersect : function() {
+       //var set = {};
+       //[].forEach.call(arguments, function(a,i){
+         //var tokens = a.match(/\w+/g);
+         //if (!i) {
+           //tokens.forEach(function(t){ set[t]=1 });
+         //} else {
+           //for (var k in set){
+             //if (tokens.indexOf(k)<0) delete set[k];
+           //}
+         //}
+       //});
+    //return Object.keys(set);
+  //},
   sendMail : function(from,to,subject,html) {
-    var transporter = nodemailer.createTransport(config.transport);
+        var transporter = nodemailer.createTransport(config.transport);
 
-    var mailOptions = {
-      from: from,
-      to: to,
-      subject: subject,
-      html: html
-    };
+        var mailOptions = {
+          from: from,
+          to: to,
+          subject: subject,
+          html: html
+        };
 
-    transporter.sendMail(mailOptions, function(error, info){
-      if (error) {
-        console.log(error);
-        res.send('FAIL');
-      } else {
-        console.log('Email sent: ' + info.response);
-        res.send('OK');
-      }
-    });
-
-},
+        transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+            res.send('FAIL');
+          } else {
+            console.log('Email sent: ' + info.response);
+            res.send('OK');
+          }
+        });
+   },
+   
    renderLogin: function renderLogin(req,vars) {
         let templateVars = Object.assign({},req.body);
         templateVars = Object.assign(templateVars,vars);
@@ -50,6 +130,7 @@ module.exports = {
         for (var questionKey in json['questions']) {
             //console.log('index q '+questionKey);
             const question = json['questions'][questionKey]
+            console.log(question);
             //question.tags = question.tags ? question.tags.trim().toLowerCase() : '';
             var id = question._id ? question._id :  new ObjectId();
             question._id = id;
@@ -59,7 +140,7 @@ module.exports = {
                 tagList = question.tags.trim().toLowerCase().split(",");
                 question.tags = tagList;
             }
-           // console.log(question.tags);
+            // console.log(question.tags);
             //console.log(question.access);
             // only generate tags for public questions    
             if (question.access==="public") {
@@ -85,3 +166,5 @@ module.exports = {
    
 
 }
+
+module.exports = utilFunctions;

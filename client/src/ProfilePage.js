@@ -117,6 +117,10 @@ export default class ProfilePage extends Component {
   }
 //            <a className='btn btn-info' onClick={() => this.allowAlexa.bind(this)(true)} >Yes</a>
     
+    dumpalexa() {
+        fetch('/api/dumpalexa', {});
+    };
+    
     render() { //req,vars/
         let oauth=localStorage.getItem('oauth');
         let authRequest = localStorage.getItem('oauth_request');
@@ -157,9 +161,12 @@ export default class ProfilePage extends Component {
                                Logout
                               </a>
                               {this.props.isAdmin() && 
-                              <a  href='#' onClick={() => this.props.import()} className='btn btn-info btn-warning' >
+                              <span><a  href='#' onClick={() => this.props.import()} className='btn btn-info btn-warning' >
                                Import
                               </a>
+                              <a  href='#' onClick={() => this.dumpalexa.bind(this)()} className='btn btn-info btn-warning' >
+                               Train
+                              </a></span>
                              }
                     </div>
                     <div className="row">

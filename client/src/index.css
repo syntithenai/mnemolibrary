@@ -140,9 +140,10 @@ pre.mnemonicalternative {
 .btn {
     border: 1px solid black;
     border-radius: 10px;
-    box-shadow: 2px 2px #888888;
+    dbox-shadow: 2px 2px #888888;
     margin-right: 3px;
 }
+
 
 h4.graphTitle::before { 
   z-index: 0;
@@ -155,11 +156,11 @@ h4.graphTitle::before {
 }
 
 .topmenu {
-    margin-top: 1.2em;
+    margin-top: 2.0em;
 }
 
-.topmenu .nav-link {
-    color: lightgrey;
+.topmenu .btn {
+    min-width: 5em;
     font-size: large;
     padding-bottom: 5px;
 }

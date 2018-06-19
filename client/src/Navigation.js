@@ -50,7 +50,7 @@ export default class Navigation extends Component {
         <nav className="navbar navbar-expand-md" >
        <div className="navbar-brand" >
           
-          <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemos' Library" src="/mnemoicon.jpg" height='100%' data-toggle="collapse" data-target="#navbarCollapse" style={{clear:'right' }}/></a>
+          <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemos' Library" src="/mnemoicon-100.png" height='100%' data-toggle="collapse" data-target="#navbarCollapse" style={{clear:'right' }}/></a>
              
 
             {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='loginbutton btn btn-outline btn-warning' style={{verticalAlign: 'top',marginLeft: '1em'}}>
@@ -66,30 +66,30 @@ export default class Navigation extends Component {
           <div className="collapse navbar-collapse" id="navbarCollapse">
             <div className="row topmenu" data-toggle="collapse" data-target="#navbarCollapse" >
               <div className="col-4" >
-                <a className="nav-link"  href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</a>
+                <a className="btn btn-secondary"  href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</a>
               </div>
               <div className="col-4">
-                <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Search</a>
+                <a className="btn btn-secondary" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Search</a>
               </div>
               <div className="col-4">
-                <a className="nav-link" href="#"  onClick={() => this.props.setCurrentPage('review')} >Review</a>
+                <a className="btn btn-secondary" href="#"  onClick={() => this.props.setCurrentPage('review')} >Review</a>
               </div>
               {this.props.isLoggedIn() && 
               <div className="col-4">
-                <a className="nav-link"  href="#" onClick={() => this.props.setCurrentPage('create')}>Create</a>
+                <a className="btn btn-secondary"  href="#" onClick={() => this.props.setCurrentPage('create')}>Create</a>
               </div>}
               {!this.props.isLoggedIn() && 
               <div className="col-4">
-                <a className="nav-link"  href="#" onClick={() => this.props.setCurrentPage('createhelp')}>Create</a>
+                <a className="btn btn-secondary"  href="#" onClick={() => this.props.setCurrentPage('createhelp')}>Create</a>
               </div>}
             
               <div className="col-4">
-                <a className="nav-link" href="#" onClick={() => this.props.setCurrentPage('about')}>Help</a>
+                <a className="btn btn-secondary" href="#" onClick={() => this.props.setCurrentPage('about')}>Help</a>
                 
               </div>
               <div className="col-4">
                 
-                {this.props.isLoggedIn() && <a href='#' onClick={() => this.props.setCurrentPage('profile')} className='nav-link'>
+                {this.props.isLoggedIn() && <a href='#' onClick={() => this.props.setCurrentPage('profile')} className='btn btn-secondary'>
                    Profile
                   </a>}
               </div>

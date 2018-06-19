@@ -321,13 +321,14 @@ export default class SingleQuestion extends Component {
                         
                         <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
                         {(this.isVisible('answer') || !showRecallButton) && question.answer && <div className="card-block answer">
-                            <div  className='card-text'><b>Answer</b> <span><pre>{question.answer}</pre></span></div>
+                            <div  className='card-text'><b>Answer</b><br/> <span className='shortanswer' style={{fontWeight:'bold',fontSize:'1.1em'}} >{question.shortanswer}</span></div>
+                            <div  className='card-text'><span><pre>{question.answer}</pre></span></div>
                         </div>}
-                        {(this.isVisible('answer') || !showRecallButton) && question.link && <b>From <a href={question.link} target='_new' >{shortLink}</a></b>}
+                        {(this.isVisible('answer') || !showRecallButton) && question.link && <b style={{fontSize:'0.85em'}}>From <a href={question.link} target='_new' >{shortLink}</a></b>}
                         <div ref={(section) => { this.scrollTo.moreinfo = section; }} ><br/></div>
                        
                         {(this.isVisible('answer') || !showRecallButton) && question.attribution && <div className="card-block answer">
-                            <div  className='card-text'><b>Attribution/Source</b> <span>{attribution}</span></div>
+                            <div  className='card-text'><b >Attribution/Source</b> <span >{attribution}</span></div>
                         </div>}
                         
                         <div ref={(section) => { this.scrollTo.tags = section; }} ></div>

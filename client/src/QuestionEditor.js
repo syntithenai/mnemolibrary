@@ -30,7 +30,8 @@ export default class QuestionEditor extends Component {
               ],
               suggestions: [],
               imageProgress: null,
-              mediaProgress: null
+              mediaProgress: null,
+              showAnswerDetails: false
              // imageURL:this.props.question.image
             
             //question : {
@@ -293,8 +294,25 @@ export default class QuestionEditor extends Component {
                             <br/>
                         </div>
                         <div className='form-group'>    
-                            <label htmlFor="answer" >* Answer </label><textarea autoComplete="false" id="answer" type='text' name='answer' onChange={this.change} value={this.props.question.answer} className='form-control' ></textarea>
+                            {!this.state.showAnswerDetails && <button style={{float: 'right'}} className="btn btn-info" onClick={() => this.setState({showAnswerDetails:true})} aria-expanded="false" aria-controls="answerDetails">
+                              Show Details
+                            </button>}
+                            {this.state.showAnswerDetails && <button style={{float: 'right'}} className="btn btn-info" onClick={() => this.setState({showAnswerDetails:false})} aria-expanded="false" aria-controls="answerDetails">
+                              Hide Details
+                            </button>}
+                            <label htmlFor="shortanswer" >* Answer </label>
+                            <textarea autoComplete="false" id="answer" type='text' name='answer' onChange={this.change} value={this.props.question.answer} className='form-control' ></textarea>
+                            
+                            
                         </div>
+                        {this.state.showAnswerDetails &&  <div id="answerDetails" className='form-group'>    
+                            <label htmlFor="specific_question" >Specific Question </label><textarea autoComplete="false" id="specific_question" type='text' name='specific_question' onChange={this.change} value={this.props.question.specific_question} className='form-control' ></textarea>
+                            <label htmlFor="specific_answer" >Specific Answer </label><textarea autoComplete="false" id="specific_answer" type='text' name='specific_answer' onChange={this.change} value={this.props.question.specific_answer} className='form-control' ></textarea>
+                            <label htmlFor="also_accept" >Also Accept </label><textarea autoComplete="false" id="also_accept" type='text' name='also_accept' onChange={this.change} value={this.props.question.also_accept} className='form-control' ></textarea>
+                            <label htmlFor="multiple_choice" >Multiple Choices </label><textarea autoComplete="false" id="multiple_choice" type='text' name='multiple_choice' onChange={this.change} value={this.props.question.multiple_choice} className='form-control' ></textarea>
+                            
+                        </div>}
+                        
                         <div className='form-inline'>    
                           
                              <label htmlFor="technique" >Technique</label><select autoComplete="false" id="technique" type='text' name='technique' onChange={this.change} value={this.props.question.technique} className='col-5 form-control' ><option/>{techniques}</select>

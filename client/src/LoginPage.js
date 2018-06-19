@@ -34,6 +34,7 @@ export default class LoginPage extends Component {
         this.submitSignIn = this.submitSignIn.bind(this);
         this.googleLogin = this.googleLogin.bind(this);
         this.forgotPassword = this.forgotPassword.bind(this);
+        this.unforgotPassword = this.unforgotPassword.bind(this);
         this.recoverPassword = this.recoverPassword.bind(this);
         
     };
@@ -77,6 +78,11 @@ export default class LoginPage extends Component {
     forgotPassword(e) {
         e.preventDefault();
         this.setState({forgotPassword: true});
+        return false;
+    };
+    unforgotPassword(e) {
+        e.preventDefault();
+        this.setState({forgotPassword: false});
         return false;
     };
 
@@ -228,51 +234,71 @@ export default class LoginPage extends Component {
                             <br/>
                             <br/>
                             <button  className='btn btn-info'>Send</button>
+                            <button onClick={this.unforgotPassword} className='btn btn-info'>Cancel</button>
                         </fieldset>
                     </form>
                 </div>
                 )
         } else {
+            //
+                       
+                          //<h3 className="card-title">Login</h3>
+                        
+                        //</form>
             return (
-                <div className="row">
-                    <div className='col-12 warning-message'>{this.state.warning_message}</div>
-                    <div className="col-12 col-lg-6 card">
-                        <form method="POST" onSubmit={this.submitSignIn} className="form-group">
-                          <h3 className="card-title">Login</h3>
-                          <GoogleLogin 
-                                clientId={config.googleClientId}
-                                onSuccess={this.googleLogin}
-                           />
-                          <div className='col-12 warning-message'>{this.state.signin_warning_message}</div>
+                <div  style={{width: '100%'}}>
+                    <div className='warning-message'>{this.state.warning_message}</div>
+                    <div style={{paddingLeft:'1em'}} >
                     
-                            <label htmlFor="email_login" className="row">Email </label><input id="email_login" type='text' name='email_login'   onChange={this.change} value={this.state.email_login}  autoComplete="false"  />
-                            <label htmlFor="password_login" className="row">Password </label><input id="password_login" type='password' name='password_login'  onChange={this.change} value={this.state.password_login}  autoComplete="false"  />
-                            <br/><br/>
-                           <button  className='btn btn-info'>Login</button>
-                           <button onClick={this.forgotPassword} className='btn btn-info'>Forgot</button>
-                           
+                        <h3 className="card-title">Login</h3>
+                        <div className="" style={{fontWeight:'bold',fontSize:'large'}} >By logging into Mnemo's Library, you are agreeing to our <a style={{textDecoration:'underline',color: 'blue', paddingLeft:'0.3em'}} onClick={() => this.props.setCurrentPage('termsofuse')} > terms and conditions</a><br/><br/></div>
+                       <span style={{float:'right'}}><GoogleLogin 
+                            clientId={config.googleClientId}
+                            onSuccess={this.googleLogin}
+                       /></span>
+                       <div style={{paddingLeft: '2em'}}>
+                            <form method="POST" onSubmit={this.submitSignIn} className="form-group">
+                                <div className='warning-message'>{this.state.signin_warning_message}</div>
+                        
+                                <label htmlFor="email_login" className="row">Email </label><input id="email_login" type='text' name='email_login'   onChange={this.change} value={this.state.email_login}  autoComplete="false"  />
+                                <label htmlFor="password_login" className="row">Password </label><input id="password_login" type='password' name='password_login'  onChange={this.change} value={this.state.password_login}  autoComplete="false"  />
+                                <br/><br/>
+                                <button  className='btn btn-info'>Login</button>
+                                <button onClick={this.forgotPassword} className='btn btn-info'>Forgot</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div style={{paddingLeft:'1em'}}>
+                       
+                        <form method="POST" onSubmit={this.submitSignUp}  >
+                              <h3 className="card-title">Registration</h3>
+                              <div className='col-12 warning-message'>{this.state.signup_warning_message}</div>
+                                <div class="form-group">
+                                    <label htmlFor="name" >Name </label><input className='form-control' autoComplete="false" id="name" type='text' name='name' onChange={this.change} />
+                                </div>
+                                <div class="form-group">
+                                    <label htmlFor="avatar" className='row'>Avatar </label><input className='form-control' autoComplete="false" id="avatar" type='text' name='avatar' value={this.state.avatar} onChange={this.change} />
+                                </div>
+                                <div class="form-group">
+                                    <label htmlFor="email" className='row'>Email </label><input className='form-control' autoComplete="false" id="email" type='text' name='email' onChange={this.change} />
+                                </div>
+                                <div class="form-group">
+                                    <label htmlFor="password" className='row'>Password</label> <input className='form-control' autoComplete="false"  id="password" type='password' name='password' onChange={this.change} />
+                                </div>
+                                <div class="form-group">
+                                    <label htmlFor="password2" className='row'>Repeat Password</label><input className='form-control'  autoComplete="false"  id="password2" type='password' name='password2' onChange={this.change} />
+                                    
+                                </div>
+                                <br/>
+                                <br/>
+                                <button  className='btn btn-info'>Register</button>
                         </form>
                     </div>
-                    <div className="col-12 col-lg-6  card">
-                        <form method="POST" onSubmit={this.submitSignUp} className="form-group" >
-                          <h3 className="card-title">Registration</h3>
-                          <div className='col-12 warning-message'>{this.state.signup_warning_message}</div>
-                    
-                            <label htmlFor="name" className='row'>Name </label><input autoComplete="false" id="name" type='text' name='name' onChange={this.change} />
-                            <label htmlFor="avatar" className='row'>Avatar </label><input autoComplete="false" id="avatar" type='text' name='avatar' value={this.state.avatar} onChange={this.change} />
-                            <label htmlFor="email" className='row'>Email </label><input autoComplete="false" id="email" type='text' name='email' onChange={this.change} />
-                            <label htmlFor="password" className='row'>Password</label> <input  autoComplete="false"  id="password" type='password' name='password' onChange={this.change} />
-                            <label htmlFor="password2" className='row'>Repeat Password</label><input  autoComplete="false"  id="password2" type='password' name='password2' onChange={this.change} />
-                            <br/>
-                            <br/>
-                            <button  className='btn btn-info'>Register</button>
-                        </form>
-                        <br/>
-                    </div>
+                  
                 </div>
             )
         }
     }
-    
+
 
 }

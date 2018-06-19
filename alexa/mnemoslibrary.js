@@ -1,54 +1,149 @@
 var alexa = require("alexa-app");
-
+let intentHandlers = require('./mnemoslibrary_intentHandlers');
 
 var app = new alexa.app("mnemoslibrary");
-app.dictionary = {
-  "names": ["matt", "joe", "bob", "bill", "mary", "jane", "dawn"]
-};
+
+let customSlots = require('./vocabdump.js');
+for (slot in customSlots) {
+    app.customSlot(slot,customSlots[slot]);
+}
+
+//app.dictionary["names"]= ["matt", "joe", "bob", "bill", "mary", "jane", "dawn"];
 app.invocationName="nemo's library";
 
+// ENTRY/EXIT
+app.launch(intentHandlers.launch);
 
 // CUSTOM INTENTS
-app.intent("get_question", {
+
+app.intent("yes", {
     "slots": { },
-    "utterances": ["Discover"]
-  },
-  function(request, response) {
-    let session = request.getSession();
-    let type = request.type();
-    let confirmed = request.isConfirmed();
-    let confirmedStatus = request.confirmationStatus
-    let context = request.context;
-    let data = request.data;
-    
-    //var number = request.slot("number");
-    response.shouldEndSession(false ,'Now what' )
-    response.say("Discover");
-  }
+    "utterances": ["yes","i agree","yep","yes please","please do","that's what i want","affirmative","okay","ok"]
+  },intentHandlers.yes
 );
 
-app.intent("test", {
-  },
-  function(request, response) {
-    response.say("test");
-  }
+app.intent("no", {
+    "slots": { },
+    "utterances": ["no","i disagree","nope","no thanks","please don't","that's not what i want"]
+  },intentHandlers.no
 );
 
+app.intent("discover", {
+    "slots": {
+      "TAG": "tags",
+      "TOPIC": "topics",
+    },
+    "utterances": [
+      "{discover|browse|search|explore}","{discover|browse|search|find|learn about|give me|locate|unearth|uncover|explore|reveal|see|dig up|look up} {tag |} {-|TAG}","{discover|browse|search|find|learn about|give me|locate|unearth|uncover|explore|reveal|see|dig up|look up} {topic |}  {-|TOPIC}"
+    ]
+  },intentHandlers.discover
+);
+
+//app.intent("rediscover", {
+    //"utterances": [
+      //"rediscover {questions |}",
+    //]
+  //},intentHandlers.rediscover
+//);
+
+
+app.intent("review", {
+    "slots": {
+      "TAG": "tags",
+      "TOPIC": "topics",
+    },
+    "utterances": ["{start |}{commence |}{begin |} {review|quiz|test|test me on|pop quiz |questionnaire } {on |} {about |} {-|TAG}","review {-|TOPIC}","{start |}{commence |}{begin |} {review|quiz|test|test me on|pop quiz |questionnaire }"]
+  },intentHandlers.start_review
+);
+
+// RECALL DURING REVIEW
+app.intent("recall", {
+    "slots": { }, 
+    "utterances": ["recall","i recall","remember","i remember","i remember that"]
+  },intentHandlers.recall
+);
+app.intent("mnemonic_is", {
+    "slots": { THEMNEMONIC:"mnemonics", THELASTWORD: "mnemonicLastWords"},
+    "utterances": ["the mnemonic is {-|THEMNEMONIC} ","the last word of {the |} mnemonic is {-|THEMNEMONIC} ","the last word  is {-|THELASTWORD}"]
+  },intentHandlers.mnemonic_is
+);
+app.intent("answer_is", {
+    "slots": { THEANSWER:"answers"},
+    "utterances": ["the {answer|solution} is {-|THEANSWER}","{-|THEANSWER}"]
+  },intentHandlers.answer_is
+);
+app.intent("spelling_is", {
+    "slots": { THEANSWERASLETTERS:"spelledWords"},
+    "utterances": ["{it|the answer|answer} is {spelled|spelt|written} {-|THEANSWERASLETTERS}"]
+  },intentHandlers.spelling_is
+);
+
+// SPEAK QUESTION ELEMENTS
+app.intent("answer", {
+    "slots": { },
+    "utterances": ["{answer|solution}","what is the {answer|solution}","give me the {answer|solution}","tell me the {answer|solution}","I want the {answer|solution}"]
+  },intentHandlers.answer
+);
+app.intent("moreinfo", {
+    "slots": { },
+    "utterances": ["more info","more information","give me the {full|complete|whole} answer"]
+  },intentHandlers.moreinfo
+);
+app.intent("spellanswer", {
+    "slots": { },
+    "utterances": ["spell {answer|solution}","spell that","how do i spell that"]
+  },intentHandlers.spellanswer
+);
+
+app.intent("block_question", {
+    "slots": { },
+    "utterances": ["{block|ignore|discard|reject|throw away|delete|trash} {this |} question"]
+  },intentHandlers.block_question
+);
+
+app.intent("mnemonic", {
+    "slots": { },
+    "utterances": ["mnemonic","what is the mnemonic"]
+  },intentHandlers.mnemonic
+);
+
+app.intent("repeat_question", {
+    "slots": { },
+    "utterances": ["repeat question","say question again","repeat that","say again","pardon","read question again"]
+  },intentHandlers.repeat_question
+);
+
+
+
+// MISC
+app.intent("next_question", {
+    "slots": { },
+    "utterances": ["next question"]
+  },intentHandlers.next_question
+);
+
+app.intent("open_website", {
+    "slots": { },
+    "utterances": ["{open|go to} {the |} {website|Mnemo site|Mnemo site on the internet|Mnemo's Library site}"]
+  },intentHandlers.open_website
+);
+
+app.intent("show_image", {
+    "slots": { },
+    "utterances": ["{show|display} {image|picture|photo|photograph}"]
+  },intentHandlers.show_image
+);
+
+// OTHER INTENTS
 
 app.intent("login", {
     "slots": { },
-    "utterances": ["Login"]
+    "utterances": ["Login","sign in","log in to site"]
   },
   function(request, response) {
     response.linkAccount();
   }
 );
-
-// ENTRY/EXIT
-app.launch(function(request, response) {
-  response.say("Hello me to");
-  response.card("Hello Worlddes", "This is an example card");
-});
 
 
 app.sessionEnded(function(request, response) {
@@ -60,10 +155,10 @@ app.sessionEnded(function(request, response) {
 // AMAZON INTENTS
 app.intent("AMAZON.HelpIntent", {
     "slots": {},
-    "utterances": []
+    "utterances": ['help']
   },
   function(request, response) {
-    var helpOutput = "You can say 'some statement' or ask 'some question'. You can also say stop or exit to quit.";
+    var helpOutput = "You can say discover questions or review them. You can also say stop to stop speech or cancel to quit.";
     var reprompt = "What would you like to do?";
     // AMAZON.HelpIntent must leave session open -> .shouldEndSession(false)
     response.say(helpOutput).reprompt(reprompt).shouldEndSession(false);
@@ -72,36 +167,86 @@ app.intent("AMAZON.HelpIntent", {
 
 app.intent("AMAZON.StopIntent", {
     "slots": {},
-    "utterances": []
+    "utterances": ['stop']
   }, function(request, response) {
-    var stopOutput = "Don't You Worry. I'll be back.";
-    response.say(stopOutput);
+    var stopOutput = "Ok.";
+    response.say(stopOutput).shouldEndSession(false,'What next ?');
+    
   }
 );
 
 app.intent("AMAZON.CancelIntent", {
     "slots": {},
-    "utterances": []
+    "utterances": ['cancel','exit','quit','die','go away']
   }, function(request, response) {
-    var cancelOutput = "No problem. Request cancelled.";
+    var cancelOutput = "Bye.";
     response.say(cancelOutput);
   }
 );
+//app.intent("AMAZON.FallbackIntent", {
+    //"slots": {},
+    //"utterances": []
+  //}, function(request, response) {
+    //var cancelOutput = "what was that";
+    //response.say(cancelOutput);
+  //}
+//);
 
 // PRE/POST 
 app.pre = function(request, response, type) {
-    console.log(['REQUEST',request.type,request.session,request.slots]);
+    console.log(['REQUEST',request.data.request.intent,request.type()]); //,request.getSession().details.attributes]);//,request.getSession().details.attributes,request.slots]);
+    //,JSON.stringify(request.data)
   //if (request.applicationId != "amzn1.echo-sdk-ams.app.000000-d0ed-0000-ad00-000000d00ebe") {
     //// fail ungracefully
     //throw "Invalid applicationId";
     //// `return response.fail("Invalid applicationId")` will also work
   //}
+
 };
 app.post = function(request, response, type, exception) {
   if (exception) {
     // always turn an exception into a successful response
+    console.log(exception);
     return response.clear().say("An error occured: " + exception).send();
   }
 };
-//console.log(app.schemas.askcli("Mnemo's Library") );
+
+app.on('AMAZON.CanFulfillIntentRequest', (request, response, request_json) => {
+  response.say("You triggered an event from device " + request_json.request.event.deviceName);
+});
+
 module.exports = app;
+
+
+
+//// ASK QUESTIONS
+//app.intent("who_is", {
+    //"slots": { QUESTION:"questions"},
+    //"utterances": ["who is {-|QUESTION} "]
+  //},intentHandlers.who_is
+//);
+//app.intent("what_is", {
+    //"slots": { QUESTION:"questions"},
+    //"utterances": ["what is {-|QUESTION} "]
+  //},intentHandlers.what_is
+//);
+//app.intent("when_is", {
+    //"slots": { QUESTION:"questions"},
+    //"utterances": ["when is {-|QUESTION} ","when was {-|QUESTION} "]
+  //},intentHandlers.when_is
+//);
+//app.intent("where_is", {
+    //"slots": { QUESTION:"questions"},
+    //"utterances": ["where is {-|QUESTION} "]
+  //},intentHandlers.answer_is
+//);
+//app.intent("why_is", {
+    //"slots": { QUESTION:"questions"},
+    //"utterances": ["why is {-|QUESTION} "]
+  //},intentHandlers.why_is
+//);
+//app.intent("how_is", {
+    //"slots": { QUESTION:"questions"},
+    //"utterances": ["how is {-|QUESTION} "]
+  //},intentHandlers.how_is
+//);

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "concurrently --kill-others-on-fail  \"npm run server\" \"npm run client\" ",
-    "server": "nodemon server.js",
+    "server": "nodemon --ignore alexa/ server.js",
     "client": "cd client && react-scripts start",
     "publicapi": "cd publicapi && nodemon app.js"
   },
@@ -21,12 +21,14 @@
     "mongodb": "^3.0.4",
     "mongoose": "^5.0.9",
     "morgan": "^1.9.0",
+    "mqtt": "^2.18.0",
     "mustache": "^2.3.0",
     "nodemailer": "^4.6.2",
     "nodemailer-direct-transport": "^3.3.2",
     "npm": "^5.7.1",
     "oauth2-server": "^3.0.0",
-    "papaparse": "^4.3.7",
+    "paho-mqtt": "^1.0.4",
+    "papaparse": "^4.5.0",
     "react": "^16.3.2",
     "react-autocomplete": "^1.8.1",
     "react-confirm-alert": "^2.0.2",
@@ -45,7 +47,8 @@
     "simple-get": "^2.7.0",
     "throttle-debounce": "^1.0.1",
     "video-react": "^0.10.4",
-    "xhr2": "^0.1.4"
+    "xhr2": "^0.1.4",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "concurrently": "^3.5.0",

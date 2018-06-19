@@ -5,13 +5,20 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon --ignore models index.js"
   },
   "author": "Steve Ryan <stever@syntithenai.com>",
   "license": "MIT",
   "dependencies": {
     "alexa-app": "^4.2.2",
+    "ask-cli": "^1.3.1",
     "express": "^4.16.3",
-    "nodemon": "^1.17.5"
+    "fast-levenshtein": "^2.0.6",
+    "mongodb": "^3.0.10",
+    "mqtt": "^2.18.0",
+    "nodemon": "^1.17.5",
+    "paho-mqtt": "^1.0.4",
+    "ssml-builder": "^0.4.3",
+    "talisman": "^0.20.0"
   }
 }

@@ -8,8 +8,7 @@ let app = require('./mnemoslibrary')
 
 
 
-
-
+// EXPRESS
 
 // setup the alexa app and attach it to express before anything else
 app.express({ expressApp: express_app,  
