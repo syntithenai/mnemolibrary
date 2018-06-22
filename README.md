@@ -59,6 +59,9 @@ The script needs to be run inside the MongoDB container so it has access to mong
 
 ## Links
 
+https://github.com/Pizzaface/Alexa-Chromecast-Skill-2.0
+
+
 - crosswords
 
 https://github.com/jasonphillips/react-crossword-generator THIS ONE also no editing

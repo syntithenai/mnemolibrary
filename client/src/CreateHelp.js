@@ -21,13 +21,13 @@ export default class CreateHelp extends Component {
         
         <h4>Mnemonic Techniques</h4>
           <ul>
-            <li><a href="http://itools.com/tool/rhymezone-words-that-sound-like">Find</a> a homonym embedded in the word/phrase. Try saying it aloud eg 'Stephen Langton: negotiated the Magna Carta with a [long tongue]'.</li>
-            <li><a href="https://www.rhymezone.com">Find</a> words that rhyme with the keyword: 'If you want to be a genius, find a teacher like Comenius'</li>
+            <li><a  target="_new"  href="http://itools.com/tool/rhymezone-words-that-sound-like">Find</a> a homonym embedded in the word/phrase. Try saying it aloud eg 'Stephen Langton: negotiated the Magna Carta with a [long tongue]'.</li>
+            <li><a  target="_new"  href="https://www.rhymezone.com">Find</a> words that rhyme with the keyword: 'If you want to be a genius, find a teacher like Comenius'</li>
             <li>Make an acronym: In what order of genus did homo sapiens evolve? 'many HEs, came down from trees' Answer: habilis, erectus, sapien</li>
             <li>Use alliteration: 'Mnemosyne, mother to muses', &lsquo;Hydrogen Henry Cavendish&rsquo;</li>
             <li>Any other pithy association 'Mather Cotton wore pure puritan cotton'</li>
             <li>Visual cues (eg Chinese character for &lsquo;one&rsquo; looks like one stick or finger: &ldquo;一&rdquo;</li>
-            <li><a href="https://major-system.info/en">Major system</a>, where numbers are involved.</li>
+            <li><a  target="_new"  href="https://major-system.info/en">Major system</a>, where numbers are involved.</li>
           </ul>
 
                 

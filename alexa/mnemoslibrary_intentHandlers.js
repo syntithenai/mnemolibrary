@@ -2,7 +2,7 @@ var levenshtein = require('fast-levenshtein');
 var config = require("../config")
 var utils= require('./alexautils'); 
 var alexaSpeak=require('./alexaSpeak')
-
+var __ = require('./speechStrings'); 
 //let talisman = require('talisman/metrics/distance/eudex');
 //let distance=talisman.distance;
 //console.log(['talisman'])
@@ -26,13 +26,13 @@ const closest= require('./closest');
 
 var mqtt = require('mqtt')
 //var client  = mqtt.connect('wss://mosquitto:9001')
-var client  = mqtt.connect('mqtt://mosquitto',{clientId: 'alexa_' + Math.random().toString(16).substr(2, 8),keepalive: 10000})
+var client  = mqtt.connect('mqtt://mosquitto',{clientId: 'alexa_' + Math.random().toString(16).substr(2, 8),keepalive: 60000})
 //var client  = mqtt.connect('wss://mongo')
 
 console.log('MQTT INIT');
 client.on('connect', function () {
     console.log('MQTT CONNECT');
-  client.subscribe('presence')
+ // client.subscribe('presence')
  // client.publish('presence', 'Hello mqtt alex')
 })
 
@@ -55,6 +55,15 @@ client.on('reconnect', function (error) {
 })
 
 
+function sendMqtt(request,response,message) {
+     databaseFunctions.getUser(db,database,request,response).then(function(user)  {
+        if (user && user._id) {
+            client.publish('users/'+user._id, JSON.stringify(message))
+        } 
+     });
+}
+
+
 // put filter slots into session
     // AND do soundex matching on filter
     // @return Object with fields re soundex matching
@@ -62,6 +71,8 @@ function setDiscoveryFilters(request,response) {
     let session = request.getSession();
     let tagFilter = null
     let topicFilter = null
+    //session.set('tagFilter',null);
+    //session.set('topicFilter',null);
     console.log(['setDiscoveryFilters',request.slots['TOPIC'],request.slots['TAG']]);
     if (request.slots['TOPIC'] && request.slots['TOPIC'].value)  {
         session.set('topicFilter',request.slots['TOPIC'].value);
@@ -92,7 +103,7 @@ function setReviewFilters(request,response) {
 let intentHandlers ={
     launch: function(request, response) {
         //console.log('LAUNCH');
-        let reprompt = "Do you want to Discover Nemo's questions or start a review";
+        let reprompt = __("Do you want to Discover Nemo's questions or start a review");
         let now = new Date();
        // console.log(['DISCOVER',request.sessionDetails.accessToken]);
         return databaseFunctions.getUser(db,database,request,response).then(function(user) {
@@ -100,11 +111,11 @@ let intentHandlers ={
             if (user) {
                 // intentHandlers.yes(request,response);
                  let nameParts=user.name.split(' ');
-                 response.say('Hi '+alexaUtils.speakable(nameParts[0])+". "+reprompt);
+                 response.say(__('Hi ')+alexaUtils.speakable(nameParts[0])+". "+reprompt);
                  response.shouldEndSession(false, reprompt )
                  return response.send();
             } else {
-                response.say("Hi. Welcome to Nemo's Library. "+ reprompt);
+                response.say(__("Hi ")+__(". Welcome to Nemo's Library. ")+ reprompt);
                 response.shouldEndSession(false, reprompt )
                 return response.send();                
             }
@@ -135,8 +146,8 @@ let intentHandlers ={
                 return intentHandlers[denyAction](request,response)
             }
         } else {
-            response.say('Do you want another question')
-            response.shouldEndSession(false,'Do you want another question')
+            response.say(__('Do you want another question'))
+            response.shouldEndSession(false,__('Do you want another question'))
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
             return response.send();  
@@ -148,85 +159,93 @@ let intentHandlers ={
         response.shouldEndSession(true)
         return response.send();                            
     },
-    discover: function(request, response) {
+    
+    start_discover: function(request, response) {
         //client.publish('presence', 'discover')
         // set mode to discover
         let session = request.getSession();
         session.set('denyAction',null)
         session.set('confirmAction',null)
         session.set('mode','discover')
+        session.set('tagFilter',null);
+        session.set('topicFilter',null);
         let status=setDiscoveryFilters(request,response);
         // only on requests where slots exists but are not exact match
         console.log(status);
         //return;
+            
         if ((status.tagFilter && status.tagFilter.seek && !status.tagFilter.match) ||  (status.topicFilter && status.topicFilter.seek && !status.topicFilter.match)) {
             session.set('confirmAction','discover')
             if (status.topicFilter)  {
-                response.say("Couldn't find "+alexaUtils.speakable(status.topicFilter.seek));
-                response.say('Did you mean '+alexaUtils.speakable(status.topicFilter.text));
+                response.say(__("Couldn't find ")+alexaUtils.speakable(status.topicFilter.seek));
+                response.say(__('Did you mean ')+alexaUtils.speakable(status.topicFilter.text));
                 session.set('topicFilter',status.topicFilter.text);
                 session.set('confirmAction','discover')
-                response.shouldEndSession(false,'Should I search for '+alexaUtils.speakable(status.topicFilter.text))
+                response.shouldEndSession(false,__('Should I search for ')+alexaUtils.speakable(status.topicFilter.text))
             } else if (status.tagFilter)  {
-                response.say("Couldn't find "+alexaUtils.speakable(status.tagFilter.seek));
-                response.say('Did you mean '+alexaUtils.speakable(status.tagFilter.text));
+                response.say(__("Couldn't find ")+alexaUtils.speakable(status.tagFilter.seek));
+                response.say(__('Did you mean ')+alexaUtils.speakable(status.tagFilter.text));
                 session.set('confirmAction','discover')
                 session.set('tagFilter',status.tagFilter.text);
-                response.shouldEndSession(false,'Should I search for '+alexaUtils.speakable(status.tagFilter.text))
+                response.shouldEndSession(false,__('Should I search for ')+alexaUtils.speakable(status.tagFilter.text))
             }
         } else {
-            // yay discover
-            return databaseFunctions.nextDiscoveryQuestion(db,database,request,response).then(function(questions) {
-                //console.log(['then',questions]);
-                let question=questions[0];
-                if (question) {
-                    session.set('currentQuestion',question)
-                    // speak the question, the mnemonic and the short answer
-                    client.publish('presence', JSON.stringify({from:'alexa',action:'discover',question:question._id} ))
-                    alexaSpeak.readQuestion(question,request,response);
-                    // mark question as seen
-                    databaseFunctions.logStatus(db,database,'seen',question._id,request,response);
-                    if (alexaUtils.moreInfo(question).length == 0) {
-                        response.shouldEndSession(false,'Do you want another question')
-                        session.set('confirmAction','discover')
-                        session.set('denyAction','bye')
-                        return response.send();                
-                    } else {
-                        response.say('Would you like more information');
-                        response.shouldEndSession(false,'Would you like more information')
-                        session.set('confirmAction','moreinfo')
-                        session.set('denyAction','next_question')
-                        return response.send();                
-                    }
-                } else {
-                    session.set('currentQuestion',null)
-                    if (session.get('tagFilter')) {
-                        response.say('I had a problem finding a question matching '+alexaUtils.speakable(session.get('tagFilter')));
-                        response.say('Would you like to search again without a filter');
-                        response.shouldEndSession(false,'Would you like to try a random question')
-                        session.set('tagFilter',null)
-                        session.set('topicFilter',null)
-                        session.set('confirmAction','discover')
-                        session.set('denyAction','bye')
-                    } else if (session.get('topicFilter')) {
-                        response.say('I had a problem finding a question matching '+alexaUtils.speakable(session.get('topicFilter')));
-                        response.say('Would you like to search again without a filter');
-                        response.shouldEndSession(false,'Would you like to try a random question')
-                        session.set('tagFilter',null)
-                        session.set('topicFilter',null)
-                        session.set('confirmAction','discover')
-                        session.set('denyAction','bye')
-                    } else {
-                        // system error or seen all questions
-                        response.say('I had a problem finding a question sorry. Try again later.');
-                        response.shouldEndSession(true)
-                    }
-                    return response.send();                
-                    
-                }
-            });
+            return intentHandlers.discover(request,response);
         }
-        
+    },
+    discover: function(request, response) {
+        let session = request.getSession();
+        // yay discover
+        return databaseFunctions.nextDiscoveryQuestion(db,database,request,response).then(function(questions) {
+            //console.log(['then',questions]);
+            let question=questions[0];
+            if (question) {
+                session.set('currentQuestion',question)
+                // speak the question, the mnemonic and the short answer
+                //client.publish('presence', JSON.stringify( ))
+                sendMqtt(request, response,{from:'alexa',action:'discover',question:question._id});
+                alexaSpeak.readQuestion(question,request,response);
+                // mark question as seen
+                databaseFunctions.logStatus(db,database,'seen',question._id,request,response);
+                if (alexaUtils.moreInfo(question).length == 0) {
+                    response.shouldEndSession(false,__('Do you want another question'))
+                    session.set('confirmAction','discover')
+                    session.set('denyAction','bye')
+                    return response.send();                
+                } else {
+                    response.say(__('Would you like more information'));
+                    response.shouldEndSession(false,__('Would you like more information'))
+                    session.set('confirmAction','moreinfo')
+                    session.set('denyAction','next_question')
+                    return response.send();                
+                }
+            } else {
+                session.set('currentQuestion',null)
+                if (session.get('tagFilter')) {
+                    response.say(__('I had a problem finding a question matching ')+alexaUtils.speakable(session.get('tagFilter')));
+                    response.say(__('Would you like to search again without a filter'));
+                    response.shouldEndSession(false,__('Would you like to try a random question'))
+                    session.set('tagFilter',null)
+                    session.set('topicFilter',null)
+                    session.set('confirmAction','discover')
+                    session.set('denyAction','bye')
+                } else if (session.get('topicFilter')) {
+                    response.say(__('I had a problem finding a question matching ')+alexaUtils.speakable(session.get('topicFilter')));
+                    response.say(__('Would you like to search again without a filter'));
+                    response.shouldEndSession(false,__('Would you like to try a random question'))
+                    session.set('tagFilter',null)
+                    session.set('topicFilter',null)
+                    session.set('confirmAction','discover')
+                    session.set('denyAction','bye')
+                } else {
+                    // system error or seen all questions
+                    response.say(__('I had a problem finding a question sorry. Try again later.'));
+                    response.shouldEndSession(true)
+                }
+                return response.send();                
+                
+            }
+        });
     },
     //rediscover: function(request,response) {
         //let session = request.getSession();
@@ -268,66 +287,79 @@ let intentHandlers ={
     start_review: function(request,response) {
         // set mode to review
         let session = request.getSession();
-        session.set('denyAction',null)
-        session.set('confirmAction',null)
-        session.set('mode','review')
-        
-        let status=setReviewFilters(request,response);
-        // only on requests where slots exists but are not exact match
-        console.log(status);
-        if ((status.tagFilter && status.tagFilter.seek && !status.tagFilter.match) ||  (status.topicFilter && status.topicFilter.seek && !status.topicFilter.match)) {
-            session.set('confirmAction','discover')
-            if (status.topicFilter)  {
-                response.say("Couldn't find "+alexaUtils.speakable(status.topicFilter.seek));
-                response.say('Did you mean '+alexaUtils.speakable(status.topicFilter.text));
-                session.set('confirmAction','discover')
-                session.set('topicFilter',status.topicFilter.text);
-                response.shouldEndSession(false,'Should I search for '+alexaUtils.speakable(status.topicFilter.text))
-            } else if (status.tagFilter)  {
-                response.say("Couldn't find "+alexaUtils.speakable(status.tagFilter.seek));
-                response.say('Did you mean '+alexaUtils.speakable(status.tagFilter.text));
-                session.set('tagFilter',status.tagFilter.text);
-                session.set('confirmAction','discover')
-                response.shouldEndSession(false,'Should I search for '+alexaUtils.speakable(status.tagFilter.text))
-            }
-        } else {
-            return databaseFunctions.getReviewQuestions(db,database,request,response).then(function(questions) {
-                if (questions.length > 0) {
-                    response.say("Starting review with "+questions.length+' questions.');
-                    session.set('questions',questions);
-                    session.set('currentQuestion',null);
-                    return intentHandlers.review(request,response);                    
-                } else {
-                    // couldn't find any questions matching ...
-                     session.set('currentQuestion',null)
-                    if (session.get('reviewTagFilter')) {
-                        response.say('No questions matching tag '+alexaUtils.speakable(session.get('reviewTagFilter'))+' available for review ');
-                        response.say('Would you like to review all questions');
-                        response.shouldEndSession(false,'Would you like to review all questions')
-                        session.set('reviewTagFilter',null)
-                        session.set('reviewTopicFilter',null)
-                        session.set('confirmAction','start_review')
-                        session.set('denyAction','bye')
-                    } else if (session.get('reviewTopicFilter')) {
-                        response.say('No questions matching topic '+alexaUtils.speakable(session.get('reviewTopicFilter'))+' available for review ');
-                        response.say('Would you like to review all questions');
-                        response.shouldEndSession(false,'Would you like to review all questions')
-                        session.set('reviewTagFilter',null)
-                        session.set('reviewTopicFilter',null)
-                        session.set('confirmAction','start_review')
-                        session.set('denyAction','bye')
-                    } else {
-                        // system error or seen all questions
-                        response.say('No questions currently available for review  . Would you like to discover new questions.');
+    
+        return databaseFunctions.getUser(db,database,request,response).then(function(user) {
+            if (user) {
+                session.set('denyAction',null)
+                session.set('confirmAction',null)
+                session.set('mode','review')
+                session.set('tagFilter',null);
+                session.set('topicFilter',null);
+                let status=setReviewFilters(request,response);
+                // only on requests where slots exists but are not exact match
+                console.log(status);
+                if ((status.tagFilter && status.tagFilter.seek && !status.tagFilter.match) ||  (status.topicFilter && status.topicFilter.seek && !status.topicFilter.match)) {
+                    session.set('confirmAction','discover')
+                    if (status.topicFilter)  {
+                        response.say(__("Couldn't find ")+alexaUtils.speakable(status.topicFilter.seek));
+                        response.say(__('Did you mean ')+alexaUtils.speakable(status.topicFilter.text));
                         session.set('confirmAction','discover')
-                        response.shouldEndSession(false,'Do you want to start discovery')
-                        session.set('denyAction','bye')
+                        session.set('topicFilter',status.topicFilter.text);
+                        response.shouldEndSession(false,__('Should I search for ')+alexaUtils.speakable(status.topicFilter.text))
+                        return response.send();
+                    } else if (status.tagFilter)  {
+                        response.say(__("Couldn't find ")+alexaUtils.speakable(status.tagFilter.seek));
+                        response.say(__('Did you mean ')+alexaUtils.speakable(status.tagFilter.text));
+                        session.set('tagFilter',status.tagFilter.text);
+                        session.set('confirmAction','discover')
+                        response.shouldEndSession(false,__('Should I search for ')+alexaUtils.speakable(status.tagFilter.text))
+                        return response.send();
                     }
-                    return response.send();
+                } else {
+                    return databaseFunctions.getReviewQuestions(db,database,request,response).then(function(questions) {
+                        if (questions.length > 0) {
+                            response.say(__("Starting review with ")+questions.length+' questions.');
+                            session.set('questions',questions);
+                            session.set('currentQuestion',null);
+                            return intentHandlers.review(request,response);                    
+                        } else {
+                            // couldn't find any questions matching ...
+                             session.set('currentQuestion',null)
+                            if (session.get('reviewTagFilter')) {
+                                response.say(__('No questions matching tag ')+alexaUtils.speakable(session.get('reviewTagFilter'))+__(' available for review '));
+                                response.say(__('Would you like to review all questions'));
+                                response.shouldEndSession(false,__('Would you like to review all questions'))
+                                session.set('reviewTagFilter',null)
+                                session.set('reviewTopicFilter',null)
+                                session.set('confirmAction','start_review')
+                                session.set('denyAction','bye')
+                            } else if (session.get('reviewTopicFilter')) {
+                                response.say(__('No questions matching topic ')+alexaUtils.speakable(session.get('reviewTopicFilter'))+__(' available for review '));
+                                response.say(__('Would you like to review all questions'));
+                                response.shouldEndSession(false,__('Would you like to review all questions'))
+                                session.set('reviewTagFilter',null)
+                                session.set('reviewTopicFilter',null)
+                                session.set('confirmAction','start_review')
+                                session.set('denyAction','bye')
+                            } else {
+                                // system error or seen all questions
+                                response.say(__('No questions currently available for review  . Would you like to discover new questions.'));
+                                session.set('confirmAction','discover')
+                                response.shouldEndSession(false,__('Do you want to start discovery'))
+                                session.set('denyAction','bye')
+                            }
+                            return response.send();
+                        }
+                    });
                 }
-            });
-            
-        }
+            } else {
+                response.say(__("Would you like to login to track progress and review?"));
+                session.set('confirmAction','login')
+                session.set('denyAction','next_question')
+                response.shouldEndSession(false,__('Would you like to login?'))
+               return response.send();
+            }
+        });
     },
     review: function(request,response) {
         // set mode to review
@@ -350,8 +382,8 @@ let intentHandlers ={
             console.log('REV'+currentQuestion);
             if (currentQuestion>session.get('questions').length) {
                 // quiz complete
-                response.say("You've finished this review set. Do you want to review more or discover new questions");
-                response.shouldEndSession(false,'Discover or review ?')
+                response.say(__("You've finished this review set. Do you want to review more or discover new questions"));
+                response.shouldEndSession(false,__('Discover or review ?'))
                 session.set('currentQuestion',null)
                 session.set('currentReviewQuestion',null)
                 session.set('questions',null)
@@ -362,13 +394,20 @@ let intentHandlers ={
                 if (question) {
                     console.log('yes question');
                     session.set('currentQuestion',question)
-                    client.publish('presence', JSON.stringify({from:'alexa',action:'review',question:question._id}))
+                    //client.publish('presence', JSON.stringify({from:'alexa',action:'review',question:question._id}))
+                    sendMqtt(request, response,{from:'alexa',action:'review',question:question._id});
+                    if (currentQuestion > 1) response.say("Next question");
                     // ask the question
                     alexaSpeak.askQuestion(question,request,response);
                     databaseFunctions.logStatus(db,database,'seen',question._id,request,response);
-                    response.shouldEndSession(false,'Do you remember ?')
-                    session.set('confirmAction','recall')
-                    session.set('denyAction','next_question')
+                    if (alexaUtils.canAnswer(question)) {
+                        response.shouldEndSession(false,__('what is the answer ?'))
+                        session.set('denyAction','next_question')
+                    } else {
+                        response.shouldEndSession(false,__('Do you remember ?'))
+                        session.set('confirmAction','recall')
+                        session.set('denyAction','answer')
+                    }
                     return response.send();                
                 } else {
                     console.log('no question');
@@ -380,22 +419,33 @@ let intentHandlers ={
         }
     },
     really_block_question: function(request,response) {
+        let session = request.getSession();
         session.set('confirmAction',null)
         session.set('denyAction',null)
-        let session = request.getSession();
         let currentQuestion = session.get('currentQuestion');
-        databaseFunctions.getUser(db,database,request,response).then(function(user) {
-            databaseFunctions.blockQuestion(db,database,user._id,currentQuestion._id,currentQuestion.quiz);
+        return databaseFunctions.getUser(db,database,request,response).then(function(user) {
+            if (user && user._id) {
+                databaseFunctions.blockQuestion(db,database,user._id,currentQuestion._id,currentQuestion.quiz);
+                response.say(__('Ok blocked. '));// console.log('recall');
+                return intentHandlers.next_question(request,response);
+            }
         });
-        response.say('Ok blocked. Next question ');// console.log('recall');
-        return intentHandlers.next_question(request,response);
+       
     },
     block_question: function(request,response) {
         let session = request.getSession();
-        session.set('confirmAction','really_block_question')
-        session.set('denyAction','next_question')
-        response.say('Do you really want to block this question');// console.log('recall');
-        response.shouldEndSession(false,'Do you really want to block this question')            
+        return databaseFunctions.getUser(db,database,request,response).then(function(user) {
+            if (user) {
+                session.set('confirmAction','really_block_question')
+                session.set('denyAction','next_question')
+                response.say(__('Do you really want to block this question'));// console.log('recall');
+                response.shouldEndSession(false,__('Do you really want to block this question'))
+                return response.send();
+            } else {
+                response.shouldEndSession(false);
+                return response.send();
+            }
+        })
     },
     recall: function(request,response) {
        // console.log('recall');
@@ -407,11 +457,11 @@ let intentHandlers ={
         if (currentQuestion && session.get('mode') === 'review') {
             //console.log(currentQuestion);
             // mark question as success
-            response.say('OK, next question');
+            response.say(__('OK'));
             databaseFunctions.logStatus(db,database,'successes',currentQuestion._id,request,response);
             return intentHandlers.next_question(request,response);
         } else {
-            response.shouldEndSession(false,'Do you want to start a review')            
+            response.shouldEndSession(false,__('Do you want to start a review'))            
             session.set('confirmAction','review');
             session.set('denyAction','bye')
             
@@ -444,8 +494,8 @@ let intentHandlers ={
                         console.log(['ANSWERIS is specific']);
                         answer = currentQuestion.specific_answer;
                         if (find && (alexaUtils.strip(answer).toLowerCase()===alexaUtils.strip(find).toLowerCase()) ) {  //|| levenshtein.get(find,answer) < 1
-                            response.say(alexaUtils.speakable(answer) + " is correct");
-                            response.say("Next question");
+                            response.say( __(" well done ") + alexaUtils.speakable(answer) + __(" is correct"));
+                           // response.say(__("Next question"));
                             databaseFunctions.logStatus(db,database,'successes',currentQuestion._id,request,response);
                             return intentHandlers.next_question(request,response);
                         } else {
@@ -467,17 +517,17 @@ let intentHandlers ={
                             answer = alexaUtils.strip(aiParts[i]).toLowerCase();
                             console.log(['ANSWERIS is also include',find,answer]);
                             if (find && (answer===alexaUtils.strip(find).toLowerCase()) ) { //|| levenshtein.get(find,answer) < 1
-                                response.say(alexaUtils.speakable(answer) + " is correct");
-                                response.say("Next question");
+                                response.say(alexaUtils.speakable(answer) + __(" is correct"));
+                                //response.say(__("Next question"));
                                 databaseFunctions.logStatus(db,database,'successes',currentQuestion._id,request,response);
                                 return intentHandlers.next_question(request,response);
                             } 
                         };
-                        response.say(alexaUtils.speakable(find) + " is not correct. Try again ");
+                        response.say(alexaUtils.speakable(find) + __(" is not correct. Try again "));
                         session.set('denyAction','next_question')
                         return intentHandlers.repeat_question(request,response);
                     } else {
-                        response.say(alexaUtils.speakable(find) + "is not correct. Try again ");
+                        response.say(alexaUtils.speakable(find) + __("is not correct. Try again "));
                         session.set('denyAction','next_question')
                         return intentHandlers.repeat_question(request,response);
                     }
@@ -494,8 +544,8 @@ let intentHandlers ={
                         answer = currentQuestion.answer;
                         console.log(['ANSWERIS < 5',answer,find,(answer.indexOf(find) !== -1)]);
                         if (find && (alexaUtils.strip(answer).indexOf(alexaUtils.strip(find)) !== -1 ) ) { //|| levenshtein.get(find,answer) < 4
-                            response.say(alexaUtils.speakable(answer) + " is correct");
-                            response.say("Next question");
+                            response.say(alexaUtils.speakable(answer) + __(" is correct"));
+                            //response.say("Next question");
                             databaseFunctions.logStatus(db,database,'successes',currentQuestion._id,request,response);
                             return intentHandlers.next_question(request,response);
                         } else {
@@ -508,20 +558,19 @@ let intentHandlers ={
                     if (currentQuestion.specific_answer || currentQuestion.also_accept) {
                         return checkSpecificAnswer(find,currentQuestion);
                     } else {
-                        response.say("I can't answer this question. Just say ")
-                        response.say("I recall");
+                        response.say(__("I can't answer this question. Just say. I recall"))
                         response.shouldEndSession(false)
                         //return intentHandlers.repeat_question(request,response);
                     }
                 }
             } else {
-                response.say("Didn't catch that. Try again");
+                response.say(__("Didn't catch that. Try again"));
                 response.shouldEndSession(false)
             }
         } else {
-            response.say('No current question. Would you like to hear one');
+            response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
-            response.shouldEndSession(false,'Do you want another question')
+            response.shouldEndSession(false,__('Do you want another question'))
             session.set('denyAction','bye')
         }
     },
@@ -548,21 +597,21 @@ let intentHandlers ={
             find=alexaUtils.strip(find)
             console.log(['mnemonic compare ']);
             if (find && (mnemonic.indexOf(find) !== -1 ||  levenshtein.get(find,mnemonic) < 3)) {
-                response.say("Correct");
-                response.say('Next question');
+                response.say(__(" well done ") + __("Correct"));
+                //response.say(__('Next question'));
                 databaseFunctions.logStatus(db,database,'successes',currentQuestion._id,request,response);
                 return intentHandlers.next_question(request,response);
             } else {
-                response.say(alexaUtils.speakable(find) + "is not correct. Try again .");
+                response.say(alexaUtils.speakable(find) + ' ' +__("is not correct. Try again ."));
                 //session.set('denyAction','next_question')
                 return intentHandlers.repeat_question(request,response);
             }
             
         } else {
-            response.say('No current question. Would you like to hear one');
+            response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,'Do you want another question')
+            response.shouldEndSession(false,__('Do you want another question'))
         }
     },
     // repeat info
@@ -576,13 +625,13 @@ let intentHandlers ={
         if (currentQuestion) {
             alexaSpeak.readAnswer(currentQuestion,request,response);
             if (alexaUtils.moreInfo(currentQuestion).length==0) {
-                response.shouldEndSession(false,'what next. Do you want another question?')
+                response.shouldEndSession(false,__('Do you want another question'))
                 session.set('confirmAction','next_question')
                 session.set('denyAction','bye')
                 return response.send();                
             } else {
-                response.say('Would you like more information');
-                response.shouldEndSession(false,'Would you like more information')
+                response.say(__('Would you like more information'));
+                response.shouldEndSession(false,__('Would you like more information'))
                 session.set('confirmAction','moreinfo')
                 session.set('denyAction','next_question')
                 return response.send();                
@@ -590,28 +639,32 @@ let intentHandlers ={
             
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {
-            response.say('No current question. Would you like to hear one');
+            response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,'Do you want another question')
+            response.shouldEndSession(false,__('Do you want another question'))
         }
     },
     spellanswer: function(request,response) {
         // if there is a current question speak answer
+        console.log('spell');
         let session = request.getSession();
         session.set('confirmAction',null)
         session.set('denyAction',null)
         
         let currentQuestion = session.get('currentQuestion');
+        console.log(currentQuestion);
         if (currentQuestion) {
             alexaSpeak.readAnswerLetters(currentQuestion,request,response);
-            response.shouldEndSession(false,'What next. Would you like another question')
-        // otherwise ask if want a new question and prime confirmAction=discover
-        } else {
-            response.say('No current question. Would you like to hear one');
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,'Do you want another question')
+            response.shouldEndSession(false,__('Would you like another question'))
+        // otherwise ask if want a new question and prime confirmAction=discover
+        } else {
+            response.say(__('No current question. Would you like to hear one'));
+            session.set('confirmAction','next_question')
+            session.set('denyAction','bye')
+            response.shouldEndSession(false,__('Do you want another question'))
         }
     },
     moreinfo: function(request,response) {
@@ -626,13 +679,15 @@ let intentHandlers ={
             console.log(['more info preread']);
             alexaSpeak.readMoreInfo(currentQuestion,request,response);
             console.log(['more info postread']);
-            response.shouldEndSession(false,'What next. Would you like another question')
-        // otherwise ask if want a new question and prime confirmAction=discover
-        } else {
-            response.say('No current question. Would you like to hear one');
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,'Do you want another question')
+        response.shouldEndSession(false,__('Would you like another question'))
+        // otherwise ask if want a new question and prime confirmAction=discover
+        } else {
+            response.say(__('No current question. Would you like to hear one'));
+            session.set('confirmAction','next_question')
+            session.set('denyAction','bye')
+            response.shouldEndSession(false,__('Do you want another question'))
         }
     },
     mnemonic: function(request,response) {
@@ -644,13 +699,16 @@ let intentHandlers ={
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
             alexaSpeak.readMnemonic(currentQuestion,request,response);
-            response.shouldEndSession(false,'What next. Would you like another question')
-        // otherwise ask if want a new question and prime confirmAction=discover
-        } else {
-            response.say('No current question. Would you like to hear one');
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,'Do you want another question')
+        
+            response.shouldEndSession(false,__('Would you like another question'))
+        // otherwise ask if want a new question and prime confirmAction=discover
+        } else {
+            response.say(__('No current question. Would you like to hear one'));
+            session.set('confirmAction','next_question')
+            session.set('denyAction','bye')
+            response.shouldEndSession(false,__('Do you want another question'))
         }
     },
     repeat_question: function(request,response) {
@@ -662,13 +720,16 @@ let intentHandlers ={
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
             alexaSpeak.askQuestion(currentQuestion,request,response);
-             response.shouldEndSession(false,'What next. Would you like another question')
+             response.shouldEndSession(false,__('Would you like another question'))
+             session.set('confirmAction','next_question')
+            session.set('denyAction','bye')
+        
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {
-            response.say('No current question. Would you like to hear one');
+            response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,'Do you want another question')
+            response.shouldEndSession(false,__('Do you want another question'))
         }
     },
     next_question: function(request,response) {
@@ -693,8 +754,8 @@ let intentHandlers ={
         session.set('denyAction',null)
         
         response.card("Visit Mnemo's Library","(copy and paste)  \n\n https://mnemolibrary.com ");
-        response.say("Sure. Check your Alexa app for a card with a link");
-        response.shouldEndSession(false,'Do you want another question')
+        response.say(__("Sure. Check your Alexa app for a card with a link"));
+        response.shouldEndSession(false,__('Do you want another question'))
         session.set('confirmAction','next_question')
         session.set('denyAction','bye')
         
@@ -706,19 +767,22 @@ let intentHandlers ={
         
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
-            let text="https://mnemolibrary.com";
+            let text="Mnemo's Library https://mnemolibrary.com";
             if (currentQuestion.image) {
                 if (currentQuestion.imageattribution) {
                     text="\nImage from "+currentQuestion.imageattribution;
                 }
-                response.card({type:"Standard",title:"Visit Mnemo's Library",text:text,image:{smallImageUrl:currentQuestion.image,largeImageUrl:currentQuestion.image}});
-                response.say("Sure. Check your Alexa app for a card with the image");                
+                response.card({type:"Standard",title:currentQuestion.question,text:text,image:{smallImageUrl:currentQuestion.image,largeImageUrl:currentQuestion.image}});
+                response.say(__("Sure. Check your Alexa app for a card with the image"));                
             } else {
-                response.say("Sadly there's no image for this question");                
+                response.say(__("Sadly there's no image for this question"));                
             }
         }
-        response.shouldEndSession(false,'Do you want another question')
+        response.shouldEndSession(false,__('Do you want another question'))
     },
+    login: function(request,response) {
+        response.linkAccount();
+    }
     //// search by asking question
     //why_is:  function(request,response) {
         //if (request.slots['ANSWER'] && request.slots['ANSWER'].value)  {

@@ -15,11 +15,11 @@ export default class FAQ extends Component {
 
 <p><strong>Why do I need to remember this stuff? It's all easily accessible on the Internet anyway.</strong></p>
 
-<p><span>It's tempting to externalise knowledge, 'okay Google'? But&nbsp;there are&nbsp;</span><a href="https://www.theatlantic.com/science/archive/2018/01/what-was-this-article-about-again/551603/"><span>dangers</span></a><span>&nbsp;in over-reliance. And you need to remember what knowledge is out there in the first place.</span></p>
+<p><span>It's tempting to externalise knowledge, 'okay Google'? But&nbsp;there are&nbsp;</span><a href="https://www.theatlantic.com/science/archive/2018/01/what-was-this-article-about-again/551603/" target="_new" ><span>dangers</span></a><span>&nbsp;in over-reliance. And you need to remember what knowledge is out there in the first place.</span></p>
 
 <p><strong>Is that&nbsp;mnemonic really useful? It seems pretty cryptic</strong></p>
 
-<p>Yes, some puns are cryptic, which is why they often feature in cryptic crosswords, which aren't everyone's cup of tea. Some of the mnemonics won't be meaningful without understand the information. For example Leon Foucault ('Pendulum search [for coal], Showed the Earth's roll') requires a bit of work to associate coal with a pendulum (<a href="https://en.wikipedia.org/wiki/Dowsing#Pendulum">dowsing</a>) and with Foucault's use of it do demonstrate the rotation of the Earth. And some people don't have an ear for puns: we might readily hear 'for coal' in 'Foucault', but we understand if you don't. But give it a go and see if it works. If not, you might want to limit your learning to questions that use other mnemonics, for example rhyme, which features heavily in the news and academic questions.</p>
+<p>Yes, some puns are cryptic, which is why they often feature in cryptic crosswords, which aren't everyone's cup of tea. Some of the mnemonics won't be meaningful without understand the information. For example Leon Foucault ('Pendulum search [for coal], Showed the Earth's roll') requires a bit of work to associate coal with a pendulum (<a  target="_new"  href="https://en.wikipedia.org/wiki/Dowsing#Pendulum">dowsing</a>) and with Foucault's use of it do demonstrate the rotation of the Earth. And some people don't have an ear for puns: we might readily hear 'for coal' in 'Foucault', but we understand if you don't. But give it a go and see if it works. If not, you might want to limit your learning to questions that use other mnemonics, for example rhyme, which features heavily in the news and academic questions.</p>
 
 <p><strong>When should I start and stop reviewing?</strong></p>
 
@@ -36,6 +36,12 @@ export default class FAQ extends Component {
 <p><strong>How can I see what content is coming up?</strong></p>
 
 <p>The discover phase comes in sets of up to 20 entries, which can be viewed with the &lsquo;3 dots&rsquo; drop down menu to the top left. Another 20 entries are automatically generated when you have finished, but we recommend reviewing entries in your knowledge base until you are consistently making successful recalls before you discover more content.</p>
+
+<p><strong>How do I get this app onto my smartphone home screen?</strong></p>
+<p>For iPhone, go to mnemolibrary.com in Safari, then press the middle bottom icon, swipe to the right and select 'Add to home screen'.</p>
+<p>For Android, press the Menu button (either below the screen on some devices or at the top-right corner of the browser), then tap on Page. Tap Add Page Shortcut.</p>
+<p>&nbsp;</p>
+
 
 <p><strong>Can I borrow your content?</strong></p>
 

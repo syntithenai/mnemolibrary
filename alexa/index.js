@@ -11,14 +11,14 @@ let app = require('./mnemoslibrary')
 // EXPRESS
 
 // setup the alexa app and attach it to express before anything else
-app.express({ expressApp: express_app,  
+app.express({ expressApp: express_app 
   // verifies requests come from amazon alexa. Must be enabled for production.
   // You can disable this if you're running a dev environment and want to POST
   // things to test behavior. enabled by default.
-  checkCert: false,
+  //checkCert: false,
   // sets up a GET route when set to true. This is handy for testing in
   // development, but not recommended for production. disabled by default
-  debug: true
+  //debug: true
 });
 express_app.listen(3000, () => console.log('Mnemo listening on port 3000!'))
 

@@ -1,7 +1,14 @@
 var removeDiacritics=require('./diacritics');
     
 alexaUtils={
-    
+    canAnswer: function(val) {
+        let answerParts=val.answer.split(' ');
+        if (answerParts.length < 5 || (val.specific_answer && String(val.specific_answer).length > 0) || (val.also_accept && String(val.also_accept).length > 0)) {
+            return true;
+        } else {
+            return false;
+        }
+    },
     munge:function (val) {
         if (val) {
             if (val.indexOf("mnemo's")==0) val = val.replace("mnemo's","nemo's");  // for ASR matching
@@ -45,6 +52,7 @@ alexaUtils={
         return val;
     },
     firstSentence: function (text) {
+        text = text.replace('...',', ');
         if (text) {
             return String(text).split('.')[0];
         } else return '';
@@ -61,6 +69,14 @@ alexaUtils={
            return ''  
         }
     },
+    attribution: function (question) {
+        if (question) {
+            return question.attribution;
+            //}
+        } else {
+           return ''  
+        }
+    },
     moreInfo: function (question) {
         console.log(['more info',question]);
         if (question) {
@@ -68,26 +84,30 @@ alexaUtils={
             // otherwise strip first sentence and trailing commentary
             let text=question.answer;
             if (text) {
-                if (alexaUtils.strip(question.specific_answer) === alexaUtils.strip(question.answer) ) {
-                    return '';
-                }
-                // strip first sentence if only if we didn't use specific answer as answer
-                //if (question.specific_answer && question.specific_answer.length > 0) {
-                    
-                //} else {
-                    let startAt = text.indexOf('.')+1;
-                    if (startAt > 0) {
-                        text = text.slice(startAt);
-                    }
+                //if (alexaUtils.strip(question.specific_answer) === alexaUtils.strip(question.answer) ) {
+                    //return '';
                 //}
-
-                let endAt = text.indexOf("\n---") - 1;
-                if (endAt > 0) {
-                    return String(text).slice(0,endAt).trim();
+                // strip first sentence if only if we didn't use specific answer as answer
+                if (question.specific_answer && question.specific_answer.length > 0) {
+                    return '';
                 } else {
-                   return text;
+                    text = text.replace('...',', ');
+                    if (text.indexOf('.')!==-1) {
+                        let startAt = text.indexOf('.')+1;
+                        if (startAt > 0) {
+                            text = text.slice(startAt);
+                        }
+                    } else {
+                        return '';
+                    }
+                    
+                    let endAt = text.indexOf("\n---") - 1;
+                    if (endAt > 0) {
+                        return String(text).slice(0,endAt).trim();
+                    } else {
+                       return text;
+                    }
                 }
-                
             } else {
                 return '';
             }                   
@@ -104,7 +124,7 @@ alexaUtils={
     },
     speakable:function (val) {
         if (val) {
-            val = val.trim().replace(/[^0-9 'a-z,.;:]/gi, '');
+            val = val.trim().replace(/[^0-9 'a-z,.;:?]/gi, '');
         }
         return val;
     }

@@ -138,6 +138,7 @@ export default class AppLayout extends Component {
         this.setQuizFromTechnique = this.setQuizFromTechnique.bind(this);
          this.openAuth = this.openAuth.bind(this);
         this.shout=this.shout.bind(this);
+        this.startMqtt=this.startMqtt.bind(this);
         // listen to messages from child iframe
         //window.addEventListener('message', function(e) {
         //// check message origin
@@ -176,30 +177,31 @@ export default class AppLayout extends Component {
     }
   };
 
-  componentDidMount() {
-      let that = this;
-      ReactGA.initialize(config.analyticsKey);
-     
-        // MQTT
-        this.mqttClientId=  'nemo_'+Math.random().toString(16).substr(2, 8);
-        // Create a client instance
-        let client =  new Paho.MQTT.Client('mqtt.syntithenai.com', Number(9001), this.mqttClientId);
-        this.mqttClient=client;
-        // set callback handlers
-        this.mqttClient.onConnectionLost = onConnectionLost;
-        this.mqttClient.onMessageArrived = onMessageArrived;
-         
-        // connect the client
-        this.mqttClient.connect({onSuccess:onConnect,useSSL:true,keepAliveInterval:60,timeout:3000});  //
+
+    startMqtt(user) {
+        let that = this;
+        if (user && String(user._id).length > 0) {
+            // MQTT
+            this.mqttClientId=  'nemo_'+user._id; //Math.random().toString(16).substr(2, 8);
+            // Create a client instance
+            let client =  new Paho.MQTT.Client(config.externalMqtt, Number(9001), this.mqttClientId);
+            this.mqttClient=client;
+            // set callback handlers
+            this.mqttClient.onConnectionLost = onConnectionLost;
+            this.mqttClient.onMessageArrived = onMessageArrived;
+             
+            // connect the client
+            this.mqttClient.connect({onSuccess:onConnect,useSSL:true,keepAliveInterval:60,timeout:3000});  //
+            
+        }
          
         // called when the client connects
         function onConnect() {
           // Once a connection has been made, make a subscription and send a message.
           console.log("onConnect");
-          that.mqttClient.subscribe("presence");
+          that.mqttClient.subscribe("users/"+user._id);
         }
-         
-        // called when the client loses its connection
+            // called when the client loses its connection
         function onConnectionLost(responseObject) {
           if (responseObject && responseObject.errorCode !== 0) {
             console.log("onConnectionLost:"+responseObject.errorMessage);
@@ -248,7 +250,12 @@ export default class AppLayout extends Component {
 
         }
 
-
+        
+    };
+    
+    componentDidMount() {
+      let that = this;
+      ReactGA.initialize(config.analyticsKey);
         
         const script = document.createElement("script");
         script.src = "https://apis.google.com/js/platform.js";
@@ -399,6 +406,7 @@ export default class AppLayout extends Component {
                 localStorage.setItem('token',JSON.stringify(res.token));
                 localStorage.setItem('user',JSON.stringify(state.user));
                 that.setState(state);
+                that.startMqtt(res.user)
                 //setInterval(function() {
               ////      console.log('toke ref tok');
                     //that.refreshLogin(state.user)
@@ -456,6 +464,7 @@ export default class AppLayout extends Component {
                 state.token = res;
                 localStorage.setItem('token',JSON.stringify(res));
                 localStorage.setItem('user',JSON.stringify(that.state.user));
+                that.startMqtt(that.state.user)
                 // load progress
                 //fetch('/api/progress')
                   //.then(function(response) {
@@ -504,6 +513,7 @@ export default class AppLayout extends Component {
             localStorage.setItem('token',JSON.stringify(res.token));
             localStorage.setItem('user',JSON.stringify(state.user));
             that.setState(state);
+            that.startMqtt(state.user)
             setInterval(function() {
           //      console.log('toke ref tok');
                 that.refreshLogin(state.user)
@@ -529,6 +539,7 @@ export default class AppLayout extends Component {
             localStorage.setItem('token',JSON.stringify(res.token));
             localStorage.setItem('user',JSON.stringify(state.user));
             that.setState(state);
+            that.startMqtt(state.user)
             setInterval(function() {
             //    console.log('toke ref tok');
                 that.refreshLogin(state.user)
@@ -554,6 +565,7 @@ export default class AppLayout extends Component {
             localStorage.setItem('token',JSON.stringify(res.token));
             localStorage.setItem('user',JSON.stringify(state.user));
             that.setState(state);
+            that.startMqtt(state.user)
             setInterval(function() {
               //  console.log('toke ref tok');
                 that.refreshLogin(state.user)

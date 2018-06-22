@@ -1,6 +1,6 @@
 var alexa = require("alexa-app");
 let intentHandlers = require('./mnemoslibrary_intentHandlers');
-
+var __ = require('./speechStrings'); 
 var app = new alexa.app("mnemoslibrary");
 
 let customSlots = require('./vocabdump.js');
@@ -36,7 +36,7 @@ app.intent("discover", {
     "utterances": [
       "{discover|browse|search|explore}","{discover|browse|search|find|learn about|give me|locate|unearth|uncover|explore|reveal|see|dig up|look up} {tag |} {-|TAG}","{discover|browse|search|find|learn about|give me|locate|unearth|uncover|explore|reveal|see|dig up|look up} {topic |}  {-|TOPIC}"
     ]
-  },intentHandlers.discover
+  },intentHandlers.start_discover
 );
 
 //app.intent("rediscover", {
@@ -69,7 +69,7 @@ app.intent("mnemonic_is", {
 );
 app.intent("answer_is", {
     "slots": { THEANSWER:"answers"},
-    "utterances": ["the {answer|solution} is {-|THEANSWER}","{-|THEANSWER}"]
+    "utterances": ["the {answer|solution} is {-|THEANSWER}"]  //,"{-|THEANSWER}"
   },intentHandlers.answer_is
 );
 app.intent("spelling_is", {
@@ -139,10 +139,7 @@ app.intent("show_image", {
 app.intent("login", {
     "slots": { },
     "utterances": ["Login","sign in","log in to site"]
-  },
-  function(request, response) {
-    response.linkAccount();
-  }
+  },intentHandlers.login
 );
 
 
@@ -158,8 +155,8 @@ app.intent("AMAZON.HelpIntent", {
     "utterances": ['help']
   },
   function(request, response) {
-    var helpOutput = "You can say discover questions or review them. You can also say stop to stop speech or cancel to quit.";
-    var reprompt = "What would you like to do?";
+    var helpOutput = __("You can say discover questions or review them. You can also say stop to stop speech or cancel to quit.");
+    var reprompt = __("What would you like to do?");
     // AMAZON.HelpIntent must leave session open -> .shouldEndSession(false)
     response.say(helpOutput).reprompt(reprompt).shouldEndSession(false);
   }
@@ -169,8 +166,8 @@ app.intent("AMAZON.StopIntent", {
     "slots": {},
     "utterances": ['stop']
   }, function(request, response) {
-    var stopOutput = "Ok.";
-    response.say(stopOutput).shouldEndSession(false,'What next ?');
+    var stopOutput = __("Ok.");
+    response.say(stopOutput).shouldEndSession(false,__('What next ?'));
     
   }
 );
@@ -179,7 +176,7 @@ app.intent("AMAZON.CancelIntent", {
     "slots": {},
     "utterances": ['cancel','exit','quit','die','go away']
   }, function(request, response) {
-    var cancelOutput = "Bye.";
+    var cancelOutput = __("Bye.");
     response.say(cancelOutput);
   }
 );
@@ -207,7 +204,7 @@ app.post = function(request, response, type, exception) {
   if (exception) {
     // always turn an exception into a successful response
     console.log(exception);
-    return response.clear().say("An error occured: " + exception).send();
+    return response.clear().say(__("An error occured: ") + exception).send();
   }
 };
 

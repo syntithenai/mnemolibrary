@@ -88,6 +88,7 @@ export default class TagsPage extends Component {
                 <form className="form">
                   <input className="form-control col-sm-8" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter}  placeholder="Search" aria-label="Search" />
                 </form>
+                {this.state.tags && this.state.tags.length > 0 &&
                 <WordCloud 
                     height={wordCloudHeight}
                     width={wordCloudWidth}
@@ -96,7 +97,7 @@ export default class TagsPage extends Component {
                     rotate={rotate}
                     onWordClick={this.props.setQuiz} 
                 >
-                </WordCloud>
+                </WordCloud>}
             </div>
 
         )

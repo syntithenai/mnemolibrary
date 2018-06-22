@@ -34,7 +34,7 @@ router.get('/dumpalexa',(req,res) => {
     ROOT_APP_PATH = fs.realpathSync('.'); 
     console.log(ROOT_APP_PATH);
     TMP_PATH='/tmp'
-    db.collection('questions').distinct('quiz',{ok_for_alexa:true}).then(function(results) {
+    db.collection('questions').distinct('quiz',{$and:[{ok_for_alexa:{$eq:true}},{discoverable:{$ne:'no'}},{access:{$eq:'public'}}]}).then(function(results) {
             // TOPICS
             let topics=[];
             let topicsO={};
@@ -59,7 +59,7 @@ router.get('/dumpalexa',(req,res) => {
                 //});
                 //tags = Object.keys(tagsO);
                 // SHORTANSWERS
-                db.collection('questions').find({ok_for_alexa:true}).toArray().then(function(results) {
+                db.collection('questions').find({$and:[{ok_for_alexa:{$eq:true}},{discoverable:{$ne:'no'}},{access:{$eq:'public'}}]}).toArray().then(function(results) {
                     let answers=[];
                     let answersO={};
                     let spelledWords=[];
@@ -120,7 +120,7 @@ router.get('/dumpalexa',(req,res) => {
                     spelledWords = Object.keys(spelledWordsO);
                     tags=Object.keys(tagsO);
                     // QUESTIONS
-                    db.collection('questions').distinct('question',{ok_for_alexa:true}).then(function(results) {
+                    db.collection('questions').distinct('question',{$and:[{ok_for_alexa:{$eq:true}},{discoverable:{$ne:'no'}},{access:{$eq:'public'}}]}).then(function(results) {
                         let questions=[];
                         let questionsO={};
                         results.map(function(val,key) {
@@ -133,7 +133,7 @@ router.get('/dumpalexa',(req,res) => {
                         });
                         questions = Object.keys(questionsO);
                         // MNEMONICS
-                        db.collection('questions').distinct('mnemonic',{ok_for_alexa:true}).then(function(results) {
+                        db.collection('questions').distinct('mnemonic',{$and:[{ok_for_alexa:{$eq:true}},{discoverable:{$ne:'no'}},{access:{$eq:'public'}}]}).then(function(results) {
                             let mnemonics=[];
                             let mnemonicsO={};
                             let mnemonicsLastWordsO={};
@@ -150,7 +150,7 @@ router.get('/dumpalexa',(req,res) => {
                             });
                             mnemonics = Object.keys(mnemonicsO);
                             let mnemonicLastWords = Object.keys(mnemonicsLastWordsO);
-                            db.collection('questions').distinct('interrogative',{ok_for_alexa:true}).then(function(results) {    
+                            db.collection('questions').distinct('interrogative',{$and:[{ok_for_alexa:{$eq:true}},{discoverable:{$ne:'no'}},{access:{$eq:'public'}}]}).then(function(results) {    
                                 let interrogatives=[];
                                 let interrogativesO={};
                                 results.map(function(val,key) {
@@ -772,21 +772,23 @@ router.post('/import', (req, res) => {
                         //console.log(Object.keys(json.tags));
                         updateTags(json.tags);
                         // create indexes   
-                        db.collection('questions').dropIndex();
-                        db.collection('questions').createIndex({
-                            question: "text",
-                            interrogative: "text",
-                            answer:"text",
-                            question:"text",
-                            mnemonic: "text",
-                            //answer: "text"
-                        });
-                       
-                       //db.collection('words').dropIndex();
-                        //db.collection('words').createIndex({
-                            //text: "text"                    
-                        //}); 
-                        
+                        setTimeout(function() {
+                            db.collection('questions').dropIndexes();
+                            db.collection('questions').createIndex({
+                                question: "text",
+                                interrogative: "text",
+                                answer:"text",
+                                question:"text",
+                                mnemonic: "text",
+                                //answer: "text"
+                            });
+                           
+                           db.collection('words').dropIndexes();
+                            db.collection('words').createIndex({
+                                text: "text"                    
+                            }); 
+                            console.log('created indexes');                            
+                        },10000);
                         // sitemap
                        
 

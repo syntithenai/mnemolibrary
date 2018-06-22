@@ -3,6 +3,7 @@ var ObjectId = require('mongodb').ObjectID;
 
 let databaseFunctions = {
     nextDiscoveryQuestion: function (db,database,request,response) {
+        console.log('nextDiscoveryQuestion');
         //return new Promise(function(resolve,reject) {resolve()});
         let orderBy = request.slots['orderBy'] ? request.slots['orderBy'].value : 'successRate';
         let sortFilter={};
@@ -10,33 +11,37 @@ let databaseFunctions = {
         let criteria = [];
         return new Promise(function(resolve,reject) {
             databaseFunctions.getUser(db,database,request,response).then(function(user) {
+                console.log('nextDiscoveryQuestion got user');
+                console.log(user);
+                let session = request.getSession();
+                let tagFilter = ''
+                let topicFilter = ''
+                if (session.get('tagFilter')) {
+                    tagFilter=session.get('tagFilter')
+                //    tagFilter = closestTag(tagFilter)[0];
+                } else if (session.get('topicFilter')){
+                    topicFilter=session.get('topicFilter')
+                 //   topicFilter=closestTopic(topicFilter)[0];
+                }
+                
+                if (topicFilter) {
+                    //criteria.push({quiz:{$eq:topicFilter}});
+                    criteria.push({quiz:new RegExp('^' + topicFilter + '$', 'i')});
+                    orderBy = 'sort';
+                }
+                if (tagFilter) { 
+                    let tag = String(tagFilter).trim().toLowerCase(); 
+                    criteria.push({'tags': {$in:[tag]}});
+                }
+                
+               // console.log(['filter',tagFilter,topicFilter]);
+                criteria.push({discoverable :{$ne:'no'}});
+                criteria.push({ok_for_alexa :{$eq:true}});
+                sortFilter[orderBy]=-1;
+                
                 if (user) {
+                    console.log('nextDiscoveryQuestion have user');
                     criteria.push({$or:[{access:{$eq:ObjectId(user._id)}},{access :{$eq:'public'}}]})
-                    let session = request.getSession();
-                    let tagFilter = ''
-                    let topicFilter = ''
-                    if (session.get('tagFilter')) {
-                        tagFilter=session.get('tagFilter')
-                    //    tagFilter = closestTag(tagFilter)[0];
-                    } else if (session.get('topicFilter')){
-                        topicFilter=session.get('topicFilter')
-                     //   topicFilter=closestTopic(topicFilter)[0];
-                    }
-                    
-                    if (topicFilter) {
-                        //criteria.push({quiz:{$eq:topicFilter}});
-                        criteria.push({quiz:new RegExp('^' + topicFilter + '$', 'i')});
-                        orderBy = 'sort';
-                    }
-                    if (tagFilter) { 
-                        let tag = String(tagFilter).trim().toLowerCase(); 
-                        criteria.push({'tags': {$in:[tag]}});
-                    }
-                    
-                   // console.log(['filter',tagFilter,topicFilter]);
-                    criteria.push({discoverable :{$ne:'no'}});
-                    criteria.push({ok_for_alexa :{$eq:true}});
-                    sortFilter[orderBy]=-1;
                     let progressCriteria = {
                         $and:[
                             {'user': {$eq:ObjectId(user._id)}} , 
@@ -44,7 +49,7 @@ let databaseFunctions = {
                             
                     ]};
                     //progressCriteria = {'user': {$eq:user._id}};
-                    //console.log([user._id,progressCriteria]);
+                    console.log([user._id,progressCriteria]);
                     db.collection('userquestionprogress').find(progressCriteria).toArray().then(function(progress) {
                         if (progress) {
                            // console.log(['progress res',progress]);
@@ -53,10 +58,10 @@ let databaseFunctions = {
                                 notThese.push(ObjectId(progress[seenId].question));
                             };
                             criteria.push({'_id': {$nin: notThese}});
-                           // console.log(['disco criteria',notThese,criteria]);
+                            console.log(['disco criteria',notThese,criteria]);
                         }
                         db.collection('questions').find({$and:criteria}).sort(sortFilter).limit(limit).toArray().then(function( questions) {
-                              //console.log(['user res',questions ? questions.length : 0,questions]);    
+                            console.log(['user res',questions ? questions.length : 0,questions]);    
                             resolve(questions);
                         })
                     });
@@ -64,20 +69,32 @@ let databaseFunctions = {
 
                 } else {
                     // NO USER, SHOW BY POPULAR
-                     db.collection('questions').find({$and:criteria}).limit(limit).toArray().then(function(results) {
-                       //  console.log(['no user res',results ? results.length : 0]);    
-                        resolve(results);
-                    })
+                     //db.collection('questions').find({$and:criteria}).limit(limit).toArray().then(function(results) {
+                       ////  console.log(['no user res',results ? results.length : 0]);    
+                        //resolve(results);
+                    //})
+                    
+                    db.collection('questions').aggregate([{ $match: {$and:criteria}}, {$sample: { size: 1 }} ]
+                        ,function (err, result) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                            resolve(null);
+                        }
+                        result.toArray().then(function(final) {
+                            resolve(final);
+                        });        
+                    });
                 }
-            });        
-        });
+            });
+        });    
     },
 
     getReviewQuestions: function (db,database,request,response) {
          //console.log('review');
          let session = request.getSession();
                     
-         let limit=3;
+         let limit=10;
          let orderBy = 'timeScore'
          let orderMeBy = {};
          orderMeBy[orderBy] = 1;          
@@ -198,7 +215,7 @@ let databaseFunctions = {
 
     logStatus: function (db,database,type,question,request,response) {
         return databaseFunctions.getUser(db,database,request,response).then(function(user) {
-            if (user && (type==="seen" || type==="successes")) {
+            if (user && user._id && (type==="seen" || type==="successes")) {
                 let ts = new Date().getTime();
                 db.collection(type).insert({user:ObjectId(user._id),question:ObjectId(question),timestamp:ts}).then(function(inserted) {
                     console.log(['LOG '+type]);
@@ -217,7 +234,6 @@ let databaseFunctions = {
        // console.log('get user',accessToken,request.getSession());
         return new Promise(function(resolve,reject) {
             if (accessToken) {
-                
                 database.OAuthAccessToken.findOne({accessToken:accessToken})
                 .then(function(token)  {
          //           console.log(['found token',token]);
@@ -237,50 +253,50 @@ let databaseFunctions = {
     
     blockQuestion: function(db,database,user,question,topic) {
         console.log(['block',user,question,topic]);
-        db.collection('userquestionprogress').findOne({$and:[{'user': {$eq:ObjectId(user)}},{question:{$eq:ObjectId(question)}} ]}).then(function(progress) {
-                if (progress) {
-                    // OK
-                    progress.block = 1; //new Date().getTime();
-                    progress.topic = topic;
-                    db.collection('userquestionprogress').update({_id:progress._id},progress).then(function() {
-                      //  console.log(['update',progress]);
-                
-                    });
-                    
-                } else {
-                      progress = {'user':ObjectId(user),question:ObjectId(question)};
-                      progress.block = 1; //new Date().getTime();
-                      progress.topic = topic;
-                      db.collection('userquestionprogress').save(progress).then(function() {
-                        //  console.log(['insert',progress]);
-                
-                    });
-                } 
-            })
+        if (user && user._id) {
+            db.collection('userquestionprogress').findOne({$and:[{'user': {$eq:ObjectId(user)}},{question:{$eq:ObjectId(question)}} ]}).then(function(progress) {
+                    if (progress) {
+                        // OK
+                        progress.block = 1; //new Date().getTime();
+                        progress.topic = topic;
+                        db.collection('userquestionprogress').update({_id:progress._id},progress).then(function() {
+                          //  console.log(['update',progress]);
+                        });
+                    } else {
+                          progress = {'user':ObjectId(user),question:ObjectId(question)};
+                          progress.block = 1; //new Date().getTime();
+                          progress.topic = topic;
+                          db.collection('userquestionprogress').save(progress).then(function() {
+                            //  console.log(['insert',progress]);
+                        });
+                    } 
+                })
+        }
     },
     
     // UPDATE PROGRESS
     // update question stats into the questions collection
     updateQuestionTallies: function(db,database,user,question,tallySuccess=false) {
-        
-        db.collection('questions').findOne({_id:ObjectId(question)}).then(function(result) {
-                if (result && result._id) {
-                    let data={};
-                    if (!tallySuccess) {
-                        data.seenTally = result.seenTally ? parseInt(result.seenTally,10) + 1 : 1;
-                    } else {
-                        let successTally = result.successTally ? parseInt(result.successTally,10) + 1 : 1;
-                        data.successTally = successTally;
-                        data.successRate = data.seenTally > 0 ? successTally/data.seenTally : 0;                    
+        if (user) {
+            db.collection('questions').findOne({_id:ObjectId(question)}).then(function(result) {
+                    if (result && result._id) {
+                        let data={};
+                        if (!tallySuccess) {
+                            data.seenTally = result.seenTally ? parseInt(result.seenTally,10) + 1 : 1;
+                        } else {
+                            let successTally = result.successTally ? parseInt(result.successTally,10) + 1 : 1;
+                            data.successTally = successTally;
+                            data.successRate = data.seenTally > 0 ? successTally/data.seenTally : 0;                    
+                        }
+                        db.collection('questions').update({_id: ObjectId(question)},{$set:data}).then(function(qres) {
+                           // console.log(['saved question',qres]);
+                        });
+                        databaseFunctions.updateUserQuestionProgress(db,database,user,question,result.quiz,result.tags,tallySuccess);
                     }
-                    db.collection('questions').update({_id: ObjectId(question)},{$set:data}).then(function(qres) {
-                       // console.log(['saved question',qres]);
-                    });
-                    databaseFunctions.updateUserQuestionProgress(db,database,user,question,result.quiz,result.tags,tallySuccess);
-                }
-        }).catch(function(e) {
-            console.log(['update q err',e]);
-        });
+            }).catch(function(e) {
+                console.log(['update q err',e]);
+            });            
+        }
          
 
     },
