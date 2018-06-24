@@ -48,6 +48,11 @@ let databaseFunctions = {
                             {seenTally: {$gt:0}}, 
                             
                     ]};
+                     if (user.difficulty) {
+                        criteria.push({'difficulty': {$eq: user.difficulty}});
+                    } else {
+                        criteria.push({'difficulty': {$eq: '2'}});
+                    }
                     //progressCriteria = {'user': {$eq:user._id}};
                     console.log([user._id,progressCriteria]);
                     db.collection('userquestionprogress').find(progressCriteria).toArray().then(function(progress) {
@@ -94,7 +99,7 @@ let databaseFunctions = {
          //console.log('review');
          let session = request.getSession();
                     
-         let limit=3;
+         let limit=10;
          let orderBy = 'timeScore'
          let orderMeBy = {};
          orderMeBy[orderBy] = 1;          
