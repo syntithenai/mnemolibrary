@@ -130,13 +130,13 @@ export default class TopicsChart extends React.Component {
     }
     
     
-    clickPie(a,force=false,search=false) {
+    clickPie(a,forceReview=false,search=false) {
         console.log(['click ',a]);
       //  return;
         if (search===true) {
              console.log(['SEARCH ',a.topic,a]);
             this.props.searchQuizFromTopic(a.topic);
-        } else if (a.questions === a.total || force===true) {
+        } else if (a.questions === a.total || forceReview===true) {
             // review
             console.log(['REVIEW ',a.topic,a]);
             this.props.setReviewFromTopic(a.topic);
@@ -258,17 +258,17 @@ export default class TopicsChart extends React.Component {
                 if (this.state.series.length > 0) {
                     let topicsItems = this.state.series.map(function(val,key) {
                         let continueButton='';
+                        let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0;
                         if (val.total > val.questions) {
-                            continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val)}>Continue</a>);
+                            continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val)}>Continue&nbsp; <span class="badge badge-light">{val.questions}/{val.total}</span>&nbsp;</a>);
                         } else {
                             continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,false,true)}>Rediscover</a>);
                         }
                         let reviewButton=''
                         if (val.questions > 0) {
-                            reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;&nbsp;</a>);
+                            reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;<span class="badge badge-light">{successRate}%</span>&nbsp;</a>);
                         }
-                        let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0;
-                        return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a className='btn btn-outline-secondary' style={{color:'black'}}>{val.questions}/{val.total}</a><a className='btn btn-outline-secondary' >{successRate}%</a>{continueButton}{reviewButton}<a style={{color:'white'}} className='btn btn-danger' onClick={() => that.blockTopic.bind(that)(val)}>Block</a></span></div>)
+                        return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' >{continueButton}{reviewButton}<a style={{color:'white'}} className='btn btn-danger' onClick={() => that.blockTopic.bind(that)(val)}>Block</a></span></div>)
                     });
                     
                     topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);

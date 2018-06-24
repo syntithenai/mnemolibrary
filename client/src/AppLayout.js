@@ -610,6 +610,7 @@ export default class AppLayout extends Component {
   };  
   
      saveUser(user,child) {
+         let that = this;
         fetch('/login/saveuser', {
           method: 'POST',
           headers: {
@@ -619,9 +620,14 @@ export default class AppLayout extends Component {
         }).then(function(res) {
             return res.json();  
         }).then(function(res) {
-            //console.log('saved user');
-            //console.log(res);
+            console.log('saved user');
+            
+            console.log(res);
+            console.log(user);
+            
             child.setState(res);
+            //that.setState({users:{default:user}});
+            that.setState({user:user});
         }).catch(function(err) {
             //console.log(err);
             child.setState({'warning_message':'Not Saved'});

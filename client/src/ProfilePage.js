@@ -16,6 +16,7 @@ export default class ProfilePage extends Component {
                 _id: this.props.user._id?this.props.user._id:'',
                 name:this.props.user.name?this.props.user.name:'',
                 username:this.props.user.username?this.props.user.username:'',
+                difficulty:this.props.user.difficulty?this.props.user.difficulty:'',
                 avatar:this.props.user.avatar?this.props.user.avatar:'',
                 password:this.props.user.password?this.props.user.password:'',
                 password2:this.props.user.password2?this.props.user.password:'',
@@ -37,6 +38,8 @@ export default class ProfilePage extends Component {
           if (this.state.user.name)  data.name= this.state.user.name;
           if (this.state.user.avatar)  data.avatar= this.state.user.avatar;
           if (this.state.user.username)  data.username= this.state.user.username;  
+          if (this.state.user.difficulty) data.difficulty=this.state.user.difficulty
+            
           if (this.state.user.password && this.state.user.password.length > 0 && this.state.user.password2 && this.state.user.password2.length > 0) {
             data.password= this.state.user.password
             data.password2= this.state.user.password2
@@ -187,6 +190,9 @@ export default class ProfilePage extends Component {
                               <a id="edit"></a>
                                <label htmlFor="name" className='row'>Name </label><input autoComplete="false" id="name" type='text' name='name' onChange={this.change} value={this.state.user.name} />
                                 <label htmlFor="avatar" className='row'>Avatar </label><input autoComplete="false" id="avatar" type='text' name='avatar' onChange={this.change} value={this.state.user.avatar} />
+                                
+                                <label htmlFor="difficulty" className='row'>Difficulty </label><select autoComplete="false" id="difficulty"   name='difficulty' onChange={this.change} value={this.state.user.difficulty}  ><option value='0' ></option><option value='1' >Basic</option><option value='2' >Standard</option><option value='3' >Genius</option></select>
+                                
                                 <label htmlFor="username" className='row'>Email </label><input autoComplete="false" id="username" readOnly="true" type='text' name='username' onChange={this.change} value={this.state.user.username}  />
                                 <label htmlFor="password" className='row'>Password</label> <input  autoComplete="false" id="password" type='password' name='fake_password' onChange={this.change}  value={this.state.user.password}  />
                                 <label htmlFor="password2" className='row'>Repeat Password</label><input  autoComplete="false" id="password2" type='password' name='fake_password2' onChange={this.change} value={this.state.user.password2} />

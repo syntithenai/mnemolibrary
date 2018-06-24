@@ -75,7 +75,7 @@ router.get('/dumpalexa',(req,res) => {
                                 if (val.answer.split(' ').length < 5) {
                                     let oval = munge(val.answer);
                                     if (oval.length > 0) {
-                                        answersO[oval]=true;
+                                        answersO[oval.slice(0,139)]=true;
                                     }
                                 } 
                                 //if (val.answer.split(' ').length < 4) {
@@ -91,7 +91,7 @@ router.get('/dumpalexa',(req,res) => {
                         if (val && val.hasOwnProperty('specific_answer'))  {
                             let strip=munge(val.specific_answer);
                             if (strip.length > 0) {
-                                answersO[strip]=true;
+                                answersO[strip.slice(0,139)]=true;
                                 let spaced=strip.split('').join(' ').slice(0,160);
                                 console.log('specific answer '+strip+spaced);
                                 spelledWordsO[spaced]=true;
@@ -127,7 +127,7 @@ router.get('/dumpalexa',(req,res) => {
                             if (val && val.length > 0)  {
                                 let strip=munge(val);
                                 if (strip.length > 0) {
-                                    questionsO[strip]=true;
+                                    questionsO[strip.slice(0,139)]=true;
                                 }
                             }
                         });
@@ -141,7 +141,7 @@ router.get('/dumpalexa',(req,res) => {
                                 if (val && val.length > 0)  {
                                     val = munge(val);
                                     if (val.length > 0) {
-                                        mnemonicsO[val]=true;
+                                        mnemonicsO[val.slice(0,139)]=true;  // alexa limit 140 char
                                         let parts = val.split(' ');
                                         let lastWord = parts[parts.length-1];
                                         mnemonicsLastWordsO[lastWord]=true;                                        
@@ -856,8 +856,10 @@ router.post('/discover', (req, res) => {
     if (req.body.topic) {
         criteria.push({quiz:{$eq:req.body.topic}});
         orderBy = 'sort';
+    } else {
+        // allow non discoverable on topic search
+        criteria.push({discoverable :{$ne:'no'}});
     }
-    criteria.push({discoverable :{$ne:'no'}});
     // question block
     //criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
     // filtering
@@ -890,7 +892,8 @@ router.post('/discover', (req, res) => {
         });
         
     }
-    sortFilter[orderBy]=-1;
+    //sortFilter['difficulty']=1;
+    sortFilter['orderBy']=-1;
     
     let user = req.body.user ? req.body.user : null;
     console.log(['discover',user]);
@@ -908,19 +911,28 @@ router.post('/discover', (req, res) => {
             for (var seenId in progress) {
                 notThese.push(ObjectId(progress[seenId].question));
             };
-            
-            //for (var seenId in progress.block) {
-                //notThese.push(ObjectId(seenId));
-            //};
-           // console.log(['disco NOTHTES',notThese]);
-            criteria.push({'_id': {$nin: notThese}});
-            //console.log(['disco criteria',criteria]);
-            db.collection('questions').find({$and:criteria})
-            //db.collection('questions').aggregate({$match:{$nin:notThese}})
-            .sort(sortFilter).limit(limit).toArray().then(function( questions) {
-               //   console.log(['user res',questions ? questions.length : 0,questions]);    
-                res.send({questions:questions});
-            })
+            db.collection('users').find({_id:ObjectId(user)}).toArray().then(function(users) {
+                if (users.length > 0) {
+                    let fullUser=users[0];
+                    //for (var seenId in progress.block) {
+                        //notThese.push(ObjectId(seenId));
+                    //};
+                   // console.log(['disco NOTHTES',notThese]);
+                    criteria.push({'_id': {$nin: notThese}});
+                    if (fullUser.difficulty) {
+                        criteria.push({'difficulty': {$eq: fullUser.difficulty}});
+                    } else {
+                        criteria.push({'difficulty': {$eq: '2'}});
+                    }
+                    //console.log(['disco criteria',criteria]);
+                    db.collection('questions').find({$and:criteria})
+                    //db.collection('questions').aggregate({$match:{$nin:notThese}})
+                    .sort(sortFilter).limit(limit).toArray().then(function( questions) {
+                       //   console.log(['user res',questions ? questions.length : 0,questions]);    
+                        res.send({questions:questions});
+                    })
+                }
+            });
         } else {
             //console.log(['no user']);    
             // NO USER, SHOW BY POPULAR
@@ -1080,7 +1092,7 @@ router.get('/review', (req, res) => {
 
 // search questions
 router.get('/questions', (req, res) => {
-    //console.log('search questions');
+    console.log('search questions');
     //console.log(req.query);
     let limit = 20;
     let skip = 0;

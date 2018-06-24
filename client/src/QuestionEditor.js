@@ -289,9 +289,17 @@ export default class QuestionEditor extends Component {
                            
                             <label htmlFor="question" >*&nbsp;Question </label><input autoComplete="false" id="question" type='text' name='question' onChange={this.change} value={this.props.question.question} className='form-control' ref={(section) => { this.questionInput = section; }} size="50"/>
                         </div>
+                        <br/>
+                        <div className='form-group'>    
+                           <label htmlFor="difficulty">Difficulty </label><select autoComplete="false" id="difficulty"   name='difficulty' onChange={this.change} value={this.props.question.difficulty}  ><option value='1' >Basic</option><option value='2' >Standard</option><option value='3' >Genius</option></select>
+                        </div>   
                         <div className='form-group'>    
                            <label htmlFor="mnemonic" >*&nbsp;Mnemonic </label><textarea autoComplete="false" id="mnemonic" type='text' name='mnemonic' onChange={this.change} value={this.props.question.mnemonic} className='form-control'></textarea>
                             <br/>
+                        </div>
+                        <div className='form-inline'>    
+                          
+                             <label htmlFor="technique" >Technique</label><select autoComplete="false" id="technique" type='text' name='technique' onChange={this.change} value={this.props.question.technique} className='col-5 form-control' ><option/>{techniques}</select>
                         </div>
                         <div className='form-group'>    
                             {!this.state.showAnswerDetails && <button style={{float: 'right'}} className="btn btn-info" onClick={() => this.setState({showAnswerDetails:true})} aria-expanded="false" aria-controls="answerDetails">
@@ -313,10 +321,6 @@ export default class QuestionEditor extends Component {
                             
                         </div>}
                         
-                        <div className='form-inline'>    
-                          
-                             <label htmlFor="technique" >Technique</label><select autoComplete="false" id="technique" type='text' name='technique' onChange={this.change} value={this.props.question.technique} className='col-5 form-control' ><option/>{techniques}</select>
-                        </div>
                         
                         <div className='form-group'>    
                             <label htmlFor="tags" >Tags (press tab to create a tag)</label>

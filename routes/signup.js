@@ -98,6 +98,7 @@ router.post('/saveuser', function(req, res) {
                   if (req.body.password && req.body.password.trim().length > 0) item.password=req.body.password;
                   item.name = req.body.name;
                   if (req.body.selectedMnemonics) item.selectedMnemonics=req.body.selectedMnemonics;
+                  if (req.body.difficulty) item.difficulty=req.body.difficulty;
                   // update avatar only when changed
                  // console.log(['CHECK AVATORA',item.avatar,req.body.avatar]);
                   if (item.avatar != req.body.avatar) {

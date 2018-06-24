@@ -112,6 +112,11 @@ app.intent("repeat_question", {
     "utterances": ["repeat question","say question again","repeat that","say again","pardon","read question again"]
   },intentHandlers.repeat_question
 );
+app.intent("more_time", {
+    "slots": { },
+    "utterances": ["i need more time","give me more time","wait please"]
+  },intentHandlers.more_time
+);
 
 
 

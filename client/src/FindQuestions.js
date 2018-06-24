@@ -12,7 +12,7 @@ export default class FindQuestions extends Component {
             <div className='findquestions'>
                 <br/> 
 
-                <h5>Learn about the world through SmartReview of rhymes and other creative memory devices.</h5>
+                <h5>Learn about the world through adaptive review of rhymes and other creative memory devices.</h5>
                 <br/>
                 <span id="firstvideo" ></span>
                 <iframe width="560" height="315" src="https://www.youtube.com/embed/qXh6hkzy-8k" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe>

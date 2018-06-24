@@ -9,21 +9,21 @@ let speechStrings={
     "The answer is ":[],
     "The mnemonic is ":['The memory aid is',"Mnemo's tip is "],
     // exit
-    "Bye.":['Later','Seeya','Chow','I hope to see you again soon',''],
+    "Bye.":['see you Later','Seeya','Chow','I hope to see you again soon',"Until we meet again. Don't be evil."],
     // ??
     "Ok.":['No worries',"Okydoke"],
     
     // launch intent
-    "Hi ":["G'day","Bonjour","guten tag","bon giorno","konichiwa","Hello",""],
+    "Hi ":["<say-as interpret-as='interjection'>g'day</say-as>","Bonjour","guten tag","bon giorno","konichiwa","Hello",""],
     ". Welcome to Nemo's Library. ":[". Ready to learn with Nemo's library. ",". Let's get going with with Mnemo's library"],
     
     // help
-    "You can say discover questions or review them. You can also say stop to stop speech or cancel to quit.":["From Discover or review you can ask mnemo to repeat the question , say the answer or mnemonic or block the question"],
+    "You can say discover questions or review them. You can also say stop to stop speech or cancel to quit.":["From Discover or review you can ask mnemo to repeat the question , say the answer or mnemonic or even block the question"],
     
     "What would you like to do?":[],
     
     'What next ?':[],
-    
+    'Do you need more time?':[],
     "Do you want to Discover Nemo's questions or start a review":[],
     'Discover or review ?':[],
     
@@ -44,7 +44,7 @@ let speechStrings={
     "Did you mean ":['Did you want ','Are you after '],
     'Should I search for ':['Shall I look for ', "Should I try find ","Should I try"],
     
-    'Would you like more information':['Do you want the long answer?','More information ?','Do you want the rest?'],
+    'Would you like more information?':['Do you want the long answer?','More information ?','Do you want the rest?'],
     
     'I had a problem finding a question matching ':[],
     'Would you like to search again without a filter':[],
@@ -58,9 +58,9 @@ let speechStrings={
     
     "Starting review with ":['Kicking off a review with ','Ready to quiz you on '],
     
-    ' available for review ':['ready for review',' to be reviewed'],
+    ' available for review ':[' ready for review ',' to be reviewed '],
     
-    'OK':['Alrighty'],
+    'OK':['Alrighty','OK then'],
     "Next question":['The next question'],
     
     "Would you like to login to track progress and review?":['You need to login for review. Ready to do that?','For review, you need to login. Do you want a card for that?'],
@@ -86,7 +86,7 @@ let speechStrings={
     
     "Didn't catch that. Try again":["What's that","Sorry","Huh"],
     
-    " well done ":[' Awesome ',' Yay ',' Excellent ',' Good job ',' nice one ',' cool ',' keep it up ']
+    " well done ":[' OK ',' Awesome ',' Yay ',' Excellent ',' Good job ',' nice one ',' cool ',' keep it up ']
 }
 
 function get(key,mode) {
@@ -95,14 +95,12 @@ function get(key,mode) {
     }
     if (speechStrings && speechStrings.hasOwnProperty(key)) {
         let length = speechStrings[key].length;
-        let index = Math.floor(Math.random()*(length));
+        let index = Math.floor(Math.random()*(length+1));
         if (index==0) {
             return key;
         } else {
             return speechStrings[key][index-1]
         }
-        
-        //return speechStrings[String(key).trim()][mode];
     } else {
         return key;
     }

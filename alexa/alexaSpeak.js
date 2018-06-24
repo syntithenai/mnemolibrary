@@ -37,7 +37,24 @@ let alexaSpeak = {
         response.say(__('The answer is '))
         response.say(alexaUtils.speakable(alexaUtils.answer(question)));
     },
-
+    readAnswerAndMnemonic: function (question,request,responser) {
+        var response = new AmazonSpeech()
+        if (question) {
+            if (alexaUtils.attribution(question).length > 0) {
+                response.say('From '+alexaUtils.speakable(alexaUtils.attribution(question))+", ") //.pause('100ms')
+            }
+            if (question.specific_answer) {
+                response.pause('800ms').say(__('The answer is ')).pause('200ms').say(alexaUtils.speakable(question.specific_answer));
+            } else if (question.answer) {
+                response.pause('800ms').say(__('The answer is ')).pause('200ms').say(alexaUtils.speakable(alexaUtils.answer(question)));
+            }
+            if (question.mnemonic) {
+                response.pause('800ms').say(__('The mnemonic is ')).pause('200ms').say(alexaUtils.speakable(question.mnemonic)).pause('200ms')
+            }
+            //response.pause('10000ms');
+            responser.say(response.ssml());
+        }
+    },
     readAnswerLetters: function (question,request,responser) {
         var response = new AmazonSpeech()
         

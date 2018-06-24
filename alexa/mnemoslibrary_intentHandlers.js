@@ -3,6 +3,8 @@ var config = require("../config")
 var utils= require('./alexautils'); 
 var alexaSpeak=require('./alexaSpeak')
 var __ = require('./speechStrings'); 
+var Speech = require('ssml-builder');
+var AmazonSpeech = require('ssml-builder/amazon_speech');
 //let talisman = require('talisman/metrics/distance/eudex');
 //let distance=talisman.distance;
 //console.log(['talisman'])
@@ -160,6 +162,19 @@ let intentHandlers ={
         return response.send();                            
     },
     
+    more_time: function(request,response) {
+        var aResponse = new AmazonSpeech()
+        // clear session.confirmAction
+         let session = request.getSession();
+        session.set('denyAction',null)
+        session.set('confirmAction','more_time')
+        aResponse.pause('2000ms');
+        aResponse.say('Do you still need more time?');
+        response.say(aResponse.ssml());
+        response.shouldEndSession(false,__('Do you still need more time?'))
+        return response.send();                            
+    },
+    
     start_discover: function(request, response) {
         //client.publish('presence', 'discover')
         // set mode to discover
@@ -213,8 +228,8 @@ let intentHandlers ={
                     session.set('denyAction','bye')
                     return response.send();                
                 } else {
-                    response.say(__('Would you like more information'));
-                    response.shouldEndSession(false,__('Would you like more information'))
+                    response.say(__('Would you like more information?'));
+                    response.shouldEndSession(false,__('Would you like more information?'))
                     session.set('confirmAction','moreinfo')
                     session.set('denyAction','next_question')
                     return response.send();                
@@ -406,7 +421,7 @@ let intentHandlers ={
                     } else {
                         response.shouldEndSession(false,__('Do you remember ?'))
                         session.set('confirmAction','recall')
-                        session.set('denyAction','answer')
+                        session.set('denyAction','answerandmnemonic')
                     }
                     return response.send();                
                 } else {
@@ -457,7 +472,7 @@ let intentHandlers ={
         if (currentQuestion && session.get('mode') === 'review') {
             //console.log(currentQuestion);
             // mark question as success
-            response.say(__('OK'));
+            response.say(__(" well done "));
             databaseFunctions.logStatus(db,database,'successes',currentQuestion._id,request,response);
             return intentHandlers.next_question(request,response);
         } else {
@@ -630,8 +645,38 @@ let intentHandlers ={
                 session.set('denyAction','bye')
                 return response.send();                
             } else {
+                response.say(__('Would you like more information?'));
+                response.shouldEndSession(false,__('Would you like more information?'))
+                session.set('confirmAction','moreinfo')
+                session.set('denyAction','next_question')
+                return response.send();                
+            }
+            
+        // otherwise ask if want a new question and prime confirmAction=discover
+        } else {
+            response.say(__('No current question. Would you like to hear one'));
+            session.set('confirmAction','next_question')
+            session.set('denyAction','bye')
+            response.shouldEndSession(false,__('Do you want another question'))
+        }
+    },
+     answerandmnemonic: function(request,response) {
+        // if there is a current question speak answer
+        let session = request.getSession();
+        session.set('confirmAction',null)
+        session.set('denyAction',null)
+        
+        let currentQuestion = session.get('currentQuestion');
+        if (currentQuestion) {
+            alexaSpeak.readAnswerAndMnemonic(currentQuestion,request,response);
+            if (alexaUtils.moreInfo(currentQuestion).length==0) {
+                response.shouldEndSession(false,__('Do you want another question'))
+                session.set('confirmAction','next_question')
+                session.set('denyAction','bye')
+                return response.send();                
+            } else {
                 response.say(__('Would you like more information'));
-                response.shouldEndSession(false,__('Would you like more information'))
+                response.shouldEndSession(false,__('Would you like more information?'))
                 session.set('confirmAction','moreinfo')
                 session.set('denyAction','next_question')
                 return response.send();                
