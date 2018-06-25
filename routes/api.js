@@ -928,7 +928,7 @@ router.post('/discover', (req, res) => {
                     orderBy = 'sort';
                 } else {
                     criteria.push({discoverable :{$ne:'no'}});
-                    if (fullUser.difficulty) {
+                    if (fullUser.difficulty > 0) {
                         criteria.push({'difficulty': {$eq: fullUser.difficulty}});
                     } else {
                         criteria.push({'difficulty': {$eq: '2'}});
