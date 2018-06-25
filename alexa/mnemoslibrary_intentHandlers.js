@@ -692,7 +692,7 @@ let intentHandlers ={
             response.shouldEndSession(false,__('Do you want another question'))
         }
     },
-    spellanswer: function(request,response) {
+    spellthat: function(request,response) {
         // if there is a current question speak answer
         //console.log('spell');
         let session = request.getSession();
@@ -702,10 +702,19 @@ let intentHandlers ={
         let currentQuestion = session.get('currentQuestion');
         //console.log(currentQuestion);
         if (currentQuestion) {
-            alexaSpeak.readAnswerLetters(currentQuestion,request,response);
-            session.set('confirmAction','next_question')
-            session.set('denyAction','bye')
-            response.shouldEndSession(false,__('Would you like another question'))
+//            if (session.get('mode')==="review") {
+                alexaSpeak.readQuestionLetters(currentQuestion,request,response);
+                session.set('confirmAction','next_question')
+                session.set('denyAction','bye')
+                response.shouldEndSession(false,__('Would you like another question'))    
+                
+            //} else {
+                //alexaSpeak.readAnswerLetters(currentQuestion,request,response);
+                //session.set('confirmAction','next_question')
+                //session.set('denyAction','bye')
+                //response.shouldEndSession(false,__('Would you like another question'))    
+            //}
+            
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {
             response.say(__('No current question. Would you like to hear one'));

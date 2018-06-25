@@ -79,6 +79,22 @@ let alexaSpeak = {
         }
         responser.say(response.ssml());
     },
+    readQuestionLetters: function (question,request,responser) {
+        var response = new AmazonSpeech()
+        
+        if (question) {
+            if (question.question) {
+                let questionA=alexaUtils.strip(alexaUtils.firstSentence(question.question));
+                // just the first two words with spaces between each letter
+                questionA=alexaUtils.strip(questionA).split(' ').slice(0,3).join(' '); //.split().join(' ');
+                response.sayAs({
+                  word: questionA,
+                  interpret: "spell-out"
+                })
+            }
+        }
+        responser.say(response.ssml());
+    },
 
     readMoreInfo: function (question,request,response) {
         if (question && question.answer) {

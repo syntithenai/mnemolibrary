@@ -92,7 +92,7 @@ app.intent("moreinfo", {
 app.intent("spellanswer", {
     "slots": { },
     "utterances": ["spell {answer|solution}","spell that","how do i spell that"]
-  },intentHandlers.spellanswer
+  },intentHandlers.spellthat
 );
 
 app.intent("block_question", {
