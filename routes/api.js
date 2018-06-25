@@ -942,7 +942,7 @@ router.post('/discover', (req, res) => {
                     } else {
                         criteria.push({'difficulty': {$eq: '2'}});
                     }
-                    ////console.log(['disco criteria',criteria]);
+                    console.log(['disco criteria',JSON.stringify(criteria)]);
                     db.collection('questions').find({$and:criteria})
                     //db.collection('questions').aggregate({$match:{$nin:notThese}})
                     .sort(sortFilter).limit(limit).toArray().then(function( questions) {
