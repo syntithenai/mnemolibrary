@@ -18,7 +18,7 @@ function closestI(type,thing) {
             return 1
         }
     });
-    //console.log('DIST',distances);
+    ////console.log('DIST',distances);
     let returnval = {};
     if (distances && distances.length > 0) {
         returnval = {'text':distances[0].text,'seek':distances[0].seek};

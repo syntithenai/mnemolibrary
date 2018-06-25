@@ -879,6 +879,13 @@
                   {
                      "id": null,
                      "name": {
+                        "value": "k's spelling",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
                         "value": "mnemo's critical thinking",
                         "synonyms": []
                      }
@@ -915,6 +922,13 @@
                      "id": null,
                      "name": {
                         "value": "mnemo's japan",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "history for beginners",
                         "synonyms": []
                      }
                   }
@@ -2256,6 +2270,13 @@
                   {
                      "id": null,
                      "name": {
+                        "value": "spelling",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
                         "value": "indonesia",
                         "synonyms": []
                      }
@@ -2620,7 +2641,7 @@
                   {
                      "id": null,
                      "name": {
-                        "value": " ageing",
+                        "value": " japan",
                         "synonyms": []
                      }
                   },
@@ -2761,6 +2782,13 @@
                      "id": null,
                      "name": {
                         "value": "gaming",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": " ageing",
                         "synonyms": []
                      }
                   },
@@ -2929,6 +2957,20 @@
                      "id": null,
                      "name": {
                         "value": "palestine",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": " rome",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": " england",
                         "synonyms": []
                      }
                   }
@@ -6251,7 +6293,7 @@
                   {
                      "id": null,
                      "name": {
-                        "value": "vegetation say\"\" can't [tame us]",
+                        "value": "vegetation say\"\"\"\" can't [tame us]",
                         "synonyms": []
                      }
                   },
@@ -7546,7 +7588,7 @@
                   {
                      "id": null,
                      "name": {
-                        "value": "\"\"set targets [and bar rude] immigrants\"\", home sec denies then recants",
+                        "value": "\"\"\"\"set targets [and bar rude] immigrants\"\"\"\", home sec denies then recants",
                         "synonyms": []
                      }
                   },
@@ -7581,7 +7623,7 @@
                   {
                      "id": null,
                      "name": {
-                        "value": "for online testing of writing skills, \"\"kids don't need typing drills\"\"?!",
+                        "value": "for online testing of writing skills, \"\"\"\"kids don't need typing drills\"\"\"\"?!",
                         "synonyms": []
                      }
                   },
@@ -7680,6 +7722,13 @@
                      "id": null,
                      "name": {
                         "value": "[port man to] lift 2 sided trunk, which makes one combined",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "if movie not exciting, people will be exiting the cinema",
                         "synonyms": []
                      }
                   },
@@ -8932,6 +8981,13 @@
                   {
                      "id": null,
                      "name": {
+                        "value": "clumsiness is a sin",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
                         "value": "optimal tariffs can drive down export price, but trading partners might not be nice",
                         "synonyms": []
                      }
@@ -8953,7 +9009,7 @@
                   {
                      "id": null,
                      "name": {
-                        "value": "elderly e learning for new way of seeing, improves place in society and wellbeing",
+                        "value": "farmers now fishing boaters, under sanctioned kim's new quotas",
                         "synonyms": []
                      }
                   },
@@ -9331,6 +9387,13 @@
                   {
                      "id": null,
                      "name": {
+                        "value": "make sure 2nd p doesn’t disappear",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
                         "value": "mortgage insurance doesn't protect the buyer, can't afford deposit? might be better to hire.",
                         "synonyms": []
                      }
@@ -9366,7 +9429,7 @@
                   {
                      "id": null,
                      "name": {
-                        "value": "rodrigo \"\"dirty harry\"\" duterte won with inclusive populism, will this legitimize lapse into fascism?",
+                        "value": "rodrigo \"\"\"\"dirty harry\"\"\"\" duterte won with inclusive populism, will this legitimize lapse into fascism?",
                         "synonyms": []
                      }
                   },
@@ -9471,7 +9534,7 @@
                   {
                      "id": null,
                      "name": {
-                        "value": "\"\"all men created equal\"\", but early liberalism feared, majority redistributing property rights it revered",
+                        "value": "\"\"\"\"all men created equal\"\"\"\", but early liberalism feared, majority redistributing property rights it revered",
                         "synonyms": []
                      }
                   },
@@ -9556,6 +9619,62 @@
                      "id": null,
                      "name": {
                         "value": "divided coalition proposed n e g, for tech neutral reductions and reliability.",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "di' means 2. 'cleave' means cut.    [di]o[cle]tion",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "[constant]ly praying",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "what language do latinos speak? or where is rome today?",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "[rome, you'll as]k?",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "ottoman sounds like [uh, oh, man]",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "became [busy in time]",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "vie' means compete; 'goths' sounds like got. 'visigoth' sounds like 'vies and got'  rome .",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "in 1215 john signed magna carta, the baron's freedom charter",
                         "synonyms": []
                      }
                   }
@@ -13795,7 +13914,7 @@
                   {
                      "id": null,
                      "name": {
-                        "value": "drills\"\"?!",
+                        "value": "drills\"\"\"\"?!",
                         "synonyms": []
                      }
                   },
@@ -13880,6 +13999,13 @@
                      "id": null,
                      "name": {
                         "value": "combined",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "cinema",
                         "synonyms": []
                      }
                   },
@@ -15027,6 +15153,13 @@
                   {
                      "id": null,
                      "name": {
+                        "value": "sin",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
                         "value": "nice",
                         "synonyms": []
                      }
@@ -15048,7 +15181,7 @@
                   {
                      "id": null,
                      "name": {
-                        "value": "wellbeing",
+                        "value": "quotas",
                         "synonyms": []
                      }
                   },
@@ -15356,6 +15489,13 @@
                   {
                      "id": null,
                      "name": {
+                        "value": "disappear",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
                         "value": "hire.",
                         "synonyms": []
                      }
@@ -15546,6 +15686,62 @@
                      "id": null,
                      "name": {
                         "value": "reliability.",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "[di]o[cle]tion",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "praying",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "today?",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "as]k?",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "man]",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "time]",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": ".",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "charter",
                         "synonyms": []
                      }
                   }
@@ -17062,6 +17258,13 @@
                   {
                      "id": null,
                      "name": {
+                        "value": "exciting",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
                         "value": "sea cucumber",
                         "synonyms": []
                      }
@@ -17391,6 +17594,13 @@
                   {
                      "id": null,
                      "name": {
+                        "value": "clumsiness",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
                         "value": "morale of a group",
                         "synonyms": []
                      }
@@ -17413,6 +17623,111 @@
                      "id": null,
                      "name": {
                         "value": "what are necessary and sufficient conditions",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "disappear",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "constantine",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "constantine i",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "constantine the first",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "kingdom",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "french",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "spanish",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "italian",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "romanian",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "romulus",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "its founder romulus",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "the byzantine empire",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "byzantine empire",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "visigoths",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "the visigoths",
                         "synonyms": []
                      }
                   }
@@ -17966,11 +18281,109 @@
                         "value": "w h a t   a r e   n e c e s s a r y   a n d   s u f f i c i e n t   c o n d i t i o n s",
                         "synonyms": []
                      }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "c o n s t a n t i n e",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "c o n s t a n t i n e   i",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "c o n s t a n t i n e   t h e   f i r s t",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "k i n g d o m",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "f r e n c h",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "s p a n i s h",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "i t a l i a n",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "r o m a n i a n",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "r o m u l u s",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "i t s   f o u n d e r   r o m u l u s",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "t h e   b y z a n t i n e   e m p i r e",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "b y z a n t i n e   e m p i r e",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "v i s i g o t h s",
+                        "synonyms": []
+                     }
+                  },
+                  {
+                     "id": null,
+                     "name": {
+                        "value": "t h e   v i s i g o t h s",
+                        "synonyms": []
+                     }
                   }
                ]
             }
          ],
-         "invocationName": "nemo's library"
+         "invocationName": "nemo's developer"
       }
    }
 }

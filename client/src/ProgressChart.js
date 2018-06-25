@@ -17,7 +17,7 @@ export default class ProgressChart extends React.Component {
         .then(function(response) {
             return response.json()
         }).then(function(json) {
-            console.log(['got response', json]);
+            //console.log(['got response', json]);
             let max=0;
             
             let dataObject = {}
@@ -44,17 +44,17 @@ export default class ProgressChart extends React.Component {
                 else return 1;
             });
             let state={series:data}
-            console.log('SETSTATE');
-            console.log(state.data);
+            //console.log('SETSTATE');
+            //console.log(state.data);
             that.setState(state);
                 
         }).catch(function(ex) {
-            console.log(['test request failed', ex])
+            //console.log(['test request failed', ex])
         })        
     };
     
     clickPie(a) {
-      console.log(a); 
+      //console.log(a); 
       this.props.reviewBySuccessBand(a.index); 
     };
          

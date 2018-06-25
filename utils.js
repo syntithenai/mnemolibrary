@@ -97,10 +97,10 @@ let utilFunctions =  {
 
         transporter.sendMail(mailOptions, function(error, info){
           if (error) {
-            console.log(error);
+            //console.log(error);
             res.send('FAIL');
           } else {
-            console.log('Email sent: ' + info.response);
+            //console.log('Email sent: ' + info.response);
             res.send('OK');
           }
         });
@@ -125,12 +125,12 @@ let utilFunctions =  {
     createIndexes: function (json) {
         let tags = {};
         // collate quizzes and tags
-        //console.log(json);
+        ////console.log(json);
         let questions = [];
         for (var questionKey in json['questions']) {
-            //console.log('index q '+questionKey);
+            ////console.log('index q '+questionKey);
             const question = json['questions'][questionKey]
-            console.log(question);
+           // //console.log(question);
             //question.tags = question.tags ? question.tags.trim().toLowerCase() : '';
             var id = question._id ? question._id :  new ObjectId();
             question._id = id;
@@ -140,16 +140,16 @@ let utilFunctions =  {
                 tagList = question.tags.trim().toLowerCase().split(",");
                 question.tags = tagList;
             }
-            // console.log(question.tags);
-            //console.log(question.access);
+            // //console.log(question.tags);
+            ////console.log(question.access);
             // only generate tags for public questions    
             if (question.access==="public") {
-              //  console.log('public');
+              //  //console.log('public');
                 for (var tagKey in tagList) {
-            //        console.log(tagList[tagKey]);
-                  //  console.log(['taglist each',tagKey,tagList[tagKey]]);
+            //        //console.log(tagList[tagKey]);
+                  //  //console.log(['taglist each',tagKey,tagList[tagKey]]);
                     var tag = tagList[tagKey].trim().toLowerCase();
-          //          console.log(tag);
+          //          //console.log(tag);
                     if (tag.length > 0) {
                         if (! (Array.isArray(tags[tag]))) {
                             tags[tag] = 1
@@ -159,8 +159,8 @@ let utilFunctions =  {
             }
             questions.push(question);
         }
-        //console.log('CREATED IINDEX');
-        //console.log(tags);
+        ////console.log('CREATED IINDEX');
+        ////console.log(tags);
         return {'questions':questions,'tags':tags};
     },
    

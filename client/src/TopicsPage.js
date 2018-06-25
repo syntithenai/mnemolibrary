@@ -27,7 +27,7 @@ export default class TopicsPage extends Component {
     };
     
     clearTagFilter() {
-       // console.log('CLEAR FILTER');
+       // //console.log('CLEAR FILTER');
         //this.props.clearTagFilter();
         this.setState({'tagFilter':null});
         this.filterQuizzes(this.state.titleFilter);
@@ -37,16 +37,16 @@ export default class TopicsPage extends Component {
          let that = this;
           fetch('/api/topics?title='+title )
           .then(function(response) {
-            //console.log(['got response', response])
+            ////console.log(['got response', response])
             return response.json()
           }).then(function(json) {
             that.setState({'topics':json});
           }).catch(function(ex) {
-            console.log(['parsing failed', ex])
+            //console.log(['parsing failed', ex])
           })
           
-        //console.log(' FILTER TOPICS '+title);
-        //console.log(this.props.topics);
+        ////console.log(' FILTER TOPICS '+title);
+        ////console.log(this.props.topics);
         //let topics = {};
         ////if (title.length > 0) {
         //let that = this;        
@@ -67,7 +67,7 @@ export default class TopicsPage extends Component {
         ////} else {
             ////topics = this.props.topics;
         ////}
-        //console.log(['FILTERED TO ',topics]);
+        ////console.log(['FILTERED TO ',topics]);
         //this.setState({'topics':topics});
     };
     // {this.state.tagFilter && <button className='btn btn-warning' onClick={this.clearTagFilter}> Tag: {this.state.tagFilter} <FaClose/></button>}

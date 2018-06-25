@@ -10,13 +10,13 @@ var fetch = require('node-fetch');
 //var utils = require('../../utils')
 
 //var mongoose = require('mongoose');
-//console.log(config.databaseConnection+config.database);
+////console.log(config.databaseConnection+config.database);
 //var mongoUri = config.databaseConnection+config.database; // 'mongodb://mongo:27017/oauth';
 //mongoose.connect(mongoUri, function(err, res) {
 	//if (err) {
 		//return console.error('Error connecting to "%s":', mongoUri, err);
 	//}
-	//console.log('Connected successfully to "%s"', mongoUri);
+	////console.log('Connected successfully to "%s"', mongoUri);
 //});
 
 const db = require('../../oauth/database');
@@ -34,7 +34,7 @@ router.get('/confirm',function(req,res) {
     //let response = oauthserver.Response(res);
     //return oauth.authenticate(request, response, options)
       //.then(function(token) {
-      //  console.log(['APPROVE USER',params]); //,token,params,req]);    
+      //  //console.log(['APPROVE USER',params]); //,token,params,req]);    
           User.findOne({ token:params.code})
             .then(function(user)  {
                 //let now = new Date();
@@ -44,20 +44,20 @@ router.get('/confirm',function(req,res) {
                 //} else {
                     
                     if (user != null) {
-                        //console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
+                        ////console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
                         var userId = user._id;
                         //const user = new User({name:user2.name,username:user2.username,_id:user2._id,password:user2.tmp_password, token: null});
-                       // console.log(['res2',userId]);  
+                       // //console.log(['res2',userId]);  
                           //res.send('registration '+params.code );
-                          //console.log(user);  
-                      //console.log(user._id);  
+                          ////console.log(user);  
+                      ////console.log(user._id);  
                       
                       user.password = user.tmp_password;
                       user.token = undefined;
                       user.tmp_password = undefined;
-                   //   console.log(['KKK',user]); 
+                   //   //console.log(['KKK',user]); 
                       user.save().then(function() {
-                          //console.log(['approved']);
+                          ////console.log(['approved']);
                            var params={
                                 username: user.username,
                                 password: user.password,
@@ -75,11 +75,11 @@ router.get('/confirm',function(req,res) {
                             }).then(function(response) {
                                 return response.json();
                             }).then(function(token) {
-                         //       console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
+                         //       //console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
                                 res.redirect(config.successUrl + '?code='+token.access_token);
                             });
                       }).catch(function(e) {
-                          console.log(['Failed confirmation',e]);
+                          //console.log(['Failed confirmation',e]);
                           res.send('failed ' );
                       });
                         
@@ -88,7 +88,7 @@ router.get('/confirm',function(req,res) {
                     }
                // }
             }).catch(function(e) {
-                console.log(['failed',e]);
+                //console.log(['failed',e]);
                 res.send('failed');
             });
         
@@ -106,25 +106,25 @@ router.get('/confirm',function(req,res) {
 
 router.get('/recover',function(req,res) {
         let params = req.query;
-     //   console.log(['RECOVER USER',params]); //,token,params,req]);    
+     //   //console.log(['RECOVER USER',params]); //,token,params,req]);    
           User.findOne({ token:params.code})
             .then(function(user)  {
-             //   console.log(['found',user]);
+             //   //console.log(['found',user]);
                 if (user != null) {
-            //        console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
+            //        //console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
                     var userId = user._id;
                     //const user = new User({name:user2.name,username:user2.username,_id:user2._id,password:user2.tmp_password, token: null});
-               //     console.log(['res2',userId]);  
+               //     //console.log(['res2',userId]);  
                       //res.send('registration '+params.code );
-                      //console.log(user);  
-                  //console.log(user._id);  
+                      ////console.log(user);  
+                  ////console.log(user._id);  
                   
                   user.password = user.tmp_password;
                   user.token = undefined;
                   user.tmp_password = undefined;
-        //          console.log(['KKK',user]); 
+        //          //console.log(['KKK',user]); 
                   user.save().then(function() {
-                  //    console.log(['approved']);
+                  //    //console.log(['approved']);
                        var params={
                             username: user.username,
                             password: user.password,
@@ -142,11 +142,11 @@ router.get('/recover',function(req,res) {
                         }).then(function(response) {
                             return response.json();
                         }).then(function(token) {
-                    //        console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
+                    //        //console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
                             res.redirect(config.successUrl + '?code='+token.access_token);
                         });
                   }).catch(function(e) {
-                      console.log(['Failed confirmation',e]);
+                      //console.log(['Failed confirmation',e]);
                       res.send('failed ' );
                   });
                     
@@ -154,7 +154,7 @@ router.get('/recover',function(req,res) {
                     res.send('no matching registration' );
                 }
             }).catch(function(e) {
-                console.log(['failed',e]);
+                //console.log(['failed',e]);
                 res.send('failed');
             });
         

@@ -49,31 +49,31 @@ export default class MnemonicsList extends Component {
               })
           })
           .then(function(response) {
-            //console.log(['got response', response])
+            ////console.log(['got response', response])
             return response.json()
           }).then(function(json) {
-                //console.log(['got response', json])
+                ////console.log(['got response', json])
                 let final={'default':{question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question}};
                   
                 json.forEach(function(mnemonic) {
                     final[mnemonic._id] = mnemonic;
                 });
-               // console.log(['create MNEM indexes', final,that.props.user])
+               // //console.log(['create MNEM indexes', final,that.props.user])
                 let defaultMnemonic='default';
                 if (that.props.user && that.props.user.selectedMnemonics && that.props.user.selectedMnemonics.hasOwnProperty(question._id) && that.props.user.selectedMnemonics[question._id].length > 0 && final.hasOwnProperty(that.props.user.selectedMnemonics[question._id])) {
                     defaultMnemonic = that.props.user.selectedMnemonics[question._id];
                 }
-                //console.log(['MNEMOLOAD',{defaultMnemonic:defaultMnemonic,mnemonics:final}]);
+                ////console.log(['MNEMOLOAD',{defaultMnemonic:defaultMnemonic,mnemonics:final}]);
                 that.setState({defaultMnemonic:defaultMnemonic,mnemonics:final});
           }).catch(function(ex) {
-            console.log(['parsing failed', ex])
+            //console.log(['parsing failed', ex])
           })
         }
 
     };
     
     changeSuggest(e) {
-       // console.log(['cs',e.target.name,e.target.value]);
+       // //console.log(['cs',e.target.name,e.target.value]);
         if (e.target.name && e.target.name==="suggest_mnemonic") {
             this.setState({suggest_mnemonic:e.target.value});
         } else {
@@ -91,7 +91,7 @@ export default class MnemonicsList extends Component {
     };
 
     componentWillReceiveProps(nextProps) {
-       // console.log(['UPDATEMNEMLIST',nextProps.question]);
+       // //console.log(['UPDATEMNEMLIST',nextProps.question]);
       const question = nextProps.question;        
       //this.setState({
            //defaultMnemonic:'default', 
@@ -102,7 +102,7 @@ export default class MnemonicsList extends Component {
     //{question:'5abeec3d91ce1409b01e9553',mnemonic:'marshaled ..',technique:'association',questionText:'waht is marsh pln'}
     
     componentDidMount() {
-      //  console.log(['mount mnem list',this.props.question,this.props.user]);
+      //  //console.log(['mount mnem list',this.props.question,this.props.user]);
            //// load mnemonics
           //let user=this.props.user;
           this.loadMnemonics();
@@ -131,10 +131,10 @@ export default class MnemonicsList extends Component {
               })
           })
           .then(function(response) {
-              //console.log('DELETED');
+              ////console.log('DELETED');
               that.loadMnemonics();
           }).catch(function(ex) {
-            console.log(['delete failed', ex])
+            //console.log(['delete failed', ex])
           })
     };
 
@@ -156,7 +156,7 @@ export default class MnemonicsList extends Component {
     }; 
 
     like(questionId,mnemonicId) {
-        //console.log(['like(',questionId,mnemonicId]);
+        ////console.log(['like(',questionId,mnemonicId]);
         this.props.like(questionId,mnemonicId).then(this.loadMnemonics);
     };
 
@@ -167,19 +167,19 @@ export default class MnemonicsList extends Component {
         //let user=this.props.user;
         let question=this.props.question;
         let otherMnemonics = '';
-       // console.log(['mnemoth ren',this.state.mnemonics]);
+       // //console.log(['mnemoth ren',this.state.mnemonics]);
         if (this.state.mnemonics) {
             //if (this.state.mnemonics.length > 0) {
-                //console.log(['mnemoth ren have len',this.state.mnemonics]);
+                ////console.log(['mnemoth ren have len',this.state.mnemonics]);
                 otherMnemonics = Object.keys(this.state.mnemonics).map((mnemonicId,key) => {
                     let mnemonic=this.state.mnemonics[mnemonicId]
-                   // console.log(['MNN',mnemonic]);
+                   // //console.log(['MNN',mnemonic]);
                     let likeButton=''
                     if (this.props.isLoggedIn()) {
                         likeButton = <span className='like_dislike' >&nbsp;&nbsp;&nbsp;<a  className='btn btn-primary'  onClick={() => this.like(question._id,mnemonicId)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Select&nbsp;</a></span>
                     }  
                 
-                   // console.log(['mnemoth',key,mnemonic]);
+                   // //console.log(['mnemoth',key,mnemonic]);
                     if (mnemonicId !== this.state.defaultMnemonic) {
                         var techniqueButton = '';
                         if (mnemonic.technique && mnemonic.technique.length > 0) {
@@ -216,7 +216,7 @@ export default class MnemonicsList extends Component {
                     }
                 })
             //}
-           // console.log(['rebnmnlist',this.state.mnemonics,this.state.defaultMnemonic]);
+           // //console.log(['rebnmnlist',this.state.mnemonics,this.state.defaultMnemonic]);
             let mainLikeButton='';
             //if (this.props.isLoggedIn()) {
                 //mainLikeButton = <span className='like_dislike'  >&nbsp;&nbsp;&nbsp;<a  className='btn btn-primary'  onClick={() => this.props.like(question._id,this.state.mnemonics[this.state.defaultMnemonic]._id)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Like&nbsp;<span className="badge badge-pill badge-info"  >{question.score}</span></a></span>

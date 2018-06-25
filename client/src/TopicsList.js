@@ -34,12 +34,12 @@ export default class TopicsList extends Component {
         }).then(function(response) {
             return response.json();
         }).then(function(topics) {
-          //  console.log(['loaded topics',topics]);
+          //  //console.log(['loaded topics',topics]);
             //res.send({user:user,token:token});
             that.setState({topics:topics});
         })
         .catch(function(err) {
-            console.log(['ERR',err]);
+            //console.log(['ERR',err]);
         });
     }; 
     

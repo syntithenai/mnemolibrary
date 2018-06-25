@@ -74,7 +74,7 @@ export default class TopicEditor extends Component {
     
     handleSubmit() {
         //e.preventDefault();
-       // console.log('SAVE TOPIC');
+       // //console.log('SAVE TOPIC');
         return false;
     };
     
@@ -83,7 +83,7 @@ export default class TopicEditor extends Component {
     };
     
     setTopicEvent(e) {
-        //console.log(['topicevent',e.target.value]);
+        ////console.log(['topicevent',e.target.value]);
         this.setState({topic:e.target.value});
         this.saveTopic();
     };
@@ -95,7 +95,7 @@ export default class TopicEditor extends Component {
     };
         
     addResultToQuestions(result) {
-        //console.log(['addResultToQuestions',result]);
+        ////console.log(['addResultToQuestions',result]);
         let question = {
                 _id: '',
                 interrogative: '',
@@ -129,7 +129,7 @@ export default class TopicEditor extends Component {
         
 
    updateResultToQuestion(result) {
-       console.log(['upateres',result,this.state.currentQuestion]);
+       //console.log(['upateres',result,this.state.currentQuestion]);
        if (this.state.currentQuestion && this.state.questions.hasOwnProperty(this.state.currentQuestion)) {
             let question =  this.state.questions[this.state.currentQuestion];
             question.link = result.link;
@@ -173,7 +173,7 @@ export default class TopicEditor extends Component {
             }).then(function(response) {
                 return response.json();
             }).then(function(id) {
-              //  console.log(['saved topic',id,id.id]);
+              //  //console.log(['saved topic',id,id.id]);
                 that.setState({_id:id.id});
                 if (id.errors && Object.keys(id.errors).length > 0) {
                     that.setState({validationErrors:id.errors,message:'Some of your questions are missing required information.'});
@@ -185,7 +185,7 @@ export default class TopicEditor extends Component {
                 //res.send({user:user,token:token});
             })
             .catch(function(err) {
-                console.log(['ERR',err]);
+                //console.log(['ERR',err]);
             });
             localStorage.setItem('currentTopic',this.state._id);
             
@@ -204,13 +204,13 @@ export default class TopicEditor extends Component {
         }).then(function(response) {
             return response.json();
         }).then(function(id) {
-            //console.log(['deleted topic',id,id.id]);
+            ////console.log(['deleted topic',id,id.id]);
             //that.loadTopics();
             that.newTopic();
             that.setState({currentView:'topics'});
         })
         .catch(function(err) {
-            console.log(['ERR',err]);
+            //console.log(['ERR',err]);
         });
     };  
     
@@ -245,18 +245,18 @@ export default class TopicEditor extends Component {
         }).then(function(response) {
             return response.json();
         }).then(function(topic) {
-            //console.log(['loaded topic',topic]);
+            ////console.log(['loaded topic',topic]);
             //res.send({user:user,token:token});
             localStorage.setItem('currentTopic',topic._id);
             that.setState({topic:topic.topic,_id:topic._id,published:topic.published,questions:topic.questions,currentView:'questions',validationErrors:{},message:' '});
         })
         .catch(function(err) {
-            console.log(['ERR',err]);
+            //console.log(['ERR',err]);
         });
     };
         
     previewTopic(id) {
-        console.log(['preview topic',id]);
+        //console.log(['preview topic',id]);
         let that=this;
         fetch("/api/publishusertopic", {
           method: 'POST',
@@ -273,7 +273,7 @@ export default class TopicEditor extends Component {
             if (publishResponse.errors) {
                 that.setState({validationErrors:publishResponse.errors,currentView:'questions',message:'Cannot preview yet because some of your questions are missing required information.'});
             } else {
-                console.log(['PUB RESP',publishResponse,that.state.currentQuestion]);
+                //console.log(['PUB RESP',publishResponse,that.state.currentQuestion]);
                 let previewQuestion = that.state.currentQuestion;
                 //if (publishResponse.questions && publishResponse.questions.length > that.state.currentQuestion && publishResponse.questions[that.state.currentQuestion] && publishResponse.questions[that.state.currentQuestion].hasOwnProperty('_id')) {
                     //previewQuestion = publishResponse.questions[that.state.currentQuestion]._id;
@@ -284,7 +284,7 @@ export default class TopicEditor extends Component {
                 //let message='Published '+questions+' questions.';
                 that.setState({validationErrors:{}}); //,message:message
             }
-            //console.log(['published topic',topic]);
+            ////console.log(['published topic',topic]);
             //res.send({user:user,token:token});
             //that.setState({topic:topic.topic,_id:topic._id,questions:topic.questions,currentView:'questions'});
         })
@@ -320,7 +320,7 @@ export default class TopicEditor extends Component {
                 },2000);
                 
             }
-            //console.log(['published topic',topic]);
+            ////console.log(['published topic',topic]);
             //res.send({user:user,token:token});
             //that.setState({topic:topic.topic,_id:topic._id,questions:topic.questions,currentView:'questions'});
         })
@@ -384,7 +384,7 @@ export default class TopicEditor extends Component {
     };
     
     editQuestion(key) {
-        //console.log(['editQuestion',key]);
+        ////console.log(['editQuestion',key]);
         this.setState({currentQuestion:key,currentView:'editor',validationErrors:{},message:' '});
     };
         
@@ -397,13 +397,13 @@ export default class TopicEditor extends Component {
     };    
 
     showSearch(searchFor) {
-        console.log(['showsearch',searchFor]);
+        //console.log(['showsearch',searchFor]);
         this.setState({currentView:'search',search:searchFor});
     };  
     
     deleteQuestion(key) {
         let questions = this.state.questions;
-        console.log(['DEL Q',key,questions]);
+        //console.log(['DEL Q',key,questions]);
         let questionId = questions[key]._id;
         this.saveTopic(questionId);
         questions.splice(key,1);
@@ -412,7 +412,7 @@ export default class TopicEditor extends Component {
     };  
 
     updateQuestion(question)  {
-       // console.log(['update que',question,this.state.currentQuestion]);
+       // //console.log(['update que',question,this.state.currentQuestion]);
         let questions = this.state.questions;
         //question.tags = question.tags.trim().toLowerCase().split(',');
         questions.splice(this.state.currentQuestion,1,question);

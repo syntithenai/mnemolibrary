@@ -31,7 +31,7 @@ export default class TopicsChart extends React.Component {
                 //self.setState({   
                     //orientation: !self.state.orientation
                 //})
-                //console.log("onorientationchange");
+                ////console.log("onorientationchange");
             //}, false);
         //}
     //}
@@ -41,7 +41,7 @@ export default class TopicsChart extends React.Component {
    * Calculate & Update state of new dimensions
    */
   updateDimensions() {
-      //console.log(['U',window.innerWidth,this.state.series.length]);
+      ////console.log(['U',window.innerWidth,this.state.series.length]);
     if (window.innerWidth < 700 || this.state.series.length > 17) {
         this.setState({show:'list'});
     } else {
@@ -83,11 +83,11 @@ export default class TopicsChart extends React.Component {
             .then(function(response) {
                 return response.json()
             }).then(function(json) {
-               console.log(['got CORE response', json]);
+               //console.log(['got CORE response', json]);
 
                 let series=[];
                 json.map(function(val,key) {
-                //    console.log(['ssss map',key,val]);
+                //    //console.log(['ssss map',key,val]);
                     if (val.topic && val.topic.length > 0) {
                         
                         function getGreenToRed(percent){
@@ -100,7 +100,7 @@ export default class TopicsChart extends React.Component {
                         //let score=(((val.successRate)*(completion)*3) + (completion))/4
                         let score=(val.successRate + completion)/2
                         let color=getGreenToRed(score*100);
-                       console.log(['score',score,color,val.topic,val.questions,val.total,val.successRates]);
+                       //console.log(['score',score,color,val.topic,val.questions,val.total,val.successRates]);
                         //+ ' (' + val.questions + '/' + val.total+')'
                         let point={"topic": val.topic,"id": val.topic ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color,blocks:val.blocks};
                         //if (point.score < 0.7) {
@@ -117,12 +117,12 @@ export default class TopicsChart extends React.Component {
                     }
                     return null;
                 });
-                console.log(['SET DATA',series]);
+                //console.log(['SET DATA',series]);
                 that.setState({series:series});
                 resolve();
                     
             }).catch(function(ex) {
-                console.log(['test request failed', ex])
+                //console.log(['test request failed', ex])
                 reject();
             })   
         });
@@ -131,18 +131,18 @@ export default class TopicsChart extends React.Component {
     
     
     clickPie(a,forceReview=false,search=false) {
-        console.log(['click ',a]);
+        //console.log(['click ',a]);
       //  return;
         if (search===true) {
-             console.log(['SEARCH ',a.topic,a]);
+             //console.log(['SEARCH ',a.topic,a]);
             this.props.searchQuizFromTopic(a.topic);
         } else if (a.questions === a.total || forceReview===true) {
             // review
-            console.log(['REVIEW ',a.topic,a]);
+            //console.log(['REVIEW ',a.topic,a]);
             this.props.setReviewFromTopic(a.topic);
         } else {
             // discover
-            console.log(['DISCO ',a]);
+            //console.log(['DISCO ',a]);
             if (a.questions <= a.total) {
                 this.props.setQuizFromTopic(a.topic);
             } else {
@@ -173,10 +173,10 @@ export default class TopicsChart extends React.Component {
         .then(function(response) {
             return response.json()
         }).then(function(json) {
-            console.log(['got response', json]);
+            //console.log(['got response', json]);
             that.loadData();
         }).catch(function(ex) {
-            console.log(['test request failed', ex])
+            //console.log(['test request failed', ex])
         })        
     };
     
@@ -210,14 +210,14 @@ export default class TopicsChart extends React.Component {
         });
     };
     unblockTopic(topic) {
-        console.log('unblock' + topic);
+        //console.log('unblock' + topic);
          let url='/api/unblocktopic?user='+this.props.user._id+'&topic='+topic;
         let that=this;
         fetch(url)
         .then(function(response) {
             return response.json()
         }).then(function(json) {
-           console.log(['got unblock response', json]);
+           //console.log(['got unblock response', json]);
            that.loadData('blocks');
         });
       //  this.setState({showList:!this.state.showList});
@@ -229,25 +229,25 @@ export default class TopicsChart extends React.Component {
     
     
     setCurrentPage(page) {
-        console.log(page);
+        //console.log(page);
         this.props.setCurrentPage(page);
         return false;
     };
     
     setQuizFromDiscovery() {
-        console.log('setQuizFromDiscovery');
+        //console.log('setQuizFromDiscovery');
         this.props.setQuizFromDiscovery();
         return false;
     };
     
     //clickTopic(e) {
-        //console.log(['REDISCOVER ', e.target.textContent]);
+        ////console.log(['REDISCOVER ', e.target.textContent]);
        //// this.props.setQuizFromTopic(e.target.textContent);
     //};   
          
     // make sure parent container have a defined height when using responsive component,
     // otherwise height will be 0 and no chart will be rendered.
-    //tooltip={function(e) {console.log(['TT',e]); return (<b>dddd</b>);}}
+    //tooltip={function(e) {//console.log(['TT',e]); return (<b>dddd</b>);}}
                 //onClick={this.clickTopic.bind(this)}
     render() {
             

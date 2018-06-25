@@ -14,9 +14,9 @@ function connect(connectString='') {
       connectString = config.databaseConnection + config.database;
   }
   mongoose.connect(connectString,{useMongoClient: true}).then(() => {
-    console.log('Mongoose Connected');
+    //console.log('Mongoose Connected');
   }).catch((err) => {
-    console.log(err);
+    //console.log(err);
   });
 }
 

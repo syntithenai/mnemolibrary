@@ -10,7 +10,7 @@ export default class Navigation extends Component {
     //};
     
     authorize() {
-     //   console.log(['AUTHORIZE'])
+     //   //console.log(['AUTHORIZE'])
         //fetch('/oauth/token',{method: 'POST',headers: {
     //'Content-Type': 'application/x-www-form-urlencoded'
   //}})
@@ -18,15 +18,15 @@ export default class Navigation extends Component {
     'Content-Type': 'application/x-www-form-urlencoded'
   }})
       .then(function(response) {
-       // console.log(['got response', response.text()])
+       // //console.log(['got response', response.text()])
       //  return response.json()
       })
       //.then(function(json) {
-          //console.log(['create indexes', json])
+          ////console.log(['create indexes', json])
         //that.createIndexes(json);
       //})
       .catch(function(ex) {
-        console.log(['parsing failed', ex])
+        //console.log(['parsing failed', ex])
       })
  
     };

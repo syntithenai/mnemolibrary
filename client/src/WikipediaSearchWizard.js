@@ -49,23 +49,23 @@ export default  class WikipediaSearchWizard extends React.Component {
         if (query && query.length>0) {
             let url="https://en.wikipedia.org/w/api.php?action=opensearch&search=" + query + "&limit=50&format=json&origin=*";
             fetch(url).then(function(response) {
-               // console.log(['reponse',response]);
+               // //console.log(['reponse',response]);
                 return response.json();
                 
             }).then(function(response) {
-                   // console.log(response);
+                   // //console.log(response);
                     that.setState({lists: response,showLoader:false})
 
             })
             .catch(function(err) {
                 that.setState({showLoader:false})
-                console.log(['ERR loading wiki results',err]);
+                //console.log(['ERR loading wiki results',err]);
             });
         }
     };
 
     setSearchEvent(e) {
-       // console.log(['SE',e]);
+       // //console.log(['SE',e]);
         this.setState({search:e.target.value});
          this.setState({lists: [],showLoader:true})
         let query=this.refs.keyword.value.length > 0  ? this.refs.keyword.value : this.refs.topic.value;
@@ -73,13 +73,13 @@ export default  class WikipediaSearchWizard extends React.Component {
     };
     
     search(search) {
-     //   console.log(['SEA',search]);
+     //   //console.log(['SEA',search]);
         this.setState({search:search});
         this.doSearch(search);
     };
     
     expandResult(key) {
-      //  console.log(['expand result',key]);
+      //  //console.log(['expand result',key]);
         this.setState({currentResult:key});
     };
     
@@ -88,13 +88,13 @@ export default  class WikipediaSearchWizard extends React.Component {
     };
     
     deleteResult(key) {
-        //console.log(['del res',key]);
+        ////console.log(['del res',key]);
         let lists= this.state.lists;
         
         lists[1].splice(key,1);
         lists[2].splice(key,1);
         lists[3].splice(key,1);
-        //console.log(['lists',lists]);
+        ////console.log(['lists',lists]);
         this.setState({'lists':lists});
         //let lists= this.state.lists;
         //let newLists = [lists[0],lists[1].splice(key,1),lists[2].splice(key,1),lists[3].splice(key,1)];
@@ -107,15 +107,15 @@ export default  class WikipediaSearchWizard extends React.Component {
          ////if (this.props.currentQuestion && this.props.questions[this.props.currentQuestion]) {
             //question =  this.props.questions[this.props.currentQuestion];
          ////s}
-         //console.log(['WS',question,this.props.currentQuestion,this.props.questions,this.props.questions[this.props.currentQuestion],question]);
+         ////console.log(['WS',question,this.props.currentQuestion,this.props.questions,this.props.questions[this.props.currentQuestion],question]);
          //{String(question).length > 0 && <button  className='btn btn-info' style={{float:'right'}} onClick={() => this.props.updateResultToQuestion(result)} >Fill Question</button>}
                     
          
          if (Array.isArray(this.state.lists) && this.state.lists.length===4) {
-            // console.log(['render',this.state.lists]);
+            // //console.log(['render',this.state.lists]);
             if (this.state.lists[1].length > 0) {
              wikiResults = this.state.lists[1].map((title,key) => {
-                 //console.log(['renderi',title,key]);
+                 ////console.log(['renderi',title,key]);
                     
                 let result={title:this.state.lists[1][key], description:this.state.lists[2][key], link:this.state.lists[3][key]};
                 let link=result.link+'?printable=yes'

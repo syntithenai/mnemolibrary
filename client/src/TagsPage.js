@@ -29,10 +29,10 @@ export default class TagsPage extends Component {
           .then(function(response) {
             return response.json()
           }).then(function(json) {
-              //console.log(['SET TAGS', json])
+              ////console.log(['SET TAGS', json])
             that.setState({'tags':json});
           }).catch(function(ex) {
-            console.log(['parsing failed', ex])
+            //console.log(['parsing failed', ex])
           })
         
         
@@ -42,12 +42,12 @@ export default class TagsPage extends Component {
         
         //if (title.length > 0) {
             //let that = this;   
-            //console.log(['filter tags',this.props.tags]);     
+            ////console.log(['filter tags',this.props.tags]);     
             ////Object.keys(this.props.tags).forEach(function(tagKey) {
             //for (var w in this.props.tags) {
                 //let word = this.props.tags[w];
                 //let tag = word.text;
-                ////console.log(word);
+                //////console.log(word);
                 //// collate on tag
                 //if (tag.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
                     //word.value *= 20;
@@ -62,11 +62,11 @@ export default class TagsPage extends Component {
                 ////});
                    
             //};
-            //console.log(['TAGS collation',tagsCollation]);
+            ////console.log(['TAGS collation',tagsCollation]);
             //for (var theTag in tagsCollation) {
                 //tags.push(tagsCollation[theTag]);
             //}
-            //console.log(['TAGS',tags]);
+            ////console.log(['TAGS',tags]);
         //} else {
             //tags = this.props.tags;
         //}
@@ -78,7 +78,7 @@ export default class TagsPage extends Component {
         const rotate = word => 0; //word.value % 360;
         const wordCloudWidth = window.innerWidth * 0.9;
         const wordCloudHeight = window.innerHeight * 0.5;
-        //console.log(this.state.tags);
+        ////console.log(this.state.tags);
         
         return (
         <div>

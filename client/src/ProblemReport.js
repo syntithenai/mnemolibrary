@@ -18,7 +18,7 @@ export default class ProblemReport extends Component {
     }
     
      reportProblem() {
-         //console.log('REPORT PROB '+this.state.question.problem);
+         ////console.log('REPORT PROB '+this.state.question.problem);
           let that = this;
           fetch('/api/reportproblem', {
               method: 'POST',
@@ -28,14 +28,14 @@ export default class ProblemReport extends Component {
               
               body: JSON.stringify({question:this.props.question,user:this.props.user,problem:this.state.problem})
             }).then(function() {
-                console.log('reprted');
+                //console.log('reprted');
                 that.setState({'problem':''});                
             });
       };
     
     change(e) {
-       // console.log(e.target);
-//          console.log(['CHANGE',this.props.currentQuestion,state]);
+       // //console.log(e.target);
+//          //console.log(['CHANGE',this.props.currentQuestion,state]);
         this.setState({'problem':e.target.value});
   //      this.props.updateQuestion(state);
         return true;
@@ -43,7 +43,7 @@ export default class ProblemReport extends Component {
     
     
     render() {
-      //  console.log(['QE REN',this.props]);
+      //  //console.log(['QE REN',this.props]);
         if (this.props.question) {
             return (
             

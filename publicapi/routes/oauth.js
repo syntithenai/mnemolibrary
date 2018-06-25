@@ -13,17 +13,17 @@ database.connect(config.databaseConnection+config.database);
     database.OAuthClient.findOne({clientId: config.clientId, clientSecret:config.clientSecret}).then(function(client) {
         if (client!= null) {
             // OK
-            //console.log('Client exists');
+            ////console.log('Client exists');
         } else {
-            //console.log('Client create');
+            ////console.log('Client create');
             let client = new database.OAuthClient({clientId: config.clientId, clientSecret:config.clientSecret});
             client.save().then(function(r) {
-                console.log('Client created');
+                //console.log('Client created');
             });
         }
     }).catch(function(e) {
-        console.log('Error creating client on init');
-        console.log(e);
+        //console.log('Error creating client on init');
+        //console.log(e);
     });
 global.Promise = bluebird;
 

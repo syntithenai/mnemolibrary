@@ -3,7 +3,7 @@ import Utils from './Utils';
 
 export default class QuestionList extends Component {
     render() {
-       // console.log(['QL',this.props.questions]);
+       // //console.log(['QL',this.props.questions]);
         if (Array.isArray(this.props.questions)) {
             let questions = this.props.questions.map((question, key) => {
                 if (question && question._id) {

@@ -8,7 +8,7 @@ import Ellipsis from 'react-icons/lib/fa/ellipsis-v';
 
 export default class QuizActionButtons extends Component {
     render() {
-        //console.log(['QAB',this.props.currentPage]);
+        ////console.log(['QAB',this.props.currentPage]);
         let visible=this.props.currentPage === "review" || this.props.currentPage === "home" ? true : false;
         let showRecallButton=this.props.currentPage === "review"  ? true : false;
        

@@ -24,7 +24,7 @@ export default class ActivityChart extends React.Component {
         .then(function(response) {
             return response.json()
         }).then(function(json) {
-            console.log(['got response', json]);
+            //console.log(['got response', json]);
             let seenDateKeys={};
             let successDateKeys={};
             let now = new Date();
@@ -37,10 +37,10 @@ export default class ActivityChart extends React.Component {
                 now.setDate(now.getDate()-1);
             }
             json.success.map(function(val,key) {
-                console.log(['success map',key,val]);
+                //console.log(['success map',key,val]);
                 let lookup=val._id.day+'/'+val._id.month;
                 //if (successDateKeys[lookup]===0) {
-                    console.log(['success map r',successDateKeys[lookup],val.tally]);
+                    //console.log(['success map r',successDateKeys[lookup],val.tally]);
                     successDateKeys[lookup]=val.tally;
                     if (seriesObject[lookup]) {
                         seriesObject[lookup].success=val.tally;
@@ -49,7 +49,7 @@ export default class ActivityChart extends React.Component {
                 return null;
             });
             json.seen.map(function(val,key) {
-                console.log(['seen map',key,val]);
+                //console.log(['seen map',key,val]);
                     
                 let lookup=val._id.day+'/'+val._id.month;
                 // offset seen by success to fix stacked column ratio
@@ -64,12 +64,12 @@ export default class ActivityChart extends React.Component {
                 return null;
             });
             //json.seen//
-            console.log(['ACT CHART MOUNT',seriesObject]);
+            //console.log(['ACT CHART MOUNT',seriesObject]);
             
             that.setState({series:Object.values(seriesObject).reverse()});
                 
         }).catch(function(ex) {
-            console.log(['test request failed', ex])
+            //console.log(['test request failed', ex])
         })        
     };
          

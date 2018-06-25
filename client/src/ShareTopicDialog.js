@@ -22,7 +22,7 @@ import Facebook from 'react-icons/lib/fa/facebook';
 export default class ShareTopicDialog extends Component {
     
     render() {
-        console.log(this.props);
+        //console.log(this.props);
         let question=this.props.shareQuestion;
         //let mailTo='mailto:?subject=Mnemos Library - '+this.props.header+'&body='+this.props.shareLink;
         //let twitterText= this.props.question.mnemonic ? this.props.question.mnemonic : '';

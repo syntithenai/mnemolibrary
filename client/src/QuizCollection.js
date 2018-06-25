@@ -6,7 +6,7 @@ export default class QuizCollection extends Component {
         if (Array.isArray(this.props.collection)) {
             
             let collections = this.props.collection.map((collection, key) => {
-                console.log([collection,key]);
+                //console.log([collection,key]);
               if (collection.topics) {
                   let collatedTopics={};
                   collection.topics.forEach(function(topic) {

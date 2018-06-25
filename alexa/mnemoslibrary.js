@@ -196,7 +196,7 @@ app.intent("AMAZON.CancelIntent", {
 
 // PRE/POST 
 app.pre = function(request, response, type) {
-    console.log(['REQUEST',request.data.request.intent,request.type()]); //,request.getSession().details.attributes]);//,request.getSession().details.attributes,request.slots]);
+    //console.log(['REQUEST',request.data.request.intent,request.type()]); //,request.getSession().details.attributes]);//,request.getSession().details.attributes,request.slots]);
     //,JSON.stringify(request.data)
   //if (request.applicationId != "amzn1.echo-sdk-ams.app.000000-d0ed-0000-ad00-000000d00ebe") {
     //// fail ungracefully
@@ -208,7 +208,7 @@ app.pre = function(request, response, type) {
 app.post = function(request, response, type, exception) {
   if (exception) {
     // always turn an exception into a successful response
-    console.log(exception);
+    //console.log(exception);
     return response.clear().say(__("An error occured: ") + exception).send();
   }
 };

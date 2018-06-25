@@ -24,7 +24,7 @@ export default class TopicQuestionsList extends Component {
     }
 
     moveDown(key,e) {
-        console.log(['down',key,e]);
+        //console.log(['down',key,e]);
         this.props.moveQuestion(key,1);
         e.preventDefault();
         e.stopPropagation()
@@ -32,7 +32,7 @@ export default class TopicQuestionsList extends Component {
     };
 
     moveUp(key,e) {
-        console.log(['up',key,e]);
+        //console.log(['up',key,e]);
         this.props.moveQuestion(key,-1);
         e.preventDefault();
         e.stopPropagation()
@@ -41,7 +41,7 @@ export default class TopicQuestionsList extends Component {
 
     
     render() {
-       // console.log(['VAL ERR',this.props.validationErrors]);
+       // //console.log(['VAL ERR',this.props.validationErrors]);
         if (this.props.questions) {
             let list = this.props.questions.map((question,key) => {
                 let errors='';

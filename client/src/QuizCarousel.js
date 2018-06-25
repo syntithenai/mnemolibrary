@@ -29,11 +29,11 @@ export default class QuizCarousel extends Component {
         this.banQuestion = this.banQuestion.bind(this);
         this.percentageFinished = this.percentageFinished.bind(this);
         this.discoverQuestions = this.discoverQuestions.bind(this);
-      //  console.log(['QUIZ carousel constr']);
+      //  //console.log(['QUIZ carousel constr']);
     };
     
     componentDidMount() {
-       // console.log(['QUIZ CAR DID MOUNT',this.state.currentQuiz,this.props.questions]);
+       // //console.log(['QUIZ CAR DID MOUNT',this.state.currentQuiz,this.props.questions]);
               
     };
     
@@ -52,7 +52,7 @@ export default class QuizCarousel extends Component {
   };
       
   logStatus(status,question,preview,topic) {
-     // console.log(['log status',status,question]);
+     // //console.log(['log status',status,question]);
       if (this.props.user && !preview) {
           if (!question) question = this.props.questions[this.props.indexedQuestions[this.props.currentQuestion]]._id;
           let that = this;
@@ -79,7 +79,7 @@ export default class QuizCarousel extends Component {
             }  else {
                 // move forward one question and strip blocked questions from currentQuiz 
                 let currentQuestion = this.props.currentQuestion;
-                //console.log(['block',currentQuestion]);
+                ////console.log(['block',currentQuestion]);
                 let currentQuiz = this.props.currentQuiz;
                 currentQuiz.splice(parseInt(currentQuestion,10),1);
                // this.props.setCurrentQuestion(this.props.currentQuestion + 1);
@@ -93,7 +93,7 @@ export default class QuizCarousel extends Component {
   handleQuestionResponse(question,response) {
       this.props.setMessage('');
       const id = question._id;
-      //console.log(['handle response',response,id,question]);
+      ////console.log(['handle response',response,id,question]);
       const time = new Date().getTime();
       if (response === "list") {
          this.setState({'showList':true});  
@@ -115,7 +115,7 @@ export default class QuizCarousel extends Component {
             }  else {
                 //questions.successTally[id] = questions.successTally.hasOwnProperty(id) ? questions.successTally[id] + 1 : 1;
                 this.setState({ 'success': success});
-                //console.log(['success',this.props.currentQuestion]);
+                ////console.log(['success',this.props.currentQuestion]);
                 this.props.setCurrentQuestion(parseInt(this.props.currentQuestion,10) + 1);
                 this.logStatus('success',id,question.isPreview);
             }
@@ -148,7 +148,7 @@ export default class QuizCarousel extends Component {
           let user = this.props.progress;
           let questions = user.questions;
           // flag as blocked
-      //    console.log(['block',id]);
+      //    //console.log(['block',id]);
           if (id.length > 0) { 
               confirmAlert({
                   title: 'Block Question',
@@ -170,7 +170,7 @@ export default class QuizCarousel extends Component {
   }; 
     
     currentQuestion() {
-       // console.log(['currentQuestion',this.state]);
+       // //console.log(['currentQuestion',this.state]);
         let question=null;
         if (this.props.currentQuestion !== null && Array.isArray(this.props.currentQuiz) && this.props.indexedQuestions && this.props.questions) {
             question = this.props.questions[this.props.indexedQuestions[this.props.currentQuiz[this.props.currentQuestion]]];
@@ -181,14 +181,14 @@ export default class QuizCarousel extends Component {
     
        // FINISH QUIZ CAROUSEL
    finishQuiz(success,questions) {
-      // console.log(['finish quiz',this.props.finishQuiz]);
+      // //console.log(['finish quiz',this.props.finishQuiz]);
         // inject override
        // alert('finsih');
        if (this.props.finishQuiz) {
             this.props.finishQuiz(this.props.questions,this.state.success);
         } else {
         //this.props.setMessage('You\'ve seen '+(questions ? questions.length : 0)+' questions. Time for review ?'); 
-        //console.log('root finish quiz');
+        ////console.log('root finish quiz');
             confirmAlert({
               title: 'Question set complete',
               message: 'Time for review?',
@@ -221,7 +221,7 @@ export default class QuizCarousel extends Component {
     };
     
     getQuestions(questionIds) {
-      //  console.log(['get ques',questionIds]);
+      //  //console.log(['get ques',questionIds]);
         let questions=[];
         let that = this;
         questionIds.forEach(function(questionId) {
@@ -232,11 +232,11 @@ export default class QuizCarousel extends Component {
     };
     
     setQuizQuestion(question) {
-    //    console.log(['set quiz ques',question,this.props.currentQuiz]);
+    //    //console.log(['set quiz ques',question,this.props.currentQuiz]);
         if (Utils.isObject(question) && question._id && question._id.length > 0) {
-            //console.log(['setQuizQuestion',question]);
+            ////console.log(['setQuizQuestion',question]);
             let index = this.props.currentQuiz.indexOf(question._id);
-            //console.log(['index',index]);
+            ////console.log(['index',index]);
             this.setState({'showList':false});
             this.props.setCurrentQuestion(index);
         }
@@ -244,16 +244,16 @@ export default class QuizCarousel extends Component {
     
     render() {
         //let questions = this.props.currentQuiz;
-        //console.log(['RENDER CAROUS',questions]);
+        ////console.log(['RENDER CAROUS',questions]);
         //if (Array.isArray(questions) && questions.length > 0) {
             
         //} else if (this.props.discoverQuestions) {
             //questions = this.props.discoverQuestions();
         //}
-      //  console.log(['RENDER CAROUS2',questions]);
+      //  //console.log(['RENDER CAROUS2',questions]);
         let content = '';
         const question = this.currentQuestion();
-      //  console.log(['RENDER CAROUS2',question,questions]);
+      //  //console.log(['RENDER CAROUS2',question,questions]);
       //  if (Array.isArray(questions) && questions.length > 0 && Utils.isObject(question)) {
             if (this.state.showList) {
                 let listQuestions = this.getQuestions(this.props.currentQuiz);
@@ -268,7 +268,7 @@ export default class QuizCarousel extends Component {
             }
         
         //} else {
-            ////console.log(['ren',question,questions]);
+            //////console.log(['ren',question,questions]);
            //// content = (<div>{JSON.stringify(question)} - {questions} </div>)
             //// no matching questions
             //content = (<div><FindQuestions discoverQuestions={this.props.discoverQuestions} setCurrentPage={this.props.setCurrentPage} /></div>)

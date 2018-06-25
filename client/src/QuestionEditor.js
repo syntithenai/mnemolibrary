@@ -73,9 +73,9 @@ export default class QuestionEditor extends Component {
          // set tags from question
          if (Array.isArray(this.props.question.tags)) {
              let tags=[];
-            // console.log(['set tags from q',this.props.question.tags]);
+            // //console.log(['set tags from q',this.props.question.tags]);
              this.props.question.tags.map(function(val,key) {
-                 console.log(val,key);
+                 //console.log(val,key);
                  tags.push({id:val,name:val});
                  return null;
              });
@@ -91,16 +91,16 @@ export default class QuestionEditor extends Component {
                   suggestions.push({id:val._id,name:val.text});
                   return null;
               });
-              //console.log(['SET TAGS', json])
+              ////console.log(['SET TAGS', json])
             that.setState({'suggestions':suggestions});
           }).catch(function(ex) {
-            console.log(['parsing failed', ex])
+            //console.log(['parsing failed', ex])
           })
     }
    
    
    updateQuestionTag(tags) {
-       //console.log(['updateQuestionTag',tags]);
+       ////console.log(['updateQuestionTag',tags]);
         let state = {...this.props.question};
         let cleanTags=[];
         tags.map(function(val,key) {
@@ -121,7 +121,7 @@ export default class QuestionEditor extends Component {
   }
  
   handleAddTag (tag) {
-     // console.log(['ADDTAG',tag]);
+     // //console.log(['ADDTAG',tag]);
     const tags = [].concat(this.state.tags, tag)
     this.setState({ tags })
     this.updateQuestionTag(tags);
@@ -133,14 +133,14 @@ export default class QuestionEditor extends Component {
         //e.preventDefault();
         //var that = this;
         //that.setState({'warning_message':''});
-        ////console.log('save user ',this.state.user);
+        //////console.log('save user ',this.state.user);
         //var data = {...this.props.question}
         //this.props.saveQuestion(data,this);  
             
     //};
     
     change(e) {
-        //console.log(e.target);
+        ////console.log(e.target);
         let state = {...this.props.question};
         var key = e.target.name;
         //if (key==="tags") {
@@ -149,7 +149,7 @@ export default class QuestionEditor extends Component {
             state[key] =  e.target.value;
         //}
         
-        //console.log(['CHANGE',this.props.currentQuestion,state]);
+        ////console.log(['CHANGE',this.props.currentQuestion,state]);
         //this.setState({'question':state});
         this.props.updateQuestion(state);
         return true;
@@ -171,7 +171,7 @@ export default class QuestionEditor extends Component {
     };
     
     finishUploadImage(signResult) {
-        //console.log("Uppt finished: " + signResult.publicUrl)
+        ////console.log("Uppt finished: " + signResult.publicUrl)
         let state = {...this.props.question};
         //state.image='';
         //this.props.updateQuestion(state);
@@ -193,7 +193,7 @@ export default class QuestionEditor extends Component {
     };
     
     finishUploadMedia(signResult) {
-        //console.log("Uppt media finished: " + signResult.publicUrl)
+        ////console.log("Uppt media finished: " + signResult.publicUrl)
         let state = {...this.props.question};
         let time = new Date().getTime();
         state.media="/api"+signResult.publicUrl+'?no_cache='+time;
@@ -210,12 +210,12 @@ export default class QuestionEditor extends Component {
     
     onMediaProgress(percent, message) {
         this.setState({'mediaProgress':percent});
-        //console.log('Upload media progress: ' + percent + '% ' + message);
+        ////console.log('Upload media progress: ' + percent + '% ' + message);
     };
     
     onImageProgress(percent, message) {
         this.setState({'imageProgress':percent});
-        //console.log('Upload progress: ' + percent + '% ' + message);
+        ////console.log('Upload progress: ' + percent + '% ' + message);
     };
     
     selectInterrogative(value) {
@@ -223,7 +223,7 @@ export default class QuestionEditor extends Component {
         var key = 'interrogative';
         state[key] =  value;
         //this.setState({'question':state});
-        //console.log(['sel inter',value]);
+        ////console.log(['sel inter',value]);
         this.props.updateQuestion(state);
         return true;
     };
@@ -247,7 +247,7 @@ export default class QuestionEditor extends Component {
     
     
     render() {
-       // console.log(['QE REN',this.props]);
+       // //console.log(['QE REN',this.props]);
         if (this.props.question) {
           let techniques = this.props.mnemonic_techniques.map((technique, key) => {
                 return <option  key={key} value={technique}  >{technique}</option>

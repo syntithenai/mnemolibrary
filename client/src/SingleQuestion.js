@@ -60,7 +60,7 @@ export default class SingleQuestion extends Component {
 
       handleStateChange(state, prevState) {
         // copy player state to this component's state
-        console.log(['statechange',state,prevState]);
+        //console.log(['statechange',state,prevState]);
         var {Platform} = React;
 
         if (state.ended && Platform.OS !== 'ios') {
@@ -82,7 +82,7 @@ export default class SingleQuestion extends Component {
       }
     
      componentWillReceiveProps(props) {
-         //console.log(['rcv props',props]);
+         ////console.log(['rcv props',props]);
        // if (this.refs.player) this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['mnemonic'],{align:'top',offset:-230});
     };
@@ -103,14 +103,14 @@ export default class SingleQuestion extends Component {
         let visible = this.state.visible;
         visible.push(toShow);
         this.setState({'visible':visible});
-        console.log(['scroll to ',toShow,this.scrollTo[toShow],this.scrollTo]);
+        //console.log(['scroll to ',toShow,this.scrollTo[toShow],this.scrollTo]);
         //setTimeout(function(toShow) {
             scrollToComponent(this.scrollTo[toShow],{align:'top',offset:-230});
         //},1000) 
     };
     
     toggleMedia() {
-        //console.log(['invisible',toHide]);
+        ////console.log(['invisible',toHide]);
         let visible = this.state.visible;
         if (this.state.visible.indexOf('media')>=0) {
             visible = this.removeA(visible,'media');

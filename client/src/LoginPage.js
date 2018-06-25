@@ -52,7 +52,7 @@ export default class LoginPage extends Component {
     recoverPassword(e) {
         let that = this;
         e.preventDefault();
-       // console.log(['recover',this.state.email]);
+       // //console.log(['recover',this.state.email]);
         fetch('/login/recover', {
           method: 'POST',
           headers: {
@@ -67,10 +67,10 @@ export default class LoginPage extends Component {
         }).then(this.checkStatus)
       .then(this.parseJSON)
       .then(function(data) {
-       //console.log(['recover request with JSON response', data])
+       ////console.log(['recover request with JSON response', data])
         that.setState(data); 
       }).catch(function(error) {
-        console.log(['request failed', error])
+        //console.log(['request failed', error])
       });
         return false;
     };
@@ -91,7 +91,7 @@ export default class LoginPage extends Component {
     }
     googleLogin(user) {
      //   let that=this;
-        //console.log(['glogin ',user]);
+        ////console.log(['glogin ',user]);
         fetch('/login/googlesignin', {
           method: 'POST',
           headers: {
@@ -105,7 +105,7 @@ export default class LoginPage extends Component {
         //.then(this.checkStatus)
       .then(this.parseJSON)
       .then(function(data) {
-        //    console.log(['gsignin request with JSON response', data])
+        //    //console.log(['gsignin request with JSON response', data])
            if (data.code && data.code.length > 0) {
               window.location='/?code='+data.code;
              // that.postToUrl('/',{code:data.code},'POST');
@@ -140,7 +140,7 @@ export default class LoginPage extends Component {
         e.preventDefault();
         this.setState({'warning_message':''});
        
-        //console.log(this.state);
+        ////console.log(this.state);
        fetch('/login/signin', {
           method: 'POST',
           headers: {
@@ -153,13 +153,13 @@ export default class LoginPage extends Component {
         }).then(this.checkStatus)
       .then(this.parseJSON)
       .then(function(data) {
-       //console.log(['signin request with JSON response', data])
+       ////console.log(['signin request with JSON response', data])
        
        if (data.code && data.code.length > 0) {
          // that.postToUrl('/',{code:data.code},'POST');
           window.location='/?code='+data.code;
        } else if (data._id && data._id.length > 0) {
-         //   console.log(['login at signin',data]);
+         //   //console.log(['login at signin',data]);
             that.setState(data); 
             that.props.login(data);
             
@@ -168,7 +168,7 @@ export default class LoginPage extends Component {
         }
         
       }).catch(function(error) {
-        //console.log(['request failed', error])
+        ////console.log(['request failed', error])
       });
     };
     
@@ -192,14 +192,14 @@ export default class LoginPage extends Component {
         .then(this.checkStatus)
       .then(this.parseJSON)
       .then(function(data) {
-       // console.log(['signup  request with JSON response', data])
+       // //console.log(['signup  request with JSON response', data])
         if (data._id && data._id.length > 0) {
             that.setState({justSignedUp: true, warning_message:data.warning_message});            
         } else {
             that.setState({warning_message:data.warning_message});            
         }
       }).catch(function(error) {
-        console.log(['request failed', error]);
+        //console.log(['request failed', error]);
       });
     };
     

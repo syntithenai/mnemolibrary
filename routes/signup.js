@@ -15,7 +15,7 @@ database.connect();
 const MongoClient = require('mongodb').MongoClient
 let db;
 MongoClient.connect(config.databaseConnection, (err, client) => {
-  if (err) return console.log(err)
+  if (err) return //console.log(err)
   db = client.db(config.database) 
 })
 var ObjectId = require('mongodb').ObjectID;
@@ -31,7 +31,7 @@ router.get("/",function(req,res) {
 router.get('/me',function(req,res) {
           OAuthAccessToken.findOne({ accessToken:req.query.code})
             .then(function(token)  {
-                //console.log(['token',token]);
+                ////console.log(['token',token]);
                 let now = new Date();
                 let expire = 0;
                 if (token && token.accessTokenExpiresAt)  expire = new Date(token.accessTokenExpiresAt);
@@ -59,11 +59,11 @@ router.get('/me',function(req,res) {
                                 }).then(function(response) {
                                     return response.json();
                                 }).then(function(token) {
-                                    //console.log(['got token',token]);
+                                    ////console.log(['got token',token]);
                                     res.send({user:user,token:token});
                                 })
                                 .catch(function(err) {
-                                    console.log(['ERR',err]);
+                                    //console.log(['ERR',err]);
                                 });
                                 
                             } else {
@@ -75,7 +75,7 @@ router.get('/me',function(req,res) {
                     }
                 }
             }).catch(function(e) {
-                console.log(['failed',e]);
+                //console.log(['failed',e]);
                 res.send('failed');
             });
     
@@ -83,16 +83,16 @@ router.get('/me',function(req,res) {
 
 
 router.post('/saveuser', function(req, res) {
-   // console.log(req.body);
+   // //console.log(req.body);
     if (req.body._id && req.body._id.length > 0) {
         if (req.body.password2 != req.body.password)  {
             res.send({warning_message:'Passwords do not match'});
         } else {
-            //console.log(['find on saveuser',req.body._id]);
+            ////console.log(['find on saveuser',req.body._id]);
             db.collection(userModelName).findOne(ObjectId(req.body._id), function(err, item) {
-             // console.log([err,item]);
+             // //console.log([err,item]);
               if (err) {
-                  console.log(err);
+                  //console.log(err);
                   res.send({warning_message:err});
               } else if (item!=null) {
                   if (req.body.password && req.body.password.trim().length > 0) item.password=req.body.password;
@@ -100,18 +100,18 @@ router.post('/saveuser', function(req, res) {
                   if (req.body.selectedMnemonics) item.selectedMnemonics=req.body.selectedMnemonics;
                   if (req.body.difficulty) item.difficulty=req.body.difficulty;
                   // update avatar only when changed
-                 // console.log(['CHECK AVATORA',item.avatar,req.body.avatar]);
+                 // //console.log(['CHECK AVATORA',item.avatar,req.body.avatar]);
                   if (item.avatar != req.body.avatar) {
                       db.collection(userModelName).findOne({avatar:{$eq:req.body.avatar}}, function(err, avUser) {
                           if (avUser!=null) {
-                             // console.log('FOUND');
+                             // //console.log('FOUND');
                               //avUser.;
                               res.send({warning_message:"Avatar name is already taken, try something different."});
                           } else {
-                             // console.log('SET');
+                             // //console.log('SET');
                               item.avatar = req.body.avatar;
                               // no update email address, item.username = req.body.username;
-                              //    console.log(['save new item',item]);
+                              //    //console.log(['save new item',item]);
                               db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(xres) {
                                     //res.redir(config.authorizeUrl);
                                   item.warning_message="Saved changes";
@@ -156,20 +156,20 @@ function sendToken(req,res,user) {
     }).then(function(response) {
         return response.json();
     }).then(function(token) {
-      //  console.log(['got token',token]);
+      //  //console.log(['got token',token]);
        res.send({code:token.access_token});
     }).catch(function(e) {
-       // console.log(e);
+       // //console.log(e);
          res.send({message:'Error logging in'});
     });
 }
 
 router.post('/googlesignin',function(req,res) {
-   // console.log(['/googlesignin']);
+   // //console.log(['/googlesignin']);
     if (req.body.email && req.body.email.length > 0) {
-     //   console.log(['/googlesignin have mail',req.body.email]);
+     //   //console.log(['/googlesignin have mail',req.body.email]);
          db.collection(userModelName).findOne({username:req.body.email}).then(function(user) {
-       //      console.log(['/googlesignin fnd',user]);
+       //      //console.log(['/googlesignin fnd',user]);
               if (user!=null) {
                  sendToken(req,res,user);
               } else {
@@ -181,7 +181,7 @@ router.post('/googlesignin',function(req,res) {
                   })
               }
          }).catch(function(e) {
-             console.log(e);
+             //console.log(e);
              res.send({message:'Invalid request e'});
          });
     } else {
@@ -194,18 +194,18 @@ router.post('/googlesignin',function(req,res) {
 
 router.post('/recover', function(req, res) {
     
-   // console.log(['recover',req.body]);
+   // //console.log(['recover',req.body]);
     if (req.body.email && req.body.email.length > 0 && req.body.code && req.body.code.length > 0) {
         if (req.body.password.length==0 || req.body.password2.length==0) {
             res.send({warning_message:'Empty password is not allowed'});
         } else if (req.body.password2 != req.body.password)  {
             res.send({warning_message:'Passwords do not match'});
         } else {
-     //       console.log(['find on saveuser',req.body.email]);
+     //       //console.log(['find on saveuser',req.body.email]);
             db.collection(userModelName).findOne({username:req.body.email}, function(err, item) {
-              console.log([err,item]);
+              //console.log([err,item]);
               if (err) {
-                  console.log(err);
+                  //console.log(err);
                   res.send({warning_message:err});
               } else if (item!=null) {
                   item.tmp_password = req.body.password;
@@ -229,7 +229,7 @@ If you did not recently request a password recovery for your Mnemo's Library acc
 Mnemo's Library
 
                                   </div>`,{link:link,name:item.name});
-       //                console.log(mailTemplate);
+       //                //console.log(mailTemplate);
                                 //res.redir(config.authorizeUrl);
                        utils.sendMail(config.mailFrom,req.body.email,"Update your password on Mnemo's Library",
                                  mailTemplate
@@ -257,15 +257,15 @@ router.post('/signup', function(req, res) {
             res.send({warning_message:'Passwords do not match.'});
         } else {
              // update avatar only when changed
-           // console.log('seek avatar');
+           // //console.log('seek avatar');
             db.collection(userModelName).find({avatar:{$eq:req.body.avatar}}).toArray().then(function(avUser) {
-             // console.log(['found avatar',avUser]);
+             // //console.log(['found avatar',avUser]);
               if (avUser!=null && avUser.length>0) {
 //                   avUser.warning_message="Avatar name is already taken, try something different.";
-                //  console.log(['realy found avatar',avUser]);
+                //  //console.log(['realy found avatar',avUser]);
                   res.send({warning_message:'Avatar name is already taken, try something different.'});
               } else {
-            //      console.log(['set avatar',req.body.avatar]);
+            //      //console.log(['set avatar',req.body.avatar]);
                   
                 db.collection(userModelName).findOne({username:req.body.username}, function(err, ditem) {
                   if (ditem!=null) {
@@ -281,7 +281,7 @@ router.post('/signup', function(req, res) {
                                 'client_secret':config.clientSecret
                           };
                          // no update email address, item.username = req.body.username;
-                          //    console.log(['save new item',item]);
+                          //    //console.log(['save new item',item]);
                           db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(xres) {
                                       fetch("http://localhost:3000/oauth/token", {
                                           method: 'POST',
@@ -294,12 +294,12 @@ router.post('/signup', function(req, res) {
                                         }).then(function(response) {
                                             return response.json();
                                         }).then(function(token) {
-                                            //console.log(['got token',token]);
+                                            ////console.log(['got token',token]);
                                             item.token = token.access_token;
                                             item.tmp_password=item.password;
                                             item.password='';
                                             db.collection(userModelName).update({'_id': ObjectId(item._id)},{$set:item}).then(function(result2) {
-                                                // console.log(['jjjjj']);
+                                                // //console.log(['jjjjj']);
                                                  //var hostParts = req.headers.host.split(":");
                                                  //var host = hostParts[0];
                                                  var link = config.protocol + "://"  + config.host + '/?confirm='+token.access_token;
@@ -330,7 +330,7 @@ router.post('/signup', function(req, res) {
                                             //});  
                                         })
                                         .catch(function(err) {
-                                            console.log(['ERR',err]);
+                                            //console.log(['ERR',err]);
                                         });
                                   });  
                               
@@ -339,7 +339,7 @@ router.post('/signup', function(req, res) {
                   })  
                 }
             }).catch(function(err) {
-                console.log(['ERR',err]);
+                //console.log(['ERR',err]);
             });;
         }
     } else {
@@ -348,7 +348,7 @@ router.post('/signup', function(req, res) {
     
 });
 router.post('/signin', function(req, res) {
-    //console.log(req.body);
+    ////console.log(req.body);
     if (req.body.username && req.body.username.length > 0 && req.body.password && req.body.password.length>0) {
             db.collection(userModelName).findOne({username:req.body.username,password:req.body.password}, function(err, item) {
               if (item!=null) {
@@ -370,10 +370,10 @@ router.post('/signin', function(req, res) {
                         }).then(function(response) {
                             return response.json();
                         }).then(function(token) {
-                           // console.log(['got token',token]);
+                           // //console.log(['got token',token]);
                            res.send({code:token.access_token});
                         }).catch(function(e) {
-                            console.log(e);
+                            //console.log(e);
                              res.send({message:'Error logging in'});
                         });
               } else {
@@ -394,7 +394,7 @@ router.get('/doconfirm',function(req,res) {
     //let response = oauthserver.Response(res);
     //return oauth.authenticate(request, response, options)
       //.then(function(token) {
-      //  console.log(['APPROVE USER',params]); //,token,params,req]);    
+      //  //console.log(['APPROVE USER',params]); //,token,params,req]);    
           User.findOne({ token:params.code})
             .then(function(user)  {
                 //let now = new Date();
@@ -404,20 +404,20 @@ router.get('/doconfirm',function(req,res) {
                 //} else {
                     
                     if (user != null) {
-                        //console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
+                        ////console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
                         var userId = user._id;
                         //const user = new User({name:user2.name,username:user2.username,_id:user2._id,password:user2.tmp_password, token: null});
-                       // console.log(['res2',userId]);  
+                       // //console.log(['res2',userId]);  
                           //res.send('registration '+params.code );
-                          //console.log(user);  
-                      //console.log(user._id);  
+                          ////console.log(user);  
+                      ////console.log(user._id);  
                       
                       user.password = user.tmp_password;
                       user.token = undefined;
                       user.tmp_password = undefined;
-                     // console.log(['KKK',user]); 
+                     // //console.log(['KKK',user]); 
                       user.save().then(function() {
-                        //  console.log(['approved']);
+                        //  //console.log(['approved']);
                            var params={
                                 username: user.username,
                                 password: user.password,
@@ -435,12 +435,12 @@ router.get('/doconfirm',function(req,res) {
                             }).then(function(response) {
                                 return response.json();
                             }).then(function(token) {
-                         //       console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
+                         //       //console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
                                 //res.redirect(config.successUrl + '?code='+token.access_token);
                                 res.send({user:user,token:token});
                             });
                       }).catch(function(e) {
-                          console.log(['Failed confirmation',e]);
+                          //console.log(['Failed confirmation',e]);
                           res.send('failed ' );
                       });
                         
@@ -449,7 +449,7 @@ router.get('/doconfirm',function(req,res) {
                     }
                // }
             }).catch(function(e) {
-                console.log(['failed',e]);
+                //console.log(['failed',e]);
                 res.send('failed');
             });
         
@@ -467,25 +467,25 @@ router.get('/doconfirm',function(req,res) {
 
 router.get('/dorecover',function(req,res) {
         let params = req.query;
-     //   console.log(['RECOVER USER',params]); //,token,params,req]);    
+     //   //console.log(['RECOVER USER',params]); //,token,params,req]);    
           User.findOne({ token:params.code})
             .then(function(user)  {
-             //   console.log(['found',user]);
+             //   //console.log(['found',user]);
                 if (user != null) {
-            //        console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
+            //        //console.log(['res1',user,user._id,user.username,user.token,user.tmp_password]);
                     var userId = user._id;
                     //const user = new User({name:user2.name,username:user2.username,_id:user2._id,password:user2.tmp_password, token: null});
-               //     console.log(['res2',userId]);  
+               //     //console.log(['res2',userId]);  
                       //res.send('registration '+params.code );
-                      //console.log(user);  
-                  //console.log(user._id);  
+                      ////console.log(user);  
+                  ////console.log(user._id);  
                   
                   user.password = user.tmp_password;
                   user.token = undefined;
                   user.tmp_password = undefined;
-        //          console.log(['KKK',user]); 
+        //          //console.log(['KKK',user]); 
                   user.save().then(function() {
-                  //    console.log(['approved']);
+                  //    //console.log(['approved']);
                        var params={
                             username: user.username,
                             password: user.password,
@@ -503,12 +503,12 @@ router.get('/dorecover',function(req,res) {
                         }).then(function(response) {
                             return response.json();
                         }).then(function(token) {
-                    //        console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
+                    //        //console.log(['got token',token,config.successUrl + '?code='+token.access_token]);
                             //res.redirect(config.successUrl + '?code='+token.access_token);
                             res.send({user:user,token:token});
                         });
                   }).catch(function(e) {
-                      console.log(['Failed confirmation',e]);
+                      //console.log(['Failed confirmation',e]);
                       res.send('failed ' );
                   });
                     
@@ -516,7 +516,7 @@ router.get('/dorecover',function(req,res) {
                     res.send('no matching registration' );
                 }
             }).catch(function(e) {
-                console.log(['failed',e]);
+                //console.log(['failed',e]);
                 res.send('failed');
             });
         

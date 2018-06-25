@@ -7,8 +7,8 @@ var Speech = require('ssml-builder');
 var AmazonSpeech = require('ssml-builder/amazon_speech');
 //let talisman = require('talisman/metrics/distance/eudex');
 //let distance=talisman.distance;
-//console.log(['talisman'])
-//console.log(talisman)
+////console.log(['talisman'])
+////console.log(talisman)
 
 const database = require('../oauth/database');
 database.connect();
@@ -17,7 +17,7 @@ try {
     // ugg mongoose and raw connections
     const MongoClient = require('mongodb').MongoClient
     MongoClient.connect(config.databaseConnection, (err, client) => {
-      if (err) return console.log(err)
+      if (err) return //console.log(err)
       db = client.db(config.database)       
     })
 } catch (e) {}
@@ -31,29 +31,29 @@ var mqtt = require('mqtt')
 var client  = mqtt.connect('mqtt://mosquitto',{clientId: 'alexa_' + Math.random().toString(16).substr(2, 8),keepalive: 60000})
 //var client  = mqtt.connect('wss://mongo')
 
-console.log('MQTT INIT');
+//console.log('MQTT INIT');
 client.on('connect', function () {
-    console.log('MQTT CONNECT');
+    //console.log('MQTT CONNECT');
  // client.subscribe('presence')
  // client.publish('presence', 'Hello mqtt alex')
 })
 
 client.on('message', function (topic, message) {
   // message is Buffer
-  console.log('MQTT MESSAGE');
-  console.log(message.toString())
+  //console.log('MQTT MESSAGE');
+  //console.log(message.toString())
 })
 
 client.on('error', function (error) {
   // message is Buffer
-  console.log('MQTT Error');
-  console.log(error.toString())
-  console.log(error)
+  //console.log('MQTT Error');
+  //console.log(error.toString())
+  //console.log(error)
   //client.end()
 })
 
 client.on('reconnect', function (error) {
- console.log('MQTT reconnect');
+ //console.log('MQTT reconnect');
 })
 
 
@@ -75,7 +75,7 @@ function setDiscoveryFilters(request,response) {
     let topicFilter = null
     //session.set('tagFilter',null);
     //session.set('topicFilter',null);
-    console.log(['setDiscoveryFilters',request.slots['TOPIC'],request.slots['TAG']]);
+    //console.log(['setDiscoveryFilters',request.slots['TOPIC'],request.slots['TAG']]);
     if (request.slots['TOPIC'] && request.slots['TOPIC'].value)  {
         session.set('topicFilter',request.slots['TOPIC'].value);
         topicFilter=closest.topic(request.slots['TOPIC'].value);
@@ -90,7 +90,7 @@ function setReviewFilters(request,response) {
     let session = request.getSession();
     let tagFilter = null
     let topicFilter = null
-    console.log(['setReviewFilters',request.slots['TOPIC'],request.slots['TAG']]);
+    //console.log(['setReviewFilters',request.slots['TOPIC'],request.slots['TAG']]);
     if (request.slots['TOPIC'] && request.slots['TOPIC'].value)  {
         session.set('reviewTopicFilter',request.slots['TOPIC'].value);
         topicFilter=closest.topic(request.slots['TOPIC'].value);
@@ -104,12 +104,12 @@ function setReviewFilters(request,response) {
 
 let intentHandlers ={
     launch: function(request, response) {
-        //console.log('LAUNCH');
+        ////console.log('LAUNCH');
         let reprompt = __("Do you want to Discover Nemo's questions or start a review");
         let now = new Date();
-       // console.log(['DISCOVER',request.sessionDetails.accessToken]);
+       // //console.log(['DISCOVER',request.sessionDetails.accessToken]);
         return databaseFunctions.getUser(db,database,request,response).then(function(user) {
-            //console.log('LAUNCHED',user);
+            ////console.log('LAUNCHED',user);
             if (user) {
                 // intentHandlers.yes(request,response);
                  let nameParts=user.name.split(' ');
@@ -130,9 +130,9 @@ let intentHandlers ={
         let confirmAction = session.get('confirmAction')
         
         if (confirmAction) {
-            console.log('confirm '+confirmAction);
+            //console.log('confirm '+confirmAction);
             if (intentHandlers.hasOwnProperty(confirmAction)) {
-                //console.log('confirm action exists');
+                ////console.log('confirm action exists');
                 return intentHandlers[confirmAction](request,response)
             }
         }
@@ -142,7 +142,7 @@ let intentHandlers ={
         session.set('confirmAction',null)
         let denyAction = session.get('denyAction')
         if (denyAction) {
-            console.log('deny '+denyAction);
+            //console.log('deny '+denyAction);
             if (intentHandlers.hasOwnProperty(denyAction)) {
                 session.set('denyAction',null)
                 return intentHandlers[denyAction](request,response)
@@ -186,7 +186,7 @@ let intentHandlers ={
         session.set('topicFilter',null);
         let status=setDiscoveryFilters(request,response);
         // only on requests where slots exists but are not exact match
-        console.log(status);
+        //console.log(status);
         //return;
             
         if ((status.tagFilter && status.tagFilter.seek && !status.tagFilter.match) ||  (status.topicFilter && status.topicFilter.seek && !status.topicFilter.match)) {
@@ -212,7 +212,7 @@ let intentHandlers ={
         let session = request.getSession();
         // yay discover
         return databaseFunctions.nextDiscoveryQuestion(db,database,request,response).then(function(questions) {
-            //console.log(['then',questions]);
+            ////console.log(['then',questions]);
             let question=questions[0];
             if (question) {
                 session.set('currentQuestion',question)
@@ -312,7 +312,7 @@ let intentHandlers ={
                 session.set('topicFilter',null);
                 let status=setReviewFilters(request,response);
                 // only on requests where slots exists but are not exact match
-                console.log(status);
+                //console.log(status);
                 if ((status.tagFilter && status.tagFilter.seek && !status.tagFilter.match) ||  (status.topicFilter && status.topicFilter.seek && !status.topicFilter.match)) {
                     session.set('confirmAction','discover')
                     if (status.topicFilter)  {
@@ -381,12 +381,12 @@ let intentHandlers ={
         let session = request.getSession();
         session.set('confirmAction',null)
         session.set('denyAction',null)
-        console.log('REV');
+        //console.log('REV');
         // try get next question
         // no question then say review complete
         // else deliver question
         if (session.get('questions') && session.get('questions').length > 0) {
-            console.log('REVq');
+            //console.log('REVq');
             let currentQuestion=session.get('currentReviewQuestion')
             if (currentQuestion && parseInt(currentQuestion,10)>0) {
                 currentQuestion+=1;
@@ -394,7 +394,7 @@ let intentHandlers ={
                 currentQuestion=1;
             }
             session.set('currentReviewQuestion',currentQuestion)
-            console.log('REV'+currentQuestion);
+            //console.log('REV'+currentQuestion);
             if (currentQuestion>session.get('questions').length) {
                 // quiz complete
                 response.say(__("You've finished this review set. Do you want to review more or discover new questions"));
@@ -402,12 +402,14 @@ let intentHandlers ={
                 session.set('currentQuestion',null)
                 session.set('currentReviewQuestion',null)
                 session.set('questions',null)
+                session.set('confirmAction','start_review')
+            
             } else {
-                //console.log(['REV',session.get('questions')]);
+                ////console.log(['REV',session.get('questions')]);
                 let question=session.get('questions')[currentQuestion-1];
-                console.log(question);
+                //console.log(question);
                 if (question) {
-                    console.log('yes question');
+                    //console.log('yes question');
                     session.set('currentQuestion',question)
                     //client.publish('presence', JSON.stringify({from:'alexa',action:'review',question:question._id}))
                     sendMqtt(request, response,{from:'alexa',action:'review',question:question._id});
@@ -425,12 +427,12 @@ let intentHandlers ={
                     }
                     return response.send();                
                 } else {
-                    console.log('no question');
+                    //console.log('no question');
                    // return response.send(); 
                 }
             }
         } else {
-            console.log('ERROR: review called without questions in session');
+            //console.log('ERROR: review called without questions in session');
         }
     },
     really_block_question: function(request,response) {
@@ -441,7 +443,7 @@ let intentHandlers ={
         return databaseFunctions.getUser(db,database,request,response).then(function(user) {
             if (user && user._id) {
                 databaseFunctions.blockQuestion(db,database,user._id,currentQuestion._id,currentQuestion.quiz);
-                response.say(__('Ok blocked. '));// console.log('recall');
+                response.say(__('Ok blocked. '));// //console.log('recall');
                 return intentHandlers.next_question(request,response);
             }
         });
@@ -453,7 +455,7 @@ let intentHandlers ={
             if (user) {
                 session.set('confirmAction','really_block_question')
                 session.set('denyAction','next_question')
-                response.say(__('Do you really want to block this question'));// console.log('recall');
+                response.say(__('Do you really want to block this question'));// //console.log('recall');
                 response.shouldEndSession(false,__('Do you really want to block this question'))
                 return response.send();
             } else {
@@ -463,14 +465,14 @@ let intentHandlers ={
         })
     },
     recall: function(request,response) {
-       // console.log('recall');
+       // //console.log('recall');
         let session = request.getSession();
         session.set('confirmAction',null)
         session.set('denyAction',null)
         
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion && session.get('mode') === 'review') {
-            //console.log(currentQuestion);
+            ////console.log(currentQuestion);
             // mark question as success
             response.say(__(" well done "));
             databaseFunctions.logStatus(db,database,'successes',currentQuestion._id,request,response);
@@ -487,26 +489,26 @@ let intentHandlers ={
     //},
     // check recall
     answer_is:  function(request,response) {
-        console.log(['ANSWERIS']);
+        //console.log(['ANSWERIS']);
         let session = request.getSession();
         session.set('confirmAction',null)
         session.set('denyAction',null)
         
         let currentQuestion = session.get('currentQuestion');
-        console.log(request.slots,currentQuestion);
+        //console.log(request.slots,currentQuestion);
         if (currentQuestion) {
             if (request.slot('THEANSWER')) {
                 let find = request.slot('THEANSWER');
-                console.log(['FIND',find,currentQuestion.answer]);
+                //console.log(['FIND',find,currentQuestion.answer]);
                 var levenshtein = require('fast-levenshtein');
-             //   console.log(['ANSWERIS',find,currentQuestion.answer]);
+             //   //console.log(['ANSWERIS',find,currentQuestion.answer]);
                 let answer='';
                 let answerParts=currentQuestion.answer.split(' ');
                 // if the answer is short enough, we can use it
                 function  checkSpecificAnswer(find,currentQuestion) {
                      // also check for an answer in the specific_answer field and generate and test any responses in the also include field
                     if (currentQuestion.specific_answer) {
-                        console.log(['ANSWERIS is specific']);
+                        //console.log(['ANSWERIS is specific']);
                         answer = currentQuestion.specific_answer;
                         if (find && (alexaUtils.strip(answer).toLowerCase()===alexaUtils.strip(find).toLowerCase()) ) {  //|| levenshtein.get(find,answer) < 1
                             response.say( __(" well done ") + alexaUtils.speakable(answer) + __(" is correct"));
@@ -522,7 +524,7 @@ let intentHandlers ={
                 };
                 
                 function checkAlsoAccept(find,currentQuestion) {
-                    console.log(['try also accept']);
+                    //console.log(['try also accept']);
                     // finally try also_include
                     if (currentQuestion.also_accept) {
                         
@@ -530,7 +532,7 @@ let intentHandlers ={
                         for (var i=0 ; i < aiParts.length; i++) {
                             
                             answer = alexaUtils.strip(aiParts[i]).toLowerCase();
-                            console.log(['ANSWERIS is also include',find,answer]);
+                            //console.log(['ANSWERIS is also include',find,answer]);
                             if (find && (answer===alexaUtils.strip(find).toLowerCase()) ) { //|| levenshtein.get(find,answer) < 1
                                 response.say(alexaUtils.speakable(answer) + __(" is correct"));
                                 //response.say(__("Next question"));
@@ -557,7 +559,7 @@ let intentHandlers ={
                         return checkAlsoAccept(find,currentQuestion);
                     } else {
                         answer = currentQuestion.answer;
-                        console.log(['ANSWERIS < 5',answer,find,(answer.indexOf(find) !== -1)]);
+                        //console.log(['ANSWERIS < 5',answer,find,(answer.indexOf(find) !== -1)]);
                         if (find && (alexaUtils.strip(answer).indexOf(alexaUtils.strip(find)) !== -1 ) ) { //|| levenshtein.get(find,answer) < 4
                             response.say(alexaUtils.speakable(answer) + __(" is correct"));
                             //response.say("Next question");
@@ -598,19 +600,19 @@ let intentHandlers ={
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
             let find = '';
-            console.log(request.slot('THEMNEMONIC'));
-            console.log(request.slot('THELASTWORD'));
+            //console.log(request.slot('THEMNEMONIC'));
+            //console.log(request.slot('THELASTWORD'));
             if (request.slot('THEMNEMONIC')) {
                 find = request.slot('THEMNEMONIC');
             } else if (request.slot('THELASTWORD')) {
                 find = request.slot('THELASTWORD');
             }
-            console.log(['FIND M',find,currentQuestion.mnemonic]);
+            //console.log(['FIND M',find,currentQuestion.mnemonic]);
             // Is utterance contained in mnemonic ?
             // 
             let mnemonic=alexaUtils.strip(currentQuestion.mnemonic);
             find=alexaUtils.strip(find)
-            console.log(['mnemonic compare ']);
+            //console.log(['mnemonic compare ']);
             if (find && (mnemonic.indexOf(find) !== -1 ||  levenshtein.get(find,mnemonic) < 3)) {
                 response.say(__(" well done ") + __("Correct"));
                 //response.say(__('Next question'));
@@ -692,13 +694,13 @@ let intentHandlers ={
     },
     spellanswer: function(request,response) {
         // if there is a current question speak answer
-        console.log('spell');
+        //console.log('spell');
         let session = request.getSession();
         session.set('confirmAction',null)
         session.set('denyAction',null)
         
         let currentQuestion = session.get('currentQuestion');
-        console.log(currentQuestion);
+        //console.log(currentQuestion);
         if (currentQuestion) {
             alexaSpeak.readAnswerLetters(currentQuestion,request,response);
             session.set('confirmAction','next_question')
@@ -719,11 +721,11 @@ let intentHandlers ={
         session.set('denyAction',null)
         
         let currentQuestion = session.get('currentQuestion');
-        console.log(['more info',currentQuestion]);
+        //console.log(['more info',currentQuestion]);
         if (currentQuestion) {
-            console.log(['more info preread']);
+            //console.log(['more info preread']);
             alexaSpeak.readMoreInfo(currentQuestion,request,response);
-            console.log(['more info postread']);
+            //console.log(['more info postread']);
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
         response.shouldEndSession(false,__('Would you like another question'))

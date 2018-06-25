@@ -23,7 +23,7 @@ export default class ProfilePage extends Component {
             },
     
         }
-       // console.log(['constr',this.state]);
+       // //console.log(['constr',this.state]);
     };
 
     
@@ -31,7 +31,7 @@ export default class ProfilePage extends Component {
         e.preventDefault();
         var that = this;
         that.setState({'warning_message':''});
-        //console.log('save user ',this.state.user);
+        ////console.log('save user ',this.state.user);
         var data = {
             '_id': this.state.user._id,
           }
@@ -60,19 +60,19 @@ export default class ProfilePage extends Component {
             key = e.target.name.slice(5);
         }
         state[key] =  e.target.value;
-       // console.log(['CHANGE',state]);
+       // //console.log(['CHANGE',state]);
         this.setState({'user':state});
         return true;
     };
     
     allowAlexa(allow) {
         if (allow) {
-            console.log('allow');
+            //console.log('allow');
             // redirect with auth code
             this.getCode();
             
         } else {
-            console.log('deny');
+            //console.log('deny');
         }
         localStorage.setItem('oauth',null);
         localStorage.setItem('oauth_request',null);
@@ -81,9 +81,9 @@ export default class ProfilePage extends Component {
     
     
     getCode() {
-        console.log('get code');
+        //console.log('get code');
         let authRequest = localStorage.getItem('oauth_request');
-        console.log([authRequest,this.props.token,this.props.user]);
+        //console.log([authRequest,this.props.token,this.props.user]);
         if (this.props.token && this.props.user && authRequest) {
             let auth =JSON.parse(authRequest);
             if (!auth) auth={};
@@ -95,7 +95,7 @@ export default class ProfilePage extends Component {
                 'scope':auth.scope,
                 'state':auth.state
               };
-              console.log(['pars',params]);
+              //console.log(['pars',params]);
             fetch('/oauth/authorize', {
               method: 'POST',
               headers: {
@@ -105,16 +105,16 @@ export default class ProfilePage extends Component {
               },
               body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
             }).then(function(response) {
-                console.log('HEADERS',response.headers.location);
+                //console.log('HEADERS',response.headers.location);
                 
                 return response.json();
                 
             }).then(function(res) {
-                console.log(['getcode response',res]);
+                //console.log(['getcode response',res]);
               
             })
             .catch(function(err) {
-                console.log(['ERR',err]);
+                //console.log(['ERR',err]);
             });
         }
   }
@@ -127,7 +127,7 @@ export default class ProfilePage extends Component {
     render() { //req,vars/
         let oauth=localStorage.getItem('oauth');
         let authRequest = localStorage.getItem('oauth_request');
-        console.log([authRequest,this.props.token,this.props.user]);
+        //console.log([authRequest,this.props.token,this.props.user]);
         let auth =JSON.parse(authRequest);
         if (!auth) auth={};
 

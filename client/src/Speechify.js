@@ -33,25 +33,25 @@ export default class Speechify extends Component {
    
 
     startRecognition() {
-        console.log('START RE');
+        //console.log('START RE');
         let that=this;
         this.recognition = new window.webkitSpeechRecognition();
         this.recognition.onstart = function(event) {
             //updateRec();
         };
         this.recognition.onresult = function(event) {
-            console.log(['ONRES',event]);
+            //console.log(['ONRES',event]);
             var text = "";
             for (var i = event.resultIndex; i < event.results.length; ++i) {
                 text += event.results[i][0].transcript;
-                console.log(['ONRES',event.results[i]]);
+                //console.log(['ONRES',event.results[i]]);
             
             }
             that.setState({recognitionText:text});
             that.stopRecognition();
         };
         this.recognition.onend = function() {
-            console.log(['ONRES',event]);
+            //console.log(['ONRES',event]);
             that.stopRecognition();
         };
         this.recognition.lang = "en-US";
@@ -59,7 +59,7 @@ export default class Speechify extends Component {
     }
 
     stopRecognition() {
-        console.log('STOP RE');
+        //console.log('STOP RE');
         if (this.recognition) {
             this.recognition.stop();
             this.recognition = null;
@@ -68,7 +68,7 @@ export default class Speechify extends Component {
     }
 
     switchRecognition() {
-             console.log('toggle');
+             //console.log('toggle');
    
         if (this.recognition) {
             this.stopRecognition();

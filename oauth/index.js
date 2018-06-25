@@ -33,4 +33,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(8000, err => (err ? console.log('Error happened', err) : console.log('Server is up')));
+app.listen(8000, err => (err ? //console.log('Error happened', err) : //console.log('Server is up')));

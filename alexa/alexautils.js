@@ -78,7 +78,7 @@ alexaUtils={
         }
     },
     moreInfo: function (question) {
-        console.log(['more info',question]);
+        //console.log(['more info',question]);
         if (question) {
             // if there is a specific answer that has been used as short form, return whole answer
             // otherwise strip first sentence and trailing commentary

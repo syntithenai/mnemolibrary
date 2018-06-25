@@ -26,7 +26,7 @@ class Navigation extends Component {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse" id="navbarCollapse">
-            <ul className="navbar-nav mr-auto" onClick={(e) => console.log(this)} data-view="home">
+            <ul className="navbar-nav mr-auto" onClick={(e) => //console.log(this)} data-view="home">
               <li className="nav-item active dropdown">
                 <a className="nav-link dropdown-toggle expanded" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" href="#">Learn <span className="sr-only">(current)</span></a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -56,7 +56,7 @@ class Navigation extends Component {
 
 class App extends Component {
   constructor(props) {
-      console.log('APP CONSTRUCT')
+      //console.log('APP CONSTRUCT')
       super(props);
       this.state = {
           title : "Mnemo Learning",
@@ -70,13 +70,13 @@ class App extends Component {
   
   componentDidMount() {
       const that = this
-      console.log('APP DID MOUNT')
+      //console.log('APP DID MOUNT')
       fetch('/mnemonics.json')
       .then(function(response) {
-          console.log(['fetched',response])
+          //console.log(['fetched',response])
         return response.json()
       }).then(function(json) {
-        console.log(['parsed json',json])
+        //console.log(['parsed json',json])
         var quizzes = {}
         var tags = {}
         // collate quizzes and tags
@@ -84,11 +84,11 @@ class App extends Component {
             var id = json['questions'][question].ID
             var quizList = json['questions'][question].quiz.split(',');
             var tagList = json['questions'][question].tags; //.split(',')
-            //console.log(["COLLATE",id,quizList,tagList]);
+            ////console.log(["COLLATE",id,quizList,tagList]);
             for (var quizKey in quizList) {
                 var quiz = quizList[quizKey];
                 if (! (Array.isArray(quizzes[quiz]))) {
-                    console.log('setup quiz ' + quiz);
+                    //console.log('setup quiz ' + quiz);
                     quizzes[quiz] = []
                 }
                 quizzes[quiz].push(id);
@@ -108,21 +108,21 @@ class App extends Component {
     
         
         
-        console.log(['SETSTATE',{'questions':json['questions'],'quizzes':quizzes,'tags':words}]);
+        //console.log(['SETSTATE',{'questions':json['questions'],'quizzes':quizzes,'tags':words}]);
         that.setState({'questions':json['questions'],'quizzes':quizzes,'tags':words});
       }).catch(function(ex) {
-        console.log(['parsing failed', ex])
+        //console.log(['parsing failed', ex])
       })
       
   }
   
   componentDidUpdate() {
-      console.log('APP DID UPDATE')
+      //console.log('APP DID UPDATE')
       
   };
     
   render() {
-      console.log('APP RENDER')
+      //console.log('APP RENDER')
     const questions = this.state.questions
     //const tags = this.state.tags
     const quizzes = this.state.quizzes
