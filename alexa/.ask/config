@@ -1,7 +1,7 @@
 {
   "deploy_settings": {
     "default": {
-      "skill_id": "amzn1.ask.skill.2a9c3154-ef50-49fa-9bed-bb95d157f071",
+      "skill_id": "amzn1.ask.skill.5e58e74e-996e-40ee-b74e-4c7b71cd0506",
       "was_cloned": false,
       "merge": {
         "manifest": {
@@ -18,7 +18,7 @@
       "in_skill_products": []
     },
     "__ENVIRONMENT_ASK_PROFILE__": {
-      "skill_id": "amzn1.ask.skill.2a9c3154-ef50-49fa-9bed-bb95d157f071",
+      "skill_id": "amzn1.ask.skill.5e58e74e-996e-40ee-b74e-4c7b71cd0506",
       "was_cloned": false,
       "merge": {
         "manifest": {

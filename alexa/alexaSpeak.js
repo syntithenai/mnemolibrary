@@ -49,7 +49,7 @@ let alexaSpeak = {
                 response.pause('800ms').say(__('The answer is ')).pause('200ms').say(alexaUtils.speakable(alexaUtils.answer(question)));
             }
             if (question.mnemonic) {
-                response.pause('800ms').say(__('The mnemonic is ')).pause('200ms').say(alexaUtils.speakable(question.mnemonic)).pause('200ms')
+                response.pause('800ms').say(__('The mnemonic is ')).pause('200ms').prosody({rate: 'slow'},alexaUtils.speakable(question.mnemonic)).pause('200ms')
             }
             //response.pause('10000ms');
             responser.say(response.ssml());
@@ -102,11 +102,13 @@ let alexaSpeak = {
         }
     },
 
-    readMnemonic: function (question,request,response) {
+    readMnemonic: function (question,request,responser) {
+        var response = new AmazonSpeech()
         if (question) {
             let mnemonic = question.mnemonic ? question.mnemonic : '';
-            response.say(alexaUtils.speakable(mnemonic));
+            response.prosody({rate: 'slow'},alexaUtils.speakable(mnemonic));
         }
+        responser.say(response.ssml());
     },
     askQuestion: function (question,request,responser) {
         var response = new AmazonSpeech()
@@ -120,7 +122,7 @@ let alexaSpeak = {
                 response.say(alexaUtils.speakable(question.question))
             }
         }
-       // response.say("<audio src='https://s3.amazonaws.com/ask-soundlibrary/foley/amzn_sfx_clock_ticking_long_01.mp3'/>");
+        response.audio("https://s3.amazonaws.com/ask-soundlibrary/foley/amzn_sfx_clock_ticking_long_01.mp3");
         response.pause('500ms');
         if (alexaUtils.canAnswer(question)) {
             response.say(__('what is the answer ?'))

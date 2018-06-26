@@ -172,9 +172,10 @@ let intentHandlers ={
         var aResponse = new AmazonSpeech()
         // clear session.confirmAction
          let session = request.getSession();
-        session.set('denyAction',null)
+        session.set('denyAction','repeat_question')
         session.set('confirmAction','more_time')
-        aResponse.pause('2000ms');
+        aResponse.audio("https://s3.amazonaws.com/ask-soundlibrary/foley/amzn_sfx_clock_ticking_long_01.mp3");
+        aResponse.audio("https://s3.amazonaws.com/ask-soundlibrary/foley/amzn_sfx_clock_ticking_long_01.mp3");
         aResponse.say('Do you still need more time?');
         response.say(aResponse.ssml());
         response.shouldEndSession(false,__('Do you still need more time?'))
@@ -229,6 +230,7 @@ let intentHandlers ={
                 // mark question as seen
                 databaseFunctions.logStatus(db,database,'seen',question._id,request,response);
                 if (alexaUtils.moreInfo(question).length == 0) {
+                    response.say(__('Do you want another question'));
                     response.shouldEndSession(false,__('Do you want another question'))
                     session.set('confirmAction','discover')
                     session.set('denyAction','bye')
@@ -649,6 +651,7 @@ let intentHandlers ={
         if (currentQuestion) {
             alexaSpeak.readAnswer(currentQuestion,request,response);
             if (alexaUtils.moreInfo(currentQuestion).length==0) {
+                response.say(__('Do you want another question'))
                 response.shouldEndSession(false,__('Do you want another question'))
                 session.set('confirmAction','next_question')
                 session.set('denyAction','bye')
@@ -844,6 +847,7 @@ let intentHandlers ={
         response.shouldEndSession(false,__('Do you want another question'))
     },
     login: function(request,response) {
+        response.say(__('Check your Alexa app for a card to login'))
         response.linkAccount();
     }
     //// search by asking question
