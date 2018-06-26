@@ -752,6 +752,18 @@ router.post('/import', (req, res) => {
                         } else {
                             record.ok_for_alexa=true
                         }
+                        record.answer = record.answer.replace('"','');
+                        record.answer = record.answer.replace('"','');
+                        record.answer = record.answer.replace('"','');
+                        record.answer = record.answer.replace('"','');
+                        record.answer = record.answer.replace('"','');
+                        record.answer = record.answer.replace('"','');
+                        record.answer = record.answer.replace('"','');
+                        record.answer = record.answer.replace('"','');
+                        record.answer = record.answer.replace('"','');
+                       //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
+                       //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
+                       //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
                         // remove and restore id to allow update
                         let thePromise = null;
                         // convert to ObjectId or create new 
@@ -968,6 +980,7 @@ router.post('/discover', (req, res) => {
             }
         });
     } else {
+        criteria.push({'difficulty': {$eq: '2'}});
         criteria.push({access :{$eq:'public'}});
         discoverQuery();
     }

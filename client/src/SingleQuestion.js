@@ -310,7 +310,7 @@ export default class SingleQuestion extends Component {
                         <h4 className="card-title">{header}?</h4>
                         <div className="card-block">
                             {(this.isVisible('media') ) && question.mediaattribution  && <div className="card-block mediaattribution">
-                            <div  className='card-text'><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
+                            <div  className='card-text ' style={{fontSize:'0.85em'}}><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
                         </div>}
                         <div ref={(section) => { this.scrollTo.media = section; }} ></div>
                         {((this.isVisible('media')) && question.media) && <span>
@@ -324,12 +324,16 @@ export default class SingleQuestion extends Component {
                             <div  className='card-text'><b>Answer</b><br/> <span className='shortanswer' style={{fontWeight:'bold',fontSize:'1.1em'}} >{question.shortanswer}</span></div>
                             <div  className='card-text'><span><pre>{question.answer}</pre></span></div>
                         </div>}
-                        {(this.isVisible('answer') || !showRecallButton) && question.link && <b style={{fontSize:'0.85em'}}>From <a href={question.link} target='_new' >{shortLink}</a></b>}
-                        <div ref={(section) => { this.scrollTo.moreinfo = section; }} ><br/></div>
+                        
+                        
+                        <div  className='card-text' style={{fontSize:'0.85em'}}>
+                        {(this.isVisible('answer') || !showRecallButton) && question.link && <b >From <a href={question.link} target='_new' >{shortLink}</a></b>}
                        
-                        {(this.isVisible('answer') || !showRecallButton) && question.attribution && <div className="card-block answer">
-                            <div  className='card-text'><b >Attribution/Source</b> <span >{attribution}</span></div>
-                        </div>}
+                        {(this.isVisible('answer') || !showRecallButton) && question.attribution && 
+                            <div><b >Attribution/Source</b> <span >{attribution}</span></div>
+                        }
+                        </div>
+                        <br/>
                         
                         <div ref={(section) => { this.scrollTo.tags = section; }} ></div>
                         {((this.isVisible('tags')  && showRecallButton) && question.quiz) && <div className="card-block topic">
@@ -355,6 +359,8 @@ export default class SingleQuestion extends Component {
                        
                     </Swipeable>
                     <br/>
+                     <div ref={(section) => { this.scrollTo.moreinfo = section; }} ><br/></div>
+                       
                     <div className="card-block">
                          {(this.isVisible('moreinfo') && !target) && <div className="holds-the-iframe"><iframe className='wikiiframe'  src={link} style={{width:"98%", height: "1200px", border: "0px"}}/></div> }                
                     </div>
@@ -364,7 +370,7 @@ export default class SingleQuestion extends Component {
                         <div ref={(section) => { this.scrollTo.image = section; }} ></div>
                         {((this.isVisible('image') || !showRecallButton) && question.image) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></a></span> }
                         {(this.isVisible('image') || !showRecallButton) && question.imageattribution && <div className="card-block imageattribution">
-                            <div  className='card-text'><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div>
+                            <div  className='card-text' style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div>
                         </div>}
 
                     </div>
