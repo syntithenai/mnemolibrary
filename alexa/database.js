@@ -172,7 +172,7 @@ let databaseFunctions = {
                // //console.log(['filter',tagFilter,topicFilter]);
                 criteria.push({ok_for_alexa :{$eq:true}});
                 sortFilter[orderBy]=-1;
-                sortFilter['successRate']=1;
+                sortFilter['successRate']=-1;
                 
                 if (user) {
                     //console.log('nextDiscoveryQuestion have user');

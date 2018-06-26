@@ -879,8 +879,8 @@ router.post('/discover', (req, res) => {
     let criteria = [];
     
     function discoverQuery() {
-        sortFilter[orderBy]=-1;
-        sortFilter['successRate']=1;
+        //sortFilter[orderBy]=-1;
+        sortFilter['successRate']=-1;
         console.log(['disco criteria',JSON.stringify(criteria)]);
         db.collection('questions').find({$and:criteria})
         //db.collection('questions').aggregate({$match:{$nin:notThese}})
