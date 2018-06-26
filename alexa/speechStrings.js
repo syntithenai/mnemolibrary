@@ -67,7 +67,7 @@ let speechStrings={
     
     'Would you like to login?':['Do you want to sign in?','OK to login?'],
     
-    "You've finished this review set. Do you want to review more or discover new questions":['All done. Do you want to keep going or switch to discovery'],
+    "You've finished this review set. Do you want to review more or discover new questions":['All done. Do you want to continue review or switch to discovery'],
     
     
     'Ok blocked. ':["Done. You won't hear that one again.","Killed it."],

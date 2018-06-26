@@ -426,7 +426,7 @@ let intentHandlers ={
                     if (alexaUtils.canAnswer(question)) {
                         response.shouldEndSession(false,__('what is the answer ?'))
                         session.set('confirmAction','recall')
-                        session.set('denyAction','next_question')
+                        session.set('denyAction','answerandmnemonic')
                     } else {
                         response.shouldEndSession(false,__('Do you remember ?'))
                         session.set('confirmAction','recall')
