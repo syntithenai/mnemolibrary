@@ -235,7 +235,7 @@ let databaseFunctions = {
          ////console.log('review');
          let session = request.getSession();
                     
-         let limit=3;
+         let limit=10;
          let orderBy = 'timeScore'
          let orderMeBy = {};
          orderMeBy[orderBy] = 1;          
