@@ -45,11 +45,18 @@ The application supports import of questions from a Google spreadsheet. Administ
 
 
 
+## NPM management
 
+bad packages will crash container so need to start manually to allow npm install
+
+docker stop syn; docker rm syn; docker run --name syn -it -v /var/docker/mnemolibrary:/usr/src/app  --entrypoint /bin/bash syntithenai/nemo 
 
 
 
 ## Backup
+
+
+
 
 A backup script is included in this repository that will create a backup and upload it to Amazon S3.
 

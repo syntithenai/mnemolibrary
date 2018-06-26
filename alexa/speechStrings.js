@@ -56,7 +56,7 @@ let speechStrings={
     
     'No questions matching tag ':["Not a tag to be found matching "],
     
-    "Starting review with ":['Kicking off a review with ','Ready to quiz you on ',"Starting review, may the force be with you"],
+    "Starting review with ":['Kicking off a review with ','Ready to quiz you on ',"Starting review. may the force be with you. "],
     
     ' available for review ':[' ready for review ',' to be reviewed '],
     
