@@ -135,6 +135,12 @@ let intentHandlers ={
                 ////console.log('confirm action exists');
                 return intentHandlers[confirmAction](request,response)
             }
+        } else {
+            response.say(__('Do you want another question'))
+            response.shouldEndSession(false,__('Do you want another question'))
+            session.set('confirmAction','next_question')
+            session.set('denyAction','bye')
+            return response.send();  
         }
     },
     no: function(request,response) {
@@ -419,6 +425,7 @@ let intentHandlers ={
                     databaseFunctions.logStatus(db,database,'seen',question._id,request,response);
                     if (alexaUtils.canAnswer(question)) {
                         response.shouldEndSession(false,__('what is the answer ?'))
+                        session.set('confirmAction','recall')
                         session.set('denyAction','next_question')
                     } else {
                         response.shouldEndSession(false,__('Do you remember ?'))
