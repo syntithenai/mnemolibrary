@@ -113,7 +113,7 @@ let intentHandlers ={
             if (user) {
                 // intentHandlers.yes(request,response);
                  let nameParts=user.name.split(' ');
-                 response.say(__('Hi ')+alexaUtils.speakable(nameParts[0])+". "+reprompt);
+                 response.say(__('Hi ')+' '+alexaUtils.speakable(nameParts[0])+". "+reprompt);
                  response.shouldEndSession(false, reprompt )
                  return response.send();
             } else {

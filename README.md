@@ -52,6 +52,21 @@ bad packages will crash container so need to start manually to allow npm install
 docker stop syn; docker rm syn; docker run --name syn -it -v /var/docker/mnemolibrary:/usr/src/app  --entrypoint /bin/bash syntithenai/nemo 
 
 
+# Skill config
+endpoint https://alexa.mnemolibrary.com/mnemoslibrary
+
+
+https://mnemolibrary.com/?oauth=alexa
+https://auth.mnemolibrary.com/oauth/token
+application/secret
+
+http basic
+
+profile
+
+home.syntithenai.com
+auth.mnemolibrary.com
+
 
 ## Backup
 

@@ -174,7 +174,11 @@ router.get('/dumpalexa',(req,res) => {
                                 if (!fs.existsSync(TMP_PATH+'/alexa/.ask')) {
                                     fs.mkdirSync(TMP_PATH+'/alexa/.ask');
                                 }
-                                fs.copyFileSync(ROOT_APP_PATH+'/alexa/skill.json',TMP_PATH+'/alexa/skill.json');
+                                if (config.development) {
+                                    fs.copyFileSync(ROOT_APP_PATH+'/alexa/skill.dev.json',TMP_PATH+'/alexa/skill.json');
+                                } else {
+                                    fs.copyFileSync(ROOT_APP_PATH+'/alexa/skill.live.json',TMP_PATH+'/alexa/skill.json');
+                                }
                                 if (config.development) {
                                     fs.copyFileSync(ROOT_APP_PATH+'/alexa/.ask/config-dev',TMP_PATH+'/alexa/.ask/config');
                                 } else {
