@@ -450,7 +450,9 @@ let intentHandlers ={
         session.set('denyAction',null)
         let currentQuestion = session.get('currentQuestion');
         return databaseFunctions.getUser(db,database,request,response).then(function(user) {
+            console.log(['really block',user]);
             if (user && user._id) {
+                console.log(['really block',currentQuestion]);
                 databaseFunctions.blockQuestion(db,database,user._id,currentQuestion._id,currentQuestion.quiz);
                 response.say(__('Ok blocked. '));// //console.log('recall');
                 return intentHandlers.next_question(request,response);
