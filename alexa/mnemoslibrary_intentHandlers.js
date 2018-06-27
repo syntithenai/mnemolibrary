@@ -788,10 +788,15 @@ let intentHandlers ={
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
             alexaSpeak.askQuestion(currentQuestion,request,response);
-             response.shouldEndSession(false,__('Would you like another question'))
-             session.set('confirmAction','next_question')
-            session.set('denyAction','bye')
-        
+            if (alexaUtils.canAnswer(question)) {
+                response.shouldEndSession(false,__('what is the answer ?'))
+                session.set('confirmAction','recall')
+                session.set('denyAction','answerandmnemonic')
+            } else {
+                response.shouldEndSession(false,__('Do you remember ?'))
+                session.set('confirmAction','recall')
+                session.set('denyAction','answerandmnemonic')
+            }        
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {
             response.say(__('No current question. Would you like to hear one'));
