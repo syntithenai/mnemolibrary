@@ -62,21 +62,24 @@ app.intent("recall", {
     "utterances": ["recall","i recall","remember","i remember","i remember that"]
   },intentHandlers.recall
 );
+//, THELASTWORD: "mnemonicLastWords"
+//,"the last word  is {-|THELASTWORD}"
 app.intent("mnemonic_is", {
-    "slots": { THEMNEMONIC:"mnemonics", THELASTWORD: "mnemonicLastWords"},
-    "utterances": ["the mnemonic is {-|THEMNEMONIC} ","the last word of {the |} mnemonic is {-|THEMNEMONIC} ","the last word  is {-|THELASTWORD}"]
+    "slots": { THEMNEMONIC:"mnemonics"},  
+    "utterances": ["the mnemonic is {-|THEMNEMONIC} ","the memory aid is {-|THEMNEMONIC} "] 
   },intentHandlers.mnemonic_is
-);
+); 
+//,"{-|THEANSWER}"
 app.intent("answer_is", {
     "slots": { THEANSWER:"answers"},
-    "utterances": ["the {answer|solution} is {-|THEANSWER}"]  //,"{-|THEANSWER}"
+    "utterances": ["the {answer|solution} is {-|THEANSWER}"]  
   },intentHandlers.answer_is
 );
-app.intent("spelling_is", {
-    "slots": { THEANSWERASLETTERS:"spelledWords"},
-    "utterances": ["{it|the answer|answer} is {spelled|spelt|written} {-|THEANSWERASLETTERS}"]
-  },intentHandlers.spelling_is
-);
+//app.intent("spelling_is", {
+    //"slots": { THEANSWERASLETTERS:"spelledWords"},
+    //"utterances": ["{it|the answer|answer} is {spelled|spelt|written} {-|THEANSWERASLETTERS}"]
+  //},intentHandlers.spelling_is
+//);
 
 // SPEAK QUESTION ELEMENTS
 app.intent("answer", {

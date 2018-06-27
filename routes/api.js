@@ -139,7 +139,7 @@ router.get('/dumpalexa',(req,res) => {
                             let mnemonicsLastWordsO={};
                             results.map(function(val,key) {
                                 if (val && val.length > 0)  {
-                                    val = munge(val);
+                                    val = alexaUtils.strip(munge(val));
                                     if (val.length > 0) {
                                         mnemonicsO[val.slice(0,139)]=true;  // alexa limit 140 char
                                         let parts = val.split(' ');
@@ -164,7 +164,9 @@ router.get('/dumpalexa',(req,res) => {
                                 interrogatives = Object.keys(interrogativesO);
                                 //,questions:questions,interrogatives:interrogatives
                                 //
-                                let allDone = {topics:topics,tags:tags,mnemonics:mnemonics,mnemonicLastWords:mnemonicLastWords,answers:answers,spelledWords:spelledWords};
+                                let allDone = {topics:topics,tags:tags,mnemonics:mnemonics,answers:answers}; //,spelledWords:spelledWords  ,mnemonicLastWords:mnemonicLastWords
+                                //let allDone = {};
+                                console.log(JSON.stringify(allDone));
                                 if (!fs.existsSync(TMP_PATH+'/alexa')) {
                                     fs.mkdirSync(TMP_PATH+'/alexa');
                                 }
@@ -213,16 +215,16 @@ router.get('/dumpalexa',(req,res) => {
                                         // copy directory, even if it has subdirectories or files
                                         const fse = require('fs-extra')
                                         fse.copySync(TMP_PATH+'/alexa', ROOT_APP_PATH+'/alexa')
-                                        var exec = require('child_process').exec;
-                                        exec('ask deploy --no-wait', {
-                                          cwd: ROOT_APP_PATH+'/alexa'
-                                        }, function(error, stdout, stderr) {
-                                          // work with result
-                                          console.log(error);
-                                          console.log(stderr);
-                                          console.log(stdout);
-                                          console.log('done');
-                                        });
+                                        //var exec = require('child_process').exec;
+                                        //exec('ask deploy --no-wait', {
+                                          //cwd: ROOT_APP_PATH+'/alexa'
+                                        //}, function(error, stdout, stderr) {
+                                          //// work with result
+                                          //console.log(error);
+                                          //console.log(stderr);
+                                          //console.log(stdout);
+                                          //console.log('done');
+                                        //});
                                         res.send({ok:true});
                                     });
                                     
