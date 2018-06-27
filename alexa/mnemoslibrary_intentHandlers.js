@@ -788,7 +788,7 @@ let intentHandlers ={
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
             alexaSpeak.askQuestion(currentQuestion,request,response);
-            if (alexaUtils.canAnswer(question)) {
+            if (alexaUtils.canAnswer(currentQuestion)) {
                 response.shouldEndSession(false,__('what is the answer ?'))
                 session.set('confirmAction','recall')
                 session.set('denyAction','answerandmnemonic')
