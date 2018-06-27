@@ -393,8 +393,8 @@ let databaseFunctions = {
     },
     
     blockQuestion: function(db,database,user,question,topic) {
-        console.log(['block',user,question,topic]);
-        if (user && user._id) {
+        console.log(['block now',user,question,topic]);
+        if (user) {
             db.collection('userquestionprogress').findOne({$and:[{'user': {$eq:ObjectId(user)}},{question:{$eq:ObjectId(question)}} ]}).then(function(progress) {
                     if (progress) {
                         console.log(['block update progress',progress]);
