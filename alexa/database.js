@@ -397,6 +397,7 @@ let databaseFunctions = {
         if (user && user._id) {
             db.collection('userquestionprogress').findOne({$and:[{'user': {$eq:ObjectId(user)}},{question:{$eq:ObjectId(question)}} ]}).then(function(progress) {
                     if (progress) {
+                        console.log(['block update progress',progress]);
                         // OK
                         progress.block = 1; //new Date().getTime();
                         progress.topic = topic;
@@ -407,6 +408,7 @@ let databaseFunctions = {
                           progress = {'user':ObjectId(user),question:ObjectId(question)};
                           progress.block = 1; //new Date().getTime();
                           progress.topic = topic;
+                          console.log(['block create progress',progress]);
                           db.collection('userquestionprogress').save(progress).then(function() {
                             //  //console.log(['insert',progress]);
                         });
