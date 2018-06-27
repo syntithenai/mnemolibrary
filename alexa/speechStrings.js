@@ -73,7 +73,7 @@ let speechStrings={
     'Ok blocked. ':["Done. You won't hear that one again.","Killed it."],
     'Do you really want to block this question':["Are you sure you never ever ever want to hear this question again."],
     
-    'what is the answer ?':['Can you tell me the answer','The answer is '],
+    'what is the answer ?':['Can you tell me the answer','The answer is ?'],
     'Do you remember ?':['Do you recall?','Do you know?','Can you remember ?'],
     // commendations !!! 
     " is correct":[' is right.',' is the right answer.',' is spot on.',' is on the dot.',' is what I was looking for.'],
