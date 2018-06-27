@@ -758,15 +758,17 @@ router.post('/import', (req, res) => {
                         } else {
                             record.ok_for_alexa=true
                         }
-                        record.answer = record.answer.replace('"','');
-                        record.answer = record.answer.replace('"','');
-                        record.answer = record.answer.replace('"','');
-                        record.answer = record.answer.replace('"','');
-                        record.answer = record.answer.replace('"','');
-                        record.answer = record.answer.replace('"','');
-                        record.answer = record.answer.replace('"','');
-                        record.answer = record.answer.replace('"','');
-                        record.answer = record.answer.replace('"','');
+                        record.answer = record.answer.replace('""','"');
+                        record.answer = record.answer.replace('""','"');
+                        record.answer = record.answer.replace('""','"');
+                        record.answer = record.answer.replace('""','"');
+                        record.answer = record.answer.replace('""','"');
+                        record.answer = record.answer.replace('""','"');
+                        record.answer = record.answer.replace('""','"');
+                        record.answer = record.answer.replace('""','"');
+                        record.answer = record.answer.replace('""','"');
+                        record.answer = record.answer.replace('""','"');
+                        
                        //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
                        //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
                        //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
