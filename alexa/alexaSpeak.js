@@ -7,7 +7,7 @@ let alexaSpeak = {
 
     askNextAction(question,request,responser) {
         var response = new AmazonSpeech()
-        response.pause('3000ms');
+        response.pause('1800ms');
         let session = request.getSession();
         if (session.get('mode')==='review' ) {
             alexaSpeak.askQuestion(question,request,responser);
