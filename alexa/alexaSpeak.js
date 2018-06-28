@@ -5,12 +5,12 @@ var AmazonSpeech = require('ssml-builder/amazon_speech');
 
 let alexaSpeak = {    
 
-    askNextAction(request,responser) {
+    askNextAction(question,request,responser) {
         var response = new AmazonSpeech()
         response.pause('3000ms');
         let session = request.getSession();
         if (session.get('mode')==='review' ) {
-            alexaSpeak.askQuestion(request,responser);
+            alexaSpeak.askQuestion(question,request,responser);
         } else {
             response.say(__('Do you want another question?'))
             responser.shouldEndSession(false,__('Do you want another question?'))

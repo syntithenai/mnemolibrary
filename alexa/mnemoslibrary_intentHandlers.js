@@ -724,7 +724,7 @@ let intentHandlers ={
         if (currentQuestion) {
 //            if (session.get('mode')==="review") {
                 alexaSpeak.readQuestionLetters(currentQuestion,request,response);
-                alexaSpeak.askNextAction(request,response);
+                alexaSpeak.askNextAction(currentQuestion,request,response);
             //} else {
                 //alexaSpeak.readAnswerLetters(currentQuestion,request,response);
                 //session.set('confirmAction','next_question')
@@ -751,7 +751,7 @@ let intentHandlers ={
         if (currentQuestion) {
             //console.log(['more info preread']);
             alexaSpeak.readMoreInfo(currentQuestion,request,response);
-            alexaSpeak.askNextAction(request,response);
+            alexaSpeak.askNextAction(currentQuestion,request,response);
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {
             response.say(__('No current question. Would you like to hear one'));
@@ -769,7 +769,7 @@ let intentHandlers ={
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
             alexaSpeak.readMnemonic(currentQuestion,request,response);
-            alexaSpeak.askNextAction(request,response);
+            alexaSpeak.askNextAction(currentQuestion,request,response);
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {
             response.say(__('No current question. Would you like to hear one'));
@@ -787,7 +787,7 @@ let intentHandlers ={
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
             alexaSpeak.sayQuestion(currentQuestion,request,response);
-            alexaSpeak.askNextAction(request,response);
+            alexaSpeak.askNextAction(currentQuestion,request,response);
                     
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {
@@ -820,7 +820,7 @@ let intentHandlers ={
         
         response.card("Visit Mnemo's Library","(copy and paste)  \n\n https://mnemolibrary.com ");
         response.say(__("Sure. Check your Alexa app for a card with a link"));
-        alexaSpeak.askNextAction(request,response);
+        alexaSpeak.askNextAction(currentQuestion,request,response);
         
     },
     show_image:  function(request,response) {
@@ -841,7 +841,7 @@ let intentHandlers ={
                 response.say(__("Sadly there's no image for this question"));                
             }
         } 
-        alexaSpeak.askNextAction(request,response);
+        alexaSpeak.askNextAction(currentQuestion,request,response);
        
     },
     login: function(request,response) {
