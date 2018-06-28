@@ -786,8 +786,12 @@ let intentHandlers ={
         
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
-            alexaSpeak.sayQuestion(currentQuestion,request,response);
-            alexaSpeak.askNextAction(currentQuestion,request,response);
+            if (session.get('mode')==='review') {
+                alexaSpeak.askQuestion(currentQuestion,request,response);
+            } else {
+                alexaSpeak.sayQuestion(currentQuestion,request,response);
+                alexaSpeak.askNextAction(currentQuestion,request,response);                
+            }
                     
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {

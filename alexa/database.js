@@ -434,7 +434,7 @@ let databaseFunctions = {
                         db.collection('questions').update({_id: ObjectId(question)},{$set:data}).then(function(qres) {
                            // //console.log(['saved question',qres]);
                         });
-                        databaseFunctions.updateUserQuestionProgress(db,database,user,question,result.quiz,result.tags,tallySuccess);
+                        databaseFunctions.updateUserQuestionProgress(db,database,user,question,result.quiz,result.tags,result.ok_for_alexa,tallySuccess);
                     }
             }).catch(function(e) {
                 //console.log(['update q err',e]);
@@ -445,7 +445,7 @@ let databaseFunctions = {
     },
 
     // update per user progress stats into the userquestionprogress collection
-    updateUserQuestionProgress: function (db,database,user,question,quiz,tags,tallySuccess) {
+    updateUserQuestionProgress: function (db,database,user,question,quiz,tags,ok_for_alexa,tallySuccess) {
         ////console.log('UUQP');
         db.collection('userquestionprogress').findOne({$and:[{'user': {$eq:ObjectId(user)}},{question:ObjectId(question)} , {block:{ $not: { $gt: 0 } }}]}).then(function(progress) {
             if (!progress) progress = {user:ObjectId(user),question:ObjectId(question)};

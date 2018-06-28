@@ -1321,7 +1321,7 @@ function updateQuestionTallies(user,question,tallySuccess=false) {
                 db.collection('questions').update({_id: question},{$set:data}).then(function(qres) {
                    // //console.log(['saved question',qres]);
                 });
-                updateUserQuestionProgress(user,question,result.quiz,result.tags,tallySuccess);
+                updateUserQuestionProgress(user,question,result.quiz,result.tags,result.ok_for_alexa,tallySuccess);
             }
     }).catch(function(e) {
         //console.log(['update q err',e]);
@@ -1331,12 +1331,12 @@ function updateQuestionTallies(user,question,tallySuccess=false) {
 }
 
 // update per user progress stats into the userquestionprogress collection
-function updateUserQuestionProgress(user,question,quiz,tags,tallySuccess) {
+function updateUserQuestionProgress(user,question,quiz,tags,ok_for_alexa,tallySuccess) {
     db.collection('userquestionprogress').findOne({$and:[{'user': {$eq:ObjectId(user)}},{question:ObjectId(question)} , {block:{ $not: { $gt: 0 } }}]}).then(function(progress) {
         if (!progress) progress = {user:ObjectId(user),question:ObjectId(question)};
         progress.topic=quiz;
         progress.tags=tags;
-        progress.ok_for_alexa=ok_for_alexa
+        progress.ok_for_alexa=ok_for_alexa;
         progress.seenTally = progress.seenTally ? parseInt(progress.seenTally,10) + 1 : 1;
         progress.seen = new Date().getTime();
         if (tallySuccess) {
