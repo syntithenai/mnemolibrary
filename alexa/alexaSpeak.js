@@ -5,6 +5,21 @@ var AmazonSpeech = require('ssml-builder/amazon_speech');
 
 let alexaSpeak = {    
 
+    askNextAction(request,responser) {
+        var response = new AmazonSpeech()
+        response.pause('3000ms');
+        let session = request.getSession();
+        if (session.get('mode')==='review' ) {
+            alexaSpeak.askQuestion(request,responser);
+        } else {
+            response.say(__('Do you want another question?'))
+            responser.shouldEndSession(false,__('Do you want another question?'))
+            session.set('confirmAction','next_question')
+            session.set('denyAction','bye')
+        } 
+        responser.say(response.ssml());
+    },
+
     // VIEWS
     readQuestion: function (question,request,responser) {
         var response = new AmazonSpeech()
@@ -29,6 +44,21 @@ let alexaSpeak = {
                 response.pause('800ms').say(__('The mnemonic is ')).pause('200ms').say(alexaUtils.speakable(question.mnemonic)).pause('200ms')
             }
             //response.pause('10000ms');
+            responser.say(response.ssml());
+        }
+    },
+    // short form
+    sayQuestion: function (question,request,responser) {
+        var response = new AmazonSpeech()
+        if (question) {
+            if (question.specific_question) {
+                response.say(alexaUtils.speakable(question.specific_question)+".")
+            } else if (question.question) {
+                if (question.interrogative) {
+                    response.say(alexaUtils.speakable(question.interrogative))
+                }
+                response.say(alexaUtils.speakable(question.question)+".")
+            }
             responser.say(response.ssml());
         }
     },

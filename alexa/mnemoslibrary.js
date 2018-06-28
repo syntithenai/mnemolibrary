@@ -106,7 +106,7 @@ app.intent("block_question", {
 
 app.intent("mnemonic", {
     "slots": { },
-    "utterances": ["mnemonic","what is the mnemonic"]
+    "utterances": ["mnemonic","what is the mnemonic","what is the memory aid","give me a clue"]
   },intentHandlers.mnemonic
 );
 
@@ -174,9 +174,10 @@ app.intent("AMAZON.StopIntent", {
     "slots": {},
     "utterances": ['stop']
   }, function(request, response) {
-    var stopOutput = __("Ok.");
-    response.say(stopOutput).shouldEndSession(false,__('What next ?'));
-    
+    //var stopOutput = __("Ok.");
+    //response.say(stopOutput).say(__('Do you want another question?')).shouldEndSession(false,__('Do you want another question?'));
+    var cancelOutput = __("Bye.");
+    response.say(cancelOutput).shouldEndSession(true);
   }
 );
 
@@ -185,7 +186,7 @@ app.intent("AMAZON.CancelIntent", {
     "utterances": ['cancel','exit','quit','die','go away']
   }, function(request, response) {
     var cancelOutput = __("Bye.");
-    response.say(cancelOutput);
+    response.say(cancelOutput).shouldEndSession(true);
   }
 );
 //app.intent("AMAZON.FallbackIntent", {

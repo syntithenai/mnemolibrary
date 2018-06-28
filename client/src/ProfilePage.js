@@ -191,7 +191,7 @@ export default class ProfilePage extends Component {
                                <label htmlFor="name" className='row'>Name </label><input autoComplete="false" id="name" type='text' name='name' onChange={this.change} value={this.state.user.name} />
                                 <label htmlFor="avatar" className='row'>Avatar </label><input autoComplete="false" id="avatar" type='text' name='avatar' onChange={this.change} value={this.state.user.avatar} />
                                 
-                                <label htmlFor="difficulty" className='row'>Difficulty </label><select autoComplete="false" id="difficulty"   name='difficulty' onChange={this.change} value={this.state.user.difficulty}  ><option value='0' ></option><option value='1' >Basic</option><option value='2' >Standard</option><option value='3' >Genius</option></select>
+                                <label htmlFor="difficulty" className='row'>Difficulty </label><select autoComplete="false" id="difficulty"   name='difficulty' onChange={this.change} value={this.state.user.difficulty}  ><option value='0' ></option><option value='1' >Young Learner</option><option value='2' >Adult Learner</option><option value='3' >Sage</option></select>
                                 
                                 <label htmlFor="username" className='row'>Email </label><input autoComplete="false" id="username" readOnly="true" type='text' name='username' onChange={this.change} value={this.state.user.username}  />
                                 <label htmlFor="password" className='row'>Password</label> <input  autoComplete="false" id="password" type='password' name='fake_password' onChange={this.change}  value={this.state.user.password}  />

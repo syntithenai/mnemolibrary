@@ -36,7 +36,7 @@ let speechStrings={
     
     'No current question. Would you like to hear one':[],
     
-    'Do you want another question':['Would you like another question?','Another question?',"Shall I give you another one?"],
+    'Do you want another question?':['Would you like another question?','Another question?',"Shall I give you another one?"],
     'Would you like another question':['Do you want another question?','Another question?',"Shall I give you another one?"],
     
     

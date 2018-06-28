@@ -451,6 +451,7 @@ let databaseFunctions = {
             if (!progress) progress = {user:ObjectId(user),question:ObjectId(question)};
             progress.topic=quiz;
             progress.tags=tags;
+            progress.ok_for_alexa=ok_for_alexa;
             if (!tallySuccess) {
                 progress.seenTally = progress.seenTally ? parseInt(progress.seenTally,10) + 1 : 1;
                 progress.seen = new Date().getTime();

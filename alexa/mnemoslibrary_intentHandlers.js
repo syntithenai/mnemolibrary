@@ -136,8 +136,8 @@ let intentHandlers ={
                 return intentHandlers[confirmAction](request,response)
             }
         } else {
-            response.say(__('Do you want another question'))
-            response.shouldEndSession(false,__('Do you want another question'))
+            response.say(__('Do you want another question?'))
+            response.shouldEndSession(false,__('Do you want another question?'))
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
             return response.send();  
@@ -154,8 +154,8 @@ let intentHandlers ={
                 return intentHandlers[denyAction](request,response)
             }
         } else {
-            response.say(__('Do you want another question'))
-            response.shouldEndSession(false,__('Do you want another question'))
+            response.say(__('Do you want another question?'))
+            response.shouldEndSession(false,__('Do you want another question?'))
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
             return response.send();  
@@ -230,8 +230,8 @@ let intentHandlers ={
                 // mark question as seen
                 databaseFunctions.logStatus(db,database,'seen',question._id,request,response);
                 if (alexaUtils.moreInfo(question).length == 0) {
-                    response.say(__('Do you want another question'));
-                    response.shouldEndSession(false,__('Do you want another question'))
+                    response.say(__('Do you want another question?'));
+                    response.shouldEndSession(false,__('Do you want another question?'))
                     session.set('confirmAction','discover')
                     session.set('denyAction','bye')
                     return response.send();                
@@ -553,10 +553,12 @@ let intentHandlers ={
                         };
                         response.say(alexaUtils.speakable(find) + __(" is not correct. Try again "));
                         session.set('denyAction','next_question')
+                        session.set('confirmAction','recall')
                         return intentHandlers.repeat_question(request,response);
                     } else {
                         response.say(alexaUtils.speakable(find) + __("is not correct. Try again "));
                         session.set('denyAction','next_question')
+                        session.set('confirmAction','recall')
                         return intentHandlers.repeat_question(request,response);
                     }
                 };
@@ -587,18 +589,22 @@ let intentHandlers ={
                         return checkSpecificAnswer(find,currentQuestion);
                     } else {
                         response.say(__("I can't answer this question. Just say. I recall"))
+                        session.set('denyAction','next_question')
+                        session.set('confirmAction','recall')
                         response.shouldEndSession(false)
                         //return intentHandlers.repeat_question(request,response);
                     }
                 }
             } else {
                 response.say(__("Didn't catch that. Try again"));
+                session.set('denyAction','next_question')
+                        session.set('confirmAction','recall')
                 response.shouldEndSession(false)
             }
         } else {
             response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
-            response.shouldEndSession(false,__('Do you want another question'))
+            response.shouldEndSession(false,__('Do you want another question?'))
             session.set('denyAction','bye')
         }
     },
@@ -632,6 +638,8 @@ let intentHandlers ={
             } else {
                 response.say(alexaUtils.speakable(find) + ' ' +__("is not correct. Try again ."));
                 //session.set('denyAction','next_question')
+                session.set('denyAction','next_question')
+                session.set('confirmAction','recall')
                 return intentHandlers.repeat_question(request,response);
             }
             
@@ -639,7 +647,7 @@ let intentHandlers ={
             response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,__('Do you want another question'))
+            response.shouldEndSession(false,__('Do you want another question?'))
         }
     },
     // repeat info
@@ -653,8 +661,8 @@ let intentHandlers ={
         if (currentQuestion) {
             alexaSpeak.readAnswer(currentQuestion,request,response);
             if (alexaUtils.moreInfo(currentQuestion).length==0) {
-                response.say(__('Do you want another question'))
-                response.shouldEndSession(false,__('Do you want another question'))
+                response.say(__('Do you want another question?'))
+                response.shouldEndSession(false,__('Do you want another question?'))
                 session.set('confirmAction','next_question')
                 session.set('denyAction','bye')
                 return response.send();                
@@ -671,7 +679,7 @@ let intentHandlers ={
             response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,__('Do you want another question'))
+            response.shouldEndSession(false,__('Do you want another question?'))
         }
     },
      answerandmnemonic: function(request,response) {
@@ -684,7 +692,7 @@ let intentHandlers ={
         if (currentQuestion) {
             alexaSpeak.readAnswerAndMnemonic(currentQuestion,request,response);
             if (alexaUtils.moreInfo(currentQuestion).length==0) {
-                response.shouldEndSession(false,__('Do you want another question'))
+                response.shouldEndSession(false,__('Do you want another question?'))
                 session.set('confirmAction','next_question')
                 session.set('denyAction','bye')
                 return response.send();                
@@ -701,7 +709,7 @@ let intentHandlers ={
             response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,__('Do you want another question'))
+            response.shouldEndSession(false,__('Do you want another question?'))
         }
     },
     spellthat: function(request,response) {
@@ -716,10 +724,7 @@ let intentHandlers ={
         if (currentQuestion) {
 //            if (session.get('mode')==="review") {
                 alexaSpeak.readQuestionLetters(currentQuestion,request,response);
-                session.set('confirmAction','next_question')
-                session.set('denyAction','bye')
-                response.shouldEndSession(false,__('Would you like another question'))    
-                
+                alexaSpeak.askNextAction(request,response);
             //} else {
                 //alexaSpeak.readAnswerLetters(currentQuestion,request,response);
                 //session.set('confirmAction','next_question')
@@ -732,7 +737,7 @@ let intentHandlers ={
             response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,__('Do you want another question'))
+            response.shouldEndSession(false,__('Do you want another question?'))
         }
     },
     moreinfo: function(request,response) {
@@ -746,16 +751,13 @@ let intentHandlers ={
         if (currentQuestion) {
             //console.log(['more info preread']);
             alexaSpeak.readMoreInfo(currentQuestion,request,response);
-            //console.log(['more info postread']);
-            session.set('confirmAction','next_question')
-            session.set('denyAction','bye')
-        response.shouldEndSession(false,__('Would you like another question'))
+            alexaSpeak.askNextAction(request,response);
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {
             response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,__('Do you want another question'))
+            response.shouldEndSession(false,__('Do you want another question?'))
         }
     },
     mnemonic: function(request,response) {
@@ -767,16 +769,13 @@ let intentHandlers ={
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
             alexaSpeak.readMnemonic(currentQuestion,request,response);
-            session.set('confirmAction','next_question')
-            session.set('denyAction','bye')
-        
-            response.shouldEndSession(false,__('Would you like another question'))
+            alexaSpeak.askNextAction(request,response);
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {
             response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,__('Do you want another question'))
+            response.shouldEndSession(false,__('Do you want another question?'))
         }
     },
     repeat_question: function(request,response) {
@@ -787,22 +786,15 @@ let intentHandlers ={
         
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
-            alexaSpeak.askQuestion(currentQuestion,request,response);
-            if (alexaUtils.canAnswer(currentQuestion)) {
-                response.shouldEndSession(false,__('what is the answer ?'))
-                session.set('confirmAction','recall')
-                session.set('denyAction','answerandmnemonic')
-            } else {
-                response.shouldEndSession(false,__('Do you remember ?'))
-                session.set('confirmAction','recall')
-                session.set('denyAction','answerandmnemonic')
-            }        
+            alexaSpeak.sayQuestion(currentQuestion,request,response);
+            alexaSpeak.askNextAction(request,response);
+                    
         // otherwise ask if want a new question and prime confirmAction=discover
         } else {
             response.say(__('No current question. Would you like to hear one'));
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
-            response.shouldEndSession(false,__('Do you want another question'))
+            response.shouldEndSession(false,__('Do you want another question?'))
         }
     },
     next_question: function(request,response) {
@@ -828,9 +820,7 @@ let intentHandlers ={
         
         response.card("Visit Mnemo's Library","(copy and paste)  \n\n https://mnemolibrary.com ");
         response.say(__("Sure. Check your Alexa app for a card with a link"));
-        response.shouldEndSession(false,__('Do you want another question'))
-        session.set('confirmAction','next_question')
-        session.set('denyAction','bye')
+        alexaSpeak.askNextAction(request,response);
         
     },
     show_image:  function(request,response) {
@@ -850,12 +840,14 @@ let intentHandlers ={
             } else {
                 response.say(__("Sadly there's no image for this question"));                
             }
-        }
-        response.shouldEndSession(false,__('Do you want another question'))
+        } 
+        alexaSpeak.askNextAction(request,response);
+       
     },
     login: function(request,response) {
         response.say(__('Check your Alexa app for a card to login'))
         response.linkAccount();
+        response.shouldEndSession(true);
     }
     //// search by asking question
     //why_is:  function(request,response) {
