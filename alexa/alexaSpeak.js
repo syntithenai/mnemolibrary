@@ -63,9 +63,12 @@ let alexaSpeak = {
         }
     },
 
-    readAnswer: function (question,request,response) {
+    readAnswer: function (question,request,responser) {
+        var response = new AmazonSpeech()
         response.say(__('The answer is '))
         response.say(alexaUtils.speakable(alexaUtils.answer(question)));
+        response.pause("1800ms");
+        responser.say(response.ssml());
     },
     readAnswerAndMnemonic: function (question,request,responser) {
         var response = new AmazonSpeech()
