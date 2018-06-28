@@ -212,7 +212,7 @@ app.pre = function(request, response, type) {
 app.post = function(request, response, type, exception) {
   if (exception) {
     // always turn an exception into a successful response
-    //console.log(exception);
+    console.log(exception);
     return response.clear().say(__("An error occured: ") + exception).send();
   }
 };
