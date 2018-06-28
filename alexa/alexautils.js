@@ -2,9 +2,13 @@ var removeDiacritics=require('./diacritics');
     
 alexaUtils={
     canAnswer: function(val) {
-        let answerParts=val.answer.split(' ');
-        if (answerParts.length < 5 || (val.specific_answer && String(val.specific_answer).length > 0) || (val.also_accept && String(val.also_accept).length > 0)) {
-            return true;
+        if (val && val.answer) {
+            let answerParts=val.answer.split(' ');
+            if (answerParts.length < 5 || (val.specific_answer && String(val.specific_answer).length > 0) || (val.also_accept && String(val.also_accept).length > 0)) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
