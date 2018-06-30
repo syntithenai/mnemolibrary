@@ -10,14 +10,19 @@ let alexaSpeak = {
         response.pause('1800ms');
         let session = request.getSession();
         if (session.get('mode')==='review' ) {
-            alexaSpeak.askQuestion(question,request,responser);
+            let trigger = alexaSpeak.askQuestion(question,request,responser);
+            responser.shouldEndSession(false,trigger)
+            session.set('confirmAction','recall')
+            session.set('denyAction','answerandmnemonic')
+            responser.say(response.ssml());
         } else {
             response.say(__('Do you want another question?'))
             responser.shouldEndSession(false,__('Do you want another question?'))
             session.set('confirmAction','next_question')
             session.set('denyAction','bye')
+            responser.say(response.ssml());
         } 
-        responser.say(response.ssml());
+        
     },
 
     // VIEWS
@@ -145,6 +150,7 @@ let alexaSpeak = {
     },
     askQuestion: function (question,request,responser) {
         var response = new AmazonSpeech()
+        response.pause('500ms');
         if (question.specific_question) {
             response.say(alexaUtils.speakable(question.specific_question))
         } else if (question.question) {
@@ -157,12 +163,15 @@ let alexaSpeak = {
         }
         response.audio("https://s3.amazonaws.com/ask-soundlibrary/foley/amzn_sfx_clock_ticking_long_01.mp3");
         response.pause('500ms');
+        let trigger = __('what is the answer ?');
         if (alexaUtils.canAnswer(question)) {
-            response.say(__('what is the answer ?'))
+            response.say(trigger)
         } else {
-            response.say(__('Do you remember ?'))
+            trigger = __('Do you remember ?');
+            response.say(trigger)
         }
         responser.say(response.ssml());
+        return trigger;
     }
 }
 module.exports=alexaSpeak

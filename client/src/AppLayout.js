@@ -158,7 +158,13 @@ export default class AppLayout extends Component {
   openAuth(service) {
       ////console.log(['oauth '+service]);
       let authRequest={response_type:'code',redirect_uri:this.getQueryStringValue('redirect_uri'),response_type:this.getQueryStringValue('response_type'),scope:this.getQueryStringValue('scope'),state:this.getQueryStringValue('state')}
-    
+      // force logout
+      localStorage.setItem('token','{}');
+      localStorage.setItem('user','{}');
+      this.setState({'token':'{}','user':'{}'});
+      //    this.GoogleAuth.disconnect();
+      
+      
       this.setCurrentPage('login');
       localStorage.setItem('oauth',service);
       localStorage.setItem('oauth_request',JSON.stringify(authRequest));
@@ -1263,12 +1269,19 @@ export default class AppLayout extends Component {
         return (<div>DIS</div>);
     } else {
                 
-        
+        let oauth=localStorage.getItem('oauth');
+        let authRequest = localStorage.getItem('oauth_request');
+        //console.log([authRequest,this.props.token,this.props.user]);
+        let auth =JSON.parse(authRequest);
+        if (!auth) auth={};
+
         return (
             <div className="mnemo">
             
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
                 <Navigation shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
+                
+                
                 
                 {((this.isCurrentPage('splash')) || (this.isCurrentPage('') && !this.isLoggedIn())) && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} title={title}/></div>}
                 
@@ -1349,7 +1362,7 @@ export default class AppLayout extends Component {
                 }
                 {(this.isCurrentPage('profile') || (this.isCurrentPage('')) && this.isLoggedIn()) && <ProfilePage token={this.state.token} setCurrentPage={this.setCurrentPage} setQuizFromDiscovery={this.setQuizFromDiscovery} reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
                 }
-                {(showLogin) && <LoginPage token={this.state.token} login={this.login} setCurrentPage={this.setCurrentPage}/>
+                {(showLogin || this.isCurrentPage('forcelogin')) && <LoginPage token={this.state.token} login={this.login} setCurrentPage={this.setCurrentPage}/>
                 }<br/>
                 <Footer/>
                 

@@ -824,6 +824,7 @@ let intentHandlers ={
         
         response.card("Visit Mnemo's Library","(copy and paste)  \n\n https://mnemolibrary.com ");
         response.say(__("Sure. Check your Alexa app for a card with a link"));
+        let currentQuestion = session.get('currentQuestion');
         alexaSpeak.askNextAction(currentQuestion,request,response);
         
     },
