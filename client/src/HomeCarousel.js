@@ -25,7 +25,7 @@ export default class HomeCarousel extends Component {
     </div>
     <div class="carousel-item">
       <img class="d-block w-100" src="/help/search.jpg" alt="Search" />
-      <div class="carousel-caption d-none d-md-block">
+      <div class="carousel-caption d-none d-md-block" >
             <h5>Search</h5>
             <p> content by topic, tag, or keyword.</p>
         </div>
