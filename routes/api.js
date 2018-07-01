@@ -286,9 +286,13 @@ router.get('/unblocktopic', (req, res) => {
 router.get('/recenttopics', (req, res) => {
     if (req.query.user && req.query.user.length > 0) {
         let collatedTopics={};
+        //
+        $or:[{'successTally':{$lt : 3}},{'successTally':{$exists : false}}]
+        
+        //  collate all user progress by topic
         db.collection('userquestionprogress').aggregate([
             { $match: {
-                    $and:[{'user': {$eq:ObjectId(req.query.user)}},{$or:[{'successTally':{$lt : 3}},{'successTally':{$exists : false}}]}]
+                    $and:[{'user': {$eq:ObjectId(req.query.user)}}]
            }},
             { $group: {'_id': "$topic",
                 'questions': { $sum: 1 },
@@ -306,8 +310,10 @@ router.get('/recenttopics', (req, res) => {
                // //console.log(['RECENT TOPICS',final]);
                 let topics=[];
                 final.map(function(val,key) {
-                    collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
-                    if (val.topic) topics.push({quiz:{$eq:val.topic}});
+                    if (val.successRate<0.7 && val.topic && String(val.topic).length > 0) {
+                        collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
+                        topics.push({quiz:{$eq:val.topic}});                        
+                    }
                 });
                // //console.log(['topics',topics]);
                     //'quiz': {$in:[topics]} ,
@@ -318,7 +324,7 @@ router.get('/recenttopics', (req, res) => {
                     topicCriteria={'magicfield' : {$eq:'neverfound'}};
                 }
                 let criteria={$and:[{access:{$eq:'public'}},topicCriteria]};
-                
+                // lookup all questions in those topics and set total(questions) for each for each collatedTopic
                 db.collection('questions').aggregate([
                     { $match: criteria
                     },
