@@ -15,7 +15,7 @@ export default class FindQuestions extends Component {
             <div className='findquestions'>
                 <br/> 
 
-                <h5>Learn about the world through adaptive review of rhymes and other creative memory devices.</h5>
+                <h5>&nbsp;&nbsp;&nbsp;Learn about the world through adaptive review of rhymes and other creative memory devices.</h5>
                 <span id="firstvideo" ></span>
                 <HomeCarousel/>
                 <br/>
