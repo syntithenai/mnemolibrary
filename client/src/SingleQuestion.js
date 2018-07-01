@@ -304,7 +304,7 @@ export default class SingleQuestion extends Component {
                 <div className="card question container" >
                  <div ref={(section) => { this.scrollTo.mnemonic = section; }} ></div>
                      <div id="spacerforsmall" className='d-none d-sm-block d-md-none' ><br/><br/> </div>
-                    <div id="progressbar" style={{backgroundColor: 'blue',width: '100%'}} > <div id="innerprogressbar" style={{backgroundColor: 'red',width: this.props.percentageFinished()}} >&nbsp;</div></div>
+                    <div id="progressbar" style={{backgroundColor: 'blue',width: '100%',height:'0.3em'}} > <div id="innerprogressbar" style={{backgroundColor: 'red',width: this.props.percentageFinished()}} >&nbsp;</div></div>
                     
                     <Swipeable onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')}   >  
                         <h4 className="card-title">{header}?</h4>

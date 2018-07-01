@@ -6,7 +6,7 @@ import React, { Component } from 'react';
  
 import Navigation from './Navigation';
 //import SingleQuestion from './SingleQuestion';
-
+import HelpVideos from './HelpVideos';
 import AboutPage from './AboutPage';
 import TermsOfUse from './TermsOfUse';
 import IntroPage from './IntroPage';
@@ -1359,6 +1359,8 @@ export default class AppLayout extends Component {
                 {this.isCurrentPage('faq') && <FAQ  setCurrentPage={this.setCurrentPage} />
                 }
                 {this.isCurrentPage('createhelp') && <CreateHelp  />
+                }
+                {this.isCurrentPage('helpvideos') && <HelpVideos setCurrentPage={this.setCurrentPage}  />
                 }
                 {(this.isCurrentPage('profile') || (this.isCurrentPage('')) && this.isLoggedIn()) && <ProfilePage token={this.state.token} setCurrentPage={this.setCurrentPage} setQuizFromDiscovery={this.setQuizFromDiscovery} reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
                 }

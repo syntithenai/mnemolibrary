@@ -3,10 +3,40 @@ body {
   padding: 0;
   font-family: sans-serif;
   padding-top: 8rem;
-  padding-left: 1rem;
+  padding-left: 0rem;
 }
 #sharetopicdialog {
     z-index: 9999 !important;
+}
+.carousel-item {
+    color: black;
+    border: 1px solid black;
+    background-color: white;
+}
+.carousel-item h5 {
+    color: black;
+    font-weight: bold;
+    font-size: 1.7em;
+}
+.carousel-item p {
+    color: black;
+}
+.carousel-caption {
+    border: 1px solid black;
+    background-color: #dfeceb;
+    bottom: 200px;
+    opacity: 0.8;
+}
+.carousel-control-next,.carousel-control-prev {
+    right: 2px;
+    padding: 0em;
+    background-color: black;
+    border-radius: 20px;
+    color: black;
+    border: 1px solid black;
+    height: 2em;
+    width: 2em;
+    top: 50%;
 }
 .aboutpage div {
     padding-bottom: 1em;
@@ -21,10 +51,21 @@ body {
     background-color: lightgrey;
     opacity: 0.6;
 }
+.questionwrap  {
+    margin-right: 0;
+    padding-right: 0;
+    margin-left: 0;
+    padding-left: 0;
+    width: 100%;
+}
 .questionwrap .question {
     margin-top:4em;
     padding-top:4em;
-    
+    width: 100%;
+    margin-right: 0;
+    padding-right: 0;
+    margin-left: 0;
+    padding-left: 0;
 }
 .dddquestionwrap .blocked-tags {
 margin-top:2em;
@@ -37,7 +78,7 @@ margin-top:2em;
     border-top: 6px solid lightsteelblue;
 }
 .questionwrap .buttons {
-    background-color: plum;
+    background-color: lightblue;
     dpadding-top: 0.5em;
     dpadding-bottom: 0.5em;
     margin-top:-4.2em;
@@ -106,6 +147,10 @@ iframe#wikiiframe {
 .warning-message {
   color: red;
   font-size: 1.5em;   
+}
+.row.buttons {
+    margin-left: 0rem !important;
+    margin-right: 0rem !important;    
 }
 
 .navbar .nav-item {

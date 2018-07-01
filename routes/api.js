@@ -1506,15 +1506,15 @@ router.post('/saveusertopic', (req, res) => {
         // validation info
         let errors={};
         questions.map(function(question,key) {
-            if (question.mnemonic.length === 0) {
+            if (question.mnemonic && question.mnemonic.length === 0) {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('mnemonic');
             }
-            if (question.shortanswer.length === 0) {
+            if (question.shortanswer && question.shortanswer.length === 0) {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('shortanswer');
             }
-            if (question.question.length === 0) {
+            if (question.question && question.question.length === 0) {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('question');
             }

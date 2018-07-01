@@ -291,7 +291,7 @@ export default class QuestionEditor extends Component {
                         </div>
                         <br/>
                         <div className='form-group'>    
-                           <label htmlFor="difficulty">Difficulty </label><select autoComplete="false" id="difficulty"   name='difficulty' onChange={this.change} value={this.props.question.difficulty}  ><option value='1' >Basic</option><option value='2' >Standard</option><option value='3' >Genius</option></select>
+                           <label htmlFor="difficulty">Difficulty </label><select autoComplete="false" id="difficulty"   name='difficulty' onChange={this.change} value={this.props.question.difficulty}  ><option value='1' >Young Learner</option><option value='2' >Adult Learner</option><option value='3' >Sage</option></select>
                         </div>   
                         <div className='form-group'>    
                            <label htmlFor="mnemonic" >*&nbsp;Mnemonic </label><textarea autoComplete="false" id="mnemonic" type='text' name='mnemonic' onChange={this.change} value={this.props.question.mnemonic} className='form-control'></textarea>

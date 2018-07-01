@@ -54,10 +54,10 @@ export default class CreateHelp extends Component {
                 </div>
                 <div className='list-group-item' >
                 
-                    Difficult: 
-                    <ul><li>young learner: content suitable for children 10+, mnemonics that don’t presume a large vocabulary or knowledge base, preference for short specific answers; additional material in answer in <a href='https://en.wikipedia.org/wiki/Simple_English' target='_new' >Simple English</a>. </li>
-                    <li>adult learner: content suitable for adults that a general reader is likely to have basic familiarity with (e.g. Vladmir Putin)</li>
-                    <li>sage: content suitable for adults, content that a general reader is unlikely to be familiar with (e.g. Edwin Hubble, Jainism)</li>
+                    Difficulty: 
+                    <ul><li>Young learner: content suitable for children 10+, mnemonics that don’t presume a large vocabulary or knowledge base, preference for short specific answers; additional material in answer in <a href='https://en.wikipedia.org/wiki/Simple_English' target='_new' >Simple English</a>. </li>
+                    <li>Adult learner: content suitable for adults that a general reader is likely to have basic familiarity with (e.g. Vladmir Putin)</li>
+                    <li>Sage: content suitable for adults, content that a general reader is unlikely to be familiar with (e.g. Edwin Hubble, Jainism)</li>
                     </ul>                
                 </div>
             
