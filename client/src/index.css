@@ -165,9 +165,10 @@ iframe#wikiiframe {
     font-size: 1.5em;
 }
 .navbar .btn-secondary {
-  background-color:#ddcbdd;
+  background-color:rgb(255, 255, 0);
   color:black;  
-  font-weight:bold; 
+  font-weight:bold;
+  opacity:0.9; 
 }
 
 .question .buttons .btn {
