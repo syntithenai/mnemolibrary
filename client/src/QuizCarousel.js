@@ -189,10 +189,7 @@ export default class QuizCarousel extends Component {
         } else {
         //this.props.setMessage('You\'ve seen '+(questions ? questions.length : 0)+' questions. Time for review ?'); 
         ////console.log('root finish quiz');
-            confirmAlert({
-              title: 'Question set complete',
-              message: 'Time for review?',
-              buttons: [
+            let buttons=[
                 {
                   label: 'Review',
                   onClick: () => this.props.setCurrentPage('review')
@@ -200,12 +197,19 @@ export default class QuizCarousel extends Component {
                 {
                   label: 'Continue',
                   onClick: () => this.discoverQuestions()
-                },
-                {
-                  label: 'Profile',
-                  onClick: () => this.props.setCurrentPage('profile')
                 }
               ]
+            if (this.props.user && String(this.props.user._id).length > 0) {
+                buttons.push({
+                  label: 'Profile',
+                  onClick: () => this.props.setCurrentPage('profile')
+                })
+            }
+            
+            confirmAlert({
+              title: 'Question set complete',
+              message: 'Time for review?',
+              buttons: buttons
             })
         }    
         this.setState({'success' : []});

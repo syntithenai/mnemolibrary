@@ -315,6 +315,7 @@ export default class TopicEditor extends Component {
                     questionIds.push(val._id);
                     return null;
                 });
+                that.fetchTopicCollections();
                 setTimeout(function() {
                     fetch('/api/sitemap?ids='+questionIds.join(","));
                 },2000);
@@ -340,6 +341,7 @@ export default class TopicEditor extends Component {
             return response.json();
         }).then(function(publishResponse) {
             that.setState({validationErrors:{},published:false});
+             that.fetchTopicCollections();
         })
     }; 
     

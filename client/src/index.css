@@ -87,6 +87,14 @@ margin-top:2em;
     z-index: 99;
     opacity: 1;
 }
+.question.card {
+    padding-left:1em;
+}
+
+.videotutorials,.aboutpage,.intropage,.faq,.termsofuse {
+    padding-left:1em;
+}
+
 .question,.tags {
     background-color: lightblue !important;
 }
@@ -148,13 +156,17 @@ iframe#wikiiframe {
   color: red;
   font-size: 1.5em;   
 }
-.row.buttons {
+.row {
     margin-left: 0rem !important;
     margin-right: 0rem !important;    
 }
 
 .navbar .nav-item {
     font-size: 1.5em;
+}
+.navbar .btn-secondary {
+  background-color:#ddcbdd;
+  color:black;   
 }
 
 .question .buttons .btn {

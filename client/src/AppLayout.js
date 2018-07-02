@@ -95,6 +95,7 @@ export default class AppLayout extends Component {
       this.updateProgress = this.updateProgress.bind(this);
       this.componentDidMount = this.componentDidMount.bind(this);
       this.reviewBySuccessBand = this.reviewBySuccessBand.bind(this);
+      this.fetchTopicCollections = this.fetchTopicCollections.bind(this);
       //this.getTagsByTitle = this.getTagsByTitle.bind(this);
       //this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
       //this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
@@ -355,6 +356,11 @@ export default class AppLayout extends Component {
       //}).catch(function(ex) {
         ////console.log(['parsing failed', ex])
       //})
+      that.fetchTopicCollections();
+  };
+  
+  fetchTopicCollections() {
+      let that=this;
       fetch('/api/topiccollections')
       .then(function(response) {
         ////console.log(['got response', response])
@@ -365,7 +371,7 @@ export default class AppLayout extends Component {
       }).catch(function(ex) {
         //console.log(['parsing failed', ex])
       })
-  }
+  };
   
 
   refreshLogin (token=null) {
@@ -445,6 +451,7 @@ export default class AppLayout extends Component {
           var state={};
           var that = this;
           state.user = user;
+          localStorage.setItem('currentTopic',null)
           //state.currentPage = 'home';
           ////console.log('login at root');
             ////console.log(user);
@@ -507,6 +514,7 @@ export default class AppLayout extends Component {
   loginByToken(token) {
       let state = {token: token};
       let that = this;
+      localStorage.setItem('currentTopic',null)
       fetch('/login/me?code='+token, {
           method: 'GET',
         }).then(function(response) {
@@ -533,6 +541,7 @@ export default class AppLayout extends Component {
     loginByConfirm(token) {
       let state = {token: token};
       let that = this;
+      localStorage.setItem('currentTopic',null)
       fetch('/login/doconfirm?code='+token, {
           method: 'GET',
         }).then(function(response) {
@@ -591,6 +600,7 @@ export default class AppLayout extends Component {
       localStorage.setItem('token','{}');
       localStorage.setItem('user','{}');
       this.setState(state);
+      localStorage.setItem('currentTopic',null)
       ////console.log(['logout',gapi.auth2]);
       ////console.log(this.state);
       //this.GoogleAuth.disconnect();
@@ -1348,7 +1358,7 @@ export default class AppLayout extends Component {
                     isLoggedIn={this.isLoggedIn}  
                 />
                 }
-                {this.isCurrentPage('create') && <CreatePage  user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
+                {this.isCurrentPage('create') && <CreatePage fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
                 }
                 {this.isCurrentPage('about') && <AboutPage setCurrentPage={this.setCurrentPage} />
                 }

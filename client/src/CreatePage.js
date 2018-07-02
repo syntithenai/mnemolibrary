@@ -31,7 +31,7 @@ export default class CreatePage extends Component {
     
     render() {
             return <div>
-                <TopicEditor user={this.props.user} setQuizFromTopic={this.props.setQuizFromTopic} mnemonic_techniques={this.props.mnemonic_techniques}  setCurrentPage={this.props.setCurrentPage} />
+                <TopicEditor fetchTopicCollections={this.props.fetchTopicCollections} user={this.props.user} setQuizFromTopic={this.props.setQuizFromTopic} mnemonic_techniques={this.props.mnemonic_techniques}  setCurrentPage={this.props.setCurrentPage} />
             </div>
         
     }
