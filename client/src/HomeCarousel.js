@@ -92,7 +92,7 @@ export default class HomeCarousel extends Component {
 
         </div>)
         
-        if (h > 1048) {
+        if (h > 1200) {
             return  (
             <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" style={{width:'50%',paddingTop:'4%',paddingBottom:'4%',paddingLeft:'4%',paddingRight:'4%',marginLeft:'1%',marginRight:'1%',backgroundColor: 'lightgrey'}}>{content}
             </div>
