@@ -66,11 +66,23 @@ export default class TopicEditor extends Component {
     };
     
     componentDidMount() {
+          console.log('topic editor DID mount')
         let currentTopic = localStorage.getItem('currentTopic');
+        let that=this;
+        console.log('topic editor update');
+        console.log(currentTopic);
         if (currentTopic && currentTopic.length > 0) {
-            this.loadTopic(currentTopic);
+            setTimeout(function() {
+                that.loadTopic(currentTopic);
+            },50);
+            
         }
     }
+    
+    componentDidUpdate() {
+        
+      
+    };
     
     handleSubmit() {
         //e.preventDefault();
@@ -194,7 +206,7 @@ export default class TopicEditor extends Component {
     
     deleteTopic(key) {
         let that=this;
-        let params = {_id:key}
+        let params = {_id:key,user:this.props.user._id}
         return fetch("/api/deleteusertopic", {
           method: 'POST',
           headers: {
@@ -235,7 +247,7 @@ export default class TopicEditor extends Component {
     
     loadTopic(topicId) {
         let that = this;
-        let params={_id:topicId}
+        let params={_id:topicId,user:this.props.user._id}
         fetch("/api/usertopic", {
           method: 'POST',
           headers: {
@@ -245,10 +257,13 @@ export default class TopicEditor extends Component {
         }).then(function(response) {
             return response.json();
         }).then(function(topic) {
-            ////console.log(['loaded topic',topic]);
-            //res.send({user:user,token:token});
-            localStorage.setItem('currentTopic',topic._id);
-            that.setState({topic:topic.topic,_id:topic._id,published:topic.published,questions:topic.questions,currentView:'questions',validationErrors:{},message:' '});
+            console.log(['loaded topic complete']);
+            if (topic && topic._id) {
+                console.log(['loaded topic',topic]);
+                //res.send({user:user,token:token});
+                localStorage.setItem('currentTopic',topic._id);
+                that.setState({topic:topic.topic,_id:topic._id,published:topic.published,questions:topic.questions,currentView:'questions',validationErrors:{},message:' '});                
+            }
         })
         .catch(function(err) {
             //console.log(['ERR',err]);
@@ -265,7 +280,8 @@ export default class TopicEditor extends Component {
               },
               body: JSON.stringify({
                 _id: id,
-                preview:true
+                preview:true,
+                user:this.props.user._id
               })
         }).then(function(response) {
             return response.json();
@@ -298,7 +314,8 @@ export default class TopicEditor extends Component {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                _id: id
+                _id: id,
+                user:this.props.user._id
               })
         }).then(function(response) {
             return response.json();
@@ -315,7 +332,7 @@ export default class TopicEditor extends Component {
                     questionIds.push(val._id);
                     return null;
                 });
-                that.fetchTopicCollections();
+                that.props.fetchTopicCollections();
                 setTimeout(function() {
                     fetch('/api/sitemap?ids='+questionIds.join(","));
                 },2000);
@@ -335,13 +352,14 @@ export default class TopicEditor extends Component {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                _id: id
+                _id: id,
+                user:this.props.user._id
               })
         }).then(function(response) {
             return response.json();
         }).then(function(publishResponse) {
             that.setState({validationErrors:{},published:false});
-             that.fetchTopicCollections();
+             that.props.fetchTopicCollections();
         })
     }; 
     
@@ -433,7 +451,8 @@ export default class TopicEditor extends Component {
     
     
     render() {
-       let question = this.state.questions.hasOwnProperty(this.state.currentQuestion) ? this.state.questions[this.state.currentQuestion] : {};
+        let currentQuestion = this.state.currentQuestion > 0 ? this.state.currentQuestion : 0;
+       let question = this.state._id && String(this.state._id).length > 4 &&  this.state.questions && this.state.questions.hasOwnProperty(currentQuestion) ? this.state.questions[currentQuestion] : {};
         return (
            <div id='topiceditor' className={this.state.topic}>
                 <ShareTopicDialog id="sharetopicdialog"  header="Share Topic"  question={question} shareQuestion={this.state.shareQuestion}/>
@@ -442,7 +461,7 @@ export default class TopicEditor extends Component {
                     
                     <div className='col-12 col-lg-6'>
                         <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} ><ListAlt size={28}/>&nbsp;<span className="d-none d-sm-inline" >Topics</span></button>
-                        {String(this.state._id).length > 0 && <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/>&nbsp;<span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions.length}</span></button>}
+                        {String(this.state._id).length > 0 && <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/>&nbsp;<span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions ? this.state.questions.length : 0}</span></button>}
                         <button  href='#' onClick={() => this.showHelp()} className='btn btn-info ' ><Question size={28}/>&nbsp;<span className="d-none d-sm-inline" >Help</span></button>
                        
                     </div>
@@ -451,10 +470,10 @@ export default class TopicEditor extends Component {
                        
                             {String(this.state._id).length > 0 && <button  className='btn btn-danger'  onClick={() => this.askDeleteTopic(this.state._id)} style={{float:'right'}} ><Trash size={28}/>&nbsp;<span className="d-none d-sm-inline" >Delete Topic</span> </button>}
                             
-                              {String(this.state._id).length > 0 &&  this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Republish</span></button>}
+                              {String(this.state._id).length > 0 &&  this.state.questions && this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Republish</span></button>}
                              
-                             {String(this.state._id).length > 0 &&  this.state.questions.length >0 && !this.state.published && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Publish</span></button>}
-                             {String(this.state._id).length > 0 && this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.unpublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Unpublish</span></button>}
+                             {String(this.state._id).length > 0 &&  this.state.questions  &&  this.state.questions.length >0 && !this.state.published && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Publish</span></button>}
+                             {String(this.state._id).length > 0 &&  this.state.questions && this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.unpublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Unpublish</span></button>}
                     </div>
                 </div>
                 <div className='row'>    

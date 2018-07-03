@@ -2,11 +2,33 @@
 import React, { Component } from 'react';
 
 export default class HomeCarousel extends Component {
+  
+    constructor(props) {
+      super(props);
+      this.state = { width: 0, height: 0 };
+      this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+    }
+
+    componentDidMount() {
+      this.updateWindowDimensions();
+      window.addEventListener('resize', this.updateWindowDimensions);
+    }
+
+    componentWillUnmount() {
+      window.removeEventListener('resize', this.updateWindowDimensions);
+    }
+
+    updateWindowDimensions() {
+      this.setState({ width: window.innerWidth, height: window.innerHeight });
+      console.log(['CH',this.state.width]);
+        
+    }
+  
     
     render() {
-        return  (
-        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" style={{width:'90%',paddingTop:'4%',paddingBottom:'4%',paddingLeft:'4%',paddingRight:'4%',marginLeft:'1%',marginRight:'1%',backgroundColor: 'lightgrey'}}>
-  <ol class="carousel-indicators">
+        let h = this.state.width;
+        let content=(<div>
+          <ol class="carousel-indicators">
     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
     <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
     <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
@@ -67,5 +89,18 @@ export default class HomeCarousel extends Component {
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
     <span class="sr-only">Next</span>
   </a>
-</div>
-)}}
+
+        </div>)
+        
+        if (h > 800) {
+            return  (
+            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" style={{width:'50%',paddingTop:'4%',paddingBottom:'4%',paddingLeft:'4%',paddingRight:'4%',marginLeft:'1%',marginRight:'1%',backgroundColor: 'lightgrey'}}>{content}
+            </div>
+            )            
+        } else {
+             return  (
+            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" style={{width:'90%',paddingTop:'4%',paddingBottom:'4%',paddingLeft:'4%',paddingRight:'4%',marginLeft:'1%',marginRight:'1%',backgroundColor: 'lightgrey'}}>{content}
+            </div>
+)           
+        }
+}}

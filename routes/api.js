@@ -1567,7 +1567,7 @@ router.post('/myusertopics', (req, res) => {
 
 router.post('/usertopic', (req, res) => {
     ////console.log(['usrtop',req.body]);
-    if (req.body._id && req.body._id.length > 0) {
+    if (req.body._id && req.body._id.length > 4) {  // non empty and not string null
         db.collection('userTopics').findOne({_id:ObjectId(req.body._id)}).then(function(result) {
             res.send(result);
         }).catch(function(e) {
@@ -1680,7 +1680,7 @@ router.post('/unpublishusertopic', (req, res) => {
     ////console.log(['del usrtop',req.body]);
     if (req.body._id && req.body._id.length > 0) {
         
-        db.collection('userTopics').findOne({_id:ObjectId(req.body._id)}).then(function(result) {
+        db.collection('userTopics').findOne({$and:[{user:ObjectId(req.body.user)},{_id:ObjectId(req.body._id)}]}).then(function(result) {
            if (result) {
                 let tags={};
                        
@@ -1731,7 +1731,7 @@ router.post('/deleteusertopic', (req, res) => {
     ////console.log(['del usrtop',req.body]);
     if (req.body._id && req.body._id.length > 0) {
         
-        db.collection('userTopics').findOne({_id:ObjectId(req.body._id)}).then(function(result) {
+        db.collection('userTopics').findOne({$and:[{user:ObjectId(req.body.user)},{_id:ObjectId(req.body._id)}]}).then(function(result) {
            if (result) {
                 let tags={};
                        
@@ -1787,7 +1787,7 @@ router.post('/publishusertopic', (req, res) => {
     let tags={}
                          
     if (req.body._id && req.body._id.length > 0) {
-        db.collection('userTopics').findOne({_id:ObjectId(req.body._id)}).then(function(userTopic) {
+        db.collection('userTopics').findOne({$and:[{user:ObjectId(req.body.user)},{_id:ObjectId(req.body._id)}]}).then(function(userTopic) {
             db.collection('users').findOne({_id:ObjectId(userTopic.user)}).then(function(user) {
                 db.collection('questions').find({$and:[{userTopic:{$eq:req.body._id}},{isPreview:{$eq:false}}]}).toArray().then(function(questions) {
                     // save questions
@@ -1875,7 +1875,7 @@ router.post('/publishusertopic', (req, res) => {
                                         question.quiz = "Preview "+question.quiz;
                                         question._id=new ObjectId();
                                         question.isPreview=true;
-                                        question.access=user.username;
+                                        question.access=user._id;
                                     }
                                     db.collection('questions').save(question).then(function() {
                                         ////console.log(['saved q',question]);
