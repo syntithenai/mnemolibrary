@@ -608,24 +608,10 @@ router.get('/sitemap', (req, res) => {
                 <body>
                     <div className="card question container" >
                         <h1>Mnemo's Library Loading</h1>
-                            <div  style='float: left;' >
-                            <br/><br/><br/>
-                            <img src='../loading.gif' style="opacity: 0.2"/>
-                            
-                            </div>
                             <h4 className="card-title">{{header}}?</h4>
                             
-                            <div className="card-block answer">
-                                <div  className='card-text'><b>Answer</b> <span>{{shortanswer}}</span>  <span><pre>{{answer}}</pre></span></div>
-                            </div>
                             <div className="card-block mnemonic">
                                 <div  className='card-text'><b>Mnemonic</b> <span><pre>{{mnemonic}}</pre></span></div>
-                            </div>
-                            <div className="card-block link">
-                                <a href={question.link} target='_new' >{{link}}</a>
-                            </div>
-                            <div className="card-block attribution">
-                                <div  className='card-text'><b>Attribution/Source</b> <span>{{attribution}}</span></div>
                             </div>
                             
                            <div className="card-block topic">
@@ -636,18 +622,21 @@ router.get('/sitemap', (req, res) => {
                               <b>Tags&nbsp;&nbsp;&nbsp;</b>
                                {{tags}}
                             </div>
+                            <br/>
+                            <br/>
+                            <img src="/arrow-right.png" />
+                            <a style="font-size: 1.3em; color: black; border: 1px solid black; background-color: lightgrey; padding: 1em;" href='https://mnemolibrary.com?question={{id}}'><span >&nbsp;&nbsp;Learn more at Mnemo's Library</span></a>
                             
-                             <script>
-                            
-                            setTimeout(function() {
-                                document.location='http://mnemolibrary.com?question={{id}}'
-                            },2500);
-                            
-                            </script>
                     </div>
                 </body>
                 </html>
                 `;
+
+
+                            
+                            //setTimeout(function() {
+                                //document.location='http://mnemolibrary.com?question={{id}}'
+                            //},2500);
                 
     //var deleteFolderRecursive = function(path) {
       //if (fs.existsSync(path)) {
