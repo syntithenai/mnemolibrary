@@ -598,7 +598,7 @@ router.get('/sitemap', (req, res) => {
     var questionTemplate =  `
             <html>
                 <head>
-                  <title>{{header}}? - Mnemo's Library</title>
+                  <title>{{header}}? - Mnemo's Library {{header}}</title>
                   <meta charset="UTF-8">
                   <meta name="description" content="{{mnemonic}}">
                   <meta name="keywords" content="{{tags}},mnemonics,trivia,learn,dementia,brain">
@@ -607,7 +607,7 @@ router.get('/sitemap', (req, res) => {
                 </head>
                 <body>
                     <div className="card question container" >
-                        <h1>Mnemo's Library Loading</h1>
+                        <h1>Mnemo's Library</h1>
                             <h4 className="card-title">{{header}}?</h4>
                             
                             <div className="card-block mnemonic">

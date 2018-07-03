@@ -787,7 +787,7 @@ let intentHandlers ={
         let currentQuestion = session.get('currentQuestion');
         if (currentQuestion) {
             if (session.get('mode')==='review') {
-                alexaSpeak.askQuestion(currentQuestion,request,response);
+                alexaSpeak.askNextAction(currentQuestion,request,response);                
             } else {
                 alexaSpeak.sayQuestion(currentQuestion,request,response);
                 alexaSpeak.askNextAction(currentQuestion,request,response);                
