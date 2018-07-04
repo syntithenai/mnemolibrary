@@ -42,7 +42,7 @@ export default class Navigation extends Component {
         return  (
         <div className="navbar-dark fixed-top bg-dark" >
            
-        <div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title}&nbsp;&nbsp;&nbsp;{!this.props.isLoggedIn() && <a   onClick={() => this.props.setCurrentPage('helpvideos')}  className='btn btn-outline btn-warning' style={{display:'inline'}}>
+        <div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title}&nbsp;&nbsp;&nbsp;{!this.props.isLoggedIn() && <a   onClick={() => this.props.setCurrentPage('helpvideos')} href='#' className='btn btn-outline btn-warning' style={{display:'inline'}}>
                    Tutorial
                   </a>}</div>
         
