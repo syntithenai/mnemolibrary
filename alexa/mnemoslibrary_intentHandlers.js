@@ -522,7 +522,7 @@ let intentHandlers ={
                         //console.log(['ANSWERIS is specific']);
                         answer = currentQuestion.specific_answer;
                         if (find && (alexaUtils.strip(answer).toLowerCase()===alexaUtils.strip(find).toLowerCase()) ) {  //|| levenshtein.get(find,answer) < 1
-                            response.say( __(" well done ") + alexaUtils.speakable(answer) + __(" is correct"));
+                            response.say( __(" well done ") + ", "+ alexaUtils.speakable(answer) + __(" is correct"));
                            // response.say(__("Next question"));
                             databaseFunctions.logStatus(db,database,'successes',currentQuestion._id,request,response);
                             return intentHandlers.next_question(request,response);
@@ -631,7 +631,7 @@ let intentHandlers ={
             find=alexaUtils.strip(find)
             //console.log(['mnemonic compare ']);
             if (find && (mnemonic.indexOf(find) !== -1 ||  levenshtein.get(find,mnemonic) < 3)) {
-                response.say(__(" well done ") + __("Correct"));
+                response.say(__(" well done ") + ", " + __("Correct"));
                 //response.say(__('Next question'));
                 databaseFunctions.logStatus(db,database,'successes',currentQuestion._id,request,response);
                 return intentHandlers.next_question(request,response);
