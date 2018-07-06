@@ -59,11 +59,33 @@ export default class SingleQuestion extends Component {
       }
 
       handleStateChange(state, prevState) {
+          function getOS() {
+              var userAgent = window.navigator.userAgent,
+                  platform = window.navigator.platform,
+                  macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+                  windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+                  iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+                  os = null;
+
+              if (macosPlatforms.indexOf(platform) !== -1) {
+                os = 'Mac OS';
+              } else if (iosPlatforms.indexOf(platform) !== -1) {
+                os = 'iOS';
+              } else if (windowsPlatforms.indexOf(platform) !== -1) {
+                os = 'Windows';
+              } else if (/Android/.test(userAgent)) {
+                os = 'Android';
+              } else if (!os && /Linux/.test(platform)) {
+                os = 'Linux';
+              }
+
+              return os;
+          }  
+          
         // copy player state to this component's state
         //console.log(['statechange',state,prevState]);
-        var {Platform} = React;
-
-        if (state.ended && Platform.OS !== 'ios') {
+        
+        if (state.ended && getOS() !== 'iOS') {
             this.toggleMedia();
         }
         if (state.videoHeight > 0) {
@@ -313,7 +335,7 @@ export default class SingleQuestion extends Component {
                             <div  className='card-text ' style={{fontSize:'0.85em'}}><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
                         </div>}
                         <div ref={(section) => { this.scrollTo.media = section; }} ></div>
-                        {((this.isVisible('media')) && question.media) && <span>
+                        {((this.isVisible('media') || question.autoplay_media==="YES") && question.media) && <span>
                             {media}</span> }
                         </div>
                         
@@ -366,13 +388,11 @@ export default class SingleQuestion extends Component {
                     </div>
                     
                     <div className="card-block">
-                        
                         <div ref={(section) => { this.scrollTo.image = section; }} ></div>
-                        {((this.isVisible('image') || !showRecallButton) && question.image) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></a></span> }
+                        {((this.isVisible('image') || !showRecallButton || question.autoshow_image==="YES") && question.image) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></a></span> }
                         {(this.isVisible('image') || !showRecallButton) && question.imageattribution && <div className="card-block imageattribution">
                             <div  className='card-text' style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div>
                         </div>}
-
                     </div>
 
                 </div>

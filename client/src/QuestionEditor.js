@@ -60,6 +60,8 @@ export default class QuestionEditor extends Component {
         this.onImageProgress = this.onImageProgress.bind(this);
         this.onMediaProgress = this.onMediaProgress.bind(this);
         this.deleteQuestion=this.deleteQuestion.bind(this);
+        this.toggleAutoShowImageCheckbox=this.toggleAutoShowImageCheckbox.bind(this);
+        this.toggleAutoPlayMediaCheckbox=this.toggleAutoPlayMediaCheckbox.bind(this);
     
     };
     
@@ -241,10 +243,32 @@ export default class QuestionEditor extends Component {
               label: 'No'
             }
           ]
-        })
-            
+        })  
     };
     
+    toggleAutoShowImageCheckbox(event) {
+        if (this.props.question.autoshow_image === "YES") {
+            this.props.question.autoshow_image=""
+        } else {
+            this.props.question.autoshow_image="YES"
+        }
+        let state = {...this.props.question};
+        state['autoshow_image'] =  this.props.question.autoshow_image;
+        this.props.updateQuestion(state);
+        return true;
+    };
+    
+    toggleAutoPlayMediaCheckbox(event) {
+        if (this.props.question.autoplay_media === "YES") {
+            this.props.question.autoplay_media=""
+        } else {
+            this.props.question.autoplay_media="YES"
+        }
+        let state = {...this.props.question};
+        state['autoplay_media'] =  this.props.question.autoplay_media;
+        this.props.updateQuestion(state);
+        return true;
+    };
     
     render() {
        // //console.log(['QE REN',this.props]);
@@ -318,7 +342,6 @@ export default class QuestionEditor extends Component {
                             <label htmlFor="specific_answer" >Specific Answer </label><textarea autoComplete="false" id="specific_answer" type='text' name='specific_answer' onChange={this.change} value={this.props.question.specific_answer} className='form-control' ></textarea>
                             <label htmlFor="also_accept" >Also Accept </label><textarea autoComplete="false" id="also_accept" type='text' name='also_accept' onChange={this.change} value={this.props.question.also_accept} className='form-control' ></textarea>
                             <label htmlFor="multiple_choice" >Multiple Choices </label><textarea autoComplete="false" id="multiple_choice" type='text' name='multiple_choice' onChange={this.change} value={this.props.question.multiple_choice} className='form-control' ></textarea>
-                            
                         </div>}
                         
                         
@@ -368,7 +391,12 @@ export default class QuestionEditor extends Component {
                         <div className='form-group'>     
                                 <label htmlFor="link" >Image Source/Attribution </label><input autoComplete="false" id="imageattribution" type='text' name='imageattribution' onChange={this.change} value={this.props.question.imageattribution}  className='form-control' />
                         </div>
-                                                
+                        <div className='form-group'>     
+                            <label htmlFor="autoshow_image" >Show Image in Review ?</label>
+                            {this.props.question.autoshow_image === "YES" && <input type="checkbox" autoComplete="false" id="autoshow_image"  name='autoshow_image' checked onChange={this.toggleAutoShowImageCheckbox}  className='form-control' />}
+                            {this.props.question.autoshow_image !== "YES" && <input type="checkbox" autoComplete="false" id="autoshow_image"  name='autoshow_image' onChange={this.toggleAutoShowImageCheckbox}  className='form-control' />}
+                        </div>
+
                          <div className='form-group'>  
                                     <label htmlFor="link" >Media URL</label> <ReactS3Uploader
                                     signingUrl="/api/s3/sign"
@@ -397,7 +425,16 @@ export default class QuestionEditor extends Component {
                         
                         <div className='form-group'>     
                                 <label htmlFor="link" >Media Source/Attribution </label><input autoComplete="false" id="mediaattribution" type='text' name='mediaattribution' onChange={this.change} value={this.props.question.mediaattribution}  className='form-control' />
-                        </div>                        
+                        </div> 
+                        
+                        <div className='form-group'>     
+                            <label htmlFor="autoplay_media" >Autoplay media ? </label>
+                            <div className='checkbox-inline'>
+                                {this.props.question.autoplay_media === "YES" && <input type="checkbox" autoComplete="false" id="autoplay_media"  name='autoplay_media' checked onChange={this.toggleAutoPlayMediaCheckbox}  className='form-control' />}
+                                {this.props.question.autoplay_media !== "YES" && <input type="checkbox" autoComplete="false" id="autoplay_media"  name='autoplay_media' onChange={this.toggleAutoPlayMediaCheckbox}  className='form-control' />}
+                                
+                            </div>
+                        </div>                       
                         
                     </div>
                      

@@ -588,9 +588,6 @@ router.use('/s3', require('react-s3-uploader/s3router')({
 
 
 
-
-
-
 router.get('/sitemap', (req, res) => {
     var fs = require('fs');
     ROOT_APP_PATH = fs.realpathSync('.'); //console.log(ROOT_APP_PATH);
