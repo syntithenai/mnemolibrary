@@ -97,7 +97,7 @@ export default class MnemonicsList extends Component {
            //defaultMnemonic:'default', 
            //mnemonics:{'default':{question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question}}
         //});  
-        //this.loadMnemonics(question);
+        this.loadMnemonics(question);
     }
     //{question:'5abeec3d91ce1409b01e9553',mnemonic:'marshaled ..',technique:'association',questionText:'waht is marsh pln'}
     
