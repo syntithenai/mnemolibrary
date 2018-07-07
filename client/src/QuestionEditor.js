@@ -367,6 +367,15 @@ export default class QuestionEditor extends Component {
                                 <label htmlFor="link" >Source/Attribution </label><input autoComplete="false" id="attribution" type='text' name='attribution' onChange={this.change} value={this.props.question.attribution}  className='form-control' />
                         </div>
                         
+
+                        <div className='form-group'>     
+                                <label htmlFor="link" >Image Source/Attribution </label><input autoComplete="false" id="imageattribution" type='text' name='imageattribution' onChange={this.change} value={this.props.question.imageattribution}  className='form-control' />
+                        </div>
+                        <div className='form-group'>     
+                            <label htmlFor="autoshow_image" >Show Image in Review ?</label>
+                            {this.props.question.autoshow_image === "YES" && <input type="checkbox" autoComplete="false" id="autoshow_image"  name='autoshow_image' checked onChange={this.toggleAutoShowImageCheckbox}  className='form-control' />}
+                            {this.props.question.autoshow_image !== "YES" && <input type="checkbox" autoComplete="false" id="autoshow_image"  name='autoshow_image' onChange={this.toggleAutoShowImageCheckbox}  className='form-control' />}
+                        </div>
                         
                         <div className='form-group'>  
                                 <label htmlFor="link" >Image URL</label> <ReactS3Uploader
@@ -388,15 +397,20 @@ export default class QuestionEditor extends Component {
                                 
                         </div>
 
+                        
                         <div className='form-group'>     
-                                <label htmlFor="link" >Image Source/Attribution </label><input autoComplete="false" id="imageattribution" type='text' name='imageattribution' onChange={this.change} value={this.props.question.imageattribution}  className='form-control' />
-                        </div>
+                                <label htmlFor="link" >Media Source/Attribution </label><input autoComplete="false" id="mediaattribution" type='text' name='mediaattribution' onChange={this.change} value={this.props.question.mediaattribution}  className='form-control' />
+                        </div> 
+                        
                         <div className='form-group'>     
-                            <label htmlFor="autoshow_image" >Show Image in Review ?</label>
-                            {this.props.question.autoshow_image === "YES" && <input type="checkbox" autoComplete="false" id="autoshow_image"  name='autoshow_image' checked onChange={this.toggleAutoShowImageCheckbox}  className='form-control' />}
-                            {this.props.question.autoshow_image !== "YES" && <input type="checkbox" autoComplete="false" id="autoshow_image"  name='autoshow_image' onChange={this.toggleAutoShowImageCheckbox}  className='form-control' />}
-                        </div>
-
+                            <label htmlFor="autoplay_media" >Autoplay media ? </label>
+                            <div className='checkbox-inline'>
+                                {this.props.question.autoplay_media === "YES" && <input type="checkbox" autoComplete="false" id="autoplay_media"  name='autoplay_media' checked onChange={this.toggleAutoPlayMediaCheckbox}  className='form-control' />}
+                                {this.props.question.autoplay_media !== "YES" && <input type="checkbox" autoComplete="false" id="autoplay_media"  name='autoplay_media' onChange={this.toggleAutoPlayMediaCheckbox}  className='form-control' />}
+                                
+                            </div>
+                        </div>                       
+                       
                          <div className='form-group'>  
                                     <label htmlFor="link" >Media URL</label> <ReactS3Uploader
                                     signingUrl="/api/s3/sign"
@@ -422,19 +436,6 @@ export default class QuestionEditor extends Component {
                                     /></span> }
                                         
                         </div>
-                        
-                        <div className='form-group'>     
-                                <label htmlFor="link" >Media Source/Attribution </label><input autoComplete="false" id="mediaattribution" type='text' name='mediaattribution' onChange={this.change} value={this.props.question.mediaattribution}  className='form-control' />
-                        </div> 
-                        
-                        <div className='form-group'>     
-                            <label htmlFor="autoplay_media" >Autoplay media ? </label>
-                            <div className='checkbox-inline'>
-                                {this.props.question.autoplay_media === "YES" && <input type="checkbox" autoComplete="false" id="autoplay_media"  name='autoplay_media' checked onChange={this.toggleAutoPlayMediaCheckbox}  className='form-control' />}
-                                {this.props.question.autoplay_media !== "YES" && <input type="checkbox" autoComplete="false" id="autoplay_media"  name='autoplay_media' onChange={this.toggleAutoPlayMediaCheckbox}  className='form-control' />}
-                                
-                            </div>
-                        </div>                       
                         
                     </div>
                      

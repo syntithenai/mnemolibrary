@@ -331,7 +331,7 @@ export default class SingleQuestion extends Component {
                     <Swipeable onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')}   >  
                         <h4 className="card-title">{header}?</h4>
                         <div className="card-block">
-                            {(this.isVisible('media') ) && question.mediaattribution  && <div className="card-block mediaattribution">
+                            {(this.isVisible('media') || question.autoplay_media==="YES") && question.mediaattribution && question.media  && <div className="card-block mediaattribution">
                             <div  className='card-text ' style={{fontSize:'0.85em'}}><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
                         </div>}
                         <div ref={(section) => { this.scrollTo.media = section; }} ></div>
