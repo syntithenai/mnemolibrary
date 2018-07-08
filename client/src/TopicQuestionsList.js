@@ -48,10 +48,12 @@ export default class TopicQuestionsList extends Component {
                 if (this.props.validationErrors && this.props.validationErrors.hasOwnProperty(key) && this.props.validationErrors[key].length > 0) {
                     errors="Missing required information for "+this.props.validationErrors[key].join(" and ");
                 }
+                let excerpt='-->' + question.answer.split(' ').slice(0,3).join(' ')+'...';
+       
                 return <div className='list-group-item'  onClick={() => this.props.editQuestion(key)} key={key} >
                 <button className='btn btn-light'  onClick={(e) => this.moveUp(key,e)} ><AngleUp size={28} /></button>
                 <button className='btn btn-light'   onClick={(e) =>this.moveDown(key,e)} ><AngleDown size={28}  /></button>
-                &nbsp;&nbsp;<span >{key+1}. {question.interrogative} {question.question} </span><div className="questionErrors">{errors}</div></div>
+                &nbsp;&nbsp;<span >{key+1}. {question.interrogative} {question.question} {excerpt}</span><div className="questionErrors">{errors}</div></div>
             });
             return (
                 <div className='list-group' >
