@@ -56,6 +56,23 @@ export default class SingleQuestion extends Component {
         // subscribe state change
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
+        if (this.props.question) {
+            let question=this.props.question
+            let media=<Player
+              ref={this.setPlayerRef}
+              playsInline
+              autoPlay={true}
+              height={this.state.playerHeight}
+              width={this.state.playerWidth}
+              fluid={false}
+            >
+            {question.media && <source src={question.media} />}
+            {question.media_ogg && <source src={question.media_ogg} />}
+            {question.media_webm && <source src={question.media_webm} />}
+            {question.media_mp4 && <source src={question.media_mp4} />}
+            </Player>
+            this.setState({media:media});
+        }
       }
 
       handleStateChange(state, prevState) {
@@ -104,9 +121,33 @@ export default class SingleQuestion extends Component {
       }
     
      componentWillReceiveProps(props) {
-         ////console.log(['rcv props',props]);
+         let that=this;
+         //console.log(['rcv props',props]);
        // if (this.refs.player) this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['mnemonic'],{align:'top',offset:-230});
+        if (props.question) {
+            let question=props.question
+            let media=<Player
+              ref={this.setPlayerRef}
+              playsInline
+              autoPlay={true}
+              height={this.state.playerHeight}
+              width={this.state.playerWidth}
+              fluid={false}
+            >
+            {question.media && <source src={question.media} />}
+            {question.media_ogg && <source src={question.media_ogg} />}
+            {question.media_webm && <source src={question.media_webm} />}
+            {question.media_mp4 && <source src={question.media_mp4} />}
+            </Player>
+            this.setState({media:null});
+            setTimeout(function() {
+                    that.setState({media:media});
+            },100);
+            
+        }
+        //this.toggleMedia();
+        //this.toggleMedia();
     };
     
     removeA(arr) {
@@ -239,26 +280,14 @@ export default class SingleQuestion extends Component {
            // var {Platform} = React;
 
 
-            let media='';
+            let media=this.state.media;
             //if (Platform.OS === 'ios')
               //return (
                 //media=<a href={question.media} target='_new' >Play</a>
             //)
             //else
               //return (
-                media=<Player
-                              ref={this.setPlayerRef}
-                              playsInline
-                              autoPlay={true}
-                              height={this.state.playerHeight}
-                              width={this.state.playerWidth}
-                              fluid={false}
-                            >
-                            {question.media && <source src={question.media} />}
-                            {question.media_ogg && <source src={question.media_ogg} />}
-                            {question.media_webm && <source src={question.media_webm} />}
-                            {question.media_mp4 && <source src={question.media_mp4} />}
-                        </Player>
+               
             //)
             let attribution=question.attribution;
             if (attribution && attribution.indexOf('http')===0) {
