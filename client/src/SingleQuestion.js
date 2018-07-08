@@ -250,11 +250,15 @@ export default class SingleQuestion extends Component {
                               ref={this.setPlayerRef}
                               playsInline
                               autoPlay={true}
-                              src={question.media}
                               height={this.state.playerHeight}
                               width={this.state.playerWidth}
                               fluid={false}
-                            />
+                            >
+                            {question.media && <source src={question.media} />}
+                            {question.media_ogg && <source src={question.media_ogg} />}
+                            {question.media_webm && <source src={question.media_webm} />}
+                            {question.media_mp4 && <source src={question.media_mp4} />}
+                        </Player>
             //)
             let attribution=question.attribution;
             if (attribution && attribution.indexOf('http')===0) {

@@ -31,6 +31,9 @@ export default class QuestionEditor extends Component {
               suggestions: [],
               imageProgress: null,
               mediaProgress: null,
+              mediaProgress_ogg: null,
+              mediaProgress_webm: null,
+              mediaProgress_mp4: null,
               showAnswerDetails: false
              // imageURL:this.props.question.image
             
@@ -54,15 +57,28 @@ export default class QuestionEditor extends Component {
         this.handleAddTag = this.handleAddTag.bind(this);
         this.updateQuestionTag = this.updateQuestionTag.bind(this);
         this.finishUploadImage = this.finishUploadImage.bind(this);
-        this.finishUploadMedia = this.finishUploadMedia.bind(this);
-        this.changeMedia = this.changeMedia.bind(this);
         this.changeImage = this.changeImage.bind(this);
         this.onImageProgress = this.onImageProgress.bind(this);
-        this.onMediaProgress = this.onMediaProgress.bind(this);
         this.deleteQuestion=this.deleteQuestion.bind(this);
         this.toggleAutoShowImageCheckbox=this.toggleAutoShowImageCheckbox.bind(this);
         this.toggleAutoPlayMediaCheckbox=this.toggleAutoPlayMediaCheckbox.bind(this);
-    
+        // mp3
+        this.finishUploadMedia = this.finishUploadMedia.bind(this);
+        this.changeMedia = this.changeMedia.bind(this);
+        this.onMediaProgress = this.onMediaProgress.bind(this);
+        // ogg
+        this.finishUploadMedia_ogg = this.finishUploadMedia_ogg.bind(this);
+        this.changeMedia_ogg = this.changeMedia_ogg.bind(this);
+        this.onMediaProgress_ogg = this.onMediaProgress_ogg.bind(this);
+        // webm
+        this.finishUploadMedia_webm = this.finishUploadMedia_webm.bind(this);
+        this.changeMedia_webm = this.changeMedia_webm.bind(this);
+        this.onMediaProgress_webm = this.onMediaProgress_webm.bind(this);
+        // mp4
+        this.finishUploadMedia_mp4 = this.finishUploadMedia_mp4.bind(this);
+        this.changeMedia_mp4 = this.changeMedia_mp4.bind(this);
+        this.onMediaProgress_mp4 = this.onMediaProgress_mp4.bind(this);
+
     };
     
     componentDidMount() {
@@ -185,7 +201,18 @@ export default class QuestionEditor extends Component {
         
         //this.setState({imageURL:"/api"+signResult.publicUrl})
     };
+  focusInput(component) {
+        if (component) {
+            ReactDOM.findDOMNode(component).focus(); 
+        }
+    };
     
+    onImageProgress(percent, message) {
+        this.setState({'imageProgress':percent});
+        ////console.log('Upload progress: ' + percent + '% ' + message);
+    };
+  
+// MP3    
     changeMedia(e) {
         let state = {...this.props.question};
         state.media=e.target.value
@@ -204,21 +231,83 @@ export default class QuestionEditor extends Component {
         //this.setState({imageURL:"/api"+signResult.publicUrl})
     };
     
-    focusInput(component) {
-        if (component) {
-            ReactDOM.findDOMNode(component).focus(); 
-        }
-    };
-    
     onMediaProgress(percent, message) {
         this.setState({'mediaProgress':percent});
         ////console.log('Upload media progress: ' + percent + '% ' + message);
     };
     
-    onImageProgress(percent, message) {
-        this.setState({'imageProgress':percent});
-        ////console.log('Upload progress: ' + percent + '% ' + message);
+    // OGG
+    changeMedia_ogg(e) {
+        let state = {...this.props.question};
+        state.media_ogg=e.target.value
+        this.props.updateQuestion(state);
+        this.setState({'question':state});
+        return true;
     };
+    
+    finishUploadMedia_ogg(signResult) {
+        ////console.log("Uppt media finished: " + signResult.publicUrl)
+        let state = {...this.props.question};
+        let time = new Date().getTime();
+        state.media_ogg="/api"+signResult.publicUrl+'?no_cache='+time;
+        this.props.updateQuestion(state);
+        this.setState({mediaProgress_ogg:null});
+        //this.setState({imageURL:"/api"+signResult.publicUrl})
+    };
+    
+    onMediaProgress_ogg(percent, message) {
+        this.setState({'mediaProgress_ogg':percent});
+    };
+    // WEBM
+    changeMedia_webm(e) {
+        let state = {...this.props.question};
+        state.media_webm=e.target.value
+        this.props.updateQuestion(state);
+        this.setState({'question':state});
+        return true;
+    };
+    
+    finishUploadMedia_webm(signResult) {
+        ////console.log("Uppt media finished: " + signResult.publicUrl)
+        let state = {...this.props.question};
+        let time = new Date().getTime();
+        state.media_webm="/api"+signResult.publicUrl+'?no_cache='+time;
+        this.props.updateQuestion(state);
+        this.setState({mediaProgress_webm:null});
+        //this.setState({imageURL:"/api"+signResult.publicUrl})
+    };
+    
+    onMediaProgress_webm(percent, message) {
+        this.setState({'mediaProgress_webm':percent});
+    };
+     // MP4
+
+ changeMedia_mp4(e) {
+        let state = {...this.props.question};
+        state.media_mp4=e.target.value
+        this.props.updateQuestion(state);
+        this.setState({'question':state});
+        return true;
+    };
+    
+    finishUploadMedia_mp4(signResult) {
+        ////console.log("Uppt media finished: " + signResult.publicUrl)
+        let state = {...this.props.question};
+        let time = new Date().getTime();
+        state.media_mp4="/api"+signResult.publicUrl+'?no_cache='+time;
+        this.props.updateQuestion(state);
+        this.setState({mediaProgress_mp4:null});
+        //this.setState({imageURL:"/api"+signResult.publicUrl})
+    };
+    
+    onMediaProgress_mp4(percent, message) {
+        this.setState({'mediaProgress_mp4':percent});
+    };
+ 
+
+
+
+
     
     selectInterrogative(value) {
         let state = {...this.props.question};
@@ -412,10 +501,10 @@ export default class QuestionEditor extends Component {
                         </div>                       
                        
                          <div className='form-group'>  
-                                    <label htmlFor="link" >Media URL</label> <ReactS3Uploader
+                                    <label htmlFor="link" >Audio Media URL (mp3 format)</label> <ReactS3Uploader
                                     signingUrl="/api/s3/sign"
                                     signingUrlMethod="GET"
-                                    accept="*"
+                                    accept="audio/mp3,audio/mpeg"
                                     s3path="uploads/"
                                     inputRef={cmp => this.uploadInput = cmp}
                                     autoUpload={true}
@@ -425,7 +514,7 @@ export default class QuestionEditor extends Component {
                                     scrubFilename={(filename) => "media_"+String(this.props.question._id)}
                                     onFinish={this.finishUploadMedia}
                                     onProgress={this.onMediaProgress}
-                                    /><input autoComplete="false" id="image" type='text' name='media' onChange={this.changeMedia} value={this.props.question.media}  className='form-control' />
+                                    /><input autoComplete="false" id="media" type='text' name='media' onChange={this.changeMedia} value={this.props.question.media}  className='form-control' />
                             {this.state.mediaProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress)+'%'}} >&nbsp;</div></div>}
                                 
                             {this.props.question.media && !this.state.mediaProgress &&  <span><Player
@@ -433,6 +522,81 @@ export default class QuestionEditor extends Component {
                                       autoPlay={false}
                                       fluid={true}
                                       src={this.props.question.media}
+                                    /></span> }
+                                        
+                        </div>
+                        <div className='form-group'>  
+                                    <label htmlFor="link" >Audio Media URL (ogg format)</label> <ReactS3Uploader
+                                    signingUrl="/api/s3/sign"
+                                    signingUrlMethod="GET"
+                                    accept="audio/ogg"
+                                    s3path="uploads/"
+                                    inputRef={cmp => this.uploadInput = cmp}
+                                    autoUpload={true}
+                                    signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
+                                    uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
+                                    contentDisposition="auto"
+                                    scrubFilename={(filename) => "media_ogg_"+String(this.props.question._id)}
+                                    onFinish={this.finishUploadMedia_ogg}
+                                    onProgress={this.onMediaProgress_ogg}
+                                    /><input autoComplete="false" id="media_ogg" type='text' name='media_ogg' onChange={this.changeMedia_ogg} value={this.props.question.media_ogg}  className='form-control' />
+                            {this.state.mediaProgress_ogg && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress_ogg)+'%'}} >&nbsp;</div></div>}
+                                
+                            {this.props.question.media_ogg && !this.state.mediaProgress_ogg &&  <span><Player
+                                      playsInline
+                                      autoPlay={false}
+                                      fluid={true}
+                                      src={this.props.question.media_ogg}
+                                    /></span> }
+                                        
+                        </div>
+                        <div className='form-group'>  
+                                    <label htmlFor="link" >Video Media URL(webm format)</label> <ReactS3Uploader
+                                    signingUrl="/api/s3/sign"
+                                    signingUrlMethod="GET"
+                                    accept="video/webm"
+                                    s3path="uploads/"
+                                    inputRef={cmp => this.uploadInput = cmp}
+                                    autoUpload={true}
+                                    signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
+                                    uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
+                                    contentDisposition="auto"
+                                    scrubFilename={(filename) => "media_webm_"+String(this.props.question._id)}
+                                    onFinish={this.finishUploadMedia_webm}
+                                    onProgress={this.onMediaProgress_webm}
+                                    /><input autoComplete="false" id="media_webm" type='text' name='media_webm' onChange={this.changeMedia_webm} value={this.props.question.media_webm}  className='form-control' />
+                            {this.state.mediaProgress_webm && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress_webm)+'%'}} >&nbsp;</div></div>}
+                                
+                            {this.props.question.media_webm && !this.state.mediaProgress_webm &&  <span><Player
+                                      playsInline
+                                      autoPlay={false}
+                                      fluid={true}
+                                      src={this.props.question.media_webm}
+                                    /></span> }
+                                        
+                        </div>
+                        <div className='form-group'>  
+                                    <label htmlFor="link" >Video Media URL(mp4 format)</label> <ReactS3Uploader
+                                    signingUrl="/api/s3/sign"
+                                    signingUrlMethod="GET"
+                                    accept="video/mp4"
+                                    s3path="uploads/"
+                                    inputRef={cmp => this.uploadInput = cmp}
+                                    autoUpload={true}
+                                    signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
+                                    uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
+                                    contentDisposition="auto"
+                                    scrubFilename={(filename) => "media_mp4_"+String(this.props.question._id)}
+                                    onFinish={this.finishUploadMedia_mp4}
+                                    onProgress={this.onMediaProgress_mp4}
+                                    /><input autoComplete="false" id="media_mp4" type='text' name='media_mp4' onChange={this.changeMedia_mp4} value={this.props.question.media_mp4}  className='form-control' />
+                            {this.state.mediaProgress_mp4 && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress_mp4)+'%'}} >&nbsp;</div></div>}
+                                
+                            {this.props.question.media_mp4 && !this.state.mediaProgress &&  <span><Player
+                                      playsInline
+                                      autoPlay={false}
+                                      fluid={true}
+                                      src={this.props.question.media_mp4}
                                     /></span> }
                                         
                         </div>
