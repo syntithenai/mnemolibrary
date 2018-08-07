@@ -137,7 +137,10 @@ let utilFunctions =  {
             
             var tagList = [];
             if (question.tags) {
-                tagList = question.tags.trim().toLowerCase().split(",");
+                let splitList = question.tags.trim().toLowerCase().split(",");
+                splitList.forEach(function(tag) {
+                    tagList.push(tag.trim());
+                });
                 question.tags = tagList;
             }
             // //console.log(question.tags);
