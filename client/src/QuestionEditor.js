@@ -1,3 +1,5 @@
+import "react-bootstrap-toggle/dist/bootstrap2-toggle.css";
+
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 //import QuizList from './QuizList';
@@ -8,6 +10,7 @@ import ReactDOM from 'react-dom';
 import Autocomplete from 'react-autocomplete';
 const ReactTags = require('react-tag-autocomplete')
 import ReactS3Uploader  from 'react-s3-uploader';
+import MediaFileUpload  from './MediaFileUpload';
 import "video-react/dist/video-react.css"; // import css
 import { Player } from 'video-react';
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -18,6 +21,7 @@ import WikipediaW from 'react-icons/lib/fa/wikipedia-w';
 import Google from 'react-icons/lib/fa/google';
 import Camera from 'react-icons/lib/fa/camera';
 import ShareAlt from 'react-icons/lib/fa/share-alt';
+import Toggle from 'react-bootstrap-toggle';
 
 export default class QuestionEditor extends Component {
     constructor(props) {
@@ -64,20 +68,21 @@ export default class QuestionEditor extends Component {
         this.toggleAutoPlayMediaCheckbox=this.toggleAutoPlayMediaCheckbox.bind(this);
         // mp3
         this.finishUploadMedia = this.finishUploadMedia.bind(this);
-        this.changeMedia = this.changeMedia.bind(this);
-        this.onMediaProgress = this.onMediaProgress.bind(this);
-        // ogg
-        this.finishUploadMedia_ogg = this.finishUploadMedia_ogg.bind(this);
-        this.changeMedia_ogg = this.changeMedia_ogg.bind(this);
-        this.onMediaProgress_ogg = this.onMediaProgress_ogg.bind(this);
-        // webm
-        this.finishUploadMedia_webm = this.finishUploadMedia_webm.bind(this);
-        this.changeMedia_webm = this.changeMedia_webm.bind(this);
-        this.onMediaProgress_webm = this.onMediaProgress_webm.bind(this);
-        // mp4
-        this.finishUploadMedia_mp4 = this.finishUploadMedia_mp4.bind(this);
-        this.changeMedia_mp4 = this.changeMedia_mp4.bind(this);
-        this.onMediaProgress_mp4 = this.onMediaProgress_mp4.bind(this);
+        this.finishUploadImage = this.finishUploadImage.bind(this);
+        //this.changeMedia = this.changeMedia.bind(this);
+        //this.onMediaProgress = this.onMediaProgress.bind(this);
+        //// ogg
+        //this.finishUploadMedia_ogg = this.finishUploadMedia_ogg.bind(this);
+        //this.changeMedia_ogg = this.changeMedia_ogg.bind(this);
+        //this.onMediaProgress_ogg = this.onMediaProgress_ogg.bind(this);
+        //// webm
+        //this.finishUploadMedia_webm = this.finishUploadMedia_webm.bind(this);
+        //this.changeMedia_webm = this.changeMedia_webm.bind(this);
+        //this.onMediaProgress_webm = this.onMediaProgress_webm.bind(this);
+        //// mp4
+        //this.finishUploadMedia_mp4 = this.finishUploadMedia_mp4.bind(this);
+        //this.changeMedia_mp4 = this.changeMedia_mp4.bind(this);
+        //this.onMediaProgress_mp4 = this.onMediaProgress_mp4.bind(this);
 
     };
     
@@ -114,6 +119,7 @@ export default class QuestionEditor extends Component {
           }).catch(function(ex) {
             //console.log(['parsing failed', ex])
           })
+            
     }
    
    
@@ -188,19 +194,7 @@ export default class QuestionEditor extends Component {
         return true;
     };
     
-    finishUploadImage(signResult) {
-        ////console.log("Uppt finished: " + signResult.publicUrl)
-        let state = {...this.props.question};
-        //state.image='';
-        //this.props.updateQuestion(state);
-        //this.setState({'question':state});
-        let time = new Date().getTime();
-        state.image="/api"+signResult.publicUrl+'?no_cache='+time;
-        this.props.updateQuestion(state);
-        this.setState({imageProgress:null});
-        
-        //this.setState({imageURL:"/api"+signResult.publicUrl})
-    };
+  
   focusInput(component) {
         if (component) {
             ReactDOM.findDOMNode(component).focus(); 
@@ -213,96 +207,123 @@ export default class QuestionEditor extends Component {
     };
   
 // MP3    
-    changeMedia(e) {
-        let state = {...this.props.question};
-        state.media=e.target.value
-        this.props.updateQuestion(state);
-        this.setState({'question':state});
-        return true;
-    };
+    //changeMedia(e) {
+        //let state = {...this.props.question};
+        //state.media=e.target.value
+        //this.props.updateQuestion(state);
+        //this.setState({'question':state});
+        //return true;
+    //};
     
     finishUploadMedia(signResult) {
+        console.log(signResult);
         ////console.log("Uppt media finished: " + signResult.publicUrl)
         let state = {...this.props.question};
-        let time = new Date().getTime();
-        state.media="/api"+signResult.publicUrl+'?no_cache='+time;
+        for (var key in signResult) {
+            state['media_'+key]=signResult[key];
+        }
         this.props.updateQuestion(state);
-        this.setState({mediaProgress:null});
-        //this.setState({imageURL:"/api"+signResult.publicUrl})
     };
     
-    onMediaProgress(percent, message) {
-        this.setState({'mediaProgress':percent});
-        ////console.log('Upload media progress: ' + percent + '% ' + message);
-    };
-    
-    // OGG
-    changeMedia_ogg(e) {
-        let state = {...this.props.question};
-        state.media_ogg=e.target.value
-        this.props.updateQuestion(state);
-        this.setState({'question':state});
-        return true;
-    };
-    
-    finishUploadMedia_ogg(signResult) {
+    finishUploadImage(signResult) {
+        console.log('FINISH IMAGE UPLOAD');
+        console.log(signResult);
         ////console.log("Uppt media finished: " + signResult.publicUrl)
         let state = {...this.props.question};
-        let time = new Date().getTime();
-        state.media_ogg="/api"+signResult.publicUrl+'?no_cache='+time;
+        for (var key in signResult) {
+            state['image_'+key]=signResult[key];
+        }
         this.props.updateQuestion(state);
-        this.setState({mediaProgress_ogg:null});
+        //this.setState({state});
         //this.setState({imageURL:"/api"+signResult.publicUrl})
     };
+  
+    //finishUploadImage(signResult) {
+        //////console.log("Uppt finished: " + signResult.publicUrl)
+        //let state = {...this.props.question};
+        ////state.image='';
+        ////this.props.updateQuestion(state);
+        ////this.setState({'question':state});
+        //let time = new Date().getTime();
+        //state.image="/api"+signResult.publicUrl+'?no_cache='+time;
+        //this.props.updateQuestion(state);
+        //this.setState({imageProgress:null});
+        
+        ////this.setState({imageURL:"/api"+signResult.publicUrl})
+    //};
     
-    onMediaProgress_ogg(percent, message) {
-        this.setState({'mediaProgress_ogg':percent});
-    };
-    // WEBM
-    changeMedia_webm(e) {
-        let state = {...this.props.question};
-        state.media_webm=e.target.value
-        this.props.updateQuestion(state);
-        this.setState({'question':state});
-        return true;
-    };
+    //onMediaProgress(percent, message) {
+        //this.setState({'mediaProgress':percent});
+        //////console.log('Upload media progress: ' + percent + '% ' + message);
+    //};
     
-    finishUploadMedia_webm(signResult) {
-        ////console.log("Uppt media finished: " + signResult.publicUrl)
-        let state = {...this.props.question};
-        let time = new Date().getTime();
-        state.media_webm="/api"+signResult.publicUrl+'?no_cache='+time;
-        this.props.updateQuestion(state);
-        this.setState({mediaProgress_webm:null});
-        //this.setState({imageURL:"/api"+signResult.publicUrl})
-    };
+    //// OGG
+    //changeMedia_ogg(e) {
+        //let state = {...this.props.question};
+        //state.media_ogg=e.target.value
+        //this.props.updateQuestion(state);
+        //this.setState({'question':state});
+        //return true;
+    //};
     
-    onMediaProgress_webm(percent, message) {
-        this.setState({'mediaProgress_webm':percent});
-    };
-     // MP4
+    //finishUploadMedia_ogg(signResult) {
+        //////console.log("Uppt media finished: " + signResult.publicUrl)
+        //let state = {...this.props.question};
+        //let time = new Date().getTime();
+        //state.media_ogg="/api"+signResult.publicUrl+'?no_cache='+time;
+        //this.props.updateQuestion(state);
+        //this.setState({mediaProgress_ogg:null});
+        ////this.setState({imageURL:"/api"+signResult.publicUrl})
+    //};
+    
+    //onMediaProgress_ogg(percent, message) {
+        //this.setState({'mediaProgress_ogg':percent});
+    //};
+    //// WEBM
+    //changeMedia_webm(e) {
+        //let state = {...this.props.question};
+        //state.media_webm=e.target.value
+        //this.props.updateQuestion(state);
+        //this.setState({'question':state});
+        //return true;
+    //};
+    
+    //finishUploadMedia_webm(signResult) {
+        //////console.log("Uppt media finished: " + signResult.publicUrl)
+        //let state = {...this.props.question};
+        //let time = new Date().getTime();
+        //state.media_webm="/api"+signResult.publicUrl+'?no_cache='+time;
+        //this.props.updateQuestion(state);
+        //this.setState({mediaProgress_webm:null});
+        ////this.setState({imageURL:"/api"+signResult.publicUrl})
+    //};
+    
+    //onMediaProgress_webm(percent, message) {
+        //this.setState({'mediaProgress_webm':percent});
+    //};
+     //// MP4
 
- changeMedia_mp4(e) {
-        let state = {...this.props.question};
-        state.media_mp4=e.target.value
-        this.props.updateQuestion(state);
-        this.setState({'question':state});
-        return true;
-    };
+ //changeMedia_mp4(e) {
+        //let state = {...this.props.question};
+        //state.media_mp4=e.target.value
+        //this.props.updateQuestion(state);
+        //this.setState({'question':state});
+        //return true;
+    //};
     
-    finishUploadMedia_mp4(signResult) {
-        ////console.log("Uppt media finished: " + signResult.publicUrl)
-        let state = {...this.props.question};
-        let time = new Date().getTime();
-        state.media_mp4="/api"+signResult.publicUrl+'?no_cache='+time;
-        this.props.updateQuestion(state);
-        this.setState({mediaProgress_mp4:null});
-        //this.setState({imageURL:"/api"+signResult.publicUrl})
-    };
+    //finishUploadMedia_mp4(signResult) {
+        //////console.log("Uppt media finished: " + signResult.publicUrl)
+        //let state = {...this.props.question};
+        //let time = new Date().getTime();
+        //state.media_mp4="/api"+signResult.publicUrl+'?no_cache='+time;
+        //this.props.updateQuestion(state);
+        //this.setState({mediaProgress_mp4:null});
+        ////this.setState({imageURL:"/api"+signResult.publicUrl})
+    //};
     
-    onMediaProgress_mp4(percent, message) {
-        this.setState({'mediaProgress_mp4':percent});
-    };
+    //onMediaProgress_mp4(percent, message) {
+        //this.setState({'mediaProgress_mp4':percent});
+    //};
  
 
 
@@ -335,7 +356,7 @@ export default class QuestionEditor extends Component {
         })  
     };
     
-    toggleAutoShowImageCheckbox(event) {
+    toggleAutoShowImageCheckbox() {
         if (this.props.question.autoshow_image === "YES") {
             this.props.question.autoshow_image=""
         } else {
@@ -347,7 +368,7 @@ export default class QuestionEditor extends Component {
         return true;
     };
     
-    toggleAutoPlayMediaCheckbox(event) {
+    toggleAutoPlayMediaCheckbox() {
         if (this.props.question.autoplay_media === "YES") {
             this.props.question.autoplay_media=""
         } else {
@@ -362,6 +383,27 @@ export default class QuestionEditor extends Component {
     render() {
        // //console.log(['QE REN',this.props]);
         if (this.props.question) {
+            let currentMedia={};
+            let currentImages={};
+            
+            //for (var key in this.props.question) {
+                //if (key.startsWith('media_')) {
+                    //currentMedia[key]=this.props.question[key];
+                //} else if (key.startsWith('image_')) {
+                    //currentImages[key]=this.props.question[key];
+                //}
+            //}
+         
+         
+            if (this.props.question['media_mp3lq']) currentMedia.audioUrlMp3lq=this.props.question['media_mp3lq'];
+            if (this.props.question['media_mp3']) currentMedia.audioUrlMp3=this.props.question['media_mp3'];
+            if (this.props.question['media_webmaudio']) currentMedia.audioUrlWebm=this.props.question['media_webmaudio'];
+            if (this.props.question['media_mp4']) currentMedia.videoUrlMp4=this.props.question['media_mp4'];
+            if (this.props.question['media_webmvideo']) currentMedia.videoUrlWebm=this.props.question['media_webmvideo'];
+            if (this.props.question['image_png']) currentImages.imageUrl=this.props.question['image_png'];
+            
+            
+            
           let techniques = this.props.mnemonic_techniques.map((technique, key) => {
                 return <option  key={key} value={technique}  >{technique}</option>
             })
@@ -462,28 +504,45 @@ export default class QuestionEditor extends Component {
                         </div>
                         <div className='form-group'>     
                             <label htmlFor="autoshow_image" >Show Image in Review ?</label>
-                            {this.props.question.autoshow_image === "YES" && <input type="checkbox" autoComplete="false" id="autoshow_image"  name='autoshow_image' checked onChange={this.toggleAutoShowImageCheckbox}  className='form-control' />}
-                            {this.props.question.autoshow_image !== "YES" && <input type="checkbox" autoComplete="false" id="autoshow_image"  name='autoshow_image' onChange={this.toggleAutoShowImageCheckbox}  className='form-control' />}
+                            &nbsp;&nbsp;
+                            {this.props.question.autoshow_image === "YES" && 
+                                <Toggle
+                                  onClick={this.toggleAutoShowImageCheckbox}
+                                  on={<b>&nbsp;&nbsp;Yes&nbsp;&nbsp;</b>}
+                                  off={<b>&nbsp;&nbsp;No&nbsp;&nbsp;</b>}
+                                  size="xs"
+                                  offstyle="danger"
+                                  active={true}
+                                />
+                                
+                            }
+                            
+                            {this.props.question.autoshow_image !== "YES" && 
+                                <Toggle
+                                  onClick={this.toggleAutoShowImageCheckbox}
+                                  on={<b>&nbsp;&nbsp;Yes&nbsp;&nbsp;</b>}
+                                  off={<b>&nbsp;&nbsp;No&nbsp;&nbsp;</b>}
+                                  size="xs"
+                                  offstyle="danger"
+                                  active={false}
+                                />
+                                
+                            }
                         </div>
                         
                         <div className='form-group'>  
-                                <label htmlFor="link" >Image URL</label> <ReactS3Uploader
-                                    signingUrl="/api/s3/sign"
-                                    signingUrlMethod="GET"
-                                    accept="image/*"
-                                    s3path="uploads/"
-                                    inputRef={cmp => this.uploadInput = cmp}
-                                    autoUpload={true}
-                                    signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
-                                    uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
-                                    contentDisposition="auto"
-                                    scrubFilename={(filename) => this.props.question._id}
-                                    onFinish={this.finishUploadImage}
-                                    onProgress={this.onImageProgress}
-                                    /><input autoComplete="false" id="image" type='text' name='image' onChange={this.changeImage} value={this.props.question.image}  className='form-control' />
-                                {this.state.imageProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.imageProgress)+'%'}} >&nbsp;</div></div>}
-                                {this.props.question.image && !this.state.imageProgress &&  <img alt='progress' src={this.props.question.image} style={{width: 200}}/>}
-                                
+                                <label htmlFor="link" >Image URL</label>
+                                <MediaFileUpload
+                                        publicUrlPrefix="/uploader"
+                                        signingUrl="/uploader/s3/sign"
+                                        s3path="imagefiles/"
+                                        name="image"
+                                        scrubFilename={(filename) => "image_"+String(this.props.question._id)}
+                                        onFinish={this.finishUploadImage}
+                                        currentMedia={currentImages}
+                                        acceptFileTypes="image/*"
+                                    />
+                                    
                         </div>
 
                         
@@ -494,112 +553,49 @@ export default class QuestionEditor extends Component {
                         <div className='form-group'>     
                             <label htmlFor="autoplay_media" >Autoplay media ? </label>
                             <div className='checkbox-inline'>
-                                {this.props.question.autoplay_media === "YES" && <input type="checkbox" autoComplete="false" id="autoplay_media"  name='autoplay_media' checked onChange={this.toggleAutoPlayMediaCheckbox}  className='form-control' />}
-                                {this.props.question.autoplay_media !== "YES" && <input type="checkbox" autoComplete="false" id="autoplay_media"  name='autoplay_media' onChange={this.toggleAutoPlayMediaCheckbox}  className='form-control' />}
+                                
+                                {this.props.question.autoplay_media === "YES" && 
+                                     <Toggle
+                                  onClick={this.toggleAutoPlayMediaCheckbox}
+                                  on={<b>&nbsp;&nbsp;Yes&nbsp;&nbsp;</b>}
+                                  off={<b>&nbsp;&nbsp;No&nbsp;&nbsp;</b>}
+                                  size="xs"
+                                  offstyle="danger"
+                                  active={true}
+                                />
+                                }
+                                
+                                {this.props.question.autoplay_media !== "YES" && 
+                                     <Toggle
+                                  onClick={this.toggleAutoPlayMediaCheckbox}
+                                  on={<b>&nbsp;&nbsp;Yes&nbsp;&nbsp;</b>}
+                                  off={<b>&nbsp;&nbsp;No&nbsp;&nbsp;</b>}
+                                  size="xs"
+                                  offstyle="danger"
+                                  active={false}
+                                />
+                                    }
                                 
                             </div>
                         </div>                       
                        
                          <div className='form-group'>  
-                                    <label htmlFor="link" >Audio Media URL (mp3 format)</label> <ReactS3Uploader
-                                    signingUrl="/api/s3/sign"
-                                    signingUrlMethod="GET"
-                                    accept="audio/mp3,audio/mpeg"
-                                    s3path="uploads/"
-                                    inputRef={cmp => this.uploadInput = cmp}
-                                    autoUpload={true}
-                                    signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
-                                    uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
-                                    contentDisposition="auto"
-                                    scrubFilename={(filename) => "media_"+String(this.props.question._id)}
-                                    onFinish={this.finishUploadMedia}
-                                    onProgress={this.onMediaProgress}
-                                    /><input autoComplete="false" id="media" type='text' name='media' onChange={this.changeMedia} value={this.props.question.media}  className='form-control' />
-                            {this.state.mediaProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress)+'%'}} >&nbsp;</div></div>}
-                                
-                            {this.props.question.media && !this.state.mediaProgress &&  <span><Player
-                                      playsInline
-                                      autoPlay={false}
-                                      fluid={true}
-                                      src={this.props.question.media}
-                                    /></span> }
+                                    <label htmlFor="link" >Audio/Video Media URL</label> 
+                                    <MediaFileUpload
+                                        publicUrlPrefix="/uploader"
+                                        signingUrl="/uploader/s3/sign"
+                                        s3path="mediafiles/"
+                                        name="media"
+                                        scrubFilename={(filename) => "media_"+String(this.props.question._id)}
+                                        onFinish={this.finishUploadMedia}
+                                        currentMedia={currentMedia}
+                                        acceptFileTypes="audio/*,video/*"
+                                    />
+                                    
+                                    
                                         
                         </div>
-                        <div className='form-group'>  
-                                    <label htmlFor="link" >Audio Media URL (ogg format)</label> <ReactS3Uploader
-                                    signingUrl="/api/s3/sign"
-                                    signingUrlMethod="GET"
-                                    accept="audio/ogg"
-                                    s3path="uploads/"
-                                    inputRef={cmp => this.uploadInput = cmp}
-                                    autoUpload={true}
-                                    signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
-                                    uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
-                                    contentDisposition="auto"
-                                    scrubFilename={(filename) => "media_ogg_"+String(this.props.question._id)}
-                                    onFinish={this.finishUploadMedia_ogg}
-                                    onProgress={this.onMediaProgress_ogg}
-                                    /><input autoComplete="false" id="media_ogg" type='text' name='media_ogg' onChange={this.changeMedia_ogg} value={this.props.question.media_ogg}  className='form-control' />
-                            {this.state.mediaProgress_ogg && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress_ogg)+'%'}} >&nbsp;</div></div>}
-                                
-                            {this.props.question.media_ogg && !this.state.mediaProgress_ogg &&  <span><Player
-                                      playsInline
-                                      autoPlay={false}
-                                      fluid={true}
-                                      src={this.props.question.media_ogg}
-                                    /></span> }
-                                        
-                        </div>
-                        <div className='form-group'>  
-                                    <label htmlFor="link" >Video Media URL(webm format)</label> <ReactS3Uploader
-                                    signingUrl="/api/s3/sign"
-                                    signingUrlMethod="GET"
-                                    accept="video/webm"
-                                    s3path="uploads/"
-                                    inputRef={cmp => this.uploadInput = cmp}
-                                    autoUpload={true}
-                                    signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
-                                    uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
-                                    contentDisposition="auto"
-                                    scrubFilename={(filename) => "media_webm_"+String(this.props.question._id)}
-                                    onFinish={this.finishUploadMedia_webm}
-                                    onProgress={this.onMediaProgress_webm}
-                                    /><input autoComplete="false" id="media_webm" type='text' name='media_webm' onChange={this.changeMedia_webm} value={this.props.question.media_webm}  className='form-control' />
-                            {this.state.mediaProgress_webm && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress_webm)+'%'}} >&nbsp;</div></div>}
-                                
-                            {this.props.question.media_webm && !this.state.mediaProgress_webm &&  <span><Player
-                                      playsInline
-                                      autoPlay={false}
-                                      fluid={true}
-                                      src={this.props.question.media_webm}
-                                    /></span> }
-                                        
-                        </div>
-                        <div className='form-group'>  
-                                    <label htmlFor="link" >Video Media URL(mp4 format)</label> <ReactS3Uploader
-                                    signingUrl="/api/s3/sign"
-                                    signingUrlMethod="GET"
-                                    accept="video/mp4"
-                                    s3path="uploads/"
-                                    inputRef={cmp => this.uploadInput = cmp}
-                                    autoUpload={true}
-                                    signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
-                                    uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
-                                    contentDisposition="auto"
-                                    scrubFilename={(filename) => "media_mp4_"+String(this.props.question._id)}
-                                    onFinish={this.finishUploadMedia_mp4}
-                                    onProgress={this.onMediaProgress_mp4}
-                                    /><input autoComplete="false" id="media_mp4" type='text' name='media_mp4' onChange={this.changeMedia_mp4} value={this.props.question.media_mp4}  className='form-control' />
-                            {this.state.mediaProgress_mp4 && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress_mp4)+'%'}} >&nbsp;</div></div>}
-                                
-                            {this.props.question.media_mp4 && !this.state.mediaProgress &&  <span><Player
-                                      playsInline
-                                      autoPlay={false}
-                                      fluid={true}
-                                      src={this.props.question.media_mp4}
-                                    /></span> }
-                                        
-                        </div>
+                        
                         
                     </div>
                      
@@ -610,6 +606,35 @@ export default class QuestionEditor extends Component {
             
     }
 };
+
+
+
+                                //<input type="checkbox" autoComplete="false" id="autoshow_image"  name='autoshow_image' checked onChange={this.toggleAutoShowImageCheckbox}  className='form-control' />
+                                //<input type="checkbox" autoComplete="false" id="autoshow_image"  name='autoshow_image' onChange={this.toggleAutoShowImageCheckbox}  className='form-control' />
+
+
+//<ReactS3Uploader
+                                    //signingUrl="/api/s3/sign"
+                                    //signingUrlMethod="GET"
+                                    //accept="audio/mp3,audio/mpeg"
+                                    //s3path="uploads/"
+                                    //inputRef={cmp => this.uploadInput = cmp}
+                                    //autoUpload={true}
+                                    //signingUrlWithCredentials={ true }      // in case when need to pass authentication credentials via CORS
+                                    //uploadRequestHeaders={{ 'x-amz-acl': 'public-read' }}  // this is the default
+                                    //contentDisposition="auto"
+                                    //scrubFilename={(filename) => "media_"+String(this.props.question._id)}
+                                    //onFinish={this.finishUploadMedia}
+                                    //onProgress={this.onMediaProgress}
+                                    ///><input autoComplete="false" id="media" type='text' name='media' onChange={this.changeMedia} value={this.props.question.media}  className='form-control' />
+                            //{this.state.mediaProgress && <div className='progressbar' style={{backgroundColor: 'blue',width: '100%'}}><div className='progressbarinner' style={{backgroundColor: 'red', width:String(this.state.mediaProgress)+'%'}} >&nbsp;</div></div>}
+                                
+                            //{this.props.question.media && !this.state.mediaProgress &&  <span><Player
+                                      //playsInline
+                                      //autoPlay={false}
+                                      //fluid={true}
+                                      //src={this.props.question.media}
+                                    ///></span> }
 //filename.replace(/[^\w\d_\-.]+/ig, '')
   //<form method="POST" onSubmit={this.saveUser} className="form-group" autoComplete="false" >
                      //</form>

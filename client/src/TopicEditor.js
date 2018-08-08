@@ -40,8 +40,10 @@ export default class TopicEditor extends Component {
             currentView:'topics',
             showHelp: false,
             validationErrors:{},
-            shareQuestion:{}
+            shareQuestion:{},
+            filter:''
         };
+        this.updateFilter = this.updateFilter.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.setTopicEvent = this.setTopicEvent.bind(this);
         this.setTopic = this.setTopic.bind(this);
@@ -190,7 +192,7 @@ export default class TopicEditor extends Component {
                 if (id.errors && Object.keys(id.errors).length > 0) {
                     that.setState({validationErrors:id.errors,message:'Some of your questions are missing required information.'});
                 } else {
-                    that.setState({validationErrors:{},message:' '});
+                    that.setState({validationErrors:{},message:' ',questions:id.questions});
                 }
                 
                 
@@ -449,6 +451,10 @@ export default class TopicEditor extends Component {
         return false;
     };
     
+    updateFilter(e) {
+        this.setState({filter:String(e.target.value).toLowerCase()});
+    };
+    
     
     render() {
         let currentQuestion = this.state.currentQuestion > 0 ? this.state.currentQuestion : 0;
@@ -498,7 +504,10 @@ export default class TopicEditor extends Component {
                              
                                  {false && String(this.state._id).length > 0 && this.state.questions.length >0 && <button  className='btn btn-warning'  onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
                               
-                                <TopicQuestionsList validationErrors={this.state.validationErrors} editQuestion={this.editQuestion}  questions={this.state.questions} moveQuestion={this.moveQuestion} currentQuestion={this.state.currentQuestion} /></span>
+                              
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label>Filter <input type='text' onChange={this.updateFilter} /></label>
+                              
+                                <TopicQuestionsList filter={this.state.filter} validationErrors={this.state.validationErrors} editQuestion={this.editQuestion}  questions={this.state.questions} moveQuestion={this.moveQuestion} currentQuestion={this.state.currentQuestion} /></span>
                             }
                             {!this.state.showHelp && this.state.currentView==='editor' &&
                                 <QuestionEditor showSearch={this.showSearch} previewTopic={this.previewTopic} createQuestion={this.createQuestion} deleteQuestion={this.deleteQuestion} updateQuestion={this.updateQuestion} mnemonic_techniques={this.props.mnemonic_techniques}  question={question} questions={this.state.questions} _id={this.state._id} currentQuestion={this.state.currentQuestion} shareQuestion={this.shareQuestion} topic={this.state.topic} published={this.state.published}/>

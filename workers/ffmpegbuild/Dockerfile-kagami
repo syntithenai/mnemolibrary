@@ -1,0 +1,15 @@
+FROM ubuntu:16.04
+
+RUN apt-get update && apt-get -y install wget python git automake libtool build-essential cmake libglib2.0-dev closure-compiler
+
+RUN cd /root  &&  wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xzvf emsdk-portable.tar.gz
+RUN cd /root && cd emsdk-portable && ./emsdk update && ./emsdk install latest && ./emsdk activate latest
+RUN cd /root/emsdk-portable && /bin/bash ./emsdk_env.sh
+
+RUN cd /root && git clone https://github.com/Kagami/ffmpeg.js.git && cd ffmpeg.js && git submodule init && git submodule update --recursive 
+SHELL ["/bin/bash", "-c"]
+RUN cd /root/emsdk-portable && source ./emsdk_env.sh && cd /root/ffmpeg.js && make all
+
+
+CMD [ "sleep", "360000000" ]
+ 

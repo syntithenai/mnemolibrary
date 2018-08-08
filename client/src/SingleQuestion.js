@@ -70,10 +70,35 @@ export default class SingleQuestion extends Component {
             {question.media_ogg && <source src={question.media_ogg} />}
             {question.media_webm && <source src={question.media_webm} />}
             {question.media_mp4 && <source src={question.media_mp4} />}
+            
+            {question.media_mp3 && <source src={question.media_mp3} />}
+            {question.media_mp4 && <source src={question.media_mp4} />}
+            {question.media_webmvideo && <source src={question.media_webmvideo} />}
+            {question.media_webmaudio && <source src={question.media_webmaudio} />}
+            
+            
             </Player>
             this.setState({media:media});
         }
       }
+      
+      hasMedia(question) {
+         // console.log(['HASMEDIA',question]);
+          if (question.media ||
+            question.media_ogg ||
+            question.media_webm ||
+            question.media_mp4 ||
+            
+            question.media_mp3 ||
+            question.media_mp4 ||
+            question.media_webmvideo ||
+            question.media_webmaudio
+            )  {
+                return true;
+            } else {
+                return false;
+            }
+      };
 
       handleStateChange(state, prevState) {
           function getOS() {
@@ -296,7 +321,7 @@ export default class SingleQuestion extends Component {
                 attribution=(<a href={question.attribution} >{shortAttribution}</a>)
             }
             let imageAttribution=question.imageattribution;
-            let imageLink=question.image
+            let imageLink=question.image_png ? question.image_png : question.image;
             if (imageAttribution && imageAttribution.indexOf('http')===0) {
                 let endAttribution=question.imageattribution.indexOf("/",9);
                 let shortAttribution=question.imageattribution.slice(0,endAttribution);
@@ -318,7 +343,8 @@ export default class SingleQuestion extends Component {
                 let endDomain=question.link.indexOf("/",9);
                 shortLink = question.link.slice(0,endDomain);
             }
-            
+            let hasMedia=this.hasMedia(question);
+              
                    
            return (
             <div className="questionwrap" >
@@ -342,9 +368,9 @@ export default class SingleQuestion extends Component {
                             }&nbsp;
                             {question.answer && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
                             }&nbsp;
-                            {question.image && <button  className='btn btn-primary' onClick={() => this.setVisible('image')}><Image size={26} />&nbsp;<span className="d-none d-md-inline-block">Image</span></button>
+                            {imageLink && <button  className='btn btn-primary' onClick={() => this.setVisible('image')}><Image size={26} />&nbsp;<span className="d-none d-md-inline-block">Image</span></button>
                             }&nbsp;
-                            {question.media && <button  className='btn btn-primary' onClick={() => this.toggleMedia()}><Music size={26} />&nbsp;<span className="d-none d-md-inline-block">Media</span></button>
+                            {hasMedia && <button  className='btn btn-primary' onClick={() => this.toggleMedia()}><Music size={26} />&nbsp;<span className="d-none d-md-inline-block">Media</span></button>
                             }&nbsp;
                             
                             {(!target) && <button  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
@@ -364,14 +390,13 @@ export default class SingleQuestion extends Component {
                     <Swipeable onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')}   >  
                         <h4 className="card-title">{header}?</h4>
                         <div className="card-block">
-                            {(this.isVisible('media') || question.autoplay_media==="YES") && question.mediaattribution && question.media  && <div className="card-block mediaattribution">
+                            {(this.isVisible('media') || question.autoplay_media==="YES") && question.mediaattribution && hasMedia  && <div className="card-block mediaattribution">
                             <div  className='card-text ' style={{fontSize:'0.85em'}}><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
                         </div>}
                         <div ref={(section) => { this.scrollTo.media = section; }} ></div>
-                        {((this.isVisible('media') || question.autoplay_media==="YES") && question.media) && <span>
+                        {((this.isVisible('media') || question.autoplay_media==="YES") && hasMedia) && <span>
                             {media}</span> }
                         </div>
-                        
                        {(this.isVisible('mnemonic')|| !showRecallButton) &&<MnemonicsList isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
                         
                         <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
@@ -422,7 +447,7 @@ export default class SingleQuestion extends Component {
                     
                     <div className="card-block">
                         <div ref={(section) => { this.scrollTo.image = section; }} ></div>
-                        {((this.isVisible('image') || !showRecallButton || question.autoshow_image==="YES") && question.image) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={question.image} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={question.image} style={{width:"50%",  border: "0px"}}/></a></span> }
+                        {((this.isVisible('image') || !showRecallButton || question.autoshow_image==="YES") && imageLink) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={imageLink} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={imageLink} style={{width:"50%",  border: "0px"}}/></a></span> }
                         {(this.isVisible('image') || !showRecallButton) && question.imageattribution && <div className="card-block imageattribution">
                             <div  className='card-text' style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div>
                         </div>}

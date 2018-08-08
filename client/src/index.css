@@ -5,6 +5,13 @@ body {
   padding-top: 8rem;
   padding-left: 0rem;
 }
+.media-preview label,.media-preview input {
+    display: inline;
+}
+.toggle-handle {
+    border: none !important;
+}
+
 #sharetopicdialog {
     z-index: 9999 !important;
 }

@@ -576,7 +576,7 @@ router.get('/useractivity', (req, res) => {
 })
 
 
-
+// SUPPORT OLD PATH TO UPLOADED FILES FOR NOW
 router.use('/s3', require('react-s3-uploader/s3router')({
     bucket: "mnemolibrary.com",
     region: 'us-west-2', //optional
@@ -1491,13 +1491,14 @@ router.post('/saveusertopic', (req, res) => {
         let id = body._id && String(body._id).length > 0 ? new ObjectId(body._id) : new ObjectId();
         let user = body.user;
         let questions = body.questions;
-        let toSave = {_id:id,user:ObjectId(user),questions:questions,topic:body.topic,publishedTopic:body.publishedTopic};
-        toSave.updated=new Date().getTime();
-//        //console.log(['saveusertopic']);
-//        //console.log([toSave]);
         // validation info
         let errors={};
+        let newQuestions=[];
         questions.map(function(question,key) {
+            // ensure id
+            questions[key]._id = questions[key]._id && String(questions[key]._id).length > 0 ? new ObjectId(questions[key]._id) : new ObjectId();
+        
+            // required question fields
             if (question.mnemonic && question.mnemonic.length === 0) {
                 if (!errors.hasOwnProperty(key)) errors[key]=[];
                 errors[key].push('mnemonic');
@@ -1516,6 +1517,11 @@ router.post('/saveusertopic', (req, res) => {
             //}
 
         });
+        let toSave = {_id:id,user:ObjectId(user),questions:questions,topic:body.topic,publishedTopic:body.publishedTopic};
+        toSave.updated=new Date().getTime();
+//        //console.log(['saveusertopic']);
+//        //console.log([toSave]);
+        
         if (req.body.deleteQuestion && String(req.body.deleteQuestion).length > 0) {
             db.collection('questions').remove({_id:ObjectId(req.body.deleteQuestion)}).then(function(result) {
                 ////console.log(['deleted question',result]);
@@ -1527,7 +1533,7 @@ router.post('/saveusertopic', (req, res) => {
         
         db.collection('userTopics').save(toSave).then(function(result) {
 //            //console.log(['saved usertopic',result]);
-            res.send({id:id,errors:errors});
+            res.send({id:id,errors:errors,questions:questions,ll:9});
         }).catch(function(err) {
           //  //console.log(['save usertopic ERR',err]);
             res.send({message:'Invaddlid request ERR'});
@@ -1565,7 +1571,7 @@ router.post('/usertopic', (req, res) => {
 })
 
 router.get('/tags', (req, res) => {
-    ////console.log(['usrtop',req.query]);
+    //console.log(['TAGS',req.query]);
     //if (req.body.title && req.body.title.length > 0) {
         //criteria[]
     //}
@@ -1579,9 +1585,10 @@ router.get('/tags', (req, res) => {
     if (search.length > 0) {
         criteria={$text: {$search: search}}
     }
+    //console.log(['TAGS',criteria]);
     db.collection('words').find(criteria).sort(sort).limit(200).toArray().then(function(results) {
           let final=[];
-          ////console.log(results);
+      //    console.log(results);
           results.map(function(key,val) {
       //          //console.log([search,key,val]);
                 if (search && search.length > 0) {

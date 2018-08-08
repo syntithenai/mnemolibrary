@@ -14,9 +14,11 @@ export default class TopicsList extends Component {
     constructor(props) {
         super(props);
         this.state={
-            topics:[]
+            topics:[],
+            filter:'',
         };
         this.loadTopics = this.loadTopics.bind(this);
+        this.updateFilter = this.updateFilter.bind(this);
     };
     
     componentDidMount() {
@@ -43,20 +45,25 @@ export default class TopicsList extends Component {
         });
     }; 
     
-
+    updateFilter(e) {
+        this.setState({filter:String(e.target.value).toLowerCase()});
+    };
     
     render() {
         let list='';
         if (this.state.topics && this.state.topics.length > 0) {
             list = this.state.topics.map((topic,key) => {
+                if (!this.state.filter || (topic.topic && topic.topic.toLowerCase().indexOf(this.state.filter) >= 0)) {
                      return <div onClick={() => this.props.loadTopic(topic._id)}  className='list-group-item' key={key} >{topic.topic}</div>
-                });
+                }
+                
+            });
         } else {
             list = <div></div>
         }
         return (
             <div>
-        <button   className='btn btn-success' onClick={() => this.props.newTopic()} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >Create Topic</span> </button>
+        <button   className='btn btn-success' onClick={() => this.props.newTopic()} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >Create Topic</span> </button>&nbsp;&nbsp;&nbsp;Filter&nbsp;&nbsp;<input  onChange={this.updateFilter} />
             {list}
             </div>
         )

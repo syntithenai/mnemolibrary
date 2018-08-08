@@ -1,6 +1,9 @@
 const express = require('express')
 const bodyParser= require('body-parser')
 const app = express()
+const path = require('path')
+const fs = require('fs')
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -9,39 +12,36 @@ app.use('/api',require('./routes/api'));
 app.use('/login',require('./routes/signup'));
 app.use('/oauth',require('./publicapi/routes/oauth'));
 //app.use('/signup',require('./publicapi/routes/signup'));
+var config=require('./config')
+var router = express.Router();
 
+router.get('/proxy', (req, res) => {
+    if (req.query.url) {
+        request.get(req.query.url).pipe(res);
+    }
+});
 
-//let packagePath = path.dirname(require.resolve("react-ffmpeg-s3-uploader/package.json"));
-//let a = require(__dirname+"/client/node-modules/react-ffmpeg-s3-uploader/s3router.js");
+router.use('/s3', require('./s3router')({
+    bucket: config.s3Bucket,
+    region: config.s3Region, //optional
+    //signatureVersion: 'v4', //optional (use for some amazon regions: frankfurt and others)
+    headers: {'Access-Control-Allow-Origin': '*'}, // optional
+    ACL: 'private', // this is default
+    uniquePrefix: false // (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
+}));
+
+router.get('/worker', (req, res) => {
+    if (req.query && req.query.worker) {
         
-
-//router.get('/proxy', (req, res) => {
-    //if (req.query.url) {
-        //request.get(req.query.url).pipe(res);
-    //}
-//});
-
-//router.use('/s3', require('react-ffmpeg-s3-uploader/s3router')({
-    //bucket: config.s3Bucket,
-    //region: config.s3Region, //optional
-    ////signatureVersion: 'v4', //optional (use for some amazon regions: frankfurt and others)
-    //headers: {'Access-Control-Allow-Origin': '*'}, // optional
-    //ACL: 'private', // this is default
-    //uniquePrefix: false // (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
-//}));
-
-//router.get('/worker', (req, res) => {
-    //if (req.query && req.query.worker) {
+        let workerPath = path.join(__dirname, './workers/ffmpeg-'+req.query.worker+".js");
+        if (fs.existsSync(workerPath)) {
+            res.sendFile(workerPath);
+        }
         
-        //let workerPath = path.join(__dirname, './workers/ffmpeg-'+req.query.worker+".js");
-        //if (fs.existsSync(workerPath)) {
-            //res.sendFile(workerPath);
-        //}
-        
-    //}
-//});
+    }
+});
 
-//app.use('/uploader',router)
+app.use('/uploader',router)
 
 
 const port = 5000;
