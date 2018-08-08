@@ -2,6 +2,7 @@ var alexaUtils = require('./alexautils');
 var __ = require('./speechStrings'); 
 var Speech = require('ssml-builder');
 var AmazonSpeech = require('ssml-builder/amazon_speech');
+var config = require("../config")
 
 let alexaSpeak = {    
 
@@ -37,6 +38,9 @@ let alexaSpeak = {
                 }
                 response.say(alexaUtils.speakable(question.question)+".")
             }
+            if (question.media_mp3lq && question.media_mp3lq.length > 0 && question.autoplay_media==="YES") {
+                response.audio(question.media_mp3lq);
+            }
             if (alexaUtils.attribution(question).length > 0) {
                 response.say('From '+alexaUtils.speakable(alexaUtils.attribution(question))+", ") //.pause('100ms')
             }
@@ -63,6 +67,9 @@ let alexaSpeak = {
                     response.say(alexaUtils.speakable(question.interrogative))
                 }
                 response.say(alexaUtils.speakable(question.question)+".")
+            }
+            if (question.media_mp3lq && question.media_mp3lq.length > 0 && question.autoplay_media==="YES") {
+                response.audio(question.media_mp3lq);
             }
             responser.say(response.ssml());
         }
@@ -160,6 +167,10 @@ let alexaSpeak = {
             if (question.question) {
                 response.say(alexaUtils.speakable(question.question))
             }
+        }
+        if (question.media_mp3lq && question.media_mp3lq.length > 0 && question.autoplay_media==="YES") {
+            console.log(['ASK '+ question.media_mp3lq]);
+            response.audio(question.media_mp3lq);
         }
         response.audio("https://s3.amazonaws.com/ask-soundlibrary/foley/amzn_sfx_clock_ticking_long_01.mp3");
         response.pause('500ms');
