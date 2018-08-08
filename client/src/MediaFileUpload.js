@@ -6,6 +6,7 @@ const axios = require('axios');
 
 var React = require('react'),
     S3Upload = require('./s3upload.js');
+var config = require('../../config')
 
 /**
  * This class is a react component that renders a file input then uses ffmpeg.js to provide extras including
@@ -444,9 +445,12 @@ class MediaFileUpload extends React.Component {
                     if (that.props.onProgress) that.props.onProgress(percentage,message);  
                 } ,
                 onFinishS3Put: function(result) {
+                    console.log(['FINISH PUT']);
+                    console.log(result);
                     let uploaded = that.state.uploaded;
                     if (that.state.uploadField) {
-                        uploaded[that.state.uploadField]=that.props.publicUrlPrefix+result.publicUrl;
+                        
+                        uploaded[that.state.uploadField]='https://'+config.s3Bucket+".s3."+config.s3Region+".amazonaws.com"+"/"+result.filename;
                         that.setState({uploaded:uploaded});                    
                         that.setState({active:true});                    
                     }
