@@ -287,7 +287,7 @@ router.get('/recenttopics', (req, res) => {
     if (req.query.user && req.query.user.length > 0) {
         let collatedTopics={};
         //
-        $or:[{'successTally':{$lt : 3}},{'successTally':{$exists : false}}]
+        $or:[{'successTally':{$lt : 7}},{'successTally':{$exists : false}}]
         
         //  collate all user progress by topic
         db.collection('userquestionprogress').aggregate([
@@ -375,7 +375,7 @@ router.get('/archivedtopics', (req, res) => {
         let collatedTopics={};
         db.collection('userquestionprogress').aggregate([
             { $match: {
-                    $and:[{'user': {$eq:ObjectId(req.query.user)}},{'successTally':{$gte : 3}},{'block':{$ne : 1}}]
+                    $and:[{'user': {$eq:ObjectId(req.query.user)}},{'successTally':{$gte : 7}},{'block':{$ne : 1}}]
            }},
             { $group: {'_id': "$topic",
                 'questions': { $sum: 1 },
@@ -1340,7 +1340,7 @@ function updateUserQuestionProgress(user,question,quiz,tags,ok_for_alexa,tallySu
         progress.block=0;
         db.collection('userquestionprogress').save(progress).then(function() {
             
-            });
+        });
     
   }).catch(function(e) {
       //console.log(['err',e]);

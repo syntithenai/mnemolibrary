@@ -36,50 +36,50 @@ export default class ProfilePage extends Component {
         let newState={};
         let award=null;
         if (type==="questions") {
-            if (parseFloat(awardData) <= 50)  {
+            if (parseFloat(awardData) < 50)  {
                 award=<button className="btn-outline-primary btn" >Beginner</button>
-            } else if (parseFloat(awardData)> 50)  {
+            } else if (parseFloat(awardData)< 100)  {
                 award=<button className="btn-outline-primary btn" >50 Questions</button>
-            } else if (parseFloat(awardData)> 100)  {
+            } else if (parseFloat(awardData)< 150)  {
                 award=<button className="btn-outline-primary btn" >100 Questions</button>
-            } else if (parseFloat(awardData)> 150)  {
+            } else if (parseFloat(awardData)< 200)  {
                 award=<button className="btn-outline-primary btn" >150 Questions</button>
-            } else if (parseFloat(awardData)> 200)  {
+            } else if (parseFloat(awardData)< 300)  {
                 award=<button className="btn-outline-primary btn" >200 Questions</button>
-            } else if (parseFloat(awardData)> 300)  {
+            } else if (parseFloat(awardData)< 400)  {
                 award=<button className="btn-outline-primary btn" >300 Questions</button>
-            } else if (parseFloat(awardData)> 400)  {
+            } else if (parseFloat(awardData)< 500)  {
                 award=<button className="btn-outline-primary btn" >400 Questions</button>
-            } else if (parseFloat(awardData)> 500)  {
+            } else if (parseFloat(awardData)< 1000)  {
                 award=<button className="btn-outline-primary btn" >500 Questions</button>
-            } else if (parseFloat(awardData)> 1000)  {
+            } else  {
                 award=<button className="btn-outline-primary btn" >1000 Questions</button>
             }
                 
         } else if (type==="topics") {
-            //if (awardData > 0) {
+            if (awardData > 0) {
                 award=<button className="btn-outline-primary btn" >{awardData} Topics Complete</button>
-            //}
+            }
         } else if (type==="recall") {
             if (parseFloat(awardData)<= 0.1)  {
                 award=<button className="btn-outline-primary btn" >Novice Numbat</button>
-            } else if (parseFloat(awardData)> 0.1)  {
+            } else if (parseFloat(awardData) <= 0.2)  {
                 award=<button className="btn-outline-primary btn" >Beginner Bandicoot</button>
-            } else if (parseFloat(awardData)> 0.2)  {
+            } else if (parseFloat(awardData) <= 0.3)  {
                 award=<button className="btn-outline-primary btn" >Initiate Ibis</button>
-            } else if (parseFloat(awardData)> 0.3)  {
+            } else if (parseFloat(awardData) <= 0.4)  {
                 award=<button className="btn-outline-primary btn" >Student Sloth</button>
-            } else if (parseFloat(awardData)> 0.4)  {
+            } else if (parseFloat(awardData) <= 0.5)  {
                 award=<button className="btn-outline-primary btn" >Expert Echidna</button>
-            } else if (parseFloat(awardData)> 0.5)  {
+            } else if (parseFloat(awardData) <= 0.6)  {
                 award=<button className="btn-outline-primary btn" >Master Magpie</button>
-            } else if (parseFloat(awardData)> 0.6)  {
+            } else if (parseFloat(awardData) <= 0.7)  {
                 award=<button className="btn-outline-primary btn" >Wizard Water Dragon</button>
-            } else if (parseFloat(awardData)> 0.7)  {
+            } else if (parseFloat(awardData) <= 0.8)  {
                 award=<button className="btn-outline-primary btn" >Guru Goanna</button>
-            } else if (parseFloat(awardData)> 0.8)  {
+            } else if (parseFloat(awardData) <= 0.9)  {
                 award=<button className="btn-outline-primary btn" >Superstar Seal</button>
-            } else if (parseFloat(awardData)> 0.9)  {
+            } else {
                 award=<button className="btn-outline-primary btn" >Perfect Platypus</button>
             }
             

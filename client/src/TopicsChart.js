@@ -108,13 +108,16 @@ export default class TopicsChart extends React.Component {
                         //+ ' (' + val.questions + '/' + val.total+')'
                         let point={"topic": val.topic,"id": val.topic ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color,blocks:val.blocks};
                         //if (point.score < 0.7) {
-                        totalSeen += parseFloat(val.questions)
-                        totalSuccess += parseFloat(val.successRate)
-                        countSuccess++;
-                        if (val.questions === val.total) {
+                        if (parseFloat(val.questions) > 0) {
+                            totalSeen += parseFloat(val.questions)
+                        }
+                        if (parseFloat(val.successRate) > 0 && parseFloat(val.questions) > 0) {
+                            totalSuccess += parseFloat(val.successRate)
+                            countSuccess++;
+                        }    
+                        if (parseFloat(val.questions) > 0 && parseFloat(val.total) > 0 && val.topic && val.questions === val.total) {
                             completedTopics.push(val.topic);
                         }
-                        
                         
                         series.push(point);
                         //}
