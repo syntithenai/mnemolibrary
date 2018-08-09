@@ -50,26 +50,22 @@ export default class ProgressChart extends React.Component {
             let status='';
             if (tally.length > 0) {
                 var total=0;
-                let ups=tally.slice(3,6);
-                for(var f in ups) { total += ups[f]; }
-                total = total - tally[0] -tally[1];
+                //let ups=tally.slice(3,6);
+                //for(var f in ups) { total += ups[f]; }
+                total = total - tally[0] - 0.5 * tally[1];
                 status=total; ///tally.length;
                 console.log(['BUTTONS',tally,total,status]);
-                if (status < -40) {
-                    status='!! Memory Overload'
-                } else if (status < -20) {
+                if (status < -50) {
+                    status='!!!! Memory Overload Review Urgently'
+                } else if (status < -30) {
                     status='!! Prioritise Review'
-                } else if (status < -10) {
+                } else if (status < -15) {
                 status='Time for review'
                 } else if (status < 0) {
                     status='Nearly up to date'
-                } else if (status >= 0) {
+                } else {
                     status='Up to date'
-                } else if (status > 10) {
-                    status='Review Master'
-                } else if (status > 100) {
-                    status='Review Guru'
-                }
+                } 
             }
             that.props.addAward('distribution',status);
             

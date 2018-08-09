@@ -74,6 +74,8 @@ export default class ActivityChart extends React.Component {
                     maxStreakDays++;
                     successRateTotal+=seriesObject[key].success/seriesObject[key].seen;
                     successRateCount++;
+                } else if (seriesObject[key].seen && seriesObject[key].seen > 0) {
+                    maxStreakDays++;
                 } else {
                     streaks.push(maxStreakDays);
                     maxStreakDays=0;
