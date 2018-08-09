@@ -284,7 +284,7 @@ export default class TopicsChart extends React.Component {
                         }
                         let reviewButton=''
                         if (val.questions > 0) {
-                            reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;<span class="badge badge-light">{successRate}%</span>&nbsp;</a>);
+                            reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;<span className="badge badge-light">{successRate}%</span>&nbsp;</a>);
                         }
                         return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' >{continueButton}{reviewButton}<a style={{color:'white'}} className='btn btn-danger' onClick={() => that.blockTopic.bind(that)(val)}>Block</a></span></div>)
                     });
