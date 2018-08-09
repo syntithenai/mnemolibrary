@@ -72,12 +72,15 @@ export default class ActivityChart extends React.Component {
             for (var key in seriesObject) {
                 if (seriesObject[key].seen && seriesObject[key].seen > 0 && seriesObject[key].success && seriesObject[key].success > 0) {
                     maxStreakDays++;
+                    streaks.push(maxStreakDays);
                     successRateTotal+=seriesObject[key].success/seriesObject[key].seen;
                     successRateCount++;
                 } else if (seriesObject[key].seen && seriesObject[key].seen > 0) {
                     maxStreakDays++;
+                    streaks.push(maxStreakDays);
                 } else if (seriesObject[key].success && seriesObject[key].success > 0) {
                     maxStreakDays++;
+                    streaks.push(maxStreakDays);
                 } else {
                     streaks.push(maxStreakDays);
                     maxStreakDays=0;
