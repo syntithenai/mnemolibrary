@@ -1921,7 +1921,19 @@ router.post('/publishusertopic', (req, res) => {
 })
 
 
+router.get('/leaderboard', (req, res) => {
+    db.collection('users').find().sort({streak: -1}).limit(5).toArray(function(err, result) {
+        let final=[];
+        result.map(function(user,key) {
+            if (user.streak > 0) {
+                let data={'avatar':user.avatar,streak:user.streak,questions:user.questions,recall:Math.round(user.recall * 10000)/100}
+                final.push(data);
+            }
+        });
+        res.send(final);
+    });
 
+})
 
 module.exports = router;
     

@@ -627,7 +627,7 @@ export default class AppLayout extends Component {
   
      saveUser(user,child) {
          let that = this;
-        fetch('/login/saveuser', {
+        return fetch('/login/saveuser', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

@@ -99,6 +99,9 @@ router.post('/saveuser', function(req, res) {
                   item.name = req.body.name;
                   if (req.body.selectedMnemonics) item.selectedMnemonics=req.body.selectedMnemonics;
                   if (req.body.difficulty) item.difficulty=req.body.difficulty;
+                  if (req.body.streak) item.streak=req.body.streak;
+                  if (req.body.questions) item.questions=req.body.questions;
+                  if (req.body.recall) item.recall=req.body.recall;
                   // update avatar only when changed
                  // //console.log(['CHECK AVATORA',item.avatar,req.body.avatar]);
                   if (item.avatar != req.body.avatar) {

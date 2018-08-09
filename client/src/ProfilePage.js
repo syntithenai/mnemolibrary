@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import ActivityChart from './ActivityChart'
 import TopicsChart from './TopicsChart'
 import ProgressChart from './ProgressChart'
+import LeaderBoard from './LeaderBoard'
+
 var config = require('../../config') 
 
 export default class ProfilePage extends Component {
@@ -35,6 +37,17 @@ export default class ProfilePage extends Component {
         console.log(['ADDAWARD',type,awardData]);
         let newState={};
         let award=null;
+        let that=this;
+        if (type==="questions" || type==="streak" || type==="recall") {
+            let newState={};
+            newState[type] = awardData;
+            this.setState(newState);
+            this.saveUser().then(function() {
+                    that.setState({'warning_message':''});
+            });
+            
+        }
+        
         if (type==="questions") {
             if (parseFloat(awardData) > 0)  {
                 if (parseFloat(awardData) < 25)  {
@@ -109,7 +122,7 @@ export default class ProfilePage extends Component {
     
     
     saveUser(e) {
-        e.preventDefault();
+        if (e) e.preventDefault();
         var that = this;
         that.setState({'warning_message':''});
         ////console.log('save user ',this.state.user);
@@ -130,7 +143,16 @@ export default class ProfilePage extends Component {
                 return;
             }
           }
-          this.props.saveUser(data,this);  
+          if (this.state.questions) {
+              data.questions=this.state.questions;
+          }
+          if (this.state.streak) {
+              data.streak=this.state.streak;
+          }
+          if (this.state.recall) {
+              data.recall=this.state.recall;
+          }          
+          return this.props.saveUser(data,this);  
             
     };
     
@@ -254,10 +276,9 @@ export default class ProfilePage extends Component {
                              }
                     </div>
                     <div className="row">
-                        <br/><br/>
-                        <br/><br/>
-                        <div className='col-12 warning-message'>{this.state.warning_message}</div>
                         <div className='col-12 awards'>
+                        <br/><br/>
+                        <br/><br/>
                             <span>{this.state.streak_award}</span>
                             <span>{this.state.questions_award}</span>
                             <span>{this.state.topics_award}</span>
@@ -273,8 +294,13 @@ export default class ProfilePage extends Component {
                         <div className="col-12" style={{height: '700px'}}>
                               <ActivityChart addAward={this.addAward} user={this.props.user}  />
                         </div>
+                        <div className="col-12" style={{height: '250px'}} >
+                           <LeaderBoard/>
+                        </div>
                         <div className="col-12">
                               <h3  className="card-title">Profile</h3>
+                            <div className='col-12 warning-message'>{this.state.warning_message}</div>
+                        
                               <a id="edit"></a>
                                <label htmlFor="name" className='row'>Name </label><input autoComplete="false" id="name" type='text' name='name' onChange={this.change} value={this.state.user.name} />
                                 <label htmlFor="avatar" className='row'>Avatar </label><input autoComplete="false" id="avatar" type='text' name='avatar' onChange={this.change} value={this.state.user.avatar} />
