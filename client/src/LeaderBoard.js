@@ -35,7 +35,7 @@ export default class LeaderBoard extends React.Component {
                       <td>{user.avatar}</td>
                       <td>{user.streak}</td>
                       <td>{user.questions}</td>
-                      <td>{user.recall}%</td>
+                      <td>{user.recall}</td>
                     </tr>
               
             });
@@ -47,8 +47,8 @@ export default class LeaderBoard extends React.Component {
                       <th scope="col">#</th>
                       <th scope="col">Avatar</th>
                       <th scope="col">Days in a row</th>
-                      <th scope="col">Question Seen</th>
-                      <th scope="col">Recall Rate</th>
+                      <th scope="col">Total Questions</th>
+                      <th scope="col">Recall %</th>
                     </tr>
                   </thead>
                   <tbody>
