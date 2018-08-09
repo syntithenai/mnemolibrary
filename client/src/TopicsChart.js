@@ -86,6 +86,10 @@ export default class TopicsChart extends React.Component {
                //console.log(['got CORE response', json]);
 
                 let series=[];
+                let totalSeen=0;
+                let totalSuccess=0;
+                let countSuccess=0;
+                let completedTopics=[];
                 json.map(function(val,key) {
                 //    //console.log(['ssss map',key,val]);
                     if (val.topic && val.topic.length > 0) {
@@ -104,7 +108,15 @@ export default class TopicsChart extends React.Component {
                         //+ ' (' + val.questions + '/' + val.total+')'
                         let point={"topic": val.topic,"id": val.topic ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color,blocks:val.blocks};
                         //if (point.score < 0.7) {
-                            series.push(point);
+                        totalSeen += parseFloat(val.questions)
+                        totalSuccess += parseFloat(val.successRate)
+                        countSuccess++;
+                        if (val.questions === val.total) {
+                            completedTopics.push(val.topic);
+                        }
+                        
+                        
+                        series.push(point);
                         //}
                         series.sort(function(a,b) {
                             if (a.topic < b.topic) {
@@ -117,6 +129,9 @@ export default class TopicsChart extends React.Component {
                     }
                     return null;
                 });
+                that.props.addAward('topics',completedTopics.length);
+                that.props.addAward('questions',totalSeen);
+                that.props.addAward('recall',totalSuccess/countSuccess);
                 //console.log(['SET DATA',series]);
                 that.setState({series:series});
                 resolve();

@@ -21,11 +21,80 @@ export default class ProfilePage extends Component {
                 password:this.props.user.password?this.props.user.password:'',
                 password2:this.props.user.password2?this.props.user.password:'',
             },
-    
+            questions_award:'',
+            topics_award:'',
+            recall_award:'',
+            streak_award:'',
+            distribution_award:'',
         }
+        this.addAward = this.addAward.bind(this);
        // //console.log(['constr',this.state]);
     };
 
+    addAward(type,awardData) {
+        console.log(['ADDAWARD',type,awardData]);
+        let newState={};
+        let award=null;
+        if (type==="questions") {
+            if (parseFloat(awardData) <= 50)  {
+                award=<button className="btn-outline-primary btn" >Beginner</button>
+            } else if (parseFloat(awardData)> 50)  {
+                award=<button className="btn-outline-primary btn" >50 Questions</button>
+            } else if (parseFloat(awardData)> 100)  {
+                award=<button className="btn-outline-primary btn" >100 Questions</button>
+            } else if (parseFloat(awardData)> 150)  {
+                award=<button className="btn-outline-primary btn" >150 Questions</button>
+            } else if (parseFloat(awardData)> 200)  {
+                award=<button className="btn-outline-primary btn" >200 Questions</button>
+            } else if (parseFloat(awardData)> 300)  {
+                award=<button className="btn-outline-primary btn" >300 Questions</button>
+            } else if (parseFloat(awardData)> 400)  {
+                award=<button className="btn-outline-primary btn" >400 Questions</button>
+            } else if (parseFloat(awardData)> 500)  {
+                award=<button className="btn-outline-primary btn" >500 Questions</button>
+            } else if (parseFloat(awardData)> 1000)  {
+                award=<button className="btn-outline-primary btn" >1000 Questions</button>
+            }
+                
+        } else if (type==="topics") {
+            //if (awardData > 0) {
+                award=<button className="btn-outline-primary btn" >{awardData} Topics Complete</button>
+            //}
+        } else if (type==="recall") {
+            if (parseFloat(awardData)<= 0.1)  {
+                award=<button className="btn-outline-primary btn" >Novice Numbat</button>
+            } else if (parseFloat(awardData)> 0.1)  {
+                award=<button className="btn-outline-primary btn" >Beginner Bandicoot</button>
+            } else if (parseFloat(awardData)> 0.2)  {
+                award=<button className="btn-outline-primary btn" >Initiate Ibis</button>
+            } else if (parseFloat(awardData)> 0.3)  {
+                award=<button className="btn-outline-primary btn" >Student Sloth</button>
+            } else if (parseFloat(awardData)> 0.4)  {
+                award=<button className="btn-outline-primary btn" >Expert Echidna</button>
+            } else if (parseFloat(awardData)> 0.5)  {
+                award=<button className="btn-outline-primary btn" >Master Magpie</button>
+            } else if (parseFloat(awardData)> 0.6)  {
+                award=<button className="btn-outline-primary btn" >Wizard Water Dragon</button>
+            } else if (parseFloat(awardData)> 0.7)  {
+                award=<button className="btn-outline-primary btn" >Guru Goanna</button>
+            } else if (parseFloat(awardData)> 0.8)  {
+                award=<button className="btn-outline-primary btn" >Superstar Seal</button>
+            } else if (parseFloat(awardData)> 0.9)  {
+                award=<button className="btn-outline-primary btn" >Perfect Platypus</button>
+            }
+            
+        } else if (type==="streak") {
+            if (awardData > 1) {
+                award=<button className="btn-outline-primary btn" >{awardData} days in a row</button>
+            }
+            
+        } else if (type==="distribution") {
+            award=<button className="btn-outline-primary btn" >{awardData}</button>
+        } 
+        newState[type+'_award']=award;
+        this.setState(newState);
+    };
+    
     
     saveUser(e) {
         e.preventDefault();
@@ -173,17 +242,24 @@ export default class ProfilePage extends Component {
                              }
                     </div>
                     <div className="row">
-                        <div className='col-12 warning-message'>{this.state.warning_message}</div>
-                              
                         <br/><br/>
+                        <br/><br/>
+                        <div className='col-12 warning-message'>{this.state.warning_message}</div>
+                        <div className='col-12 awards'>
+                            <span>{this.state.streak_award}</span>
+                            <span>{this.state.questions_award}</span>
+                            <span>{this.state.topics_award}</span>
+                            <span>{this.state.recall_award}</span>
+                             <span>{this.state.distribution_award}</span>
+                        </div>
                         <div className="col-12" style={{minHeight: '700px'}}>
-                              <TopicsChart setCurrentPage={this.props.setCurrentPage} setQuizFromDiscovery={this.props.setQuizFromDiscovery} setReviewFromTopic={this.props.setReviewFromTopic} setQuizFromTopic={this.props.setQuizFromTopic} searchQuizFromTopic={this.props.searchQuizFromTopic}  user={this.props.user} />
+                              <TopicsChart addAward={this.addAward} setCurrentPage={this.props.setCurrentPage} setQuizFromDiscovery={this.props.setQuizFromDiscovery} setReviewFromTopic={this.props.setReviewFromTopic} setQuizFromTopic={this.props.setQuizFromTopic} searchQuizFromTopic={this.props.searchQuizFromTopic}  user={this.props.user} />
                         </div>
                         <div className="col-12" style={{height: '500px'}} >
-                              <ProgressChart reviewBySuccessBand={this.props.reviewBySuccessBand} user={this.props.user} />
+                              <ProgressChart addAward={this.addAward} reviewBySuccessBand={this.props.reviewBySuccessBand} user={this.props.user} />
                         </div>
                         <div className="col-12" style={{height: '700px'}}>
-                              <ActivityChart user={this.props.user}  />
+                              <ActivityChart addAward={this.addAward} user={this.props.user}  />
                         </div>
                         <div className="col-12">
                               <h3  className="card-title">Profile</h3>

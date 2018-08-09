@@ -90,6 +90,9 @@ https://github.com/jasonphillips/react-crossword-generator THIS ONE also no edit
 
 https://github.com/satchamo/Crossword-Generator - nice software but no editing
 
+# crosswords JS
+https://github.com/richardrulach/js-xwords
+
 
 
 - mongo-express for developers to manipulate the databse
@@ -107,8 +110,6 @@ docker run -v /var/docker/mnemolibrary:/usr/src/app --entrypoint=/bin/bash -it s
 
 http://nivo.rocks/line
 
-# crosswords JS
-https://github.com/richardrulach/js-xwords
 
 
 Content AI

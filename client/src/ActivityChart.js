@@ -63,6 +63,25 @@ export default class ActivityChart extends React.Component {
                 //}
                 return null;
             });
+            console.log(['ACT CHART MOUNT',seriesObject]);
+            // calculate awards
+            let successRateTotal=0;
+            let successRateCount=0;
+            let maxStreakDays=0;
+            let streaks=[];
+            for (var key in seriesObject) {
+                if (seriesObject[key].seen && seriesObject[key].seen > 0 && seriesObject[key].success && seriesObject[key].success > 0) {
+                    maxStreakDays++;
+                    successRateTotal+=seriesObject[key].success/seriesObject[key].seen;
+                    successRateCount++;
+                } else {
+                    streaks.push(maxStreakDays);
+                    maxStreakDays=0;
+                }
+            }
+            console.log(['ACT CHART MOUNT',seriesObject,streaks,Math.max(...streaks),successRateTotal,successRateCount]);
+            that.props.addAward('streak',Math.max(...streaks));
+           // that.props.addAward('recall',successRateTotal/successRateCount);
             //json.seen//
             //console.log(['ACT CHART MOUNT',seriesObject]);
             

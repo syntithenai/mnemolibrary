@@ -845,7 +845,8 @@ router.get('/topiccollections', (req, res) => {
                     topics.push(key.publishedTopic);
             });
             if (topics.length > 0) {
-                collections.push({name:'Community',sort:7,topics:topics});
+                // append generated Community section at the end
+                collections.push({name:'Community',sort:collections.length + 1,column:"2",topics:topics});
             }
                 
             res.send(collections);
@@ -875,7 +876,7 @@ router.post('/discover', (req, res) => {
    // //console.log('discover',req.body.user);
     let orderBy = req.body.orderBy ? req.body.orderBy : 'successRate';
     let sortFilter={};
-    let limit = 20;
+    let limit = 10;
     let criteria = [];
     
     function discoverQuery() {
@@ -992,7 +993,7 @@ router.post('/discover', (req, res) => {
 
 router.get('/review', (req, res) => {
     ////console.log('review');
-    let limit=20;
+    let limit=10;
      let orderBy = (req.query.orderBy == 'successRate') ? 'successRate' : 'timeScore'
      let orderMeBy = {};
      orderMeBy[orderBy] = 1;          

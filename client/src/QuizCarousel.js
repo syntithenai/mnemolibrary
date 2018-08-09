@@ -197,6 +197,10 @@ export default class QuizCarousel extends Component {
                 {
                   label: 'Continue',
                   onClick: () => this.discoverQuestions()
+                },
+                {
+                  label: 'Search',
+                  onClick: () => this.props.setCurrentPage('topics')
                 }
               ]
             if (this.props.user && String(this.props.user._id).length > 0) {

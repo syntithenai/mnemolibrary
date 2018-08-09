@@ -7,8 +7,7 @@ export default class ProgressChart extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-                labels:[],
-                
+            labels:[],
         } 
     }
     componentDidMount() {
@@ -21,11 +20,13 @@ export default class ProgressChart extends React.Component {
             let max=0;
             
             let dataObject = {}
+            let tally=[]
             json.map(function(val,key) {
                 let id=0;
                 if ((parseInt(val._id,10) > 0)) id=parseInt(val._id,10);
                 if (id > max) max=id;
                 let point={y:val.questions,x:id,yColor:'blue'}
+                tally.push(parseInt(val.questions,10));
                // val.questionsColor = "lightblue";
                 dataObject[id]=point;
                 return null;
@@ -43,6 +44,35 @@ export default class ProgressChart extends React.Component {
                 if (a.x < b.x) return -1
                 else return 1;
             });
+            // buttons
+            console.log(['BUTTONS',tally,Object.keys(tally).length]);
+            // take average around 3
+            let status='';
+            if (tally.length > 0) {
+                var total=0;
+                let ups=tally.slice(3,6);
+                for(var f in ups) { total += ups[f]; }
+                total = total - tally[0] -tally[1];
+                status=total; ///tally.length;
+                console.log(['BUTTONS',tally,total,status]);
+                if (status < -40) {
+                    status='!! Memory Overload'
+                } else if (status < -20) {
+                    status='!! Prioritise Review'
+                } else if (status < -10) {
+                status='Time for review'
+                } else if (status < 0) {
+                    status='Nearly up to date'
+                } else if (status >= 0) {
+                    status='Up to date'
+                } else if (status > 10) {
+                    status='Review Master'
+                } else if (status > 100) {
+                    status='Review Guru'
+                }
+            }
+            that.props.addAward('distribution',status);
+            
             let state={series:data}
             //console.log('SETSTATE');
             //console.log(state.data);
