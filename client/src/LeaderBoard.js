@@ -41,14 +41,14 @@ export default class LeaderBoard extends React.Component {
             });
             return <div style={{height: '200px'}}>
                    <h4 id="leaderboard" className='graphTitle' >Leaderboard</h4>
-                  <table className="table table-striped">
+                  <table className="table table-striped table-responsive">
                   <thead className="thead-dark">
                     <tr>
                       <th scope="col">#</th>
                       <th scope="col">Avatar</th>
                       <th scope="col">Days in a row</th>
-                      <th scope="col">Total Questions</th>
-                      <th scope="col">Accuracy</th>
+                      <th scope="col">Question Seen</th>
+                      <th scope="col">Recall Rate</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -263,6 +263,7 @@ export default class ProfilePage extends Component {
                               <a  href='#progress'  className='btn btn-info'>Progress</a>
                               <a  href='#activity'  className='btn btn-info'>Activity</a>
                               <a  href='#edit'  className='btn btn-info'>Edit</a>
+                              <a  href='#leaderboard'  className='btn btn-info'>Leaders</a>
                               <a  href='#' onClick={() => this.props.logout()} className='btn btn-info btn-danger' >
                                Logout
                               </a>
@@ -274,6 +275,8 @@ export default class ProfilePage extends Component {
                                Train
                               </a></span>
                              }
+                             
+                              
                     </div>
                     <div className="row">
                         <div className='col-12 awards'>
