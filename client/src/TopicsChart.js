@@ -11,6 +11,7 @@ export default class TopicsChart extends React.Component {
         this.state = {
                 labels:[],
                 series:[],
+                archiveSeries:[],
                 show: 'chart'
         } 
         this.loadData = this.loadData.bind(this);
@@ -72,6 +73,11 @@ export default class TopicsChart extends React.Component {
         let that = this;
         //usersuccessprogress
         //useractivity
+        that.props.addAward('topics',null);
+        //that.props.addAward('distribution',null);
+        that.props.addAward('questions',null);
+        that.props.addAward('recall',null);
+        
         let url='/api/recenttopics?user='+this.props.user._id;
         if (type==='blocks')  {
             url='/api/blockedtopics?user='+this.props.user._id;
@@ -132,9 +138,12 @@ export default class TopicsChart extends React.Component {
                     }
                     return null;
                 });
-                that.props.addAward('topics',completedTopics.length);
-                that.props.addAward('questions',totalSeen);
-                that.props.addAward('recall',totalSuccess/countSuccess);
+                console.log(['LOADDATA TOPIC CHART',type]);
+                if (type!=='blocks' && type!=='archive') {
+                    that.props.addAward('topics',completedTopics.length);
+                    that.props.addAward('questions',totalSeen);
+                    that.props.addAward('recall',totalSuccess/countSuccess);
+                }
                 //console.log(['SET DATA',series]);
                 that.setState({series:series});
                 resolve();
@@ -278,7 +287,7 @@ export default class TopicsChart extends React.Component {
                         let continueButton='';
                         let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0;
                         if (val.total > val.questions) {
-                            continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val)}>Continue&nbsp; <span class="badge badge-light">{val.questions}/{val.total}</span>&nbsp;</a>);
+                            continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val)}>Continue&nbsp; <span className="badge badge-light">{val.questions}/{val.total}</span>&nbsp;</a>);
                         } else {
                             continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,false,true)}>Rediscover</a>);
                         }
