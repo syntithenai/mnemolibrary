@@ -1922,7 +1922,7 @@ router.post('/publishusertopic', (req, res) => {
 
 
 router.get('/leaderboard', (req, res) => {
-    db.collection('users').find().sort({streak: -1}).limit(5).toArray(function(err, result) {
+    db.collection('users').find().sort({streak: -1,questions:-1, recall:-1}).limit(10).toArray(function(err, result) {
         let final=[];
         result.map(function(user,key) {
             if (user.streak > 0) {
