@@ -1922,7 +1922,15 @@ router.post('/publishusertopic', (req, res) => {
 
 
 router.get('/leaderboard', (req, res) => {
-    db.collection('users').find().sort({streak: -1,questions:-1, recall:-1}).limit(10).toArray(function(err, result) {
+    let sort={streak: -1,questions:-1, recall:-1};
+    if (req.query.sort==="days") {
+        sort = {streak: -1,questions:-1, recall:-1}
+    } else if (req.query.sort==="questions") {
+        sort = {questions: -1,streak:-1, recall:-1}
+    } else if (req.query.sort==="recall") {
+        sort = {recall:-1,streak: -1,questions:-1}
+    }
+    db.collection('users').find().sort(sort).limit(10).toArray(function(err, result) {
         let final=[];
         result.map(function(user,key) {
             if (user.streak > 0) {

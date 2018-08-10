@@ -298,8 +298,16 @@ export default class ProfilePage extends Component {
                               <ActivityChart addAward={this.addAward} user={this.props.user}  />
                         </div>
                         <div className="col-12" style={{height: '500px'}} >
-                           <LeaderBoard/>
+                            <h4 id="leaderboard" className='graphTitle' >Leaderboards</h4>
+                            <LeaderBoard type="streak"/>
                         </div>
+                        <div className="col-12" style={{height: '500px'}} >
+                           <LeaderBoard type="questions" />
+                        </div>
+                        <div className="col-12" style={{height: '500px'}} >
+                           <LeaderBoard type="recall"/>
+                        </div>
+                        
                         <div className="col-12">
                               <h3  className="card-title">Profile</h3>
                             <div className='col-12 warning-message'>{this.state.warning_message}</div>
