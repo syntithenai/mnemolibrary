@@ -56,9 +56,9 @@ export default class ProgressChart extends React.Component {
                 status=total; ///tally.length;
                 console.log(['BUTTONS',tally,total,status]);
                 if (status < -60) {
-                    status='!!!! Memory Overload Review Urgently'
+                    status='Memory Overload Review Urgently !!!! '
                 } else if (status < -30) {
-                    status='!! Prioritise Review'
+                    status='Prioritise Review !'
                 } else if (status < -15) {
                 status='Time for review'
                 } else if (status < 0) {

@@ -226,6 +226,9 @@ export default class ProfilePage extends Component {
     dumpalexa() {
         fetch('/api/dumpalexa', {});
     };
+    refreshindexes() {
+        fetch('/api/indexes', {});
+    };
     
     render() { //req,vars/
         let oauth=localStorage.getItem('oauth');
@@ -273,6 +276,9 @@ export default class ProfilePage extends Component {
                               </a>
                               <a  href='#' onClick={() => this.dumpalexa.bind(this)()} className='btn btn-info btn-warning' >
                                Train
+                              </a>
+                              <a  href='#' onClick={() => this.refreshindexes.bind(this)()} className='btn btn-info btn-warning' >
+                               Indexes
                               </a></span>
                              }
                              
@@ -297,14 +303,14 @@ export default class ProfilePage extends Component {
                         <div className="col-12" style={{height: '700px'}}>
                               <ActivityChart addAward={this.addAward} user={this.props.user}  />
                         </div>
-                        <div className="col-12" style={{height: '500px'}} >
+                        <div className="col-12" style={{height: '600px'}} >
                             <h4 id="leaderboard" className='graphTitle' >Leaderboards</h4>
                             <LeaderBoard type="streak"/>
                         </div>
-                        <div className="col-12" style={{height: '500px'}} >
+                        <div className="col-12" style={{height: '600px'}} >
                            <LeaderBoard type="questions" />
                         </div>
-                        <div className="col-12" style={{height: '500px'}} >
+                        <div className="col-12" style={{height: '600px'}} >
                            <LeaderBoard type="recall"/>
                         </div>
                         

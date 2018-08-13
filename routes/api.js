@@ -711,7 +711,22 @@ router.post('/reportproblem', (req, res) => {
     res.send('sent email');
 });
 
-
+router.post('/indexes', (req, res) => {
+    db.collection('questions').dropIndexes();
+    db.collection('questions').createIndex({
+        question: "text",
+        interrogative: "text",
+        answer:"text",
+        question:"text",
+        mnemonic: "text",
+        //answer: "text"
+    });
+   
+   db.collection('words').dropIndexes();
+    db.collection('words').createIndex({
+        text: "text"                    
+    }); 
+});
 
 router.post('/import', (req, res) => {
   //  //console.log(['import']);
@@ -1105,7 +1120,7 @@ router.get('/review', (req, res) => {
  //               }
                 
                 
-         //       //console.log(['REVItEW',successAndDateOrderedIds]);
+         //       console.log(['REVItEW',successAndDateOrderedIds]);
                 db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).toArray(function(err,results) {
                    // //console.log([err,results]);
                     let questionIndex={};
@@ -1136,8 +1151,8 @@ router.get('/review', (req, res) => {
 
 // search questions
 router.get('/questions', (req, res) => {
-   // //console.log('search questions');
-    ////console.log(req.query);
+    console.log('search questions');
+    console.log(req.query);
     let limit = 20;
     let skip = 0;
     if (req.query.limit && req.query.limit > 0) {
@@ -1162,7 +1177,7 @@ router.get('/questions', (req, res) => {
             criteria.push({'mnemonic_technique': {$eq:req.query.technique.trim()}});
         // SEARCH BY text query
         }
-       // //console.log(criteria);
+       console.log(criteria);
         db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).project({score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).toArray(function(err, results) {
           res.send({'questions':results});
         })
@@ -1187,9 +1202,9 @@ router.get('/questions', (req, res) => {
             if (req.query.tag) { 
                 let tag = req.query.tag.trim().toLowerCase(); 
                 criteria.push({'tags': {$in:[tag]}});
-              //  //console.log(['search by tag',criteria,tag]);
+              console.log(['search by tag',criteria,tag]);
                 db.collection('questions').find({$and:criteria}).limit(limit*10).skip(skip).sort({question:1}).toArray(function(err, results) {
-                //    //console.log(['search by tag res',results]);
+                    //console.log(['search by tag res',results]);
                   res.send({'questions':results});
                 })
             }
@@ -1197,11 +1212,11 @@ router.get('/questions', (req, res) => {
         } else if (req.query.question && req.query.question.length > 0) {
             //if (req.query.question) { 
                 let question = req.query.question; 
-              //  //console.log(['search by qu ',question]);
+              console.log(['search by qu ',question]);
                 criteria.push({'_id': ObjectId(question)});
                // //console.log(['search by id',criteria,question]);
                 db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
-                 //   //console.log(['search by id res',results]);
+                 console.log(['search by id res',results]);
                     res.send({'questions':results});
                 })
             //}
@@ -1572,7 +1587,7 @@ router.post('/usertopic', (req, res) => {
 })
 
 router.get('/tags', (req, res) => {
-    //console.log(['TAGS',req.query]);
+    console.log(['TAGS',req.query]);
     //if (req.body.title && req.body.title.length > 0) {
         //criteria[]
     //}
@@ -1586,10 +1601,10 @@ router.get('/tags', (req, res) => {
     if (search.length > 0) {
         criteria={$text: {$search: search}}
     }
-    //console.log(['TAGS',criteria]);
+    console.log(['TAGS',criteria]);
     db.collection('words').find(criteria).sort(sort).limit(200).toArray().then(function(results) {
           let final=[];
-      //    console.log(results);
+          console.log(results);
           results.map(function(key,val) {
       //          //console.log([search,key,val]);
                 if (search && search.length > 0) {
@@ -1923,12 +1938,12 @@ router.post('/publishusertopic', (req, res) => {
 
 router.get('/leaderboard', (req, res) => {
     let sort={streak: -1,questions:-1, recall:-1};
-    if (req.query.sort==="days") {
-        sort = {streak: -1,questions:-1, recall:-1}
+    if (req.query.sort==="streak") {
+        sort = {streak: -1}
     } else if (req.query.sort==="questions") {
-        sort = {questions: -1,streak:-1, recall:-1}
+        sort = {questions: -1}
     } else if (req.query.sort==="recall") {
-        sort = {recall:-1,streak: -1,questions:-1}
+        sort = {recall:-1}
     }
     db.collection('users').find().sort(sort).limit(10).toArray(function(err, result) {
         let final=[];
