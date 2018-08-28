@@ -77,6 +77,7 @@ export default class TopicsChart extends React.Component {
         //that.props.addAward('distribution',null);
         that.props.addAward('questions',null);
         that.props.addAward('recall',null);
+        that.props.addAward('successes',null);
         
         let url='/api/recenttopics?user='+this.props.user._id;
         if (type==='blocks')  {

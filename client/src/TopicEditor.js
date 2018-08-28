@@ -58,7 +58,7 @@ export default class TopicEditor extends Component {
         this.updateQuestion = this.updateQuestion.bind(this);
         this.newTopic = this.newTopic.bind(this);
         this.loadTopic = this.loadTopic.bind(this);
-        this.saveTopic = debounce(500,this.saveTopic.bind(this));
+        this.saveTopic = this.saveTopic.bind(this);
         this.deleteTopic = this.deleteTopic.bind(this);
         this.askDeleteTopic = this.askDeleteTopic.bind(this);
         this.previewTopic = this.previewTopic.bind(this);
@@ -97,7 +97,7 @@ export default class TopicEditor extends Component {
     };
     
     setTopicEvent(e) {
-        ////console.log(['topicevent',e.target.value]);
+        console.log(['topicevent',e.target.value]);
         this.setState({topic:e.target.value});
         this.saveTopic();
     };
@@ -189,7 +189,7 @@ export default class TopicEditor extends Component {
             }).then(function(id) {
               //  //console.log(['saved topic',id,id.id]);
                 that.setState({_id:id.id});
-                if (id.errors && Object.keys(id.errors).length > 0) {
+                if ((id.errors && Object.keys(id.errors).length > 0) || id.message) {
                     that.setState({validationErrors:id.errors,message:'Some of your questions are missing required information.'});
                 } else {
                     that.setState({validationErrors:{},message:' ',questions:id.questions});
@@ -248,28 +248,31 @@ export default class TopicEditor extends Component {
  
     
     loadTopic(topicId) {
-        let that = this;
-        let params={_id:topicId,user:this.props.user._id}
-        fetch("/api/usertopic", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
-        }).then(function(response) {
-            return response.json();
-        }).then(function(topic) {
-            console.log(['loaded topic complete']);
-            if (topic && topic._id) {
-                console.log(['loaded topic',topic]);
-                //res.send({user:user,token:token});
-                localStorage.setItem('currentTopic',topic._id);
-                that.setState({topic:topic.topic,_id:topic._id,published:topic.published,questions:topic.questions,currentView:'questions',validationErrors:{},message:' '});                
-            }
-        })
-        .catch(function(err) {
-            //console.log(['ERR',err]);
-        });
+        if (topicId) {
+            let that = this;
+            let params={_id:topicId,user:this.props.user._id}
+            fetch("/api/usertopic", {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+            }).then(function(response) {
+                return response.json();
+            }).then(function(topic) {
+                console.log(['loaded topic complete']);
+                if (topic && topic._id) {
+                    console.log(['loaded topic',topic]);
+                    //res.send({user:user,token:token});
+                    localStorage.setItem('currentTopic',topic._id);
+                    that.setState({topic:topic.topic,_id:topic._id,published:topic.published,questions:topic.questions,currentView:'questions',validationErrors:{},message:' '});                
+                }
+            })
+            .catch(function(err) {
+                //console.log(['ERR',err]);
+            });
+            
+        }
     };
         
     previewTopic(id) {
@@ -433,15 +436,20 @@ export default class TopicEditor extends Component {
         
     };  
 
-    updateQuestion(question)  {
-       // //console.log(['update que',question,this.state.currentQuestion]);
-        let questions = this.state.questions;
-        //question.tags = question.tags.trim().toLowerCase().split(',');
-        questions.splice(this.state.currentQuestion,1,question);
-        this.setState({questions:questions});
-        this.saveTopic();
+    updateQuestion(updatedQuestion)  {
+       //console.log(['update que',updatedQuestion,this.state.currentQuestion]);
+       let questions = this.state.questions;
+       //let currentQuestion = isNaN(this.state.currentQuestion) ? 0 : this.state.currentQuestion;
+       //if (questions.length)
+       if (!isNaN(this.state.currentQuestion) && (questions.length > this.state.currentQuestion)) {
+            //let question.tags = question.tags.trim().toLowerCase().split(',');
+            //console.log(['really update que',question,this.state.currentQuestion]);
+            questions.splice(this.state.currentQuestion,1,updatedQuestion);
+            this.setState({questions:questions});
+            this.saveTopic();
+        }
     };
-    
+     
     showHelp(e) {
         this.setState({showHelp:true});
         return false;

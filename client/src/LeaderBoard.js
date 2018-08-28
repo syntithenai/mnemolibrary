@@ -20,6 +20,15 @@ export default class LeaderBoard extends React.Component {
             return response.json()
         }).then(function(json) {
             console.log(['leaderboard loaded', json])
+            json.sort(function(a,b) {
+                if (a[that.props.type] > b[that.props.type]) {
+                    return -1;
+                } else if (a[that.props.type] < b[that.props.type]) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
            that.setState({series:json});
         }).catch(function(ex) {
             console.log(['leaderboard request failed', ex])
@@ -29,7 +38,6 @@ export default class LeaderBoard extends React.Component {
     render() {
         let that=this;
         if (this.state.series && this.state.series.length > 0) {
-        
             let rows = this.state.series.map(function(user,key) {
                 return   <tr>
                       <th scope="row">{key+1}</th>
@@ -52,7 +60,15 @@ export default class LeaderBoard extends React.Component {
                     </tr>
                   </thead>
                   <tbody>
-                  {rows}
+                  <tr style={{backgroundColor:'lightblue'}} >
+                      <th scope="row"></th>
+                      <td><b>You</b></td>
+                      {that.props.type==="streak" &&  <td>{this.props.user.streak}</td>}
+                      {that.props.type==="questions" &&  <td>{this.props.user.questions}</td>}
+                      {that.props.type==="recall" &&  <td>{parseInt(this.props.user.recall*10000,10)/100}</td>}
+                    </tr>
+                   
+                   {rows}
                   
                   </tbody>
                 </table>

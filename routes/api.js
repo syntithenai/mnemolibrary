@@ -711,7 +711,7 @@ router.post('/reportproblem', (req, res) => {
     res.send('sent email');
 });
 
-router.post('/indexes', (req, res) => {
+router.get('/indexes', (req, res) => {
     db.collection('questions').dropIndexes();
     db.collection('questions').createIndex({
         question: "text",
@@ -1502,54 +1502,77 @@ router.post('/saveusertopic', (req, res) => {
     //let body=JSON.parse(req.body);
     //res.send({message:req.body});
     let body=req.body;
-//    //console.log(['SAVEUSERTOP',body]);
-    if (body.user  && body.questions && body.topic) {
+    console.log(['SAVEUSERTOP',body]);
+    if (body.user  && Array.isArray(body.questions) && body.topic) {
         let id = body._id && String(body._id).length > 0 ? new ObjectId(body._id) : new ObjectId();
         let user = body.user;
-        let questions = body.questions;
+        console.log('POSTED');
+        console.log(body.questions);
+        let questions = Array.isArray(body.questions) ? body.questions : [];
+        console.log('THEN');
+        console.log(questions);
+        console.log('DONE');
         // validation info
         let errors={};
-        let newQuestions=[];
+        let foundIndex=null;
         questions.map(function(question,key) {
-            // ensure id
-            questions[key]._id = questions[key]._id && String(questions[key]._id).length > 0 ? new ObjectId(questions[key]._id) : new ObjectId();
-        
-            // required question fields
-            if (question.mnemonic && question.mnemonic.length === 0) {
-                if (!errors.hasOwnProperty(key)) errors[key]=[];
-                errors[key].push('mnemonic');
+            if (req.body.deleteQuestion && String(req.body.deleteQuestion).length > 0 && questions[key]._id === req.body.deleteQuestion) {
+                // skip
+                console.log('skip');
+                foundIndex = key;
+                //delete questions[key];
+            } else {
+                console.log('add');
+                // ensure id
+                
+                questions[key]._id = questions[key]._id && String(questions[key]._id).length > 0 ? new ObjectId(questions[key]._id) : new ObjectId();
+            
+                // required question fields
+                if (question.mnemonic && question.mnemonic.length === 0) {
+                    if (!errors.hasOwnProperty(key)) errors[key]=[];
+                    errors[key].push('mnemonic');
+                }
+                if (question.shortanswer && question.shortanswer.length === 0) {
+                    if (!errors.hasOwnProperty(key)) errors[key]=[];
+                    errors[key].push('shortanswer');
+                }
+                if (question.question && question.question.length === 0) {
+                    if (!errors.hasOwnProperty(key)) errors[key]=[];
+                    errors[key].push('question');
+                }
+                //if (question.tags.length === 0) {
+                    //if (!errors.hasOwnProperty(key)) errors[key]=[];
+                    //errors[key].push('tags');
+                //}                
             }
-            if (question.shortanswer && question.shortanswer.length === 0) {
-                if (!errors.hasOwnProperty(key)) errors[key]=[];
-                errors[key].push('shortanswer');
-            }
-            if (question.question && question.question.length === 0) {
-                if (!errors.hasOwnProperty(key)) errors[key]=[];
-                errors[key].push('question');
-            }
-            //if (question.tags.length === 0) {
-                //if (!errors.hasOwnProperty(key)) errors[key]=[];
-                //errors[key].push('tags');
-            //}
 
         });
+        //console.log(questions);
+        if (foundIndex != null && !isNaN(foundIndex) && foundIndex >= 0) {
+            ////questions = questions.slice(0,foundIndex);
+            //questions.splice(foundIndex,1);
+            console.log(['SPLICE',foundIndex,questions,questions.slice(0,foundIndex), questions.slice(foundIndex+1)]);
+            questions = questions.slice(0,foundIndex).concat(questions.slice(foundIndex+1));
+        }
+        
         let toSave = {_id:id,user:ObjectId(user),questions:questions,topic:body.topic,publishedTopic:body.publishedTopic};
         toSave.updated=new Date().getTime();
-//        //console.log(['saveusertopic']);
-//        //console.log([toSave]);
-        
+        console.log(['saveusertopic']);
+        console.log(JSON.stringify(toSave));
+        console.log(questions);
         if (req.body.deleteQuestion && String(req.body.deleteQuestion).length > 0) {
             db.collection('questions').remove({_id:ObjectId(req.body.deleteQuestion)}).then(function(result) {
-                ////console.log(['deleted question',result]);
+                //console.log(['deleted question',result]);
                 
             }).catch(function(err) {
-//                //console.log(['save usertopic ERR',err]);
+                console.log(['del q usertopic ERR',err]);
             });
+            
         }
         
         db.collection('userTopics').save(toSave).then(function(result) {
-//            //console.log(['saved usertopic',result]);
-            res.send({id:id,errors:errors,questions:questions,ll:9});
+            console.log(['saved usertopic',result]);
+            res.send({id:id,errors:errors,questions:questions});
         }).catch(function(err) {
           //  //console.log(['save usertopic ERR',err]);
             res.send({message:'Invaddlid request ERR'});
@@ -1587,7 +1610,7 @@ router.post('/usertopic', (req, res) => {
 })
 
 router.get('/tags', (req, res) => {
-    console.log(['TAGS',req.query]);
+    //console.log(['TAGS',req.query]);
     //if (req.body.title && req.body.title.length > 0) {
         //criteria[]
     //}
@@ -1601,10 +1624,10 @@ router.get('/tags', (req, res) => {
     if (search.length > 0) {
         criteria={$text: {$search: search}}
     }
-    console.log(['TAGS',criteria]);
+    //console.log(['TAGS',criteria]);
     db.collection('words').find(criteria).sort(sort).limit(200).toArray().then(function(results) {
           let final=[];
-          console.log(results);
+         // console.log(results);
           results.map(function(key,val) {
       //          //console.log([search,key,val]);
                 if (search && search.length > 0) {

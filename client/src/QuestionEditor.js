@@ -164,7 +164,7 @@ export default class QuestionEditor extends Component {
     //};
     
     change(e) {
-        ////console.log(e.target);
+        console.log(e.target.name,e.target.value);
         let state = {...this.props.question};
         var key = e.target.name;
         //if (key==="tags") {
@@ -176,7 +176,7 @@ export default class QuestionEditor extends Component {
         ////console.log(['CHANGE',this.props.currentQuestion,state]);
         //this.setState({'question':state});
         this.props.updateQuestion(state);
-        return true;
+        return false;
     };
     
     changeInterrogative(e,value) {

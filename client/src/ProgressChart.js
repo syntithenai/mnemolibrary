@@ -11,12 +11,13 @@ export default class ProgressChart extends React.Component {
         } 
     }
     componentDidMount() {
-           let that = this;
-        fetch('/api/usersuccessprogress?user='+this.props.user._id)
+        let that = this;
+        let ts = new Date().getTime();
+        fetch('/api/usersuccessprogress?rand='+ts+'&user='+this.props.user._id)
         .then(function(response) {
             return response.json()
         }).then(function(json) {
-            //console.log(['got response', json]);
+            console.log(['got response', json]);
             let max=0;
             
             let dataObject = {}
@@ -24,9 +25,10 @@ export default class ProgressChart extends React.Component {
             json.map(function(val,key) {
                 let id=0;
                 if ((parseInt(val._id,10) > 0)) id=parseInt(val._id,10);
+                else id=0;
                 if (id > max) max=id;
                 let point={y:val.questions,x:id,yColor:'blue'}
-                tally.push(parseInt(val.questions,10));
+                tally[id] = parseInt(val.questions,10);
                // val.questionsColor = "lightblue";
                 dataObject[id]=point;
                 return null;
@@ -48,6 +50,7 @@ export default class ProgressChart extends React.Component {
             console.log(['BUTTONS',tally,Object.keys(tally).length]);
             // take average around 3
             let status='';
+            let statusText='';
             if (tally.length > 0) {
                 var total=0;
                 //let ups=tally.slice(3,6);
@@ -55,19 +58,19 @@ export default class ProgressChart extends React.Component {
                 total = total - tally[0] - 0.5 * tally[1];
                 status=total; ///tally.length;
                 console.log(['BUTTONS',tally,total,status]);
-                if (status < -60) {
-                    status='Memory Overload Review Urgently !!!! '
-                } else if (status < -30) {
-                    status='Prioritise Review !'
+                if (status < -80) {
+                    statusText='Memory Overload Review Urgently !!!! '
+                } else if (status < -50) {
+                    statusText='Prioritise Review !'
                 } else if (status < -15) {
-                status='Time for review'
+                    statusText='Time for review'
                 } else if (status < 0) {
-                    status='Nearly up to date'
+                    statusText='Nearly up to date'
                 } else {
-                    status='Up to date'
+                    statusText='Up to date'
                 } 
             }
-            that.props.addAward('distribution',status);
+            that.props.addAward('distribution',{status:statusText,val:(1-(-1*status/60))*100});
             
             let state={series:data}
             //console.log('SETSTATE');

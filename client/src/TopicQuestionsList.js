@@ -48,8 +48,9 @@ export default class TopicQuestionsList extends Component {
                 if (this.props.validationErrors && this.props.validationErrors.hasOwnProperty(key) && this.props.validationErrors[key].length > 0) {
                     errors="Missing required information for "+this.props.validationErrors[key].join(" and ");
                 }
-                let excerpt='-->' + question.answer.split(' ').slice(0,3).join(' ')+'...';
-                if (!this.props.filter || (question.question.indexOf(this.props.filter)>=0 || question.interrogative.indexOf(this.props.filter)>=0 || question.mnemonic.indexOf(this.props.filter)>=0 || question.answer.indexOf(this.props.filter)>=0))
+                
+                let excerpt= question.answer ?  '-->' + question.answer.split(' ').slice(0,3).join(' ')+'...' : '';
+                if (!this.props.filter || (question.question && question.question.indexOf(this.props.filter)>=0 || (question.interrogative && question.interrogative.indexOf(this.props.filter)>=0) || (question.mnemonic && question.mnemonic.indexOf(this.props.filter)>=0) || (question.answer && question.answer.indexOf(this.props.filter)>=0)))
                 return <div className='list-group-item'  onClick={() => this.props.editQuestion(key)} key={key} >
                 <button className='btn btn-light'  onClick={(e) => this.moveUp(key,e)} ><AngleUp size={28} /></button>
                 <button className='btn btn-light'   onClick={(e) =>this.moveDown(key,e)} ><AngleDown size={28}  /></button>

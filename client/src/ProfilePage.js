@@ -42,34 +42,41 @@ export default class ProfilePage extends Component {
             let newState={};
             newState[type] = awardData;
             this.setState(newState);
+            
             this.saveUser().then(function() {
                     that.setState({'warning_message':''});
             });
             
         }
-        
+        function getGreenToRed(percent){
+            let r = percent<50 ? 255 : Math.floor(255-(percent*2-100)*255/100);
+            let g = percent>50 ? 255 : Math.floor((percent*2)*255/100);
+            return 'rgb('+r+','+g+',0)';
+        }
         if (type==="questions") {
             if (parseFloat(awardData) > 0)  {
+                let borderColor = getGreenToRed(awardData/1000*100);
+                let buttonStyle={backgroundColor:borderColor,borderColor:borderColor ,color: 'black',fontWeight: 'bold'}
                 if (parseFloat(awardData) < 25)  {
-                    award=<button className="btn-outline-primary btn" >New User</button>
+                    award=<button style={buttonStyle} className="btn-outline btn" >New User</button>
                 } else if (parseFloat(awardData) < 50)  {
-                    award=<button className="btn-outline-primary btn" >Beginner</button>
+                    award=<button style={buttonStyle} className="btn-outline btn" >Beginner</button>
                 } else if (parseFloat(awardData)< 100)  {
-                    award=<button className="btn-outline-primary btn" >50 Questions</button>
+                    award=<button style={buttonStyle} className="btn-outline btn" >50 Questions</button>
                 } else if (parseFloat(awardData)< 150)  {
-                    award=<button className="btn-outline-primary btn" >100 Questions</button>
+                    award=<button style={buttonStyle} className="btn-outline btn" >100 Questions</button>
                 } else if (parseFloat(awardData)< 200)  {
-                    award=<button className="btn-outline-primary btn" >150 Questions</button>
+                    award=<button style={buttonStyle} className="btn-outline btn" >150 Questions</button>
                 } else if (parseFloat(awardData)< 300)  {
-                    award=<button className="btn-outline-primary btn" >200 Questions</button>
+                    award=<button style={buttonStyle} className="btn-outline btn" >200 Questions</button>
                 } else if (parseFloat(awardData)< 400)  {
-                    award=<button className="btn-outline-primary btn" >300 Questions</button>
+                    award=<button style={buttonStyle}  className="btn-outline btn" >300 Questions</button>
                 } else if (parseFloat(awardData)< 500)  {
-                    award=<button className="btn-outline-primary btn" >400 Questions</button>
+                    award=<button style={buttonStyle} className="btn-outline btn" >400 Questions</button>
                 } else if (parseFloat(awardData)< 1000)  {
-                    award=<button className="btn-outline-primary btn" >500 Questions</button>
+                    award=<button style={buttonStyle}  className="btn-outline btn" >500 Questions</button>
                 } else  {
-                    award=<button className="btn-outline-primary btn" >1000 Questions</button>
+                    award=<button style={buttonStyle}  className="btn-outline btn" >1000 Questions</button>
                 }
             } else {
                 award=null;
@@ -77,30 +84,36 @@ export default class ProfilePage extends Component {
                 
         } else if (type==="topics") {
             if (awardData > 0) {
-                award=<button className="btn-outline-primary btn" >{awardData} Topics Complete</button>
+                let borderColor = getGreenToRed(awardData/30*100);
+                let buttonStyle={backgroundColor:borderColor,borderColor:borderColor ,color: 'black',fontWeight: 'bold'}
+                
+                award=<button style={buttonStyle} className="btn-outline-primary btn" >{awardData} Topics Complete</button>
             }
         } else if (type==="recall") {
             if (parseFloat(awardData) >=0) {
+                let borderColor = getGreenToRed((awardData)*100);
+                let buttonStyle={backgroundColor:borderColor,borderColor:borderColor ,color: 'black',fontWeight: 'bold'}
+                
                 if (parseFloat(awardData)<= 0.1)  {
-                    award=<button className="btn-outline-primary btn" >1. Novice Numbat</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >1. Novice Numbat</button>
                 } else if (parseFloat(awardData) <= 0.2)  {
-                    award=<button className="btn-outline-primary btn" >2. Beginner Bandicoot</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >2. Beginner Bandicoot</button>
                 } else if (parseFloat(awardData) <= 0.3)  {
-                    award=<button className="btn-outline-primary btn" >3. Initiate Ibis</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >3. Initiate Ibis</button>
                 } else if (parseFloat(awardData) <= 0.4)  {
-                    award=<button className="btn-outline-primary btn" >4. Student Sloth</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >4. Student Sloth</button>
                 } else if (parseFloat(awardData) <= 0.5)  {
-                    award=<button className="btn-outline-primary btn" >5. Expert Echidna</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >5. Expert Echidna</button>
                 } else if (parseFloat(awardData) <= 0.6)  {
-                    award=<button className="btn-outline-primary btn" >6. Master Magpie</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >6. Master Magpie</button>
                 } else if (parseFloat(awardData) <= 0.7)  {
-                    award=<button className="btn-outline-primary btn" >7. Wizard Water Dragon</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >7. Wizard Water Dragon</button>
                 } else if (parseFloat(awardData) <= 0.8)  {
-                    award=<button className="btn-outline-primary btn" >8. Guru Goanna</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >8. Guru Goanna</button>
                 } else if (parseFloat(awardData) <= 0.9)  {
-                    award=<button className="btn-outline-primary btn" >9. Superstar Seal</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >9. Superstar Seal</button>
                 } else {
-                    award=<button className="btn-outline-primary btn" >10. Perfect Platypus</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >10. Perfect Platypus</button>
                 }
             } else {
                 award=null;
@@ -108,12 +121,18 @@ export default class ProfilePage extends Component {
             
         } else if (type==="streak") {
             if (awardData > 1) {
-                award=<button className="btn-outline-primary btn" >{awardData} days in a row</button>
+                let borderColor = getGreenToRed(awardData/31*100);
+                let buttonStyle={backgroundColor:borderColor,borderColor:borderColor ,color: 'black',fontWeight: 'bold'}
+                
+                award=<button style={buttonStyle}  className="btn-outline-primary btn" >{awardData} days in a row</button>
             }
             
         } else if (type==="distribution") {
-            if (awardData && awardData.length > 0) {
-                award=<button className="btn-outline-primary btn" >{awardData}</button>
+            if (awardData && awardData.val && awardData.status && awardData.status.length > 0) {
+                let borderColor = getGreenToRed(awardData.val);
+                let buttonStyle={backgroundColor:borderColor,borderColor:borderColor ,color: 'black',fontWeight: 'bold'}
+                
+                award=<button  style={buttonStyle} className="btn-outline-primary btn" >{awardData.status}</button>
             }
         } 
         newState[type+'_award']=award;
@@ -227,7 +246,7 @@ export default class ProfilePage extends Component {
         fetch('/api/dumpalexa', {});
     };
     refreshindexes() {
-        fetch('/api/indexes', {});
+        fetch('/api/indexes?rand='+Math.random(), {});
     };
     
     render() { //req,vars/
@@ -305,13 +324,13 @@ export default class ProfilePage extends Component {
                         </div>
                         <div className="col-12" style={{height: '600px'}} >
                             <h4 id="leaderboard" className='graphTitle' >Leaderboards</h4>
-                            <LeaderBoard type="streak"/>
+                            <LeaderBoard type="streak" user={this.props.user} />
                         </div>
                         <div className="col-12" style={{height: '600px'}} >
-                           <LeaderBoard type="questions" />
+                           <LeaderBoard type="questions" user={this.props.user}  />
                         </div>
                         <div className="col-12" style={{height: '600px'}} >
-                           <LeaderBoard type="recall"/>
+                           <LeaderBoard type="recall" user={this.props.user} />
                         </div>
                         
                         <div className="col-12">

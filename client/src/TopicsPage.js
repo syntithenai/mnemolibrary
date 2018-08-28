@@ -3,6 +3,7 @@ import QuizList from './QuizList';
 import QuizCollection from './QuizCollection';
 //import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
+import scrollToComponent from 'react-scroll-to-component';
 
 export default class TopicsPage extends Component {
     constructor(props) {
@@ -13,9 +14,12 @@ export default class TopicsPage extends Component {
         this.filterQuizzes = this.filterQuizzes.bind(this);
         this.clearTagFilter = this.clearTagFilter.bind(this);
         //this.filterQuizzes('');
+        this.scrollTo={};
+        
     };
     
     componentDidMount() {
+       scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
        // this.filterQuizzes('');
     }
     
@@ -74,6 +78,7 @@ export default class TopicsPage extends Component {
     render() {
         return (
             <div>
+                <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                 <form className="form-inline">
                   <input className="form-control" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter}  placeholder="Search" aria-label="Search" />
                   
