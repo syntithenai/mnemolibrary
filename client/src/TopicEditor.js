@@ -58,7 +58,7 @@ export default class TopicEditor extends Component {
         this.updateQuestion = this.updateQuestion.bind(this);
         this.newTopic = this.newTopic.bind(this);
         this.loadTopic = this.loadTopic.bind(this);
-        this.saveTopic = this.saveTopic.bind(this);
+        this.saveTopic = debounce(500,this.saveTopic.bind(this));
         this.deleteTopic = this.deleteTopic.bind(this);
         this.askDeleteTopic = this.askDeleteTopic.bind(this);
         this.previewTopic = this.previewTopic.bind(this);
@@ -192,7 +192,13 @@ export default class TopicEditor extends Component {
                 if ((id.errors && Object.keys(id.errors).length > 0) || id.message) {
                     that.setState({validationErrors:id.errors,message:'Some of your questions are missing required information.'});
                 } else {
-                    that.setState({validationErrors:{},message:' ',questions:id.questions});
+                    let idsUpdate = this.state.questions;
+                    idsUpdate.map(function(value,key) {
+                        if (!idsUpdate[key]._id) {
+                            idsUpdate[key]._id = id.questions[key]._id;
+                        }
+                    });
+                    that.setState({validationErrors:{},message:' ',questions:idsUpdate});
                 }
                 
                 
