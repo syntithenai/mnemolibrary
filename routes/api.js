@@ -1077,6 +1077,7 @@ router.get('/review', (req, res) => {
                // questions = questions.slice(0,limit);
                // let questionIds = [];
                 let questionKeys = [];
+                let completeCheck = {};
                 let indexedQuestions = {};
                 let successAndDateKeyed={};
                 let successKeys=[];
@@ -1100,6 +1101,7 @@ router.get('/review', (req, res) => {
                     successAndDateKeyed[successTally][dateKey].push(question);
                 //    questionIds.push(question.questionId);
                     questionKeys.push(ObjectId(question.question));
+                    completeCheck[question.question] = 1;
                 //    indexedQuestions[question.questionId] = i;
                 //    i++;
                 });
@@ -1123,22 +1125,37 @@ router.get('/review', (req, res) => {
          //       console.log(['REVItEW',successAndDateOrderedIds]);
                 db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).toArray(function(err,results) {
                    // //console.log([err,results]);
+                   
                     let questionIndex={};
                     results.forEach(function(question) {
                         questionIndex[question._id]=question;
                         ////console.log(question._id);
+                        completeCheck[question._id]=null;
                     });
+                    // CLEANUP
+                   //completeCheck();
+                   if (successAndDateOrderedIds.length != results.length) {
+                       console.log('MISSING QUESTIONS');
+                       for (let qid in completeCheck) {
+                           if (completeCheck[qid] !== null) {
+                               console.log('DELETE PROGRESS FOR QUESTION '+qid);
+                               // remove this question id from userquestionprogress
+                               db.collection("userquestionprogress").deleteOne({$and:[{question:{$eq:ObjectId(qid)}},{user:{$eq:ObjectId(req.query.user)}}]}).then(function(res) {console.log(res.result)});
+                           }
+                       }
+                   }
+                    
                     let orderedResults=[];
                     successAndDateOrderedIds.forEach(function(question) {
                         if (questionIndex[question]) {
                             orderedResults.push(questionIndex[question]);   
                         }
                     });
-           //         //console.log(['q',err,orderedResults]);
+           //       //console.log(['q',err,orderedResults]);
                     //res.send({'currentQuestion':'0','currentQuiz':questionIds,'questions':results,indexedQuestions:indexedQuestions});
                     res.send({'questions':orderedResults});
                     //res.send({'questions':results});
-                })
+                }) 
             } else {
                 res.send('Invalid request, no user progress');
             }
