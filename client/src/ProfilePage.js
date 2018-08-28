@@ -322,14 +322,14 @@ export default class ProfilePage extends Component {
                         <div className="col-12" style={{height: '700px'}}>
                               <ActivityChart addAward={this.addAward} user={this.props.user}  />
                         </div>
-                        <div className="col-12" style={{height: '600px'}} >
+                        <div className="col-12" style={{height: '660px'}} >
                             <h4 id="leaderboard" className='graphTitle' >Leaderboards</h4>
                             <LeaderBoard type="streak" user={this.props.user} />
                         </div>
-                        <div className="col-12" style={{height: '600px'}} >
+                        <div className="col-12" style={{height: '660px'}} >
                            <LeaderBoard type="questions" user={this.props.user}  />
                         </div>
-                        <div className="col-12" style={{height: '600px'}} >
+                        <div className="col-12" style={{height: '660px'}} >
                            <LeaderBoard type="recall" user={this.props.user} />
                         </div>
                         
