@@ -911,10 +911,11 @@ class MediaFileUpload extends React.Component {
     secondsToProgress(progress) {
         let hours=parseInt(progress/3600,10);
         let minutes=parseInt(progress/60,10);
-        let remainder = parseInt((progress - hours)*100,10)/100;
+        let seconds = progress - hours *3600 - minutes * 60 ;//parseInt((progress - hours)*100,10)/100;
         let hoursString=(hours > 10) ? String(hours) : '0'+String(hours);
         let minutesString=(minutes > 10) ? String(minutes) : '0'+String(minutes);
-        return hoursString+":"+minutesString+":"+String(remainder);
+        let secondsString=(seconds > 10) ? String(seconds) : '0'+String(seconds);
+        return hoursString+":"+minutesString+":"+secondsString;
         //var date = new Date(null);
         //date.setSeconds(parseInt(progress)); // specify value for SECONDS here
         //let val= date.toISOString().substr(11, 8);
