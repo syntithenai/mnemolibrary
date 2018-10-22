@@ -41,15 +41,40 @@ export default class SingleQuestion extends Component {
           this.player = element;
           if (this.player) this.player.subscribeToStateChange(this.handleStateChange.bind(this));
         };
-        this.state = {'visible':[],playerHeight:50,playerWidth:400}
+        this.state = {swipeable:true,'visible':[],playerHeight:50,playerWidth:400}
         this.setVisible = this.setVisible.bind(this);
         this.toggleMedia = this.toggleMedia.bind(this);
         this.isVisible = this.isVisible.bind(this);
         this.hideAll = this.hideAll.bind(this);
         this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
+        this.swipeLeft = this.swipeLeft.bind(this);
+        this.swipeRight = this.swipeRight.bind(this);
+        this.disableSwipe = this.disableSwipe.bind(this);
+        this.enableSwipe = this.enableSwipe.bind(this);
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.scrollTo={};
         this.questionmessage='';
+    };
+    
+    disableSwipe() {
+        this.setState({swipeable:false});
+    };
+    
+    
+    enableSwipe() {
+        this.setState({swipeable:true});
+    };
+    
+    swipeLeft(question) {
+        if (this.state.swipeable) {
+            this.handleQuestionResponse(question,'next')
+        }
+        
+    };
+    swipeRight(question) {
+        if (this.state.swipeable) {
+            this.handleQuestionResponse(question,'previous')
+        }
     };
     
       componentDidMount() {
@@ -322,6 +347,8 @@ export default class SingleQuestion extends Component {
             }
             let imageAttribution=question.imageattribution;
             let imageLink=question.image_png ? question.image_png : question.image;
+            //imageLink="/s3/uploads/imagefiles/image_5b6ac06107ddb0007afc848b.png"
+            //imageLink =  imageLink ? imageLink +"?rand="+Math.random() : '';
             if (imageAttribution && imageAttribution.indexOf('http')===0) {
                 let endAttribution=question.imageattribution.indexOf("/",9);
                 let shortAttribution=question.imageattribution.slice(0,endAttribution);
@@ -387,7 +414,7 @@ export default class SingleQuestion extends Component {
                      <div id="spacerforsmall" className='d-none d-sm-block d-md-none' ><br/><br/> </div>
                     <div id="progressbar" style={{backgroundColor: 'blue',width: '100%',height:'0.3em'}} > <div id="innerprogressbar" style={{backgroundColor: 'red',width: this.props.percentageFinished()}} >&nbsp;</div></div>
                     
-                    <Swipeable onSwipedLeft={() => this.handleQuestionResponse(question,'next')} onSwipedRight={() => this.handleQuestionResponse(question,'previous')}   >  
+                    <Swipeable onSwipedLeft={() => this.swipeLeft(question)} onSwipedRight={() => this.swipeRight(question)}   >  
                         <h4 className="card-title">{header}?</h4>
                         <div className="card-block">
                             {(this.isVisible('media') || question.autoplay_media==="YES") && question.mediaattribution && hasMedia  && <div className="card-block mediaattribution">
@@ -397,7 +424,7 @@ export default class SingleQuestion extends Component {
                         {((this.isVisible('media') || question.autoplay_media==="YES") && hasMedia) && <span>
                             {media}</span> }
                         </div>
-                       {(this.isVisible('mnemonic')|| !showRecallButton) &&<MnemonicsList isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
+                       {(this.isVisible('mnemonic')|| !showRecallButton) &&<MnemonicsList isAdmin={this.props.isAdmin} disableSwipe={this.disableSwipe} enableSwipe={this.enableSwipe} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
                         
                         <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
                         {(this.isVisible('answer') || !showRecallButton) && question.answer && <div className="card-block answer">
@@ -448,9 +475,9 @@ export default class SingleQuestion extends Component {
                     <div className="card-block">
                         <div ref={(section) => { this.scrollTo.image = section; }} ></div>
                         {((this.isVisible('image') || !showRecallButton || question.autoshow_image==="YES") && imageLink) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={imageLink} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={imageLink} style={{width:"50%",  border: "0px"}}/></a></span> }
-                        {(this.isVisible('image') || !showRecallButton) && question.imageattribution && <div className="card-block imageattribution">
-                            <div  className='card-text' style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div>
-                        </div>}
+                        {(this.isVisible('image') || !showRecallButton) && question.imageattribution && <div><div className="card-block imageattribution">
+                            
+                        </div><div   style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div></div>}
                     </div>
 
                 </div>

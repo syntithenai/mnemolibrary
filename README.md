@@ -81,6 +81,9 @@ The script needs to be run inside the MongoDB container so it has access to mong
 
 ## Links
 
+
+https://www.fontsquirrel.com/tools/webfont-generator
+
 https://github.com/Pizzaface/Alexa-Chromecast-Skill-2.0
 
 

@@ -296,9 +296,8 @@ export default class ProfilePage extends Component {
                               <a  href='#' onClick={() => this.dumpalexa.bind(this)()} className='btn btn-info btn-warning' >
                                Train
                               </a>
-                              <a  href='#' onClick={() => this.refreshindexes.bind(this)()} className='btn btn-info btn-warning' >
-                               Indexes
-                              </a></span>
+                              
+                              </span>
                              }
                              
                               

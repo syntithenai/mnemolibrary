@@ -29,8 +29,52 @@ export default class MnemonicsList extends Component {
         this.editSuggestion = this.editSuggestion.bind(this);
         this.deleteSuggestion = this.deleteSuggestion.bind(this);
         this.like = this.like.bind(this);
+        this.startEditing = this.startEditing.bind(this);
+        this.stopEditing = this.stopEditing.bind(this);
+    };
+
+    //componentWillReceiveProps(nextProps) {
+    //componentDidUpdate(nextProps) {
+       //console.log(['componentWillReceiveProps',this.props.question,    nextProps.question]);
+      //const question = nextProps.question;        
+      ////this.setState({
+           ////defaultMnemonic:'default', 
+           ////mnemonics:{'default':{question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question}}
+        ////});  
+        //if (this.props.question != nextProps.question) {
+          ////  this.loadMnemonics(question);
+        //}
+        
+    //}
+    //{question:'5abeec3d91ce1409b01e9553',mnemonic:'marshaled ..',technique:'association',questionText:'waht is marsh pln'}
+    
+    componentDidMount() {
+      //  //console.log(['mount mnem list',this.props.question,this.props.user]);
+           //// load mnemonics
+          //let user=this.props.user;
+          this.loadMnemonics();
+      //}
+     
     };
     
+    componentDidUpdate(prevProps) {
+      //  //console.log(['mount mnem list',this.props.question,this.props.user]);
+        if (this.props.question != prevProps.question) {
+            this.loadMnemonics(this.props.question);
+        }
+      //}
+     
+    };
+        
+    startEditing() {
+        this.props.disableSwipe();
+        this.setState({isEditing:true});
+    };
+    
+    stopEditing() {
+        this.props.enableSwipe();
+        this.setState({isEditing:false});
+    };
 
     loadMnemonics(loadQuestion) {
         let that=this;
@@ -52,7 +96,7 @@ export default class MnemonicsList extends Component {
             ////console.log(['got response', response])
             return response.json()
           }).then(function(json) {
-                ////console.log(['got response', json])
+                console.log(['got response', json])
                 let final={'default':{question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question}};
                   
                 json.forEach(function(mnemonic) {
@@ -63,7 +107,7 @@ export default class MnemonicsList extends Component {
                 if (that.props.user && that.props.user.selectedMnemonics && that.props.user.selectedMnemonics.hasOwnProperty(question._id) && that.props.user.selectedMnemonics[question._id].length > 0 && final.hasOwnProperty(that.props.user.selectedMnemonics[question._id])) {
                     defaultMnemonic = that.props.user.selectedMnemonics[question._id];
                 }
-                ////console.log(['MNEMOLOAD',{defaultMnemonic:defaultMnemonic,mnemonics:final}]);
+                console.log(['MNEMOLOAD',{defaultMnemonic:defaultMnemonic,mnemonics:final}]);
                 that.setState({defaultMnemonic:defaultMnemonic,mnemonics:final});
           }).catch(function(ex) {
             //console.log(['parsing failed', ex])
@@ -88,34 +132,16 @@ export default class MnemonicsList extends Component {
         
         this.props.saveSuggestion(this.state.suggest_id,this.props.question,this.state.suggest_mnemonic,this.state.suggest_technique).then(this.loadMnemonics);
         this.setState({suggest_id:'',suggest_mnemonic:'',suggest_technique:''});
+        this.stopEditing();
     };
 
-    componentWillReceiveProps(nextProps) {
-       // //console.log(['UPDATEMNEMLIST',nextProps.question]);
-      const question = nextProps.question;        
-      //this.setState({
-           //defaultMnemonic:'default', 
-           //mnemonics:{'default':{question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question}}
-        //});  
-        this.loadMnemonics(question);
-    }
-    //{question:'5abeec3d91ce1409b01e9553',mnemonic:'marshaled ..',technique:'association',questionText:'waht is marsh pln'}
-    
-    componentDidMount() {
-      //  //console.log(['mount mnem list',this.props.question,this.props.user]);
-           //// load mnemonics
-          //let user=this.props.user;
-          this.loadMnemonics();
-      //}
-     
-    };
-    
     editSuggestion(mnemonic) {
         this.setState({suggest_id:mnemonic._id,suggest_mnemonic:mnemonic.mnemonic,suggest_technique:mnemonic.technique});
     };
     
     createSuggestion() {
         this.setState({suggest_mnemonic:'',suggest_technique:''});
+        this.startEditing();
         return true;
     };
 
@@ -155,9 +181,14 @@ export default class MnemonicsList extends Component {
         
     }; 
 
-    like(questionId,mnemonicId) {
-        ////console.log(['like(',questionId,mnemonicId]);
+    like(e,questionId,mnemonicId) {
+        console.log(['LIKE',e,questionId,mnemonicId]);
+        e.stopPropagation();
+        e.preventDefault();
+        //////console.log(['like(',questionId,mnemonicId]);
         this.props.like(questionId,mnemonicId).then(this.loadMnemonics);
+        //
+        return false;
     };
 
     render() {
@@ -176,7 +207,7 @@ export default class MnemonicsList extends Component {
                    // //console.log(['MNN',mnemonic]);
                     let likeButton=''
                     if (this.props.isLoggedIn()) {
-                        likeButton = <span className='like_dislike' >&nbsp;&nbsp;&nbsp;<a  className='btn btn-primary'  onClick={() => this.like(question._id,mnemonicId)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Select&nbsp;</a></span>
+                        likeButton = <span className='like_dislike' >&nbsp;&nbsp;&nbsp;<a  className='btn btn-primary'  onClick={(e) => this.like(e,question._id,mnemonicId)} ><ThumbsUp size={26}  style={{float: 'left'}} className="badge badge-pill badge-info"/>&nbsp;Select&nbsp;</a></span>
                     }  
                 
                    // //console.log(['mnemoth',key,mnemonic]);
@@ -230,17 +261,17 @@ export default class MnemonicsList extends Component {
                 }
             }
             let selectedMnemonic=this.state.mnemonics[this.state.defaultMnemonic];
-                        
+                        // className="modal" tabIndex="-1" role="dialog"
             return (<div   className="card-block mnemonics list-group">
                 <div className='card-text'>
                     {this.props.isLoggedIn() && <button  className='btn btn-success '  style={{float:'right'}} data-toggle="modal" data-target="#suggestdialog" onClick={this.createSuggestion} ><Plus size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Suggest a Mnemonic&nbsp;</span></button>}
                     <b>Mnemonics</b>
-                    <div id="suggestdialog" className="modal" tabIndex="-1" role="dialog">
+                    {this.state.isEditing && <div id="suggestdialog" style={{zIndex:99999,position:'fixed',top:'4em',width:'80%',textAlign:'center'}}>
                       <div className="modal-dialog" role="document">
                         <div className="modal-content">
                           <div className="modal-header">
                             <h5 className="modal-title">Suggest a mnemonic for this question</h5>
-                            <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" className="close" onClick={this.stopEditing} aria-label="Close">
                               <span aria-hidden="true">&times;</span>
                             </button>
                           </div>
@@ -257,12 +288,14 @@ export default class MnemonicsList extends Component {
                             </div>
                             <div className='form-group'>    
                             <br/>
-                                  <button  data-toggle="modal" data-target="#suggestdialog" onClick={() => this.saveSuggestion()} className='btn btn-info'>&nbsp;Submit&nbsp;</button>     
+                                  <button onClick={() => this.saveSuggestion()} className='btn btn-info'>&nbsp;Submit&nbsp;</button>    
+                                  <button onClick={this.stopEditing}  className='btn btn-info'>&nbsp;Cancel&nbsp;</button>    
+                                  
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </div>}
                     
                     
                     <div className='row' >

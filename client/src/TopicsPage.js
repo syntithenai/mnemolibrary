@@ -3,6 +3,7 @@ import QuizList from './QuizList';
 import QuizCollection from './QuizCollection';
 //import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
+import FaChild from 'react-icons/lib/fa/child';
 import scrollToComponent from 'react-scroll-to-component';
 
 export default class TopicsPage extends Component {
@@ -79,15 +80,15 @@ export default class TopicsPage extends Component {
         return (
             <div>
                 <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
-                <form className="form-inline">
+                <form className="form-inline" style={{width:'100%'}}>
                   <input className="form-control" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter}  placeholder="Search" aria-label="Search" />
                   
                   <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</a>
                   <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</a>
-              
+                <a className="btn btn-success"  href="#" style={{marginLeft:'5em'}} onClick={() => this.props.setQuizFromMissingMnemonic()}><FaChild size="22"/> Crowdsource Mnemonics</a>
                 </form>
-                {this.state.titleFilter.length>0 && <QuizList quizzes={this.state.topics} setQuiz={this.props.setQuiz} ></QuizList>}
-                {this.state.titleFilter.length === 0 && <QuizCollection collection={this.props.topicCollections} quizzes={this.state.topics} setQuiz={this.props.setQuiz} ></QuizCollection>}
+                {this.state.titleFilter.length>0 && <QuizList quizzes={this.state.topics} setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} setQuiz={this.props.setQuiz} questionsMissingMnemonics={this.props.questionsMissingMnemonics} ></QuizList>}
+                {this.state.titleFilter.length === 0 && <QuizCollection collection={this.props.topicCollections} quizzes={this.state.topics} setQuiz={this.props.setQuiz}  setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic}  questionsMissingMnemonics={this.props.questionsMissingMnemonics}  ></QuizCollection>}
             </div>
         )
     }

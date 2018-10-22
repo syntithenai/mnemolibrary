@@ -111,17 +111,17 @@ export default class TopicEditor extends Component {
     addResultToQuestions(result) {
         ////console.log(['addResultToQuestions',result]);
         let question = {
-                _id: '',
-                interrogative: '',
-                question:result.title,
-                mnemonic:'',
-                technique:'',
-                answer:result.description,
-                topic:'',
-                link:result.link, 
-                tags:[],
-                message:'',
-            }
+            _id: '',
+            interrogative: '',
+            question:result.title,
+            mnemonic:'',
+            technique:'',
+            answer:result.description,
+            topic:'',
+            link:result.link, 
+            tags:[],
+            message:'',
+        }
         let questions = this.state.questions;
         questions.push(question);
         this.setState({questions:questions,currentQuestion:questions.length-1,validationErrors:{},message:' ',currentView:'editor'});

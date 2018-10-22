@@ -142,7 +142,7 @@ export default class TopicsChart extends React.Component {
                 console.log(['LOADDATA TOPIC CHART',type]);
                 if (type!=='blocks' && type!=='archive') {
                     that.props.addAward('topics',completedTopics.length);
-                    that.props.addAward('questions',totalSeen);
+                   // that.props.addAward('questions',totalSeen);
                     that.props.addAward('recall',totalSuccess/countSuccess);
                 }
                 //console.log(['SET DATA',series]);

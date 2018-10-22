@@ -22,6 +22,7 @@ import QuizCarousel from './QuizCarousel';
 import Footer from './Footer';
 import FindQuestions from './FindQuestions';
 import CreateHelp from './CreateHelp';
+
 import FAQ from './FAQ';
 import ReactGA from 'react-ga';
 //import { BrowserRouter as Router, Route, Link } from "react-router-dom";
@@ -63,6 +64,7 @@ export default class AppLayout extends Component {
       this.state = {
           title : "Mnemo's Library",
           message: null,
+          currentTopic: "",
           currentPage: "", //splash
           currentQuestion: 0,
           questions: [],
@@ -85,10 +87,13 @@ export default class AppLayout extends Component {
       }
       // make 'this' available in setCurrentPage function
       this.setCurrentPage = this.setCurrentPage.bind(this);
+      this.setCurrentTopic = this.setCurrentTopic.bind(this);
+      this.getCurrentTopic = this.getCurrentTopic.bind(this);
       this.setQuiz = this.setQuiz.bind(this);
       this.setQuizFromQuestion = this.setQuizFromQuestion.bind(this);
       this.setQuizFromQuestionId = this.setQuizFromQuestionId.bind(this);
       this.setQuizFromTopic = this.setQuizFromTopic.bind(this);
+      this.setQuizFromMissingMnemonic = this.setQuizFromMissingMnemonic.bind(this);
       this.setReviewFromTopic = this.setReviewFromTopic.bind(this);
       this.discoverQuizFromTopic = this.discoverQuizFromTopic.bind(this);
       this.setQuizFromTag = this.setQuizFromTag.bind(this);
@@ -154,6 +159,13 @@ export default class AppLayout extends Component {
   getQueryStringValue (key) {  
           return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
   } 
+  
+  setCurrentTopic(topic) {
+      this.setState({currentTopic:topic});
+  };
+  getCurrentTopic() {
+      return this.state.currentTopic;
+  };
           
       
   openAuth(service) {
@@ -367,7 +379,8 @@ export default class AppLayout extends Component {
         return response.json()
       }).then(function(json) {
         ////console.log(['create indexes', json])
-        that.setState({topicCollections:json});
+        that.setState({topicCollections:json[0]});
+        that.setState({questionsMissingMnemonics:json[1]});
       }).catch(function(ex) {
         //console.log(['parsing failed', ex])
       })
@@ -743,7 +756,7 @@ export default class AppLayout extends Component {
         }
     };
 
-  // send an api request to like a question
+  // send an api request to save a selected mnemonic
   
   like(questionId,mnemonicId) {
       ////console.log(['applike']);
@@ -761,9 +774,9 @@ export default class AppLayout extends Component {
         let user=that.state.user;
         ////console.log(['applike results user',user]);
         user.selectedMnemonics = userSelections;
-        ////console.log(['applike results set mn',userSelections]);
-         that.setState(user:user);
-        ////console.log(['set user',user]);
+        console.log(['applike results set mn',userSelections]);
+        // that.setState(user:user);
+        //console.log(['set user',user]);
     }).catch(function(err) {
         //that.setState({'warning_message':'Not Saved'});
     });
@@ -859,7 +872,8 @@ export default class AppLayout extends Component {
   };
     
        
-   discoverQuestions() {
+   discoverQuestions(topic='') {
+      this.setCurrentTopic(topic);
       // //console.log(['discover da questions']);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
@@ -867,7 +881,7 @@ export default class AppLayout extends Component {
       //?user='+(this.state.user ? this.state.user._id : '') + '&rand='+Math.random()
       let rand=Math.random()
       fetch('/api/discover',{ method: "POST",headers: {
-    "Content-Type": "application/json"},body:JSON.stringify({user:(this.state.user ? this.state.user._id : ''),rand:rand,blocks:this.state.discoveryBlocks})})
+    "Content-Type": "application/json"},body:JSON.stringify({user:(this.state.user ? this.state.user._id : ''),rand:rand,blocks:this.state.discoveryBlocks,topic:topic})})
       .then(function(response) {
         // //console.log(['got response', response])
         return response.json()
@@ -889,14 +903,15 @@ export default class AppLayout extends Component {
   }; 
   
   setQuizFromDiscovery() {
+      this.setCurrentTopic('');
      // //console.log(['Setquiz discovery']);
       this.setCurrentPage('home')
-      this.discoverQuestions()
-      
+      this.discoverQuestions() 
   };
 
 
   discoverFromQuestionId(questionId) {
+      this.setCurrentTopic('');
       let that = this;
       // load selected question
       fetch('/api/questions?question='+questionId )
@@ -920,6 +935,7 @@ export default class AppLayout extends Component {
   };
   
   reviewFromQuestionId(questionId) {
+      this.setCurrentTopic('');
       //console.log(['SQFQid',questionId]);
       let that = this;
       // load selected question
@@ -944,6 +960,7 @@ export default class AppLayout extends Component {
   };
 
   setQuizFromQuestionId(questionId) {
+      this.setCurrentTopic('');
       //console.log(['SQFQid',questionId]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
@@ -992,6 +1009,7 @@ export default class AppLayout extends Component {
   };
   
   setQuizFromQuestion(question) {
+      this.setCurrentTopic('');
       let selectedQuestion=question._id;
       ////console.log(['set quiz from question',selectedQuestion]);
       let topic = question.quiz;
@@ -1033,7 +1051,8 @@ export default class AppLayout extends Component {
       })
   };
   
-  setQuizFromTopic(topic,selectedQuestion) {
+   setQuizFromTopic(topic,selectedQuestion) {
+      this.setCurrentTopic(topic);
       ////console.log(['set quiz from topic',topic,selectedQuestion]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
@@ -1042,6 +1061,7 @@ export default class AppLayout extends Component {
       if (this.state.user) {
           url=url+'&user='+this.state.user._id;
       }
+      
       fetch(url)
       .then(function(response) {
       //  //console.log(['got response', response])
@@ -1074,8 +1094,51 @@ export default class AppLayout extends Component {
       
   };
   
+  setQuizFromMissingMnemonic(topic) {
+      this.setCurrentTopic(topic);
+      ////console.log(['set quiz from topic',topic,selectedQuestion]);
+      let that = this;
+      //this.setState({'currentQuiz':'1,2,3,4,5'});
+      // load initial questions
+      let url='/api/questions?missingMnemonicsOnly=1'
+      
+      if (this.state.user) {
+          url=url+'&user='+this.state.user._id;
+      }
+      if (topic && topic.length > 0) {
+          url = url + '&topic='+topic ;
+      }
+      fetch(url)
+      .then(function(response) {
+      //  //console.log(['got response', response])
+        return response.json()
+      }).then(function(json) {
+      //  //console.log(['create indexes', json])
+        let currentQuiz = [];
+        let indexedQuestions= {};
+        let currentQuestion=0;
+        let j=0;
+        for (var questionKey in json['questions']) {
+            const question = json['questions'][questionKey]
+            var id = question._id;
+         //   //console.log(['check ID match',j,id, selectedQuestion ])
+            currentQuiz.push(id);
+            indexedQuestions[id]=questionKey;
+            j++;
+        }
+     //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
+        that.analyticsEvent('discover topic')
+        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+        ////console.log(['set state done', that.state])
+      }).catch(function(ex) {
+        //console.log(['parsing failed', ex])
+      })
+      
+  };
+  
   
   discoverQuizFromTopic(topic,selectedQuestion) {
+      this.setCurrentTopic(topic);
       //console.log(['dissc quiz from topic',topic,selectedQuestion,this.state.user]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
@@ -1122,6 +1185,7 @@ export default class AppLayout extends Component {
       
   };
   reviewBySuccessBand(band) {
+      this.setCurrentTopic('');
       //console.log(['set review from band',band]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
@@ -1159,6 +1223,7 @@ export default class AppLayout extends Component {
   };
   
   setReviewFromTopic(topic,selectedQuestion) {
+      this.setCurrentTopic(topic);
       //console.log(['set review from topic',topic,selectedQuestion]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
@@ -1200,6 +1265,7 @@ export default class AppLayout extends Component {
   };
   
   setQuizFromTag(tag) {
+      this.setCurrentTopic('');
      ////console.log(['set quiz form tag',tag]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
@@ -1228,6 +1294,7 @@ export default class AppLayout extends Component {
       })
   };
   setQuizFromTechnique(tag) {
+      this.setCurrentTopic('');
      let that=this;
      ////console.log(['set quiz form tag',tag]);
       //this.setState({'currentQuiz':'1,2,3,4,5'});
@@ -1303,6 +1370,8 @@ export default class AppLayout extends Component {
                     saveSuggestion={this.saveSuggestion} 
                     setQuizFromTechnique={this.setQuizFromTechnique} 
                     setQuizFromTopic={this.setQuizFromTopic} 
+                    setReviewFromTopic={this.setReviewFromTopic}
+                    discoverQuizFromTopic={this.discoverQuizFromTopic}
                     setDiscoveryBlock={this.setDiscoveryBlock}  
                     setQuizFromDiscovery={this.setQuizFromDiscovery} 
                     setQuizFromTag={this.setQuizFromTag} 
@@ -1320,9 +1389,10 @@ export default class AppLayout extends Component {
                     isLoggedIn={this.isLoggedIn} 
                     mnemonic_techniques={this.state.mnemonic_techniques} 
                     setMessage={this.setMessage} 
+                    getCurrentTopic={this.getCurrentTopic}
                     isReview={false} /> }
                 
-                {this.isCurrentPage('topics') && <TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage}/>
+                {this.isCurrentPage('topics') && <TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage}/>
                 }
                 {this.isCurrentPage('tags') && <TagsPage  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
                 }
@@ -1337,6 +1407,8 @@ export default class AppLayout extends Component {
                     setQuizFromTechnique={this.setQuizFromTechnique} 
                     setQuizFromDiscovery={this.setQuizFromDiscovery} 
                     setQuizFromTopic={this.setQuizFromTopic} 
+                    setReviewFromTopic={this.setReviewFromTopic}
+                    discoverQuizFromTopic={this.discoverQuizFromTopic}
                     setDiscoveryBlock={this.setDiscoveryBlock} 
                     setQuizFromTag={this.setQuizFromTag}  
                     clearDiscoveryBlock={this.clearDiscoveryBlock} 
@@ -1355,6 +1427,7 @@ export default class AppLayout extends Component {
                     setMessage={this.setMessage} 
                     like={this.like} user={this.state.user} 
                     progress={progress} 
+                    getCurrentTopic={this.getCurrentTopic}
                     isLoggedIn={this.isLoggedIn}  
                 />
                 }

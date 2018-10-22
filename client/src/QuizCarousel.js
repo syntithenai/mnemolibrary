@@ -18,7 +18,8 @@ export default class QuizCarousel extends Component {
             'quizComplete': false,
             'showList':false,
             'isReview': this.props.isReview,
-            'success' : []
+            'success' : [],
+            'logged':{seen:{},success:{}}
         };
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.currentQuestion = this.currentQuestion.bind(this);
@@ -55,17 +56,25 @@ export default class QuizCarousel extends Component {
      // //console.log(['log status',status,question]);
       if (this.props.user && !preview) {
           if (!question) question = this.props.questions[this.props.indexedQuestions[this.props.currentQuestion]]._id;
-          let that = this;
-           // central storage
-             fetch('/api/'+status, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({'user':this.props.user._id,'question':question,topic:topic})
-            }).catch(function(err) {
-                that.setState({'message':'Not Saved'});
-            });
+          if (this.state.logged[status].hasOwnProperty(question)) {
+              // ignore duplicate logs 
+          } else {
+              console.log(['log status',status,question]);
+              let logged = this.state.logged;
+              logged[status][question] = true;
+              this.setState({logged:logged});
+              let that = this;
+               // central storage
+                 fetch('/api/'+status, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({'user':this.props.user._id,'question':question,topic:topic})
+                }).catch(function(err) {
+                    that.setState({'message':'Not Saved'});
+                });              
+          }
         }
   };    
 
@@ -187,12 +196,13 @@ export default class QuizCarousel extends Component {
        if (this.props.finishQuiz) {
             this.props.finishQuiz(this.props.questions,this.state.success);
         } else {
+            
         //this.props.setMessage('You\'ve seen '+(questions ? questions.length : 0)+' questions. Time for review ?'); 
         ////console.log('root finish quiz');
             let buttons=[
                 {
                   label: 'Review',
-                  onClick: () => this.props.setCurrentPage('review')
+                  onClick: () => this.reviewQuestions()
                 },
                 {
                   label: 'Continue',
@@ -225,8 +235,21 @@ export default class QuizCarousel extends Component {
    }; 
    
     discoverQuestions() {
-        this.props.setQuizFromDiscovery();
+        //this.props.setQuizFromDiscovery();
+        let topic = this.props.getCurrentTopic();
+        //console.log(['finish quiz',topic]);
+        this.props.discoverQuizFromTopic(topic);
     };
+    
+    
+    reviewQuestions() {
+        let topic = this.props.getCurrentTopic();
+        //console.log(['finish quiz',topic]);
+      
+        this.props.setReviewFromTopic(topic);
+        //this.props.setCurrentPage('review')
+    };
+    
     
     getQuestions(questionIds) {
       //  //console.log(['get ques',questionIds]);

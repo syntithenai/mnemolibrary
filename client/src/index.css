@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'sans_forgeticaregular';
+    src: url('sansforgetica-regular-webfont.woff2') format('woff2'),
+         url('sansforgetica-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -22,6 +31,7 @@ body {
     border: 1px solid black;
     background-color: white;
 }
+
 .carousel-item h5 {
     color: black;
     font-weight: bold;
@@ -190,10 +200,12 @@ pre {
 }
 pre.mnemonic {
     color :  red;
+    font-family: 'sans_forgeticaregular';
     font-size: 1.3em;
 }
 pre.mnemonicalternative {
     color :  black;
+    font-family: 'sans_forgeticaregular';
     font-size: 1.2em;
 
 }

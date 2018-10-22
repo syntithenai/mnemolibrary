@@ -34,7 +34,7 @@ export default class QuizCollection extends Component {
                   });
                   return <div   key={key} >
                           <h4>{collection.name}</h4>
-                          <QuizList quizzes={collatedTopics} setQuiz={this.props.setQuiz} ></QuizList>
+                          <QuizList quizzes={collatedTopics} setQuiz={this.props.setQuiz}  questionsMissingMnemonics={this.props.questionsMissingMnemonics}   setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic}></QuizList>
                         </div>
               }
               return '';

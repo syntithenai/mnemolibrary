@@ -450,7 +450,7 @@ class MediaFileUpload extends React.Component {
                     let uploaded = that.state.uploaded;
                     if (that.state.uploadField) {
                         
-                        uploaded[that.state.uploadField]='https://'+config.s3Bucket+".s3."+config.s3Region+".amazonaws.com"+"/"+result.filename+'?rand='+String(new Date().getTime());
+                        uploaded[that.state.uploadField]='https://'+"s3."+config.s3Region+".amazonaws.com"+"/"+config.s3Bucket+"/"+result.filename+'?rand='+String(new Date().getTime());
                         that.setState({uploaded:uploaded});                    
                         that.setState({active:true});                    
                     }

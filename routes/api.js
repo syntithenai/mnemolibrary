@@ -287,7 +287,7 @@ router.get('/recenttopics', (req, res) => {
     if (req.query.user && req.query.user.length > 0) {
         let collatedTopics={};
         //
-        $or:[{'successTally':{$lt : 7}},{'successTally':{$exists : false}}]
+       // $or:[{'successTally':{$lt : 7}},{'successTally':{$exists : false}}]
         
         //  collate all user progress by topic
         db.collection('userquestionprogress').aggregate([
@@ -308,12 +308,19 @@ router.get('/recenttopics', (req, res) => {
             }
             result.toArray().then(function(final) {
                // //console.log(['RECENT TOPICS',final]);
-                let topics=[];
+                let topics = [];
+                let totalQuestions = 0;
                 final.map(function(val,key) {
                     if (val.successRate<0.7 && val.topic && String(val.topic).length > 0) {
                         collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
                         topics.push({quiz:{$eq:val.topic}});                        
                     }
+                    totalQuestions += val.questions;
+                });
+                // UPDATE USERS WITH TALLY
+                console.log(['UPDATE USER TOTLAL' ,req.query.user,totalQuestions]);
+                db.collection('users').updateOne({_id:{$eq:ObjectId(req.query.user)}},{$set:{questions:totalQuestions}}).then(function() {
+                    console.log('UPDATED');
                 });
                // //console.log(['topics',topics]);
                     //'quiz': {$in:[topics]} ,
@@ -729,7 +736,7 @@ router.get('/indexes', (req, res) => {
 });
 
 router.post('/import', (req, res) => {
-  //  //console.log(['import']);
+  console.log(['import']);
     let that = this;
     let url = config.masterSpreadsheet;
     // load mnemonics and collate tags, topics
@@ -789,6 +796,11 @@ router.post('/import', (req, res) => {
                              record._id = ObjectId();  
                             // //console.log(['NEW ID',record._id]);
                         }
+                        if (record.mnemonic && record.mnemonic.length > 0) {
+                            record.hasMnemonic = 1;
+                        } else {
+                            record.hasMnemonic = 0;
+                        }
                         thePromise = new Promise(function(resolve,reject) {
                             db.collection('questions').save(record).then(function(resy) {
                                 ////console.log(['UPDATE']);
@@ -806,17 +818,16 @@ router.post('/import', (req, res) => {
                     }
                 }
                 Promise.all(promises).then(function(ids) {
-                    ////console.log(['del ids',ids]);
+                    console.log(['del ids',ids]);
                     // delete all questions that are not in this updated set (except userTopic questions)
                     db.collection('questions').remove({$and:[{_id:{$nin:ids}},{userTopic:{$not:{$exists:true}}}]}).then(function(dresults) {
                        // //console.log('DELETEd THESE');
                        // //console.log(ids);
                         // update tags
-                        ////console.log('UPDATE TAGS');
+                        console.log('UPDATE TAGS and indexes');
                         ////console.log(Object.keys(json.tags));
-                        updateTags(json.tags);
-                        // create indexes   
-                        setTimeout(function() {
+                        updateTags(json.tags).then(function() {
+                            // create indexes   
                             db.collection('questions').dropIndexes();
                             db.collection('questions').createIndex({
                                 question: "text",
@@ -827,13 +838,13 @@ router.post('/import', (req, res) => {
                                 //answer: "text"
                             });
                            
-                           db.collection('words').dropIndexes();
+                            db.collection('words').dropIndexes();
                             db.collection('words').createIndex({
                                 text: "text"                    
                             }); 
                             //console.log('created indexes');                            
-                        },10000);
-                        // sitemap
+                        });
+                        
                        
 
                         
@@ -851,25 +862,68 @@ router.post('/import', (req, res) => {
                 
 });
 
+
 router.get('/topiccollections', (req, res) => {
-    db.collection('topicCollections').find({}).sort({sort:1}).toArray().then(function(collections) {
-        db.collection('userTopics').find({published:{$eq:true}}).sort({updated:-1}).limit(10).toArray().then(function(userTopics) {
-            let topics=[];//sort({updated:-1}).
-           // //console.log(['TOPICCOLLES',userTopics]);
-            userTopics.map(function(key,val) {
-                    topics.push(key.publishedTopic);
-            });
-            if (topics.length > 0) {
-                // append generated Community section at the end
-                collections.push({name:'Community',sort:collections.length + 1,column:"2",topics:topics});
-            }
-                
-            res.send(collections);
+    
+    let missingQuestionsByTopic={}
+    
+    //db.collection('questions').aggregate([
+            //{ $match: {
+                    //$and:[{$where: "this.mnemonic.length == 0"}]
+           //}},
+            //{ $group: {'_id': "$quiz",
+                //'questions': { $sum: 1 }
+            //}},
+            //{$sort:{"_id":1}}
+    //]).toArray().then(function(results) {
+        //console.log('TOPIC COLL');
+        //console.log(results);
+    //});
+    
+    
+    
+    db.collection('questions').find({$where: "this.mnemonic.length == 0"}).toArray().then(function(questions) {
+        //console.log(['LOADING TOPICS, FOUND MNEM FREE QU',questions]);
+        questions.map(function(question,key) {
+            if (question.quiz && question.quiz.length > 0) {
+                missingQuestionsByTopic[question.quiz] = (parseInt(missingQuestionsByTopic[question.quiz],10) > 0) ? parseInt(missingQuestionsByTopic[question.quiz],10) + 1 : 1;
+             }
         });
-    }).catch(function(e) {
-        //console.log(e);
-        res.send({});
+        console.log(['MISSING',missingQuestionsByTopic]);
+        
+        db.collection('topicCollections').find({}).sort({sort:1}).toArray().then(function(collections) {
+            let final=[]
+            collections.map(function(cValue,cKey) {
+                //let missingTopics=[]
+                //cValue.topics.map(function(topic,i) {
+                    //if (topic )
+                //});
+                //if (cValue.quiz && cValue.quiz.length > 0 && missingQuestionsByTopic[cValue.quiz] > 0) {
+                    //cValue.missingCount=missingQuestionsByTopic[cValue.quiz];
+                //}
+                final.push(cValue);
+            });
+            db.collection('userTopics').find({published:{$eq:true}}).sort({updated:-1}).limit(10).toArray().then(function(userTopics) {
+                let topics=[];//sort({updated:-1}).
+               // //console.log(['TOPICCOLLES',userTopics]);
+                userTopics.map(function(key,val) {
+                        topics.push(key.publishedTopic);
+                });
+                if (topics.length > 0) {
+                    // append generated Community section at the end
+                    final.push({name:'Community',sort:collections.length + 1,column:"2",topics:topics});
+                }
+                    
+                res.send([final,missingQuestionsByTopic]);
+            });
+        }).catch(function(e) {
+            //console.log(e);
+            res.send({});
+        });        
+        
     });
+    
+
 });
 
 
@@ -896,12 +950,15 @@ router.post('/discover', (req, res) => {
     
     function discoverQuery() {
         //sortFilter[orderBy]=-1;
-        sortFilter['successRate']=-1;
+        let sortFilter={hasMnemonic:1};
+        sortFilter['hasMnemonic']=-1;
+       // sortFilter['successRate']=-1;
+        
         console.log(['disco criteria',JSON.stringify(criteria)]);
         db.collection('questions').find({$and:criteria})
         //db.collection('questions').aggregate({$match:{$nin:notThese}})
         .sort(sortFilter).limit(limit).toArray().then(function( questions) {
-           //   //console.log(['user res',questions ? questions.length : 0,questions]);    
+           console.log(['user res',questions ? questions.length : 0]);    
             res.send({questions:questions});
         })
     };
@@ -942,6 +999,8 @@ router.post('/discover', (req, res) => {
             });
             
         }
+      //  criteria.push({mnemonic: {$exists: true}, $where: "this.mnemonic.length > 0"});
+        
         let user = req.body.user ? req.body.user : null;
         db.collection('users').find({_id:ObjectId(user)}).toArray().then(function(users) {
             if (users.length > 0) {
@@ -957,13 +1016,13 @@ router.post('/discover', (req, res) => {
                 } else {
                     criteria.push({discoverable :{$ne:'no'}});
                     if (fullUser.difficulty > 0) {
-                        criteria.push({'difficulty': {$eq: fullUser.difficulty}});
+                        criteria.push({'difficulty': {$lte: fullUser.difficulty}});
                     } else {
-                        criteria.push({'difficulty': {$eq: '2'}});
+                        criteria.push({'difficulty': {$lte: '2'}});
                     }
                 }
                 
-               db.collection('userquestionprogress').find({
+                db.collection('userquestionprogress').find({
                         $and:[
                             {'user': {$eq:ObjectId(user)}} , 
                             {$or:[
@@ -996,7 +1055,7 @@ router.post('/discover', (req, res) => {
             }
         });
     } else {
-        criteria.push({'difficulty': {$eq: '2'}});
+        criteria.push({'difficulty': {$lte: '2'}});
         criteria.push({access :{$eq:'public'}});
         discoverQuery();
     }
@@ -1185,6 +1244,8 @@ router.get('/questions', (req, res) => {
     } else {
         criteria.push({access :{$eq:'public'}});
     }
+    
+    
    // //console.log(['questions request',req.query.search,req.query.technique]);
     if (req.query.search && req.query.search.trim().length > 0) {
         // SEARCH BY technique and text query
@@ -1199,6 +1260,7 @@ router.get('/questions', (req, res) => {
           res.send({'questions':results});
         })
     } else {
+        
         // SEARCH BY technique
         if (req.query.technique && req.query.technique.length > 0) {
             criteria.push({'mnemonic_technique': {$eq:req.query.technique}});
@@ -1211,6 +1273,9 @@ router.get('/questions', (req, res) => {
             let topic = req.query.topic.trim(); //.toLowerCase(); 
             criteria.push({'quiz': {$eq:topic}});
           //  //console.log(['topic search C    ',criteria]);
+            if (req.query.missingMnemonicsOnly > 0) {
+                criteria.push({ $where: "this.mnemonic.length == 0"});
+            } 
             db.collection('questions').find({$and:criteria}).sort({sort:1}).toArray(function(err, results) {
               res.send({'questions':results});
             })
@@ -1237,6 +1302,12 @@ router.get('/questions', (req, res) => {
                     res.send({'questions':results});
                 })
             //}
+        } else if (req.query.missingMnemonicsOnly > 0) {
+            criteria.push({ $where: "this.mnemonic.length == 0"});
+            criteria.push({discoverable:{$ne:'no'}});
+            db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).project({score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).toArray(function(err, results) {
+              res.send({'questions':results});
+            })
         } else {
             res.send({'questions':[]});
         //db.collection('questions').find({}).sort({question:1}).toArray(function(err, results) {
@@ -1667,61 +1738,75 @@ router.get('/tags', (req, res) => {
 router.get('/topics', (req, res) => {
     ////console.log(['topics',req.body]);
     let search = req.query.title;
-    //if (req.body._id && req.body._id.length > 0) {
+    //db.collection('questions').find({$where: "this.mnemonic.length == 0"}).toArray().then(function(questions) {
+        //console.log(['LOADING TOPICS, FOUND MNEM FREE QU',questions]);
         db.collection('questions').distinct('quiz').then(function(results) {
             let final={};
             results.map(function(key,val) {
       //          //console.log([search,key,val]);
                 if (search && search.length > 0 && key.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
-                    final[key]=1;
+                    final[key]=results.length;
                 } 
             });
+            console.log(['GET TOPICS FINALLY',final]);
             res.send(final);
         }).catch(function(e) {
             res.send({'err':e.message});
         });
-    //} else {
-        //res.send({message:'Invalid request'});
-    //}
+    //});
 })
 
 function updateTags(tags) {
-    ////console.log(['UPDATETAGS']);
+    console.log(['UPDATETAGS']);
     ////console.log(tags);
-    Object.keys(tags).map(function(tag,key) {
-      //  //console.log(['UPDATETAGS matching']);
-        let criteria=[];
-        criteria.push({'tags': {$in:[tag]}});
-        ////console.log(criteria);
-        db.collection('questions').find({$and:criteria}).toArray().then(function(result) {
-                ////console.log(['UPDATETAGS found']);
-                ////console.log(result);
-                if (result.length > 0) {
-                    ////console.log('UPDATETAGS found questions');
-                    db.collection('words').findOne({text:{$eq:tag}}).then(function(word) {
-                        ////console.log('UPDATETAGS UPDATED WORD');
-                        ////console.log(word);
-                        if (word) {
-                            ////console.log('UPDATETAGS UPDATED');
-                            word.value=result.length;
-                            db.collection('words').save(word).then(function(saveres) {
-                              //      //console.log('UPDATETAGS TAG');
-                                    ////console.log(saveres);
-                            });                            
+    let p = new Promise(function(resolve,reject) {
+        let promises=[];
+        Object.keys(tags).map(function(tag,key) {
+          //  //console.log(['UPDATETAGS matching']);
+            let criteria=[];
+            criteria.push({'tags': {$in:[tag]}});
+            ////console.log(criteria);
+            let ip = new Promise(function(iresolve,ireject) {
+                db.collection('questions').find({$and:criteria}).toArray().then(function(result) {
+                        ////console.log(['UPDATETAGS found']);
+                        ////console.log(result);
+                        if (result.length > 0) {
+                            ////console.log('UPDATETAGS found questions');
+                            db.collection('words').findOne({text:{$eq:tag}}).then(function(word) {
+                                ////console.log('UPDATETAGS UPDATED WORD');
+                                ////console.log(word);
+                                if (word) {
+                                    ////console.log('UPDATETAGS UPDATED');
+                                    word.value=result.length;
+                                    db.collection('words').save(word).then(function(saveres) {
+                                      //      //console.log('UPDATETAGS TAG');
+                                            ////console.log(saveres);
+                                            iresolve();
+                                    });                            
+                                } else {
+                                    db.collection('words').save({'text':tag,value:result.length}).then(function(saveres) {
+                                        //    //console.log('UPDATETAGS TAG NEW');
+                                           // //console.log(saveres);
+                                           iresolve();
+                                    });                            
+                                }
+                            });
                         } else {
-                            db.collection('words').save({'text':tag,value:result.length}).then(function(saveres) {
-                                //    //console.log('UPDATETAGS TAG NEW');
-                                   // //console.log(saveres);
-                            });                            
+                            db.collection('words').remove({text:{$eq:tag}}).then(function(word) {
+                                ////console.log('UPDATETAGS REMOVED TAG');
+                               iresolve();
+                            });
                         }
-                    });
-                } else {
-                    db.collection('words').remove({text:{$eq:tag}}).then(function(word) {
-                        ////console.log('UPDATETAGS REMOVED TAG');
-                    });
-                }
-         });
+                 })
+            }) ;
+            promises.push(ip);
+        });
+        Promise.all(promises).then(function() {
+            resolve();
+        });
+        
     });
+    return p;
 }
 
 
@@ -1878,15 +1963,20 @@ router.post('/publishusertopic', (req, res) => {
                             question.user=ObjectId(user._id);
                             question.userQuestion=true;
                             question.userTopic=ObjectId(req.body._id);
+                            if (question.mnemonic && question.mnemonic.length > 0) {
+                                question.hasMnemonic = 1;
+                            } else {
+                                question.hasMnemonic = 0;
+                            }
                              if (Array.isArray(question.tags)) {
                                    question.tags.map(function(tag,key) {
                                        tags[tag]=1;
                                    });
                                }
-                            if (question.mnemonic.length === 0) {
-                                if (!errors.hasOwnProperty(key)) errors[key]=[];
-                                errors[key].push('mnemonic');
-                            }
+                            //if (question.mnemonic.length === 0) {
+                                //if (!errors.hasOwnProperty(key)) errors[key]=[];
+                                //errors[key].push('mnemonic');
+                            //}
                             //if (question.interrogative.length === 0) {
                                 //if (!errors.hasOwnProperty(key)) errors[key]=[];
                                 //errors[key].push('interrogative');
@@ -1977,12 +2067,13 @@ router.post('/publishusertopic', (req, res) => {
 
 
 router.get('/leaderboard', (req, res) => {
+    console.log(['LEADERBOARD',req.query.type]);
     let sort={streak: -1,questions:-1, recall:-1};
-    if (req.query.sort==="streak") {
+    if (req.query.type==="streak") {
         sort = {streak: -1}
-    } else if (req.query.sort==="questions") {
+    } else if (req.query.type==="questions") {
         sort = {questions: -1}
-    } else if (req.query.sort==="recall") {
+    } else if (req.query.type=="recall") {
         sort = {recall:-1}
     }
     db.collection('users').find().sort(sort).limit(10).toArray(function(err, result) {
