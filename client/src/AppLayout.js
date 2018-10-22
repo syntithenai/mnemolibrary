@@ -1356,7 +1356,7 @@ export default class AppLayout extends Component {
             <div className="mnemo">
             
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
-                <Navigation shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
+                <Navigation setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
                 
                 
                 

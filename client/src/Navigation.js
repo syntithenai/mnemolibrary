@@ -32,6 +32,10 @@ export default class Navigation extends Component {
     };
     
 
+    startReview() {
+        this.props.setCurrentTopic('');
+        this.props.setCurrentPage('review')
+    };
     
     import(e) {
         this.props.import();
@@ -72,7 +76,7 @@ export default class Navigation extends Component {
                 <a className="btn btn-secondary" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Search</a>
               </div>
               <div className="col-4">
-                <a className="btn btn-secondary" href="#"  onClick={() => this.props.setCurrentPage('review')} >Review</a>
+                <a className="btn btn-secondary" href="#"  onClick={() => this.startReview.bind(this)()} >Review</a>
               </div>
               {this.props.isLoggedIn() && 
               <div className="col-4">
