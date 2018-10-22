@@ -238,7 +238,7 @@ export default class MnemonicsList extends Component {
                             <div style={{float:'left'}} >{likeButton}&nbsp;{techniqueButton}</div>
                             
                             </div>
-                            <pre  className='mnemonicalternative col-12 col-lg-5' >{mnemonic.mnemonic}</pre>
+                            <pre style={{overflowY: 'hidden'}} className='mnemonicalternative col-12 col-lg-5' >{mnemonic.mnemonic}</pre>
                             
                         </div>
                         
