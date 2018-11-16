@@ -763,7 +763,7 @@ router.post('/import', (req, res) => {
                 // iterate questions collecting promises and insert/update as required
                 let promises=[];
                 for (var a in json.questions) {
-                 //  //console.log([a]); //,json[collection][a]]);
+                 console.log([a]); //,json[collection][a]]);
                     if (json.questions[a]) {
                         let record =  json.questions[a];
                         if (!record.successRate) record.successRate = Math.random()/100; // randomisation to get started
@@ -803,7 +803,7 @@ router.post('/import', (req, res) => {
                         }
                         thePromise = new Promise(function(resolve,reject) {
                             db.collection('questions').save(record).then(function(resy) {
-                                ////console.log(['UPDATE']);
+                                console.log(['UPDATE']);
                                 //let newRecord={_id:record._id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
                                 resolve(record._id);
                                 
@@ -842,7 +842,7 @@ router.post('/import', (req, res) => {
                             db.collection('words').createIndex({
                                 text: "text"                    
                             }); 
-                            //console.log('created indexes');                            
+                            console.log('created indexes');                            
                         });
                         
                        
@@ -1086,12 +1086,19 @@ router.get('/review', (req, res) => {
      if ((req.query.topic && req.query.topic.length > 0) || (req.query.band && req.query.band.length > 0)) {
          // no time filter for search based
      } else {
-         let oneHourBack = new Date().getTime() - 1800000;
-         //criteria.push({seen:{$lt:oneHourBack}});   
-         criteria.push({$or:[{seen:{$lt:oneHourBack}},{successTally:{$not:{$gt:0}}}]});    
+        let oneHourBack = new Date().getTime() - 3600000;
+        let oneDayBack = new Date().getTime() - 86400000;
+        //criteria.push({seen:{$lt:oneHourBack}});   
+        criteria.push({$or:[
+             {$and:[{seen:{$lt:oneHourBack}},{successTally:{$eq:1}}]},
+             {$and:[{seen:{$lt:oneHourBack}},{successTally:{$eq:2}}]},
+             {$and:[{seen:{$lt:oneDayBack}},{successTally:{$gt:2}}]},
+             {successTally:{$not:{$gt:0}}}
+        ]});    
      }
      //else {
-        criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
+    
+    criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
         
          
      //}
