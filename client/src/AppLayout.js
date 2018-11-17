@@ -101,6 +101,7 @@ export default class AppLayout extends Component {
       this.componentDidMount = this.componentDidMount.bind(this);
       this.reviewBySuccessBand = this.reviewBySuccessBand.bind(this);
       this.fetchTopicCollections = this.fetchTopicCollections.bind(this);
+      this.getCurrentBand = this.getCurrentBand.bind(this);
       //this.getTagsByTitle = this.getTagsByTitle.bind(this);
       //this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
       //this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
@@ -774,7 +775,7 @@ export default class AppLayout extends Component {
         let user=that.state.user;
         ////console.log(['applike results user',user]);
         user.selectedMnemonics = userSelections;
-        console.log(['applike results set mn',userSelections]);
+        //console.log(['applike results set mn',userSelections]);
         // that.setState(user:user);
         //console.log(['set user',user]);
     }).catch(function(err) {
@@ -842,7 +843,7 @@ export default class AppLayout extends Component {
     };
     
      getQuestionsForReview() {
-     //    //console.log('getQuestionsForReview');
+    //console.log('getQuestionsForReview');
       let that = this;
       ////console.log('get q for review');
       if (this.state.user) {
@@ -863,10 +864,10 @@ export default class AppLayout extends Component {
                     indexedQuestions[id]=questionKey;                    
                 }
             }
-            that.setState({'currentQuestion':0,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Review'});
-           // //console.log(['set state done', that.state])
+            that.setState({'currentQuestion':0,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Review'});
+           //console.log(['GETQUESTIONFORREVIEW set state done', that.state])
           }).catch(function(ex) {
-            //console.log(['parsing failed', ex])
+            console.log(['parsing failed', ex])
           })
       }
   };
@@ -1184,8 +1185,14 @@ export default class AppLayout extends Component {
       })
       
   };
+  
+  getCurrentBand() {
+      return this.state.currentBand;
+  };
+  
   reviewBySuccessBand(band) {
       this.setCurrentTopic('');
+      this.setState({currentBand:band});
       //console.log(['set review from band',band]);
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
@@ -1255,8 +1262,8 @@ export default class AppLayout extends Component {
             j++;
         }
      //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
-        that.analyticsEvent('discover topic')
-        that.setState({currentPage:"review",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+        that.analyticsEvent('review topic')
+        that.setState({currentPage:"review",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Review Topic '+  decodeURI(Utils.snakeToCamel(topic))});
         ////console.log(['set state done', that.state])
       }).catch(function(ex) {
         //console.log(['parsing failed', ex])
@@ -1354,13 +1361,13 @@ export default class AppLayout extends Component {
 
         return (
             <div className="mnemo">
-            
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
                 <Navigation setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
                 
                 
                 
                 {((this.isCurrentPage('splash')) || (this.isCurrentPage('') && !this.isLoggedIn())) && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} title={title}/></div>}
+                
                 
                 {this.isCurrentPage('home') && <QuizCarousel 
                     isAdmin={this.isAdmin}  
@@ -1392,7 +1399,7 @@ export default class AppLayout extends Component {
                     getCurrentTopic={this.getCurrentTopic}
                     isReview={false} /> }
                 
-                {this.isCurrentPage('topics') && <TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage}/>
+                {this.isCurrentPage('topics') && <TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn}  />
                 }
                 {this.isCurrentPage('tags') && <TagsPage  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
                 }
@@ -1429,6 +1436,8 @@ export default class AppLayout extends Component {
                     progress={progress} 
                     getCurrentTopic={this.getCurrentTopic}
                     isLoggedIn={this.isLoggedIn}  
+                    getCurrentBand={this.getCurrentBand}
+                    reviewBySuccessBand={this.reviewBySuccessBand}
                 />
                 }
                 {this.isCurrentPage('create') && <CreatePage fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
@@ -1449,6 +1458,8 @@ export default class AppLayout extends Component {
                 }
                 {(showLogin || this.isCurrentPage('forcelogin')) && <LoginPage token={this.state.token} login={this.login} setCurrentPage={this.setCurrentPage}/>
                 }<br/>
+                
+                
                 <Footer/>
                 
             </div>
@@ -1458,7 +1469,8 @@ export default class AppLayout extends Component {
     }
   }
 }
-
+//<b>{this.getCurrentTopic()}</b>
+                
  
 //<AdSense.Google
               //client='ca-pub-8152690534650306'

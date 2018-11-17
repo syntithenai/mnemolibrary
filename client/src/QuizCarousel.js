@@ -53,13 +53,18 @@ export default class QuizCarousel extends Component {
   };
       
   logStatus(status,question,preview,topic) {
-     // //console.log(['log status',status,question]);
+     //console.log(['log status',status,question,preview,topic,this.props.user,this.state.logged[status]]);
+     if (!this.state.logged[status]) {
+         this.state.logged[status]={};
+     }
       if (this.props.user && !preview) {
+          //console.log(['logging status']);
           if (!question) question = this.props.questions[this.props.indexedQuestions[this.props.currentQuestion]]._id;
+          //console.log(['logging status',question]);
           if (this.state.logged[status].hasOwnProperty(question)) {
-              // ignore duplicate logs 
+              //console.log(['ignore duplicate logs']);
           } else {
-              console.log(['log status',status,question]);
+              //console.log(['REALLY log status',status,question]);
               let logged = this.state.logged;
               logged[status][question] = true;
               this.setState({logged:logged});
@@ -79,8 +84,12 @@ export default class QuizCarousel extends Component {
   };    
 
   banQuestion(questions,id,time,topic) {
+      
+      //console.log(['BAN QUESTION',this.props.currentQuiz.length,this.isQuizFinished(),questions,id,time,topic]);
       questions.block[id] = time;
        this.logStatus('block',id,false,topic);
+      //console.log(['BAN QUESTION logged',this.props.currentQuiz.length,this.isQuizFinished(),questions,id,time,topic]);
+      
        // quiz complete ?
           if (this.props.currentQuiz.length > 0) {
             if (this.isQuizFinished()) {

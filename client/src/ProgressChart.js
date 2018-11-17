@@ -17,7 +17,7 @@ export default class ProgressChart extends React.Component {
         .then(function(response) {
             return response.json()
         }).then(function(json) {
-            console.log(['got response', json]);
+           // console.log(['got response', json]);
             let max=0;
             
             let dataObject = {}
@@ -47,7 +47,7 @@ export default class ProgressChart extends React.Component {
                 else return 1;
             });
             // buttons
-            console.log(['BUTTONS',tally,Object.keys(tally).length]);
+            //console.log(['BUTTONS',tally,Object.keys(tally).length]);
             // take average around 3
             let status='';
             let statusText='';
@@ -57,7 +57,7 @@ export default class ProgressChart extends React.Component {
                 //for(var f in ups) { total += ups[f]; }
                 total = total - tally[0] - 0.5 * tally[1];
                 status=total; ///tally.length;
-                console.log(['BUTTONS',tally,total,status]);
+                //console.log(['BUTTONS',tally,total,status]);
                 if (status < -80) {
                     statusText='Memory Overload Review Urgently !!!! '
                 } else if (status < -50) {

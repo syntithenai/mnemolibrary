@@ -54,7 +54,7 @@ export default class TopicsList extends Component {
         if (this.state.topics && this.state.topics.length > 0) {
             list = this.state.topics.map((topic,key) => {
                 if (!this.state.filter || (topic.topic && topic.topic.toLowerCase().indexOf(this.state.filter) >= 0)) {
-                     return <div><span onClick={() => this.props.loadTopic(topic._id)}  className='list-group-item' key={key} >{topic.topic}</span></div>
+                     return <div key={key}><span onClick={() => this.props.loadTopic(topic._id)}  className='list-group-item' key={key} >{topic.topic}</span></div>
                 }
                 
             });

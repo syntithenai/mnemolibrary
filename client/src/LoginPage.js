@@ -283,7 +283,7 @@ export default class LoginPage extends Component {
                                     <label htmlFor="difficulty" className='row'>Difficulty </label><select autoComplete="false" id="difficulty"   name='difficulty' onChange={this.change} value={this.state.difficulty}  ><option value='1' >Young Learner</option><option value='2' >Adult Learner</option><option value='3' >Sage</option></select>
                                 </div>
                                 <div class="form-group">
-                                    <label htmlFor="email" className='row'>Email </label><input className='form-control' autoComplete="false" id="email" type='text' name='email' onChange={this.change} />
+                                    <label htmlFor="email" className='row'>Email </label><input className='form-control' autoComplete="false" id="email" type='email' name='email' onChange={this.change} />
                                 </div>
                                 <div class="form-group">
                                     <label htmlFor="password" className='row'>Password</label> <input className='form-control' autoComplete="false"  id="password" type='password' name='password' onChange={this.change} />

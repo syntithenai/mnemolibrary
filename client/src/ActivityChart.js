@@ -63,7 +63,7 @@ export default class ActivityChart extends React.Component {
                 //}
                 return null;
             });
-            console.log(['ACT CHART MOUNT',seriesObject]);
+            //console.log(['ACT CHART MOUNT',seriesObject]);
             // calculate awards
             let successRateTotal=0;
             let successRateCount=0;
@@ -86,7 +86,7 @@ export default class ActivityChart extends React.Component {
                     maxStreakDays=0;
                 }
             }
-            console.log(['ACT CHART MOUNT',seriesObject,streaks,Math.max(...streaks),successRateTotal,successRateCount]);
+            //console.log(['ACT CHART MOUNT',seriesObject,streaks,Math.max(...streaks),successRateTotal,successRateCount]);
             that.props.addAward('streak',Math.max(...streaks));
            // that.props.addAward('recall',successRateTotal/successRateCount);
             //json.seen//

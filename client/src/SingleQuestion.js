@@ -288,7 +288,8 @@ export default class SingleQuestion extends Component {
           let link = '';
           let target=false;
           if (question.link && question.link.length > 0) {
-             if (question.link.indexOf('wikipedia.org') > 0) {
+             //if (question.link.indexOf('wikipedia.org') > 0) {
+             if (question.link.indexOf('wikipedia.org') > 0 || question.link.indexOf('unistudyguides.com') > 0 ) {
                  let parts = question.link.split('#');
                  if (parts.length>1) {
                     link = parts.slice(0,-1) + '?printable=yes#' + parts.slice(-1);

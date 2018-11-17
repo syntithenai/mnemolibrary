@@ -17,6 +17,7 @@ var router = express.Router();
 
 router.get('/proxy', (req, res) => {
     if (req.query.url) {
+        var request = require('request');
         request.get(req.query.url).pipe(res);
     }
 });

@@ -34,7 +34,7 @@ export default class ProfilePage extends Component {
     };
 
     addAward(type,awardData) {
-        console.log(['ADDAWARD',type,awardData]);
+        //console.log(['ADDAWARD',type,awardData]);
         let newState={};
         let award=null;
         let that=this;
@@ -342,7 +342,7 @@ export default class ProfilePage extends Component {
                                 
                                 <label htmlFor="difficulty" className='row'>Difficulty </label><select autoComplete="false" id="difficulty"   name='difficulty' onChange={this.change} value={this.state.user.difficulty}  ><option value='0' ></option><option value='1' >Young Learner</option><option value='2' >Adult Learner</option><option value='3' >Sage</option></select>
                                 
-                                <label htmlFor="username" className='row'>Email </label><input autoComplete="false" id="username" readOnly="true" type='text' name='username' onChange={this.change} value={this.state.user.username}  />
+                                <label htmlFor="username" className='row'>Email </label><input autoComplete="false" id="username" readOnly="true" type='email' name='username' onChange={this.change} value={this.state.user.username}  />
                                 <label htmlFor="password" className='row'>Password</label> <input  autoComplete="false" id="password" type='password' name='fake_password' onChange={this.change}  value={this.state.user.password}  />
                                 <label htmlFor="password2" className='row'>Repeat Password</label><input  autoComplete="false" id="password2" type='password' name='fake_password2' onChange={this.change} value={this.state.user.password2} />
                                 <input id="id" type='hidden' name='_id' value={this.state.user._id} />

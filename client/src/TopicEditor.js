@@ -68,11 +68,11 @@ export default class TopicEditor extends Component {
     };
     
     componentDidMount() {
-          console.log('topic editor DID mount')
+          //console.log('topic editor DID mount')
         let currentTopic = localStorage.getItem('currentTopic');
         let that=this;
-        console.log('topic editor update');
-        console.log(currentTopic);
+        //console.log('topic editor update');
+        //console.log(currentTopic);
         if (currentTopic && currentTopic.length > 0) {
             setTimeout(function() {
                 that.loadTopic(currentTopic);
@@ -97,7 +97,7 @@ export default class TopicEditor extends Component {
     };
     
     setTopicEvent(e) {
-        console.log(['topicevent',e.target.value]);
+        //console.log(['topicevent',e.target.value]);
         this.setState({topic:e.target.value});
         this.saveTopic();
     };
@@ -266,9 +266,9 @@ export default class TopicEditor extends Component {
             }).then(function(response) {
                 return response.json();
             }).then(function(topic) {
-                console.log(['loaded topic complete']);
+                //console.log(['loaded topic complete']);
                 if (topic && topic._id) {
-                    console.log(['loaded topic',topic]);
+                    //console.log(['loaded topic',topic]);
                     //res.send({user:user,token:token});
                     localStorage.setItem('currentTopic',topic._id);
                     that.setState({topic:topic.topic,_id:topic._id,published:topic.published,questions:topic.questions,currentView:'questions',validationErrors:{},message:' '});                

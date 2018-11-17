@@ -164,7 +164,7 @@ export default class QuestionEditor extends Component {
     //};
     
     change(e) {
-        console.log(e.target.name,e.target.value);
+        //console.log(e.target.name,e.target.value);
         let state = {...this.props.question};
         var key = e.target.name;
         //if (key==="tags") {
@@ -216,7 +216,7 @@ export default class QuestionEditor extends Component {
     //};
     
     finishUploadMedia(signResult) {
-        console.log(signResult);
+        //console.log(signResult);
         ////console.log("Uppt media finished: " + signResult.publicUrl)
         let state = {...this.props.question};
         for (var key in signResult) {
@@ -226,8 +226,8 @@ export default class QuestionEditor extends Component {
     };
     
     finishUploadImage(signResult) {
-        console.log('FINISH IMAGE UPLOAD');
-        console.log(signResult);
+        //console.log('FINISH IMAGE UPLOAD');
+        //console.log(signResult);
         ////console.log("Uppt media finished: " + signResult.publicUrl)
         let state = {...this.props.question};
         for (var key in signResult) {

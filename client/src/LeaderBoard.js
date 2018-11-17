@@ -19,7 +19,7 @@ export default class LeaderBoard extends React.Component {
         .then(function(response) {
             return response.json()
         }).then(function(json) {
-            console.log(['leaderboard loaded', json])
+            //console.log(['leaderboard loaded', json])
             json.sort(function(a,b) {
                 if (a[that.props.type] > b[that.props.type]) {
                     return -1;

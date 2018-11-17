@@ -26,7 +26,7 @@ class Navigation extends Component {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse" id="navbarCollapse">
-            <ul className="navbar-nav mr-auto" onClick={(e) => //console.log(this)} data-view="home">
+            <ul className="navbar-nav mr-auto"  data-view="home">
               <li className="nav-item active dropdown">
                 <a className="nav-link dropdown-toggle expanded" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" href="#">Learn <span className="sr-only">(current)</span></a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">

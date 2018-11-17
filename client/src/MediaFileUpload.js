@@ -89,7 +89,7 @@ class MediaFileUpload extends React.Component {
        this.initWebmWorker();
        this.initMp4Worker();   
        this.initOtherWorker();   
-       console.log(['init media',this.props.currentMedia]);
+       //console.log(['init media',this.props.currentMedia]);
        if (this.props.currentMedia) {
            this.setState(this.props.currentMedia)
        }
@@ -120,7 +120,7 @@ class MediaFileUpload extends React.Component {
         let that = this;
         let file = e.target.files[0];
         if (file && this.isWorkerLoaded()) {
-            console.log(['CHEKC FILE LENGth',file.size,file,this.props.fileSizeLimit]);
+            //console.log(['CHEKC FILE LENGth',file.size,file,this.props.fileSizeLimit]);
             if (file.size > this.props.fileSizeLimit) {
                this.resetForm();
                let inMb = parseInt(file.size/1048576,10);
@@ -139,7 +139,7 @@ class MediaFileUpload extends React.Component {
     };
     
     downloadAndConvert(e) {
-        console.log(['CONVERT',e.target.value]);
+        //console.log(['CONVERT',e.target.value]);
         
       let that=this;
       let parts = e.target.value.split('/');
@@ -317,7 +317,7 @@ class MediaFileUpload extends React.Component {
                                 stateUpdate.audioUrlPreview=true; //event.target.result
                                 that.createWaveSurfer('audio',that.props.audioMaxLength);
                                 that._wavesurfer.load(URL.createObjectURL(f));
-                                console.log(that._wavesurfer.regions);
+                                //console.log(that._wavesurfer.regions);
                                 that._wavesurfer.on('ready', function () {
                                     console.log(['ready',that.props.audioMaxLength,that._wavesurfer.getDuration(),Math.min(that.props.audioMaxLength,that._wavesurfer.getDuration())]);
                                     that.addRange(0,Math.min(that.props.audioMaxLength,that._wavesurfer.getDuration()));
@@ -328,7 +328,7 @@ class MediaFileUpload extends React.Component {
                                 stateUpdate.uploadMessage='Video preview complete'
                                 that.createWaveSurfer('video',that.props.videoMaxLength);
                                 that._wavesurfer.load(URL.createObjectURL(f));
-                                console.log(that._wavesurfer.regions);
+                                //console.log(that._wavesurfer.regions);
                                 that._wavesurfer.on('ready', function () {
                                     console.log(['ready',that.props.videoMaxLength,that._wavesurfer.getDuration(),Math.min(that.props.videoMaxLength,that._wavesurfer.getDuration())]);
                                     that.addRange(0,Math.min(that.props.videoMaxLength,that._wavesurfer.getDuration()));
@@ -341,7 +341,7 @@ class MediaFileUpload extends React.Component {
                         //// read as dataurl, generate preview, save/upload file and call next processing step
                         var reader  = new FileReader();
                         reader.addEventListener("load", function (event) {
-                            console.log('LOADED',that.state.fileNameOut);
+                            //console.log('LOADED',that.state.fileNameOut);
                             // contrained filenames after upload ensures that file extensions are usable
                             if (that.state.fileNameOut && that.state.fileNameOut.endsWith('.video.webm')) {
                                 stateUpdate.videoUrlWebm=event.target.result
@@ -407,7 +407,7 @@ class MediaFileUpload extends React.Component {
         this._wavesurfer.on('region-update-end',function(e) {
             let newState={cropStart:Math.round(e.start*100)/100,cropEnd:Math.round(e.end*100)/100};
             that.setState(newState);
-            console.log(['region-update-end',e]);
+            //console.log(['region-update-end',e]);
         });
     };
 
@@ -445,8 +445,8 @@ class MediaFileUpload extends React.Component {
                     if (that.props.onProgress) that.props.onProgress(percentage,message);  
                 } ,
                 onFinishS3Put: function(result) {
-                    console.log(['FINISH PUT']);
-                    console.log(result);
+                    //console.log(['FINISH PUT']);
+                    //console.log(result);
                     let uploaded = that.state.uploaded;
                     if (that.state.uploadField) {
                         
@@ -538,7 +538,7 @@ class MediaFileUpload extends React.Component {
    // other
     stopUpload() {
         let that=this;
-        console.log('STOP');
+        //console.log('STOP');
         if (this.state.webmWorker) {
             this.state.webmWorker.terminate();
         }
@@ -620,7 +620,7 @@ class MediaFileUpload extends React.Component {
             }
             transcodeArguments = ["-i","input_"+that.state.fileName,"-strict","-2"].concat(transcodeArguments);
             transcodeArguments.push(that.state.fileNameBase + ".video.webm");
-            console.log(['TC',transcodeArguments]);
+            //console.log(['TC',transcodeArguments]);
             that.state.webmWorker.postMessage({
               type: "run",
               arguments: transcodeArguments,
@@ -696,7 +696,7 @@ class MediaFileUpload extends React.Component {
             }
             transcodeArguments = ["-i","input_"+that.state.fileName,"-vf","showinfo","-strict","-2"].concat(transcodeArguments);
             transcodeArguments.push(that.state.fileNameBase + ".audio.webm");
-            console.log(['TC',transcodeArguments]);
+            //console.log(['TC',transcodeArguments]);
             that.state.webmWorker.postMessage({
               type: "run",
               arguments: transcodeArguments,
@@ -733,7 +733,7 @@ class MediaFileUpload extends React.Component {
             }
             transcodeArguments = ["-i","input_"+that.state.fileName,"-vf","showinfo","-strict","-2"].concat(transcodeArguments);
             transcodeArguments.push(that.state.fileNameBase + ".mp3");
-            console.log(['TC',transcodeArguments]);
+            //console.log(['TC',transcodeArguments]);
             that.state.mp4Worker.postMessage({
               type: "run",
               arguments:transcodeArguments,
@@ -765,7 +765,7 @@ class MediaFileUpload extends React.Component {
         }
         transcodeArguments = ["-i","input_"+that.state.fileName,"-vf","showinfo","-strict","-2","-ac","2","-b:a","48k","-ar","16000"].concat(transcodeArguments);
         transcodeArguments.push(that.state.fileNameBase + ".low.mp3");
-        console.log(['TC',transcodeArguments]);
+        //console.log(['TC',transcodeArguments]);
         that.state.mp4Worker.postMessage({
           type: "run",
           arguments: transcodeArguments,
@@ -877,7 +877,7 @@ class MediaFileUpload extends React.Component {
                 that.setState({ imageUrl: canvas.toDataURL(), imageUrlPreview:null ,content:content})
                 let file=new File([content],that.state.fileNameOut,{'type':that.state.fileTypeOut});
                 that.uploadFile(file).then(function() {
-                    console.log(['image ulaoded']);
+                    //console.log(['image ulaoded']);
                     that.setState({active:false,imageUrl:that.state.uploaded.png,uploadMessage:'Finished'});
                     //imageUrl:uploaded.png
                     that.props.onFinish(that.state.uploaded);            
@@ -1070,17 +1070,17 @@ class MediaFileUpload extends React.Component {
      
 MediaFileUpload.defaultProps ={
             preprocess: function(file, next) {
-                console.log('Pre-process: ' + file.name);
+                //console.log('Pre-process: ' + file.name);
                 next(file);
             },
             onSignedUrl: function( signingServerResponse ) {
-                console.log('Signing server response: ', signingServerResponse);
+                //console.log('Signing server response: ', signingServerResponse);
             },
             onProgress: function(percent, message) {
-                console.log('Upload progress: ' + percent + '% ' + message);
+                //console.log('Upload progress: ' + percent + '% ' + message);
             },
             onFinish: function(signResult) {
-                console.log(["Upload finished: " , signResult])
+                //console.log(["Upload finished: " , signResult])
             },
             onError: function(message) {
                 console.log("Upload error: " + message);

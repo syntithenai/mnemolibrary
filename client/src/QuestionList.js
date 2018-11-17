@@ -9,7 +9,7 @@ export default class QuestionList extends Component {
                 if (question && question._id) {
                     let title=Utils.getQuestionTitle(question);
                     let excerpt='';
-                    console.log(this.props);
+                    //console.log(this.props);
                     if (this.props.isReview===false) {
                         excerpt='-->' + question.answer.split(' ').slice(0,3).join(' ')+'...';
                     } 

@@ -19,17 +19,16 @@ export default class ReviewPage extends Component {
         this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
         this.reviewQuestions = this.reviewQuestions.bind(this);
         this.discoverQuestions = this.discoverQuestions.bind(this);
-        
     };
 
    componentDidMount() {
-  //  this.getQuestionsForReview();
+      // this.getQuestionsForReview();
    }
         
    
-   // return seen questionIds sorted by 'review status'
+    // return seen questionIds sorted by 'review status'
     getQuestionsForReview() {
-     //  //console.log('getQuestionsForReview');
+      //console.log('getQuestionsForReview');
       //let topic = this.props.getCurrentTopic();
       this.props.getQuestionsForReview();
     };
@@ -45,9 +44,14 @@ export default class ReviewPage extends Component {
     
     reviewQuestions() {
         let topic = this.props.getCurrentTopic();
-        //console.log(['finish quiz',topic]);
-      
-        this.props.setReviewFromTopic(topic);
+        //console.log(['REVUIEW PAGEfinish quiz',topic,this.props.setReviewFromTopic]);
+        if (topic && topic.length > 0) {
+            this.props.setReviewFromTopic(topic);
+        } else {
+            let band = this.props.getCurrentBand();
+            this.props.reviewBySuccessBand(band);
+        }
+        
         //this.props.setCurrentPage('review')
     };
     
@@ -55,7 +59,7 @@ export default class ReviewPage extends Component {
       // //console.log('finish review');
        //this.setCurrentPage('review');
        let topic = this.props.getCurrentTopic();
-       console.log(['finish review',topic]);
+       //console.log(['finish review',topic]);
         confirmAlert({
           title: 'Review set complete',
           message: 'You recalled '+success.length+' out of '+questions.length+' questions.',

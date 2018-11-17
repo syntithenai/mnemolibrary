@@ -20,7 +20,7 @@ export default class HomeCarousel extends Component {
 
     updateWindowDimensions() {
       this.setState({ width: window.innerWidth, height: window.innerHeight });
-      console.log(['CH',this.state.width]);
+      //console.log(['CH',this.state.width]);
         
     }
   
