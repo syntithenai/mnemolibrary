@@ -58,7 +58,7 @@ export default class ReviewPage extends Component {
     finishReview(questions,success) {
       // //console.log('finish review');
        //this.setCurrentPage('review');
-       let topic = this.props.getCurrentTopic();
+       //let topic = this.props.getCurrentTopic();
        //console.log(['finish review',topic]);
         confirmAlert({
           title: 'Review set complete',

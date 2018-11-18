@@ -9,10 +9,10 @@ import ReactDOM from 'react-dom';
 //import CreateHelp from './CreateHelp';
 import Autocomplete from 'react-autocomplete';
 const ReactTags = require('react-tag-autocomplete')
-import ReactS3Uploader  from 'react-s3-uploader';
+//import ReactS3Uploader  from 'react-s3-uploader';
 import MediaFileUpload  from './MediaFileUpload';
 import "video-react/dist/video-react.css"; // import css
-import { Player } from 'video-react';
+//import { Player } from 'video-react';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import Trash from 'react-icons/lib/fa/trash';
@@ -216,8 +216,8 @@ export default class QuestionEditor extends Component {
     //};
     
     finishUploadMedia(signResult) {
-        //console.log(signResult);
-        ////console.log("Uppt media finished: " + signResult.publicUrl)
+        console.log(signResult);
+        console.log("Uppt media finished: " + signResult.publicUrl)
         let state = {...this.props.question};
         for (var key in signResult) {
             state['media_'+key]=signResult[key];
@@ -533,16 +533,15 @@ export default class QuestionEditor extends Component {
                         <div className='form-group'>  
                                 <label htmlFor="link" >Image URL</label>
                                 <MediaFileUpload
-                                        publicUrlPrefix="/uploader"
-                                        signingUrl="/uploader/s3/sign"
-                                        s3path="imagefiles/"
-                                        name="image"
-                                        scrubFilename={(filename) => "image_"+String(this.props.question._id)}
-                                        onFinish={this.finishUploadImage}
-                                        currentMedia={currentImages}
-                                        acceptFileTypes="image/*"
-                                    />
-                                    
+                                    publicUrlPrefix="/uploader"
+                                    signingUrl="/uploader/s3/sign"
+                                    s3path="imagefiles/"
+                                    name="image"
+                                    scrubFilename={(filename) => "image_"+String(this.props.question._id)}
+                                    onFinish={this.finishUploadImage}
+                                    currentMedia={currentImages}
+                                    acceptFileTypes="image/*"
+                                />
                         </div>
 
                         

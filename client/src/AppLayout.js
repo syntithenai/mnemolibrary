@@ -171,7 +171,7 @@ export default class AppLayout extends Component {
       
   openAuth(service) {
       ////console.log(['oauth '+service]);
-      let authRequest={response_type:'code',redirect_uri:this.getQueryStringValue('redirect_uri'),response_type:this.getQueryStringValue('response_type'),scope:this.getQueryStringValue('scope'),state:this.getQueryStringValue('state')}
+      let authRequest={redirect_uri:this.getQueryStringValue('redirect_uri'),response_type:this.getQueryStringValue('response_type'),scope:this.getQueryStringValue('scope'),state:this.getQueryStringValue('state')}
       // force logout
       localStorage.setItem('token','{}');
       localStorage.setItem('user','{}');
@@ -1118,14 +1118,14 @@ export default class AppLayout extends Component {
         let currentQuiz = [];
         let indexedQuestions= {};
         let currentQuestion=0;
-        let j=0;
+        //let j=0;
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
             var id = question._id;
          //   //console.log(['check ID match',j,id, selectedQuestion ])
             currentQuiz.push(id);
             indexedQuestions[id]=questionKey;
-            j++;
+          //  j++;
         }
      //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
         that.analyticsEvent('discover topic')
@@ -1210,7 +1210,7 @@ export default class AppLayout extends Component {
         let currentQuiz = [];
         let indexedQuestions= {};
         let currentQuestion=0;
-        let j=0;
+        //let j=0;
         for (var questionKey in json['questions']) {
             const question = json['questions'][questionKey]
             var id = question._id;
@@ -1218,7 +1218,7 @@ export default class AppLayout extends Component {
            
             currentQuiz.push(id);
             indexedQuestions[id]=questionKey;
-            j++;
+           // j++;
         }
      //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
         that.analyticsEvent('discover topic')
@@ -1259,7 +1259,7 @@ export default class AppLayout extends Component {
             }
             currentQuiz.push(id);
             indexedQuestions[id]=questionKey;
-            j++;
+           j++;
         }
      //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
         that.analyticsEvent('review topic')
@@ -1345,7 +1345,7 @@ export default class AppLayout extends Component {
     const progress = this.state.users.default;
     const topics = this.state.topics;
     const tags = this.state.words;
-    const showProfile = this.isCurrentPage('profile') && this.isLoggedIn();
+    //const showProfile = this.isCurrentPage('profile') && this.isLoggedIn();
     const showLogin = this.isCurrentPage('login') && !this.isLoggedIn();
     let title=decodeURIComponent(this.state.title);
     
@@ -1353,7 +1353,7 @@ export default class AppLayout extends Component {
         return (<div>DIS</div>);
     } else {
                 
-        let oauth=localStorage.getItem('oauth');
+        //let oauth=localStorage.getItem('oauth');
         let authRequest = localStorage.getItem('oauth_request');
         //console.log([authRequest,this.props.token,this.props.user]);
         let auth =JSON.parse(authRequest);
@@ -1454,7 +1454,7 @@ export default class AppLayout extends Component {
                 }
                 {this.isCurrentPage('helpvideos') && <HelpVideos setCurrentPage={this.setCurrentPage}  />
                 }
-                {(this.isCurrentPage('profile') || (this.isCurrentPage('')) && this.isLoggedIn()) && <ProfilePage token={this.state.token} setCurrentPage={this.setCurrentPage} setQuizFromDiscovery={this.setQuizFromDiscovery} reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
+                {(this.isCurrentPage('profile') || (this.isCurrentPage('') && this.isLoggedIn())) && <ProfilePage token={this.state.token} setCurrentPage={this.setCurrentPage} setQuizFromDiscovery={this.setQuizFromDiscovery} reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} />
                 }
                 {(showLogin || this.isCurrentPage('forcelogin')) && <LoginPage token={this.state.token} login={this.login} setCurrentPage={this.setCurrentPage}/>
                 }<br/>

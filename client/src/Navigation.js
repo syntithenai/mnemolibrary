@@ -41,15 +41,12 @@ export default class Navigation extends Component {
         this.props.import();
     };
     //<div style={{position: 'fixed', right: '6.1em',  zIndex:99, marginTop: '0.4em'}}><Speechify/></div>
-       
+          //<div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title}&nbsp;&nbsp;&nbsp;{!this.props.isLoggedIn() && <a   onClick={() => this.props.setCurrentPage('splash')} href='#' className='btn btn-outline btn-warning' style={{display:'inline'}}>
+                   //Tutorial
+                  //</a>}</div>
     render() {
         return  (
         <div className="navbar-dark fixed-top bg-dark" >
-           
-        <div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title}&nbsp;&nbsp;&nbsp;{!this.props.isLoggedIn() && <a   onClick={() => this.props.setCurrentPage('splash')} href='#' className='btn btn-outline btn-warning' style={{display:'inline'}}>
-                   Tutorial
-                  </a>}</div>
-        
             
         <nav className="navbar navbar-expand-md" >
        <div className="navbar-brand" >

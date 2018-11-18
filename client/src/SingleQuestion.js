@@ -10,7 +10,7 @@ import Info from 'react-icons/lib/fa/info';
 import Ellipsis from 'react-icons/lib/fa/ellipsis-v';
 //import ThumbsUp from 'react-icons/lib/fa/thumbs-up';
 import Image from 'react-icons/lib/fa/image';
-import Ban from 'react-icons/lib/fa/ban';
+//import Ban from 'react-icons/lib/fa/ban';
 import Search from 'react-icons/lib/fa/search';
 import Tags from 'react-icons/lib/fa/tags';
 import ExternalLink from 'react-icons/lib/fa/external-link';
@@ -172,7 +172,7 @@ export default class SingleQuestion extends Component {
     
      componentWillReceiveProps(props) {
          let that=this;
-         //console.log(['rcv props',props]);
+         console.log(['rcv props',props]);
        // if (this.refs.player) this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['mnemonic'],{align:'top',offset:-230});
         if (props.question) {
@@ -189,6 +189,11 @@ export default class SingleQuestion extends Component {
             {question.media_ogg && <source src={question.media_ogg} />}
             {question.media_webm && <source src={question.media_webm} />}
             {question.media_mp4 && <source src={question.media_mp4} />}
+            
+            {question.media_mp3 && <source src={question.media_mp3} />}
+            {question.media_mp4 && <source src={question.media_mp4} />}
+            {question.media_webmvideo && <source src={question.media_webmvideo} />}
+            {question.media_webmaudio && <source src={question.media_webmaudio} />}
             </Player>
             this.setState({media:null});
             setTimeout(function() {
@@ -311,7 +316,8 @@ export default class SingleQuestion extends Component {
           if (question.tags && Array.isArray(question.tags)) {
               tags = question.tags.map((tag, key) => {
                   tag=tag.trim().toLowerCase();
-                  return <button className="btn btn-outline btn-primary" key={key}  ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('tag',tag)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTag({text:tag})} style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{tag}&nbsp;</span></button>
+                  //<Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('tag',tag)} />
+                  return <button className="btn btn-outline btn-primary" key={key}  ><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTag({text:tag})} style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{tag}&nbsp;</span></button>
                 })
             //
         
@@ -448,7 +454,7 @@ export default class SingleQuestion extends Component {
                             <b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.quiz}</span></button></span><br/>
                         </div>}
                         {((!showRecallButton) && question.quiz) && <div className="card-block topic">
-                            <b>Topic&nbsp;&nbsp;&nbsp;</b><button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('topic',question.quiz)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTopic(question.quiz)} style={{float:'right'}}/> <span className="hidden-sm-down" >{question.quiz}</span></button><br/>
+                            <b>Topic&nbsp;&nbsp;&nbsp;</b><button className="btn btn-outline btn-primary"   ><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTopic(question.quiz)} style={{float:'right'}}/> <span className="hidden-sm-down" >{question.quiz}</span></button><br/>
                         </div>}
                         
                         {(!showRecallButton) && <div   className="card-block tags" >
@@ -501,6 +507,6 @@ export default class SingleQuestion extends Component {
         
     };
 }
-
+//<Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('topic',question.quiz)} />
 //{!this.isVisible('moreinfo') && <img className="" src={image} alt={header}  style={{width:"70%"}} /> }
                     

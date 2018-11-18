@@ -178,7 +178,7 @@ export default class TopicEditor extends Component {
             let that=this;
             let publishedTopic=this.props.user.avatar+'\'s '+this.state.topic;
             let params = {_id:this.state._id,user:this.props.user._id,topic:this.state.topic,questions:this.state.questions,deleteQuestion:deleteQuestion,publishedTopic:publishedTopic}
-            fetch("/api/saveusertopic", {
+            return fetch("/api/saveusertopic", {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -187,27 +187,32 @@ export default class TopicEditor extends Component {
             }).then(function(response) {
                 return response.json();
             }).then(function(id) {
-              //  //console.log(['saved topic',id,id.id]);
+                console.log(['saved topic',id,id.id,id.questions]);
                 that.setState({_id:id.id});
                 if ((id.errors && Object.keys(id.errors).length > 0) || id.message) {
+                    console.log(['ERROR MESSSAGE ON SAVE TOPIC']);
                     that.setState({validationErrors:id.errors,message:'Some of your questions are missing required information.'});
                 } else {
-                    let idsUpdate = this.state.questions;
+                    console.log(['really saved topic',that.state.questions]);
+                    let idsUpdate = that.state.questions;
                     idsUpdate.map(function(value,key) {
+                        console.log(['really saved topic check',value,key]);
                         if (!idsUpdate[key]._id) {
+                            console.log(['really saved topic update id',id.questions[key]._id]);
                             idsUpdate[key]._id = id.questions[key]._id;
                         }
+                        return null;
                     });
                     that.setState({validationErrors:{},message:' ',questions:idsUpdate});
                 }
-                
+                localStorage.setItem('currentTopic',that.state._id);
                 
                 //res.send({user:user,token:token});
             })
             .catch(function(err) {
-                //console.log(['ERR',err]);
+                console.log(['ERR',err]);
             });
-            localStorage.setItem('currentTopic',this.state._id);
+            
             
       //  });
     }; 
@@ -452,7 +457,9 @@ export default class TopicEditor extends Component {
             //console.log(['really update que',question,this.state.currentQuestion]);
             questions.splice(this.state.currentQuestion,1,updatedQuestion);
             this.setState({questions:questions});
-            this.saveTopic();
+            this.saveTopic().then(function() {
+                
+            });
         }
     };
      

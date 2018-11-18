@@ -1,7 +1,7 @@
 import React from 'react';
 //import { PropTypes } , { Component } from 'react';
 //import { render } from 'react-dom'
-import { ResponsiveBar } from '@nivo/bar'
+//import { ResponsiveBar } from '@nivo/bar'
 
  
 export default class LeaderBoard extends React.Component {
@@ -39,7 +39,7 @@ export default class LeaderBoard extends React.Component {
         let that=this;
         if (this.state.series && this.state.series.length > 0) {
             let rows = this.state.series.map(function(user,key) {
-                return   <tr>
+                return   <tr key={key} >
                       <th scope="row">{key+1}</th>
                       <td>{user.avatar}</td>
                       {that.props.type==="streak" &&  <td>{user.streak}</td>}
@@ -65,7 +65,7 @@ export default class LeaderBoard extends React.Component {
                       <td><b>You</b></td>
                       {that.props.type==="streak" &&  <td>{this.props.user.streak}</td>}
                       {that.props.type==="questions" &&  <td>{this.props.user.questions}</td>}
-                      {that.props.type==="recall" &&  <td>{parseInt(this.props.user.recall*10000,10)/100}</td>}
+                      {that.props.type==="recall" &&  <td>{String(parseInt(this.props.user.recall*10000,10)/100)}</td>}
                     </tr>
                    
                    {rows}

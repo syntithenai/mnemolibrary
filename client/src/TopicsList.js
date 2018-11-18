@@ -56,7 +56,7 @@ export default class TopicsList extends Component {
                 if (!this.state.filter || (topic.topic && topic.topic.toLowerCase().indexOf(this.state.filter) >= 0)) {
                      return <div key={key}><span onClick={() => this.props.loadTopic(topic._id)}  className='list-group-item' key={key} >{topic.topic}</span></div>
                 }
-                
+                return null;
             });
         } else {
             list = <div></div>

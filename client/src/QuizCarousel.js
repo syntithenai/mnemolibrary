@@ -55,7 +55,9 @@ export default class QuizCarousel extends Component {
   logStatus(status,question,preview,topic) {
      //console.log(['log status',status,question,preview,topic,this.props.user,this.state.logged[status]]);
      if (!this.state.logged[status]) {
-         this.state.logged[status]={};
+         let logged = this.state.logged;
+         logged[status]={};
+         this.setState({logged:logged})
      }
       if (this.props.user && !preview) {
           //console.log(['logging status']);

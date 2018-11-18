@@ -50,11 +50,21 @@ export default class TopicQuestionsList extends Component {
                 }
                 
                 let excerpt= question.answer ?  '-->' + question.answer.split(' ').slice(0,3).join(' ')+'...' : '';
-                if (!this.props.filter || (question.question && question.question.indexOf(this.props.filter)>=0 || (question.interrogative && question.interrogative.indexOf(this.props.filter)>=0) || (question.mnemonic && question.mnemonic.indexOf(this.props.filter)>=0) || (question.answer && question.answer.indexOf(this.props.filter)>=0)))
-                return <div className='list-group-item'  onClick={() => this.props.editQuestion(key)} key={key} >
-                <button className='btn btn-light'  onClick={(e) => this.moveUp(key,e)} ><AngleUp size={28} /></button>
-                <button className='btn btn-light'   onClick={(e) =>this.moveDown(key,e)} ><AngleDown size={28}  /></button>
-                &nbsp;&nbsp;<span >{key+1}. {question.interrogative} {question.question} {excerpt}</span><div className="questionErrors">{errors}</div></div>
+                if (
+                    !this.props.filter 
+                    || (question.question && question.question.indexOf(this.props.filter)>=0)
+                    || (question.interrogative && question.interrogative.indexOf(this.props.filter)>=0) 
+                    || (question.mnemonic && question.mnemonic.indexOf(this.props.filter)>=0) 
+                    || (question.answer && question.answer.indexOf(this.props.filter)>=0)
+                ) {
+                    return <div className='list-group-item'  onClick={() => this.props.editQuestion(key)} key={key} >
+                    <button className='btn btn-light'  onClick={(e) => this.moveUp(key,e)} ><AngleUp size={28} /></button>
+                    <button className='btn btn-light'   onClick={(e) =>this.moveDown(key,e)} ><AngleDown size={28}  /></button>
+                    &nbsp;&nbsp;<span >{key+1}. {question.interrogative} {question.question} {excerpt}</span><div className="questionErrors">{errors}</div></div>
+                    
+                } else {
+                    return null;
+                }
             });
             return (
                 <div className='list-group' >

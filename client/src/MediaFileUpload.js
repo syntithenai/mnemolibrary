@@ -165,7 +165,7 @@ class MediaFileUpload extends React.Component {
     
     startFileUpload(file) {
         let that=this;
-        let fileTypeParts = file.type.split("/");
+      //  let fileTypeParts = file.type.split("/");
         var reader  = new FileReader();
         reader.addEventListener("load", function () {
             let fileNameParts = file.name.split(".");
@@ -294,7 +294,7 @@ class MediaFileUpload extends React.Component {
                 } else if (message.data && message.data.indexOf('time=')>0) {
                     let time=this.progressToSeconds(message.data.trim().split("time=")[1].split(' ')[0]);
                     
-                    if (parseFloat(this.state.startOffset,10) > 0) time = time - parseFloat(this.state.startOffset,10);
+                    if (parseFloat(this.state.startOffset,10) > 0) time -= parseFloat(this.state.startOffset,10);
                     let progress=time/that.state.mediaLength*100;
                    // console.log(['FRAME',that.state.startOffset,message.data.trim().split("time=")[1].split(' ')[0],time,progress,message.data])
                     that.setState({'mediaProgress':progress});
@@ -310,7 +310,7 @@ class MediaFileUpload extends React.Component {
                     let f = new File([message.data.MEMFS[0].data],that.state.fileNameOut,{type: that.state.fileTypeOut})
                     let stateUpdate={};
                         
-                    if (that.state.fileNameOut && that.state.fileNameOut.endsWith('.preview.mp3') || that.state.fileNameOut && that.state.fileNameOut.endsWith('.preview.mp4')) {
+                    if (that.state.fileNameOut && (that.state.fileNameOut.endsWith('.preview.mp3') || that.state.fileNameOut.endsWith('.preview.mp4'))) {
                             if (that.state.fileNameOut && that.state.fileNameOut.endsWith('.preview.mp3')) {
                                 stateUpdate.active=false;
                                 stateUpdate.uploadMessage='Audio preview complete'
@@ -934,9 +934,9 @@ class MediaFileUpload extends React.Component {
             let newState={};
             let typeParts = this.state.fileType.split("/");
             let max=0;
-            if (typeParts[0]=="audio") {
+            if (typeParts[0]==="audio") {
                 max=parseFloat(this.props.audioMaxLength,10)
-            } else if (typeParts[0]=="video") {
+            } else if (typeParts[0]==="video") {
                 max=parseFloat(this.props.videoMaxLength,10)
             }
             
@@ -973,7 +973,7 @@ class MediaFileUpload extends React.Component {
   render() {
      let video='';
       let audio='';
-      let mediaElement='';
+      //let mediaElement='';
       if ((this.state.videoUrlMp4 || this.state.videoUrlWebm)) {
           video=(<video style={{width:"100%"}} controls ref={(c) => { this.mediaSourceEl = c; }} id="mediaplayer"  onTimeUpdate={this.handleMediaPosChange} onPlay={this.onCanPlay} >
           {!this.state.videoUrlPreview && this.state.videoUrlWebm && <source key='webm' src={this.state.videoUrlWebm}  />}
@@ -986,12 +986,12 @@ class MediaFileUpload extends React.Component {
           {!this.state.audioUrlPreview && !this.state.audioUrlMp3 &&  this.state.audioUrlMp3lq && <source key='mp3lq' src={this.state.audioUrlMp3lq}  />}
           </audio>);
       } 
-      let timelineOptions = {
-          timeInterval: 0.5,
-          height: 30,
-          primaryFontColor: '#00f',
-          primaryColor: '#00f'
-        };
+      //let timelineOptions = {
+          //timeInterval: 0.5,
+          //height: 30,
+          //primaryFontColor: '#00f',
+          //primaryColor: '#00f'
+        //};
         
        
       let progressWidth=this.state.mediaProgress ? (parseInt(this.state.mediaProgress,10) < 100 ? parseInt(this.state.mediaProgress,10) : 100) +'%' : '0%';
@@ -1104,8 +1104,6 @@ MediaFileUpload.defaultProps ={
             audioMaxLength: 90,
             videoMaxLength:  20,
             publicUrlPrefix: "", ///api"  // to allow for s3 routes added underneath express app path,
-            signingUrlMethod:"GET",
-            autoUpload:true,
             signingUrlWithCredentials:true,
             uploadRequestHeaders:{ 'x-amz-acl': 'public-read' } ,
             contentDisposition:"auto",
