@@ -83,12 +83,14 @@ export default class TopicsPage extends Component {
                 <form className="form-inline" style={{width:'100%'}}>
                   <input className="form-control" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter}  placeholder="Search" aria-label="Search" />
                   
-                  <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</a>
-                  <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</a>
-                {this.props.isLoggedIn() && <a className="btn btn-success"  href="#" style={{marginLeft:'5em'}} onClick={() => this.props.setQuizFromMissingMnemonic()}><FaChild size="22"/> Mnemonics needed</a>}
+                  
                 </form>
-                {this.state.titleFilter.length>0 && <QuizList quizzes={this.state.topics} setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} setQuiz={this.props.setQuiz} questionsMissingMnemonics={this.props.questionsMissingMnemonics} ></QuizList>}
-                {this.state.titleFilter.length === 0 && <QuizCollection collection={this.props.topicCollections} quizzes={this.state.topics} setQuiz={this.props.setQuiz}  setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic}  questionsMissingMnemonics={this.props.questionsMissingMnemonics}  ></QuizCollection>}
+                {this.state.titleFilter.length>0 && <div><span>Search for &nbsp;
+                    <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</a>&nbsp;or&nbsp; 
+                  <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</a>&nbsp;instead.</span>
+                
+                    <QuizList quizzes={this.state.topics} setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} setQuiz={this.props.setQuiz} questionsMissingMnemonics={this.props.questionsMissingMnemonics} ></QuizList></div>}
+                {this.state.titleFilter.length === 0 && <QuizCollection topicCollections={this.props.topicCollections}  topicTags={this.props.topicTags} tagFilter={this.props.tagFilter}  clearTagFilter={this.props.clearTagFilter} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} setCurrentPage={this.props.setCurrentPage} isLoggedIn={this.props.isLoggedIn} setQuizFromDiscovery={this.props.setQuizFromDiscovery} setQuizFromDifficulty={this.props.setQuizFromDifficulty} setQuizFromTopics={this.props.setQuizFromTopics}  setQuizFromQuestionId={this.props.setQuizFromQuestionId}  user={this.props.user}  ></QuizCollection>}
             </div>
         )
     }

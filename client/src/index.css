@@ -200,13 +200,11 @@ pre {
 }
 pre.mnemonic {
     color :  red;
-    font-family: 'sans_forgeticaregular';
-    font-size: 1.3em;
+    font-size: 1.1em;
 }
 pre.mnemonicalternative {
     color :  black;
-    font-family: 'sans_forgeticaregular';
-    font-size: 1.2em;
+    font-size: 1.0em;
 
 }
 .loginbutton {
@@ -383,33 +381,3 @@ h4.graphTitle::before {
 }
 
 
-
-
-#voicerecognitionbutton img {
-  position: absolute;
-}
-#voicerecognitionbutton {
-  position: relative;
-  z-index:999;
-  font-weight: bold;
-  font-size: 1.5em;
-  border-radius: 33px;
-  padding: 0.4em;
-  padding-left: 0.7em;
-  padding-right: 0.7em;
-  margin-top: 0px ;
-  color: black;
-  border: 2px solid black;
-}
-#voicerecognitionbutton.stopped {
-  background-color: pink;
-    border: 2px solid red;
-}
-#voicerecognitionbutton.active {
-	background-color: lightgreen;
-	  border: 2px solid green;
-}
-#voicerecognitionbutton.pending {
-	background-color: orange;
-	  border: 2px solid red;
-}

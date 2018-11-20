@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import HomeCarousel from './HomeCarousel';
+import HelpNavigation from './HelpNavigation';
 
 export default class FindQuestions extends Component {
     
@@ -13,6 +14,7 @@ export default class FindQuestions extends Component {
     render() {
         return  (
             <div className='findquestions'>
+                <HelpNavigation setCurrentPage={this.props.setCurrentPage}/>
                 <span id="firstvideo" ></span>
                 <br/> 
 

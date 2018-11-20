@@ -22,6 +22,7 @@ import QuizCarousel from './QuizCarousel';
 import Footer from './Footer';
 import FindQuestions from './FindQuestions';
 import CreateHelp from './CreateHelp';
+import QuizCollection from './QuizCollection';
 
 import FAQ from './FAQ';
 import ReactGA from 'react-ga';
@@ -143,6 +144,8 @@ export default class AppLayout extends Component {
         this.clearDiscoveryBlock = this.clearDiscoveryBlock.bind(this);
         this.clearDiscoveryBlocks = this.clearDiscoveryBlocks.bind(this);
         this.setQuizFromTechnique = this.setQuizFromTechnique.bind(this);
+        this.setQuizFromTopics = this.setQuizFromTopics.bind(this);
+        this.setQuizFromDifficulty = this.setQuizFromDifficulty.bind(this);
          this.openAuth = this.openAuth.bind(this);
         this.shout=this.shout.bind(this);
         this.startMqtt=this.startMqtt.bind(this);
@@ -903,6 +906,8 @@ export default class AppLayout extends Component {
       })
   }; 
   
+   
+  
   setQuizFromDiscovery() {
       this.setCurrentTopic('');
      // //console.log(['Setquiz discovery']);
@@ -999,7 +1004,7 @@ export default class AppLayout extends Component {
                 }
               //  //console.log(currentQuiz);
                 that.analyticsEvent('discover question')
-                that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover'});
+                that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover '+question.quiz});
                 ////console.log(['set state done', that.state])    
             });
         }
@@ -1137,6 +1142,9 @@ export default class AppLayout extends Component {
       
   };
   
+   
+  
+  
   
   discoverQuizFromTopic(topic,selectedQuestion) {
       this.setCurrentTopic(topic);
@@ -1185,6 +1193,103 @@ export default class AppLayout extends Component {
       })
       
   };
+  
+  setQuizFromDifficulty(difficulty) {
+      this.setCurrentTopic('');
+      console.log(['set quiz from difficulyt',difficulty,this.state.user]);
+      let that = this;
+      //this.setState({'currentQuiz':'1,2,3,4,5'});
+      // load initial questions
+      let url='/api/discover';
+      let rand=Math.random()
+      fetch(url,{ method: "POST",headers: {
+            "Content-Type": "application/json"
+            },
+            body:JSON.stringify({
+                difficulty:difficulty,
+                user:(this.state.user ? this.state.user._id : ''),
+                rand:rand
+            })
+        })
+      .then(function(response) {
+      //  //console.log(['got response', response])
+        return response.json()
+      }).then(function(json) {
+      //  //console.log(['create indexes', json])
+        let currentQuiz = [];
+        let indexedQuestions= {};
+        let currentQuestion=0;
+        let j=0;
+        for (var questionKey in json['questions']) {
+            const question = json['questions'][questionKey]
+            var id = question._id;
+         //   //console.log(['check ID match',j,id, selectedQuestion ])
+            //if (selectedQuestion && selectedQuestion===j) {
+                //currentQuestion=j;
+          ////      //console.log(['ID match',selectedQuestion, j])
+            //}
+            currentQuiz.push(id);
+            indexedQuestions[id]=questionKey;
+            j++;
+        }
+        console.log(['currentQuiz',currentQuestion,currentQuiz]);
+        that.analyticsEvent('discover difficulty '+ difficulty)
+        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Difficulty Level '+  difficulty});
+        ////console.log(['set state done', that.state])
+      }).catch(function(ex) {
+        //console.log(['parsing failed', ex])
+      })
+      
+  };
+  
+   setQuizFromTopics(topics) {
+      this.setCurrentTopic('');
+      //console.log(['dissc quiz from topic',topic,selectedQuestion,this.state.user]);
+      let that = this;
+      //this.setState({'currentQuiz':'1,2,3,4,5'});
+      // load initial questions
+      let url='/api/discover';
+      let rand=Math.random()
+      fetch(url,{ method: "POST",headers: {
+            "Content-Type": "application/json"
+            },
+            body:JSON.stringify({
+                topics:topics.join(","),
+                user:(this.state.user ? this.state.user._id : ''),
+                rand:rand
+            })
+        })
+      .then(function(response) {
+      //  //console.log(['got response', response])
+        return response.json()
+      }).then(function(json) {
+      //  //console.log(['create indexes', json])
+        let currentQuiz = [];
+        let indexedQuestions= {};
+        let currentQuestion=0;
+        let j=0;
+        for (var questionKey in json['questions']) {
+            const question = json['questions'][questionKey]
+            var id = question._id;
+         //   //console.log(['check ID match',j,id, selectedQuestion ])
+            //if (selectedQuestion && selectedQuestion===j) {
+                //currentQuestion=j;
+          ////      //console.log(['ID match',selectedQuestion, j])
+            //}
+            currentQuiz.push(id);
+            indexedQuestions[id]=questionKey;
+            j++;
+        }
+     //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
+        that.analyticsEvent('discover topic')
+        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover'});
+        ////console.log(['set state done', that.state])
+      }).catch(function(ex) {
+        //console.log(['parsing failed', ex])
+      })
+      
+  };
+  
   
   getCurrentBand() {
       return this.state.currentBand;
@@ -1366,7 +1471,7 @@ export default class AppLayout extends Component {
                 
                 
                 
-                {((this.isCurrentPage('splash')) || (this.isCurrentPage('') && !this.isLoggedIn())) && <div><FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} title={title}/></div>}
+                {((this.isCurrentPage('splash')) || (this.isCurrentPage('') && !this.isLoggedIn())) && <div><TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user}  /></div>}
                 
                 
                 {this.isCurrentPage('home') && <QuizCarousel 
@@ -1451,6 +1556,8 @@ export default class AppLayout extends Component {
                 {this.isCurrentPage('faq') && <FAQ  setCurrentPage={this.setCurrentPage} />
                 }
                 {this.isCurrentPage('createhelp') && <CreateHelp  />
+                }
+                {this.isCurrentPage('overview') && <FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} title={title}/>
                 }
                 {this.isCurrentPage('helpvideos') && <HelpVideos setCurrentPage={this.setCurrentPage}  />
                 }

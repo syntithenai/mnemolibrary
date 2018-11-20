@@ -942,10 +942,10 @@ router.get('/topiccollections', (req, res) => {
 
 
 router.post('/discover', (req, res) => {
-   // //console.log('discover',req.body.user);
+   console.log(['discover',req.body]);
     let orderBy = req.body.orderBy ? req.body.orderBy : 'successRate';
     let sortFilter={};
-    let limit = 10;
+    let limit = req.body.limit ? req.body.limit : 10;
     let criteria = [];
     
     function discoverQuery() {
@@ -954,75 +954,48 @@ router.post('/discover', (req, res) => {
         sortFilter['hasMnemonic']=-1;
         sortFilter['successRate']=-1;
         
-        //console.log(['disco criteria',JSON.stringify(criteria)]);
+        console.log(['disco criteria',JSON.stringify(criteria)]);
         db.collection('questions').find({$and:criteria})
         //db.collection('questions').aggregate({$match:{$nin:notThese}})
         .sort(sortFilter).limit(limit).toArray().then(function( questions) {
-         //  console.log(['user res',questions ? questions.length : 0]);    
+           console.log(['user res',questions ? questions.length : 0]);    
             res.send({questions:questions});
         })
     };
     
-
+    if (req.body.topics) {
+        let topics = req.body.topics.split(",");
+        let orCriteria=[];
+        topics.map(function(topic) {
+            orCriteria.push({quiz:{$eq:topic}});
+        });
+        criteria.push({$or:orCriteria});
+        orderBy = 'sort';
+    } else if (req.body.difficulty) {
+        criteria.push({difficulty:{$eq:String(req.body.difficulty)}});
+        orderBy = 'sort';
+    } else if (req.body.topic) {
+        criteria.push({quiz:{$eq:req.body.topic}});
+        orderBy = 'sort';
+    } else {
+        criteria.push({discoverable :{$ne:'no'}});
+        //if (fullUser.difficulty > 0) {
+            //criteria.push({'difficulty': {$eq: fullUser.difficulty}});
+        //} else {
+            //// default 
+            //criteria.push({'difficulty': {$lte: '2'}});
+        //}
+    }
     // DO WE HAVE A USER
     if (req.body.user) {
         criteria.push({$or:[{access:{$eq:ObjectId(req.body.user)}},{access :{$eq:'public'}}]})
-        // question block
-        //criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
-        // filtering
-        let blockCriteria=[];
-        if (req.body.blocks) {
-            let blocks = req.body.blocks;
-            if (blocks.tag && Array.isArray(blocks.tag)) {
-                blocks.tag.forEach(function(tag) {
-                    blockCriteria.push({'tags': {$nin:[tag]}});
-                    //blockCriteria.push({'tags': {$regex:tag}});
-                });
-            }
-            if (blocks.topic && Array.isArray(blocks.topic)) {
-                blocks.topic.forEach(function(topic) {
-                    ////console.log({$ne: topic});
-                    blockCriteria.push({quiz: {$ne: topic}});
-                });
-            }
-            if (blocks.technique && Array.isArray(blocks.technique)) {
-                blocks.technique.forEach(function(technique) {
-                    ////console.log({$ne: technique});
-                    blockCriteria.push({mnemonic_technique: {$ne: technique}});
-                });
-            }
-        }
-        ////console.log(['BC',blockCriteria]);
-        if (blockCriteria.length > 0) {
-            blockCriteria.forEach(function(c) {
-                criteria.push(c);
-            });
-            
-        }
-      //  criteria.push({mnemonic: {$exists: true}, $where: "this.mnemonic.length > 0"});
+        
         
         let user = req.body.user ? req.body.user : null;
         db.collection('users').find({_id:ObjectId(user)}).toArray().then(function(users) {
             if (users.length > 0) {
                 let fullUser=users[0];
-                //for (var seenId in progress.block) {
-                    //notThese.push(ObjectId(seenId));
-                //};
-               // //console.log(['disco NOTHTES',notThese]);
-               // allow non discoverable and remove difficulty filter on topic search
-                if (req.body.topic) {
-                    criteria.push({quiz:{$eq:req.body.topic}});
-                    orderBy = 'sort';
-                } else {
-                    criteria.push({discoverable :{$ne:'no'}});
-                    if (fullUser.difficulty > 0) {
-                        criteria.push({'difficulty': {$eq: fullUser.difficulty}});
-                    } else {
-                        // default 
-                        criteria.push({'difficulty': {$lte: '2'}});
-                    }
-                }
-                
+              
                 db.collection('userquestionprogress').find({
                         $and:[
                             {'user': {$eq:ObjectId(user)}} , 
@@ -1038,17 +1011,8 @@ router.post('/discover', (req, res) => {
                             notThese.push(ObjectId(progress[seenId].question));
                         };
                         criteria.push({'_id': {$nin: notThese}});
-                        discoverQuery();
-                       
-                    } else {
-                        ////console.log(['no user']);    
-                        // NO USER, SHOW BY POPULAR
-                        discoverQuery();
-                         //db.collection('questions').find({$and:criteria}).limit(limit).toArray().then(function(results) {
-                             //////console.log(['no user res',results ? results.length : 0]);    
-                            //res.send({'questions':results});
-                        //})
                     }
+                    
                 }).catch(function(e) {
                     //console.log(['e',e]);
                     res.send('e '+JSON.stringify(e));
@@ -1056,11 +1020,12 @@ router.post('/discover', (req, res) => {
             }
         });
     } else {
-        criteria.push({'difficulty': {$lte: '2'}});
         criteria.push({access :{$eq:'public'}});
-        discoverQuery();
+      //  criteria.push({discoverable :{$ne:'no'}});
+        
     }
-    
+    console.log(['discover',criteria]);
+    discoverQuery();
     
    // //console.log(['discover',user]);
     
