@@ -18,10 +18,11 @@ const createIcon =
 
 export default class Navigation extends Component {
 
-    //constructor(props) {
-        //super(props);
+    constructor(props) {
+        super(props);
+        this.goHome = this.goHome.bind(this);
         //this.isAdmin = this.isAdmin.bind(this);
-    //};
+    };
     
     authorize() {
      //   //console.log(['AUTHORIZE'])
@@ -51,6 +52,11 @@ export default class Navigation extends Component {
         this.props.setCurrentPage('review')
     };
     
+    goHome() {
+        this.props.hideCollection();
+        this.props.setCurrentPage('splash')
+    };
+    
     import(e) {
         this.props.import();
     };
@@ -64,11 +70,11 @@ export default class Navigation extends Component {
             
         <nav className="navbar navbar-expand-md" >
        <div className="navbar-brand" >
-          <a  href="#" onClick={() => this.props.setCurrentPage('splash')}><img alt="Mnemos' Library" src="/mnemoicon-100.png"  data-toggle="collapse" data-target="#navbarCollapse" style={{float:'left',clear:'right' ,height:'4em'}}  /></a>
+          <a  href="#" onClick={this.goHome}><img alt="Mnemos' Library" src="/mnemoicon-100.png"  data-toggle="collapse" data-target="#navbarCollapse" style={{float:'left',clear:'right' ,height:'4em'}}  /></a>
        
        <div className='page-title' style={{color:'yellow',fontSize:'1.2em',  zIndex:99, marginTop: '0.1em'}} >&nbsp;&nbsp;{this.props.title}&nbsp;&nbsp;&nbsp;</div>
           
-              <span className="dcol-4">
+              <span style={{marginLeft:'1em'}} className="dcol-4">
                 <a className="btn btn-secondary" href="#"  onClick={() => this.startReview.bind(this)()} >{reviewIcon} <span  className="d-none d-sm-inline">Review</span></a>
               </span>
               {this.props.isLoggedIn() && 
@@ -89,7 +95,7 @@ export default class Navigation extends Component {
                 {this.props.isLoggedIn() && <a href='#' onClick={() => this.props.setCurrentPage('profile')} className='btn btn-secondary'>
                    {userIcon} <span  className="d-none d-sm-inline">Profile</span>
                   </a>}
-                  {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='loginbutton btn btn-outline btn-warning' style={{verticalAlign: 'top',marginLeft: '1em'}}>
+                  {!this.props.isLoggedIn() && <a  href='#' onClick={() => this.props.setCurrentPage('login')} className='btn btn-outline btn-warning' style={{marginLeft: '1em'}}>
                    {userIcon} <span  className="d-none d-sm-inline">Login</span>
                   </a>}
               </span>

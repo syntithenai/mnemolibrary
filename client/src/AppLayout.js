@@ -103,6 +103,9 @@ export default class AppLayout extends Component {
       this.reviewBySuccessBand = this.reviewBySuccessBand.bind(this);
       this.fetchTopicCollections = this.fetchTopicCollections.bind(this);
       this.getCurrentBand = this.getCurrentBand.bind(this);
+      this.showCollection = this.showCollection.bind(this);
+      this.hideCollection = this.hideCollection.bind(this);
+      this.collectionVisible = this.collectionVisible.bind(this);
       //this.getTagsByTitle = this.getTagsByTitle.bind(this);
       //this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
       //this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
@@ -1444,7 +1447,20 @@ export default class AppLayout extends Component {
         //localStorage.setItem('users',JSON.stringify(users));
     };
     
-
+        
+    showCollection(collection) {
+        this.setState({collection:collection});
+    };
+    
+    hideCollection() {
+        this.setState({collection:null});
+    };
+    
+    collectionVisible() {
+        return this.state.collection;
+    };
+    
+    
     
   render() {
     const progress = this.state.users.default;
@@ -1467,11 +1483,11 @@ export default class AppLayout extends Component {
         return (
             <div className="mnemo">
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
-                <Navigation setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} />
+                <Navigation setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection} />
                 
                 
                 
-                {((this.isCurrentPage('splash')) || (this.isCurrentPage('') && !this.isLoggedIn())) && <div><TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user}  /></div>}
+                {((this.isCurrentPage('splash')) || (this.isCurrentPage('') && !this.isLoggedIn())) && <div><TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuizFromTopic={this.setQuizFromTopic} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user} showCollection={this.showCollection} hideCollection={this.hideCollection} collectionVisible={this.collectionVisible} collection={this.state.collection} /></div>}
                 
                 
                 {this.isCurrentPage('home') && <QuizCarousel 

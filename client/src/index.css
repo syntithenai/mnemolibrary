@@ -13,6 +13,7 @@ body {
   font-family: sans-serif;
   padding-top: 8rem;
   padding-left: 0rem;
+  background-color: #add8e6;
 }
 .media-preview label,.media-preview input {
     display: inline;

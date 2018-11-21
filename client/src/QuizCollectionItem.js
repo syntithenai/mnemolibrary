@@ -13,15 +13,25 @@ export default class QuizCollectionItem extends Component {
     componentDidMount() {
         let that = this;
         // load this question
-        if (this.props.loadQuestionByDifficulty) {
-            this.props.loadQuestionByDifficulty.bind(this)(this.props.difficulty).then(function(question) {
-                that.setState({question:Utils.getQuestionTitle(question),id:question._id});
-            });
-        } else if (this.props.loadQuestionByTopics) {
-            this.props.loadQuestionByTopics.bind(this)(this.props.topics).then(function(question) {
-                that.setState({question:Utils.getQuestionTitle(question),id:question._id});
-            });
-        } 
+        if (!this.props.hideSingleQuestionInCollectionView) {
+            if (this.props.loadQuestionByDifficulty) {
+                this.props.loadQuestionByDifficulty.bind(this)(this.props.difficulty).then(function(question) {
+                    that.setState({question:Utils.getQuestionTitle(question),id:question._id});
+                });
+            } else if (this.props.loadQuestionByTopics) {
+                this.props.loadQuestionByTopics.bind(this)(this.props.topics).then(function(question) {
+                    that.setState({question:Utils.getQuestionTitle(question),id:question._id});
+                });
+            }  else if (this.props.loadQuestionByCommunity) {
+                this.props.loadQuestionByCommunity.bind(this)(this.props.topics).then(function(question) {
+                    that.setState({question:Utils.getQuestionTitle(question),id:question._id});
+                });
+            }  else if (this.props.loadQuestionByAll) {
+                this.props.loadQuestionByAll.bind(this)(this.props.topics).then(function(question) {
+                    that.setState({question:Utils.getQuestionTitle(question),id:question._id});
+                });
+            }             
+        }
 
         //else {
             //this.setState({question:'Why is it NOT so'});

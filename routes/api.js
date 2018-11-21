@@ -911,7 +911,7 @@ router.get('/topiccollections', (req, res) => {
                 });
                 if (topics.length > 0) {
                     // append generated Community section at the end
-                    final.push({name:'Community',sort:collections.length + 1,column:"2",topics:topics});
+                    final.push({name:'Community',sort:collections.length + 1,icon:'userFriends',topics:topics});
                 }
                     
                 res.send([final,missingQuestionsByTopic]);
@@ -963,7 +963,10 @@ router.post('/discover', (req, res) => {
         })
     };
     
-    if (req.body.topics) {
+    if (req.body.userTopic && req.body.userTopic.length > 0) {
+        criteria.push({userTopic:{$exists:true}});
+        orderBy = 'sort';
+    } else if (req.body.topics) {
         let topics = req.body.topics.split(",");
         let orCriteria=[];
         topics.map(function(topic) {
@@ -1024,6 +1027,7 @@ router.post('/discover', (req, res) => {
       //  criteria.push({discoverable :{$ne:'no'}});
         
     }
+    criteria.push({discoverable :{$ne:'no'}});
     console.log(['discover',criteria]);
     discoverQuery();
     
