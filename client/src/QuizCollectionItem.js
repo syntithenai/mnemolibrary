@@ -13,6 +13,7 @@ export default class QuizCollectionItem extends Component {
     componentDidMount() {
         let that = this;
         // load this question
+        
         if (!this.props.hideSingleQuestionInCollectionView) {
             if (this.props.loadQuestionByDifficulty) {
                 this.props.loadQuestionByDifficulty.bind(this)(this.props.difficulty).then(function(question) {
@@ -32,6 +33,8 @@ export default class QuizCollectionItem extends Component {
                 });
             }             
         }
+        
+    
 
         //else {
             //this.setState({question:'Why is it NOT so'});
@@ -51,7 +54,7 @@ export default class QuizCollectionItem extends Component {
         return (
                 <div onClick={this.props.onClick} style={Object.assign({backgroundColor:this.props.backgroundColor, color: this.props.color ? this.props.color : 'black'},blockStyle)}  className="col-lg-4 col-6" >
                     <span style={{sfloat:'right',marginRight:'0.8em'}} >{getIcon(this.props.icon,iconStyle)}</span>
-                    <span style={{fontSize:'1.5em',fontWeight:'bold'}}>{this.props.name}</span>
+                    <span style={{fontSize:'1.4em',fontWeight:'bold'}}>{this.props.name}</span>
                     <div onClick={this.onQuestionClick} style={{marginTop:'0.8em'}} >{this.state.question}</div>
                 </div>
             );

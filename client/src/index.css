@@ -13,7 +13,7 @@ body {
   font-family: sans-serif;
   padding-top: 8rem;
   padding-left: 0rem;
-  background-color: #add8e6;
+  
 }
 .media-preview label,.media-preview input {
     display: inline;
@@ -101,7 +101,7 @@ margin-top:2em;
     background-color: lightblue;
     dpadding-top: 0.5em;
     dpadding-bottom: 0.5em;
-    margin-top:-4.2em;
+    margin-top:-5.2em;
     position: fixed;
     width: 100%;
     z-index: 99;

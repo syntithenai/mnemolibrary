@@ -151,7 +151,7 @@ class App extends Component {
         
         <div className='row'>
             <div className='col-sm-6'>
-            <QuizList quizzes={quizzes} ></QuizList>
+            <QuizList quizzes={quizzes}  ></QuizList>
             </div>
             <hr/>
             <div className='col-sm-6'>

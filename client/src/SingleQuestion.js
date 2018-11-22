@@ -41,7 +41,7 @@ export default class SingleQuestion extends Component {
           this.player = element;
           if (this.player) this.player.subscribeToStateChange(this.handleStateChange.bind(this));
         };
-        this.state = {swipeable:true,'visible':[],playerHeight:50,playerWidth:400}
+        this.state = {swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:''}
         this.setVisible = this.setVisible.bind(this);
         this.toggleMedia = this.toggleMedia.bind(this);
         this.isVisible = this.isVisible.bind(this);
@@ -78,10 +78,37 @@ export default class SingleQuestion extends Component {
     };
     
       componentDidMount() {
+          let that = this;
         // subscribe state change
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
         if (this.props.question) {
+            if (this.props.question.answer && this.props.question.answer.length > 0) {
+                this.setState({answer:this.props.question.answer});
+            } else {
+                if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
+                    let linkParts = this.props.question.link.split("/");
+                    // wikilookup
+                    Utils.loadWikipediaIntro(linkParts[linkParts.length - 1]).then(function(answer) {
+                        that.setState({answer:answer});
+                    });                    
+                }
+            }
+            if (this.props.question.image && this.props.question.image.length > 0) {
+                this.setState({image:this.props.question.image});
+            } else if (this.props.question.image_png && this.props.question.image_png.length > 0) {
+                this.setState({image:this.props.question.image_png});
+            } else {
+                if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
+                    let linkParts = this.props.question.link.split("/");
+                    // wikilookup
+                    Utils.loadWikipediaImage(linkParts[linkParts.length - 1]).then(function(answer) {
+                        that.setState({image:answer});
+                    });                    
+                }
+            }
+
+            
             let question=this.props.question
             let media=<Player
               ref={this.setPlayerRef}
@@ -176,6 +203,30 @@ export default class SingleQuestion extends Component {
        // if (this.refs.player) this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['media'],{align:'top',offset:-230});
         if (props.question) {
+            if (this.props.question.answer && this.props.question.answer.length > 0) {
+                this.setState({answer:this.props.question.answer});
+            } else {
+                if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
+                    let linkParts = this.props.question.link.split("/");
+                    // wikilookup
+                    Utils.loadWikipediaIntro(linkParts[linkParts.length - 1]).then(function(answer) {
+                        that.setState({answer:answer});
+                    });                    
+                }
+            }
+            if (this.props.question.image && this.props.question.image.length > 0) {
+                this.setState({image:this.props.question.image});
+            } else if (this.props.question.image_png && this.props.question.image_png.length > 0) {
+                this.setState({image:this.props.question.image_png});
+            } else {
+                if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
+                    let linkParts = this.props.question.link.split("/");
+                    // wikilookup
+                    Utils.loadWikipediaImage(linkParts[linkParts.length - 1]).then(function(answer) {
+                        that.setState({image:answer});
+                    });                    
+                }
+            }
             let question=props.question
             let media=<Player
               ref={this.setPlayerRef}
@@ -270,6 +321,7 @@ export default class SingleQuestion extends Component {
     };
     
     render() {
+        let that = this;
         let showRecallButton = this.props.successButton 
         
         let blockedTags = '';
@@ -359,7 +411,7 @@ export default class SingleQuestion extends Component {
                 attribution=(<a href={question.attribution} >{shortAttribution}</a>)
             }
             let imageAttribution=question.imageattribution;
-            let imageLink=question.image_png ? question.image_png : question.image;
+            let imageLink= this.state.image; //question.image_png ? question.image_png : question.image;
             //imageLink="/s3/uploads/imagefiles/image_5b6ac06107ddb0007afc848b.png"
             //imageLink =  imageLink ? imageLink +"?rand="+Math.random() : '';
             if (imageAttribution && imageAttribution.indexOf('http')===0) {
@@ -375,12 +427,12 @@ export default class SingleQuestion extends Component {
                 let shortAttribution=mediaAttribution.slice(0,endAttribution);
                 attribution=(<a href={mediaAttribution} >{shortAttribution}</a>)
             }
-
-            let shortanswer = this.firstSentence(question.answer);
+            let shortanswer = this.firstSentence(that.state.answer);
             let showLongAnswer = false;
-            if (shortanswer.length < question.answer.length) {
+            if (shortanswer.length < that.state.answer.length) {
                 showLongAnswer = true;
             }
+            console.log(['RENDER SINGLE',that.state.answer,shortanswer,showLongAnswer]);
             let shortLink = ""
             if (question.link) {
                 let endDomain=question.link.indexOf("/",9);
@@ -426,7 +478,7 @@ export default class SingleQuestion extends Component {
                 </div>
                 
                 
-                <div className="card question container" >
+                <div className="card question container" style={{backgroundColor: '#add8e6'}}>
                      <div id="spacerforsmall" className='d-none d-sm-block d-md-none' ><br/><br/> </div>
                     <div id="progressbar" style={{backgroundColor: 'blue',width: '100%',height:'0.3em'}} > <div id="innerprogressbar" style={{backgroundColor: 'red',height:'0.3em',width: this.props.percentageFinished()}} >&nbsp;</div></div>
                     
@@ -435,9 +487,9 @@ export default class SingleQuestion extends Component {
                         {((this.isVisible('media') || question.autoplay_media==="YES") && hasMedia) && <span style={{marginTop:'1em',float:'right'}}>
                             {media}</span> }
                          
-                       {!showRecallButton && <span>  {(!target) && <button style={{float:'right',clear:'both',fontSize:'0.9em',marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
+                       {!showRecallButton && <span>  {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
                          }
-                        {(target) && <a style={{float:'right',clear:'both',fontSize:'0.9em',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
+                        {(target) && <a style={{float:'right',clear:'both',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
                         }&nbsp;   
                         <button style={{marginTop:'1em',float:'right'}} data-toggle="modal" data-target="#problemdialog" className='btn btn-primary'><ExclamationTriangle size={26} /><span className="d-none d-md-inline-block">&nbsp;Report Problem&nbsp;</span></button>
                     &nbsp;
@@ -463,7 +515,7 @@ export default class SingleQuestion extends Component {
                             <img   alt={question.question} onClick={() => this.setVisible('image')} style={{ float:'left', maxHeight:'150px', maxWidth:'150px',border: "0px",clear:'both', paddingRight: '1em'}} src={imageLink} />
                             }
                         
-                        {(this.isVisible('answer') || !showRecallButton)  && question.answer && 
+                        {(this.isVisible('answer') || !showRecallButton)  && shortanswer.length > 0  && 
                             <div  className='card-text'><b>Answer</b><br/> 
                              
                                 
@@ -480,7 +532,7 @@ export default class SingleQuestion extends Component {
                         
                     <div className="card-block">
                         <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
-                        {(this.isVisible('answer') || !showRecallButton) && showLongAnswer && <div  className='card-text'><span style={{fontSize:'1.4em'}}><pre>{question.answer}</pre></span></div>}
+                        {(this.isVisible('answer') || !showRecallButton) && showLongAnswer && <div  className='card-text'><span style={{fontSize:'1.4em'}}><pre>{this.state.answer}</pre></span></div>}
                          
                         <div  className='card-text' style={{fontSize:'0.85em'}}>
                         {(this.isVisible('answer') || !showRecallButton) && question.link && <b >From <a href={question.link} target='_new' >{shortLink}</a></b>}

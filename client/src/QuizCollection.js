@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import getIcon from './collectionIcons';
 import QuizCollectionItem from './QuizCollectionItem';
 import QuizList from './QuizList';
+import scrollToComponent from 'react-scroll-to-component';
 
 export default class QuizCollection extends Component {
 
     constructor(props) {
         super(props);
         this.getIcon = getIcon;
+        this.scrollTo={};
         this.state={}
         this.showTopics  = this.showTopics.bind(this);
         //this.discoverByDifficulty  = this.discoverByDifficulty.bind(this);
@@ -24,6 +26,14 @@ export default class QuizCollection extends Component {
      ////   this.props.(difficulty);
     //};
 
+    componentDidMount() {
+        //scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
+    };
+    
+    componentDidUpdate(prevProps) {
+        scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
+    };
+    
     
     discoverOneByDifficulty(difficulty) {
       let that = this;
@@ -44,8 +54,8 @@ export default class QuizCollection extends Component {
       }).then(function(json) {
           if (json && json.questions && json.questions.length > 0) {
               let selected = parseInt(Math.random()*json.questions.length , 10);
-              console.log(['SEL RAND',selected,json.questions]);
-              json.questions[selected].postfix = json.questions[selected].postfix ? json.questions[selected].postfix + ' ?' : ' ?'
+             // console.log(['SEL RAND',selected,json.questions]);
+              json.questions[selected].postfix = json.questions[selected].postfix ? json.questions[selected].postfix + '?' : '?'
               return json.questions[selected];
           } else {
               return {question:"You've seen all these questions"}
@@ -77,8 +87,8 @@ export default class QuizCollection extends Component {
       }).then(function(json) {
           if (json && json.questions && json.questions.length > 0) {
               let selected = parseInt(Math.random()*json.questions.length , 10);
-              console.log(['SEL RAND',selected,json.questions]);
-              json.questions[selected].postfix = json.questions[selected].postfix ? json.questions[selected].postfix + ' ?' : ' ?'
+              //console.log(['SEL RAND',selected,json.questions]);
+              json.questions[selected].postfix = json.questions[selected].postfix ? json.questions[selected].postfix + '?' : '?'
               return json.questions[selected];
           } else {
               return {question:"You've seen all these questions"}
@@ -108,8 +118,8 @@ export default class QuizCollection extends Component {
       }).then(function(json) {
           if (json && json.questions && json.questions.length > 0) {
               let selected = parseInt(Math.random()*json.questions.length , 10);
-              console.log(['SEL RAND',selected,json.questions]);
-              json.questions[selected].postfix = json.questions[selected].postfix ? json.questions[selected].postfix + ' ?' : ' ?'
+            //  console.log(['SEL RAND',selected,json.questions]);
+              json.questions[selected].postfix = json.questions[selected].postfix ? json.questions[selected].postfix + '?' : '?'
               return json.questions[selected];
           } else {
               return {question:"You've seen all these questions"}
@@ -140,9 +150,9 @@ export default class QuizCollection extends Component {
       }).then(function(json) {
           if (json && json.questions && json.questions.length > 0) {
               let selected = parseInt(Math.random()*json.questions.length , 10);
-              console.log(['SEL RAND',selected,json.questions]);
+             // console.log(['SEL RAND',selected,json.questions]);
               // append question mark
-              json.questions[selected].postfix = json.questions[selected].postfix ? json.questions[selected].postfix + ' ?' : ' ?'
+              json.questions[selected].postfix = json.questions[selected].postfix ? json.questions[selected].postfix + '?' : '?'
               return json.questions[selected];
           } else {
               return {postfix:"You've seen all these questions"}
@@ -164,12 +174,13 @@ export default class QuizCollection extends Component {
                   collatedTopics[topic]=1;
               });
               return <div  >
+                    <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                       <h4>{collection.name}</h4>
-                      <QuizList quizzes={collatedTopics} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics}   setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic}></QuizList>
+                      <QuizList quizzes={collatedTopics} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics}   setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} isLoggedIn={this.props.isLoggedIn} ></QuizList>
                     </div>
             }
         } else {
-            console.log(['RENER COLLECTION',this.props.topicCollections]);
+           // console.log(['RENER COLLECTION',this.props.topicCollections]);
             //let iconSize=36;
             //topics={['aa','bb','cc']
              let colors = [
@@ -192,8 +203,12 @@ export default class QuizCollection extends Component {
             let collectionsIn = this.props.topicCollections;
             //this.props.setQuizFromTopics(collection.topics)
             let colorIndex=3;
+            let all={name:'All',topics:[]};
             if (Array.isArray(collectionsIn)) {
                 collectionsIn = collectionsIn.map(function(collection) {
+                    collection.topics.map(function(topic) {
+                        all.topics.push(topic);
+                    });
                     collection.color = colors[colorIndex].color;
                     collection.backgroundColor = colors[colorIndex].backgroundColor;
                     colorIndex = (colorIndex + 1)%colors.length;
@@ -205,11 +220,17 @@ export default class QuizCollection extends Component {
                     else if (a.sort > b.sort) return 1;
                     else return 0;
                 }).map((collection, key) => {
-                  return <QuizCollectionItem key={key}  color={collection.color} backgroundColor={collection.backgroundColor}  icon={collection.icon} name={collection.name} topics={collection.topics} onClick={(e) => that.props.showCollection(collection)} loadQuestionByTopics={that.discoverOneByTopics} setQuizFromQuestionId={that.props.setQuizFromQuestionId} hideSingleQuestionInCollectionView={collection.hideSingleQuestionInCollectionView ? true : false} /> 
+                    let onClickFunction = that.props.showCollection
+                    if (collection.immediateDiscover) {
+                        onClickFunction = function(collection) {
+                            that.props.setQuizFromTopics(collection.topics);
+                        };
+                    }
+                    console.log(['rtc',collection,key,this.props.immediateDiscover,onClickFunction]);
+                  return <QuizCollectionItem key={key}  color={collection.color} backgroundColor={collection.backgroundColor}  icon={collection.icon} name={collection.name} topics={collection.topics} onClick={(e) => onClickFunction(collection)} loadQuestionByTopics={that.discoverOneByTopics} setQuizFromQuestionId={that.props.setQuizFromQuestionId} immediateDiscover={collection.immediateDiscover} setQuizFromTopics={that.props.setQuizFromTopics} hideSingleQuestionInCollectionView={collection.hideSingleQuestionInCollectionView ? true : false} /> 
                 })
             }
                         
-            let all={};
             let blockStyle={minHeight:'150px',border:'2px solid white',fontSize:'1.1em',paddingTop:'0.2em',fontWeight:'bold'}
             return  (
             <div className="splash" >
@@ -217,11 +238,8 @@ export default class QuizCollection extends Component {
                     <QuizCollectionItem color="white" backgroundColor='#fe0000' icon="chalkBoard" name="Beginner" difficulty="1" onClick={(e) => this.props.setQuizFromDifficulty(1)} loadQuestionByDifficulty={this.discoverOneByDifficulty} setQuizFromQuestionId={this.props.setQuizFromQuestionId} /> 
                     <QuizCollectionItem color="white" backgroundColor='#f60'  icon="userGraduate" name="Advanced" difficulty="2" onClick={(e) => this.props.setQuizFromDifficulty(2)} loadQuestionByDifficulty={this.discoverOneByDifficulty} setQuizFromQuestionId={this.props.setQuizFromQuestionId} /> 
                     <QuizCollectionItem color="black" backgroundColor='#fe9900'  icon="brain" name="Genius" difficulty="3" onClick={(e) => this.props.setQuizFromDifficulty(3)} loadQuestionByDifficulty={this.discoverOneByDifficulty} setQuizFromQuestionId={this.props.setQuizFromQuestionId} /> 
-                   
-                    
                     {renderedTopicCollections}
-            
-                                        
+                                 
                     <QuizCollectionItem color="white" backgroundColor='#cd0067'  icon="starOfLife" name="All"  onClick={(e) => this.props.showCollection(all)} loadQuestionByAll={this.discoverOne} setQuizFromQuestionId={this.props.setQuizFromQuestionId} hideSingleQuestionInCollectionView={true} /> 
                 </div>
             </div>
