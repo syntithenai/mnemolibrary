@@ -951,8 +951,16 @@ router.post('/discover', (req, res) => {
     function discoverQuery() {
         //sortFilter[orderBy]=-1;
         let sortFilter={hasMnemonic:1};
+        // missing mnemonic as last choice
         sortFilter['hasMnemonic']=-1;
-        sortFilter['successRate']=-1;
+        // allow for asc/desc (- as first letter)
+        if (orderBy.startsWith("-")) {
+            orderBy = orderBy.slice(1);
+            sortFilter[orderBy]=-1;
+        } else {
+            sortFilter[orderBy]=1;
+        }
+        
         
         console.log(['disco criteria',JSON.stringify(criteria)]);
         db.collection('questions').find({$and:criteria})
@@ -976,12 +984,13 @@ router.post('/discover', (req, res) => {
         orderBy = 'sort';
     } else if (req.body.difficulty) {
         criteria.push({difficulty:{$eq:String(req.body.difficulty)}});
-        orderBy = 'sort';
+        orderBy = '-successRate';
     } else if (req.body.topic) {
         criteria.push({quiz:{$eq:req.body.topic}});
         orderBy = 'sort';
     } else {
         criteria.push({discoverable :{$ne:'no'}});
+        orderBy = '-successRate';
         //if (fullUser.difficulty > 0) {
             //criteria.push({'difficulty': {$eq: fullUser.difficulty}});
         //} else {

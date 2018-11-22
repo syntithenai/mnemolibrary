@@ -52,6 +52,7 @@ export default class SingleQuestion extends Component {
         this.disableSwipe = this.disableSwipe.bind(this);
         this.enableSwipe = this.enableSwipe.bind(this);
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
+        this.fromWikipedia = this.fromWikipedia.bind(this);
         this.scrollTo={};
         this.questionmessage='';
     };
@@ -77,36 +78,52 @@ export default class SingleQuestion extends Component {
         }
     };
     
+    fromWikipedia() {
+        let that = this;
+        console.log(['FROM WIKIPEDIA']);
+        if (this.props.question.answer && this.props.question.answer.length > 0) {
+            console.log(['FROM WIKIPEDIA HAVE ANSWER']);
+            this.setState({answer:this.props.question.answer});
+        } else {
+            console.log(['FROM WIKIPEDIA LOOKUP ANSWER']);
+            if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
+                console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD']);
+                let linkParts = this.props.question.link.split("/");
+                let wikiPageParts = linkParts[linkParts.length - 1].split("#");
+                let wikiPage = wikiPageParts[0];
+                // wikilookup
+                console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD',wikiPage,wikiPageParts]);
+                Utils.loadWikipediaIntro(wikiPage).then(function(answer) {
+                    console.log(['FROM WIKIPEDIA got',answer]);
+                    that.setState({answer:answer});
+                });                    
+            }
+        }
+        if (this.props.question.image && this.props.question.image.length > 0) {
+            this.setState({image:this.props.question.image});
+        } else if (this.props.question.image_png && this.props.question.image_png.length > 0) {
+            this.setState({image:this.props.question.image_png});
+        } else {
+            if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
+                let linkParts = this.props.question.link.split("/");
+                let wikiPageParts = linkParts[linkParts.length - 1].split("#");
+                let wikiPage = wikiPageParts[0];
+                // wikilookup
+                Utils.loadWikipediaImage(wikiPage).then(function(answer) {
+                    that.setState({image:answer});
+                });                    
+            }
+        }
+    };
+    
+    
       componentDidMount() {
           let that = this;
         // subscribe state change
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
         if (this.props.question) {
-            if (this.props.question.answer && this.props.question.answer.length > 0) {
-                this.setState({answer:this.props.question.answer});
-            } else {
-                if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
-                    let linkParts = this.props.question.link.split("/");
-                    // wikilookup
-                    Utils.loadWikipediaIntro(linkParts[linkParts.length - 1]).then(function(answer) {
-                        that.setState({answer:answer});
-                    });                    
-                }
-            }
-            if (this.props.question.image && this.props.question.image.length > 0) {
-                this.setState({image:this.props.question.image});
-            } else if (this.props.question.image_png && this.props.question.image_png.length > 0) {
-                this.setState({image:this.props.question.image_png});
-            } else {
-                if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
-                    let linkParts = this.props.question.link.split("/");
-                    // wikilookup
-                    Utils.loadWikipediaImage(linkParts[linkParts.length - 1]).then(function(answer) {
-                        that.setState({image:answer});
-                    });                    
-                }
-            }
+            that.fromWikipedia();
 
             
             let question=this.props.question
@@ -196,6 +213,13 @@ export default class SingleQuestion extends Component {
           //player: state
         //});
       }
+      
+      componentDidUpdate(props) {
+          console.log(['SQ UPDATE',JSON.parse(JSON.stringify(props.question)),JSON.parse(JSON.stringify(this.props.question))]);
+          if (this.props.question._id != props.question._id) {
+            this.fromWikipedia();
+          }
+      };
     
      componentWillReceiveProps(props) {
          let that=this;
@@ -203,30 +227,7 @@ export default class SingleQuestion extends Component {
        // if (this.refs.player) this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['media'],{align:'top',offset:-230});
         if (props.question) {
-            if (this.props.question.answer && this.props.question.answer.length > 0) {
-                this.setState({answer:this.props.question.answer});
-            } else {
-                if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
-                    let linkParts = this.props.question.link.split("/");
-                    // wikilookup
-                    Utils.loadWikipediaIntro(linkParts[linkParts.length - 1]).then(function(answer) {
-                        that.setState({answer:answer});
-                    });                    
-                }
-            }
-            if (this.props.question.image && this.props.question.image.length > 0) {
-                this.setState({image:this.props.question.image});
-            } else if (this.props.question.image_png && this.props.question.image_png.length > 0) {
-                this.setState({image:this.props.question.image_png});
-            } else {
-                if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
-                    let linkParts = this.props.question.link.split("/");
-                    // wikilookup
-                    Utils.loadWikipediaImage(linkParts[linkParts.length - 1]).then(function(answer) {
-                        that.setState({image:answer});
-                    });                    
-                }
-            }
+            //that.fromWikipedia();
             let question=props.question
             let media=<Player
               ref={this.setPlayerRef}
