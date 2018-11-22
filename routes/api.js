@@ -1718,6 +1718,24 @@ router.get('/tags', (req, res) => {
     //}
 })
 
+router.post('/topicdetails', (req, res) => {
+//    //console.log(['mnemonics',req.body.question]);
+    if (req.body.topic && req.body.topic.length > 0) {
+        let promises=[];
+        db.collection('topics').find({topic:req.body.topic}).toArray(function(err, result) {
+            //result.map(function(key,mnemonic));
+//            //console.log(['mnemonics found',result]);
+            if (result) {
+                res.send(result);
+            } else {
+                res.send({});
+            }
+        });
+    } else {
+        res.send({message:'Invalid request'});
+    }
+})
+
 router.get('/topics', (req, res) => {
     ////console.log(['topics',req.body]);
     let search = req.query.title;

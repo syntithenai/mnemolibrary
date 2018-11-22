@@ -316,7 +316,7 @@ export default class SingleQuestion extends Component {
     firstSentence (text) {
         if (text) {
             text = text.replace('...',', ');
-            return String(text).split('.')[0];
+            return String(text).split('. ')[0];
         } else return '';
     };
     
