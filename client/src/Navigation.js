@@ -77,19 +77,7 @@ export default class Navigation extends Component {
               <span style={{marginLeft:'1em'}} className="dcol-4">
                 <a className="btn btn-secondary" href="#"  onClick={() => this.startReview.bind(this)()} >{reviewIcon} <span  className="d-none d-sm-inline">Review</span></a>
               </span>
-              {this.props.isLoggedIn() && 
-              <span className="dcol-4">
-                <a className="btn btn-secondary"  href="#" onClick={() => this.props.setCurrentPage('create')}>{createIcon} <span  className="d-none d-sm-inline">Create</span></a>
-              </span>}
-              {!this.props.isLoggedIn() && 
-              <span className="dcol-4">
-                <a className="btn btn-secondary"  href="#" onClick={() => this.props.setCurrentPage('createhelp')}>{createIcon} <span  className="d-none d-sm-inline">Create</span></a>
-              </span>}
-            
-              <span className="dcol-4">
-                <a className="btn btn-secondary" href="#" onClick={() => this.props.setCurrentPage('about')}>{helpIcon} <span  className="d-none d-sm-inline">Help</span></a>
-                
-              </span>
+              
               <span className="dcol-4">
                 
                 {this.props.isLoggedIn() && <a href='#' onClick={() => this.props.setCurrentPage('profile')} className='btn btn-secondary'>
@@ -100,6 +88,10 @@ export default class Navigation extends Component {
                   </a>}
               </span>
            
+              <span className="dcol-4">
+                <a className="btn btn-secondary" href="#" onClick={() => this.props.setCurrentPage('about')}>{helpIcon} <span  className="d-none d-sm-inline">Help</span></a>
+                
+              </span>
           </div>
             
         </nav>

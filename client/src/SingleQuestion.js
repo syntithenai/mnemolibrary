@@ -53,6 +53,7 @@ export default class SingleQuestion extends Component {
         this.enableSwipe = this.enableSwipe.bind(this);
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.fromWikipedia = this.fromWikipedia.bind(this);
+        this.createMedia = this.createMedia.bind(this);
         this.scrollTo={};
         this.questionmessage='';
     };
@@ -97,6 +98,8 @@ export default class SingleQuestion extends Component {
                     console.log(['FROM WIKIPEDIA got',answer]);
                     that.setState({answer:answer});
                 });                    
+            } else {
+                that.setState({answer:''});
             }
         }
         if (this.props.question.image && this.props.question.image.length > 0) {
@@ -110,23 +113,31 @@ export default class SingleQuestion extends Component {
                 let wikiPage = wikiPageParts[0];
                 // wikilookup
                 Utils.loadWikipediaImage(wikiPage).then(function(answer) {
+                    console.log(['FROM WIKIPEDIA got image',answer]);
                     that.setState({image:answer});
                 });                    
+            } else {
+                that.setState({image:''});
             }
         }
     };
     
     
-      componentDidMount() {
-          let that = this;
-        // subscribe state change
-        //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
-        scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
-        if (this.props.question) {
-            that.fromWikipedia();
-
+    createMedia() {
+        let sources=[]
+        let question=this.props.question
+        if (question.media && question.media.length > 0) sources.push(<source src={question.media} />)
+        if (question.media_ogg && question.media_ogg.length > 0) sources.push(<source src={question.media_ogg} />)
+        if (question.media_webm && question.media_webm.length > 0) sources.push(<source src={question.media_webm} />)
+        if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source src={question.media_mp4} />)
             
-            let question=this.props.question
+        if (question.media_mp3 && question.media_mp3.length > 0) sources.push(<source src={question.media_mp3} />)
+        if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source src={question.media_mp4} />)
+        if (question.media_webmvideo && question.media_webmvideo.length > 0) sources.push(<source src={question.media_webmvideo} />)
+        if (question.media_webmaudio && question.media_webmaudio.length > 0) sources.push(<source src={question.media_webmaudio} />)
+            
+        console.log(['SINGLE VIEW CREATE MEDIA from q',this.props.question]);
+        let that = this;
             let media=<Player
               ref={this.setPlayerRef}
               playsInline
@@ -135,19 +146,25 @@ export default class SingleQuestion extends Component {
               width={this.state.playerWidth}
               fluid={false}
             >
-            {question.media && <source src={question.media} />}
-            {question.media_ogg && <source src={question.media_ogg} />}
-            {question.media_webm && <source src={question.media_webm} />}
-            {question.media_mp4 && <source src={question.media_mp4} />}
-            
-            {question.media_mp3 && <source src={question.media_mp3} />}
-            {question.media_mp4 && <source src={question.media_mp4} />}
-            {question.media_webmvideo && <source src={question.media_webmvideo} />}
-            {question.media_webmaudio && <source src={question.media_webmaudio} />}
-            
-            
+            {sources}
             </Player>
-            this.setState({media:media});
+            console.log(['SINGLE VIEW CREATE MEDIA',media]);
+            setTimeout(function() {
+                console.log(['SINGLE VIEW UPDATE MEDIA',media]);
+                    that.setState({media:media});
+            },100);
+
+            //this.setState({media:media});
+    };
+    
+      componentDidMount() {
+          let that = this;
+        // subscribe state change
+        //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
+        scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
+        if (this.props.question) {
+            that.fromWikipedia();
+            that.createMedia();
         }
       }
       
@@ -215,7 +232,7 @@ export default class SingleQuestion extends Component {
       }
       
       componentDidUpdate(props) {
-          console.log(['SQ UPDATE',JSON.parse(JSON.stringify(props.question)),JSON.parse(JSON.stringify(this.props.question))]);
+          //console.log(['SQ UPDATE',JSON.parse(JSON.stringify(props.question)),JSON.parse(JSON.stringify(this.props.question))]);
           if (this.props.question._id != props.question._id) {
             this.fromWikipedia();
           }
@@ -223,33 +240,12 @@ export default class SingleQuestion extends Component {
     
      componentWillReceiveProps(props) {
          let that=this;
-         console.log(['rcv props',props]);
+        // console.log(['rcv props',props]);
        // if (this.refs.player) this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['media'],{align:'top',offset:-230});
         if (props.question) {
             //that.fromWikipedia();
-            let question=props.question
-            let media=<Player
-              ref={this.setPlayerRef}
-              playsInline
-              autoPlay={true}
-              height={this.state.playerHeight}
-              width={this.state.playerWidth}
-              fluid={false}
-            >
-            {question.media && <source src={question.media} />}
-            {question.media_ogg && <source src={question.media_ogg} />}
-            {question.media_webm && <source src={question.media_webm} />}
-            {question.media_mp4 && <source src={question.media_mp4} />}
-            
-            {question.media_mp3 && <source src={question.media_mp3} />}
-            {question.media_mp4 && <source src={question.media_mp4} />}
-            {question.media_webmvideo && <source src={question.media_webmvideo} />}
-            {question.media_webmaudio && <source src={question.media_webmaudio} />}
-            </Player>
-            setTimeout(function() {
-                    that.setState({media:media});
-            },100);
+            that.createMedia();
             
         }
         //this.toggleMedia();
@@ -433,7 +429,7 @@ export default class SingleQuestion extends Component {
             if (shortanswer.length < that.state.answer.length) {
                 showLongAnswer = true;
             }
-            console.log(['RENDER SINGLE',that.state.answer,shortanswer,showLongAnswer]);
+            //console.log(['RENDER SINGLE',that.state.answer,shortanswer,showLongAnswer]);
             let shortLink = ""
             if (question.link) {
                 let endDomain=question.link.indexOf("/",9);
@@ -485,7 +481,7 @@ export default class SingleQuestion extends Component {
                     
                     <Swipeable onSwipedLeft={() => this.swipeLeft(question)} onSwipedRight={() => this.swipeRight(question)}   >  
                         <div ref={(section) => { this.scrollTo.media = section; }} ></div>
-                        {((this.isVisible('media') || question.autoplay_media==="YES") && hasMedia) && <span style={{marginTop:'1em',float:'right'}}>
+                        {((!showRecallButton || this.isVisible('media') || question.autoplay_media==="YES") && hasMedia) && <span style={{marginTop:'1em',float:'right'}}>
                             {media}</span> }
                          
                        {!showRecallButton && <span>  {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>

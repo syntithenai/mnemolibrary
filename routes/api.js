@@ -862,6 +862,31 @@ router.post('/import', (req, res) => {
                 
 });
 
+router.post('/missingmnemonics', (req, res) => {
+    //console.log(['mmNEM',req.body]);
+    let missingQuestionsByTopic={}
+    let filter={$where: "this.mnemonic.length == 0"}
+    if (req.body.topic) {
+        filter={$and:[{$where: "this.mnemonic.length == 0"},{quiz:req.body.topic}]}
+    } else if (req.body.topics) {
+        
+        let topicFilter = req.body.topics.split(",").map(function(topic) {
+            return {quiz:topic}
+        }) ;
+        filter={$and:[{$where: "this.mnemonic.length == 0"},{$or:topicFilter}]}
+    }
+    db.collection('questions').find(filter).toArray().then(function(questions) {
+        //console.log(['LOADING TOPICS, FOUND MNEM FREE QU',questions,JSON.stringify(filter)]);
+        questions.map(function(question,key) {
+            //console.log(['LOADING TOPICS, FOUND Q',question,key]);
+            if (question.quiz && question.quiz.length > 0) {
+                missingQuestionsByTopic[question.quiz] = (parseInt(missingQuestionsByTopic[question.quiz],10) > 0) ? parseInt(missingQuestionsByTopic[question.quiz],10) + 1 : 1;
+             }
+        });
+        //console.log(['MISSING',missingQuestionsByTopic]);
+        res.send(missingQuestionsByTopic);
+    });    
+});
 
 router.get('/topiccollections', (req, res) => {
     
@@ -882,14 +907,14 @@ router.get('/topiccollections', (req, res) => {
     
     
     
-    db.collection('questions').find({$where: "this.mnemonic.length == 0"}).toArray().then(function(questions) {
-        //console.log(['LOADING TOPICS, FOUND MNEM FREE QU',questions]);
-        questions.map(function(question,key) {
-            if (question.quiz && question.quiz.length > 0) {
-                missingQuestionsByTopic[question.quiz] = (parseInt(missingQuestionsByTopic[question.quiz],10) > 0) ? parseInt(missingQuestionsByTopic[question.quiz],10) + 1 : 1;
-             }
-        });
-        console.log(['MISSING',missingQuestionsByTopic]);
+    //db.collection('questions').find({$where: "this.mnemonic.length == 0"}).toArray().then(function(questions) {
+        ////console.log(['LOADING TOPICS, FOUND MNEM FREE QU',questions]);
+        //questions.map(function(question,key) {
+            //if (question.quiz && question.quiz.length > 0) {
+                //missingQuestionsByTopic[question.quiz] = (parseInt(missingQuestionsByTopic[question.quiz],10) > 0) ? parseInt(missingQuestionsByTopic[question.quiz],10) + 1 : 1;
+             //}
+        //});
+        //console.log(['MISSING',missingQuestionsByTopic]);
         
         db.collection('topicCollections').find({}).sort({sort:1}).toArray().then(function(collections) {
             let final=[]
@@ -903,7 +928,7 @@ router.get('/topiccollections', (req, res) => {
                 //}
                 final.push(cValue);
             });
-            db.collection('userTopics').find({published:{$eq:true}}).sort({updated:-1}).limit(10).toArray().then(function(userTopics) {
+            db.collection('userTopics').find({published:{$eq:true}}).sort({updated:-1}).limit(100).toArray().then(function(userTopics) {
                 let topics=[];//sort({updated:-1}).
                // //console.log(['TOPICCOLLES',userTopics]);
                 userTopics.map(function(key,val) {
@@ -921,7 +946,7 @@ router.get('/topiccollections', (req, res) => {
             res.send({});
         });        
         
-    });
+    //});
     
 
 });
