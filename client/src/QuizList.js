@@ -76,7 +76,7 @@ export default class QuizList extends Component {
             }).then(function(json) {
                 that.setState({questionsMissingMnemonics:json});
                 //console.log(['LOAD missing DETAILS',json]);
-              //if (json && json.length > 0 && json[0].description && json[0].description.length > 0) {
+                //if (json && json.length > 0 && json[0].description && json[0].description.length > 0) {
                   //let descriptionState = that.state.description;
                   //descriptionState[quiz] = json[0].description;
                   //that.setState({description:descriptionState});
@@ -85,7 +85,7 @@ export default class QuizList extends Component {
               //}
 
             }).catch(function(ex) {
-            console.log(['parsing failed', ex])
+                console.log(['parsing failed', ex])
             })
         };
             

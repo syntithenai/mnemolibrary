@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "concurrently --kill-others-on-fail  \"npm run server\" \"npm run client\" ",
-    "server": "nodemon --ignore alexa/ server.js",
+    "server": "node server.js",
     "client": "cd client && react-scripts start",
     "publicapi": "cd publicapi && nodemon app.js"
   },

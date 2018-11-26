@@ -596,6 +596,8 @@ router.use('/s3', require('react-s3-uploader/s3router')({
 
 
 router.get('/sitemap', (req, res) => {
+    res.send('');
+    return ;
     var fs = require('fs');
     ROOT_APP_PATH = fs.realpathSync('.'); //console.log(ROOT_APP_PATH);
     
@@ -738,16 +740,25 @@ router.get('/indexes', (req, res) => {
 router.post('/import', (req, res) => {
   console.log(['import']);
     let that = this;
-    let url = config.masterSpreadsheet;
+    let url = ''; //config.masterSpreadsheet;
+    let mnemonics = [];
+    let importId = req.body.importId && req.body.importId > 0 ? parseInt(req.body.importId,10) : 0;
+    if (config.importSheets && config.importSheets.length > importId) {
+        url = config.importSheets[importId];
+    } else {
+        res.send('Invalid import sheet '+importId);
+        return;
+    }
+    console.log(['IMPORT URL',url]);
     // load mnemonics and collate tags, topics
     var request = get(url, function(err,response) {
         if (err) {
-            //console.log(['e',err]);
+            console.log(['e',err]);
             return;
         }
         // clear and reimport topicCollections
         
-        ////console.log(['response',response]);
+        console.log(['response',response]);
         Papa.parse(response, {
             'header': true, 
             'delimiter': ",",	
@@ -759,7 +770,7 @@ router.post('/import', (req, res) => {
                //  //console.log(['parse',data]);
                 const toImport = {'questions':data.data};
                 let json = utils.createIndexes(toImport);
-                //console.log('got indexes');
+                console.log('got indexes');
                 // iterate questions collecting promises and insert/update as required
                 let promises=[];
                 for (var a in json.questions) {
@@ -772,6 +783,8 @@ router.post('/import', (req, res) => {
                         } else {
                             record.ok_for_alexa=true
                         }
+                        record.importId = importId;
+                        
                         record.answer = record.answer.replace('""','"');
                         record.answer = record.answer.replace('""','"');
                         record.answer = record.answer.replace('""','"');
@@ -798,6 +811,7 @@ router.post('/import', (req, res) => {
                         }
                         if (record.mnemonic && record.mnemonic.length > 0) {
                             record.hasMnemonic = 1;
+                            
                         } else {
                             record.hasMnemonic = 0;
                         }
@@ -805,6 +819,10 @@ router.post('/import', (req, res) => {
                             db.collection('questions').save(record).then(function(resy) {
                                // console.log(['UPDATE']);
                                 //let newRecord={_id:record._id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
+                                if (record.hasMnemonic) {
+                                    let newMnemonic = {user:'default',question:record._id,mnemonic:record.mnemonic,questionText:record.question,technique:record.mnemonic_technique,importId:importId};
+                                    mnemonics.push(newMnemonic);
+                                }
                                 resolve(record._id);
                                 
                             }).catch(function(e) {
@@ -818,9 +836,20 @@ router.post('/import', (req, res) => {
                     }
                 }
                 Promise.all(promises).then(function(ids) {
+                    
+                    // send import file back before tidy up and indexing
+                    let unparsed = Papa.unparse(json.questions,{quotes: true});
+                    res.send(unparsed);
+                
+                    
+                   // clear default user mnemonics
+                    db.collection('mnemonics').remove({$and:[{user:'default'},{importId:importId}]}).then(function(dresults) {
+                   // bulk save mnemonics 
+                        db.collection('mnemonics').insertMany(mnemonics);
+                    });
                    // console.log(['del ids',ids]);
                     // delete all questions that are not in this updated set (except userTopic questions)
-                    db.collection('questions').remove({$and:[{_id:{$nin:ids}},{userTopic:{$not:{$exists:true}}}]}).then(function(dresults) {
+                    db.collection('questions').remove({$and:[{importId:importId},{_id:{$nin:ids}},{userTopic:{$not:{$exists:true}}}]}).then(function(dresults) {
                        // //console.log('DELETEd THESE');
                        // //console.log(ids);
                         // update tags
@@ -844,12 +873,7 @@ router.post('/import', (req, res) => {
                             }); 
                           //  console.log('created indexes');                            
                         });
-                        
                        
-
-                        
-                        let unparsed = Papa.unparse(json.questions,{quotes: true});
-                        res.send(unparsed);
                     });
                     
                     

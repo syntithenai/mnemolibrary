@@ -3,7 +3,9 @@ import ActivityChart from './ActivityChart'
 import TopicsChart from './TopicsChart'
 import ProgressChart from './ProgressChart'
 import LeaderBoard from './LeaderBoard'
-
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+        
 var config = require('../../config') 
 let style={height:'1.2em'}
 const createIcon = 
@@ -178,6 +180,27 @@ export default class ProfilePage extends Component {
             
     };
     
+    clickImport() {
+         confirmAlert({
+          title: 'Import Selection',
+          message: 'Which sheet do you want to import?',
+          buttons: [
+            {
+              label: 'Archive',
+              onClick: () => this.props.import(0)
+            },
+            {
+              label: 'Active',
+              onClick: () => this.props.import(1)
+            },
+            {
+              label: 'Cancel',
+              onClick: () => {}
+            }
+          ]
+        })
+    }
+    
     change(e) {
         let state = {...this.state.user};
         var key = e.target.name;
@@ -293,7 +316,7 @@ export default class ProfilePage extends Component {
                                Logout
                               </a>
                               {this.props.isAdmin() && 
-                              <span><a  href='#' onClick={() => this.props.import()} className='btn btn-info btn-warning' >
+                              <span><a  href='#' onClick={() => this.clickImport()} className='btn btn-info btn-warning' >
                                Import
                               </a>
                               <a  href='#' onClick={() => this.dumpalexa.bind(this)()} className='btn btn-info btn-warning' >

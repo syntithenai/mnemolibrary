@@ -150,8 +150,9 @@ export default class SingleQuestion extends Component {
             </Player>
             console.log(['SINGLE VIEW CREATE MEDIA',media]);
             setTimeout(function() {
-                console.log(['SINGLE VIEW UPDATE MEDIA',media]);
+                console.log(['SINGLE VIEW UPDATE MEDIA',media,question.media]);
                     that.setState({media:media});
+                    that.player.load();
             },100);
 
             //this.setState({media:media});
@@ -235,6 +236,7 @@ export default class SingleQuestion extends Component {
           //console.log(['SQ UPDATE',JSON.parse(JSON.stringify(props.question)),JSON.parse(JSON.stringify(this.props.question))]);
           if (this.props.question._id != props.question._id) {
             this.fromWikipedia();
+             this.createMedia();
           }
       };
     
@@ -245,7 +247,7 @@ export default class SingleQuestion extends Component {
         scrollToComponent(this.scrollTo['media'],{align:'top',offset:-230});
         if (props.question) {
             //that.fromWikipedia();
-            that.createMedia();
+          //  that.createMedia();
             
         }
         //this.toggleMedia();
@@ -313,6 +315,7 @@ export default class SingleQuestion extends Component {
     firstSentence (text) {
         if (text) {
             text = text.replace('...',', ');
+            text = text.replace('.[','. ');
             return String(text).split('. ')[0];
         } else return '';
     };
@@ -415,7 +418,7 @@ export default class SingleQuestion extends Component {
                 let endAttribution=question.imageattribution.indexOf("/",9);
                 let shortAttribution=question.imageattribution.slice(0,endAttribution);
                 imageAttribution=(<a href={question.imageattribution} >{shortAttribution}</a>)
-                imageLink=question.imageattribution
+               // imageLink=question.imageattribution
             }
             
             let mediaAttribution=question.mediaattribution;
@@ -429,7 +432,7 @@ export default class SingleQuestion extends Component {
             if (shortanswer.length < that.state.answer.length) {
                 showLongAnswer = true;
             }
-            //console.log(['RENDER SINGLE',that.state.answer,shortanswer,showLongAnswer]);
+            console.log(['RENDER SINGLE',that.state.answer,shortanswer,showLongAnswer,media]);
             let shortLink = ""
             if (question.link) {
                 let endDomain=question.link.indexOf("/",9);
@@ -500,13 +503,7 @@ export default class SingleQuestion extends Component {
                         </div>}
                         
                         </div>
-                        
-                    
-                       
-                              
-                                                    
-                     
-                            
+                          
                         <div className="card-block answer">
                         {((this.isVisible('image') || question.autoshow_image==="YES" || !showRecallButton) && imageLink  ) && 
                             <img   alt={question.question} onClick={() => this.setVisible('image')} style={{ float:'left', maxHeight:'150px', maxWidth:'150px',border: "0px",clear:'both', paddingRight: '1em'}} src={imageLink} />
