@@ -758,7 +758,7 @@ router.post('/import', (req, res) => {
         }
         // clear and reimport topicCollections
         
-        console.log(['response',response]);
+        //console.log(['response',response]);
         Papa.parse(response, {
             'header': true, 
             'delimiter': ",",	
@@ -767,7 +767,6 @@ router.post('/import', (req, res) => {
             'escapeChar': "\\",
             
             'complete': function(data) {
-               //  //console.log(['parse',data]);
                 const toImport = {'questions':data.data};
                 let json = utils.createIndexes(toImport);
                 console.log('got indexes');
@@ -841,7 +840,7 @@ router.post('/import', (req, res) => {
                     let unparsed = Papa.unparse(json.questions,{quotes: true});
                     res.send(unparsed);
                 
-                    
+                  //  console.log(['IMPORT ALL DONE MNEMONICS ',mnemonics]);
                    // clear default user mnemonics
                     db.collection('mnemonics').remove({$and:[{user:'default'},{importId:importId}]}).then(function(dresults) {
                    // bulk save mnemonics 
