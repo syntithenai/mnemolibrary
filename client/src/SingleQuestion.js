@@ -87,7 +87,7 @@ export default class SingleQuestion extends Component {
             this.setState({answer:this.props.question.answer});
         } else {
             console.log(['FROM WIKIPEDIA LOOKUP ANSWER']);
-            if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
+            if (this.props.question.link && this.props.question.link.length > 0 && (this.props.question.link.indexOf('wikipedia.org') !== -1 ||this.props.question.link.indexOf('wiktionary.org') !== -1)) {
                 console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD']);
                 let linkParts = this.props.question.link.split("/");
                 let wikiPageParts = linkParts[linkParts.length - 1].split("#");
@@ -97,6 +97,20 @@ export default class SingleQuestion extends Component {
                 Utils.loadWikipediaIntro(wikiPage).then(function(answer) {
                     console.log(['FROM WIKIPEDIA got',answer]);
                     that.setState({answer:answer});
+                    fetch("/api/savewikidata", {
+                       method: "POST",
+                       headers: {
+                        "Content-Type": "application/json"
+                        },
+                      body: JSON.stringify({_id:that.props.question._id,answer:answer})
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(token) {
+                        console.log('updated wiki data');
+                    })
+                    .catch(function(err) {
+                        console.log(['ERR',err]);
+                    });
                 });                    
             } else {
                 that.setState({answer:''});
@@ -107,7 +121,7 @@ export default class SingleQuestion extends Component {
         } else if (this.props.question.image_png && this.props.question.image_png.length > 0) {
             this.setState({image:this.props.question.image_png});
         } else {
-            if (this.props.question.link.indexOf('wikipedia.org') !== -1) {
+            if (this.props.question.link && this.props.question.link.length > 0 &&  this.props.question.link.indexOf('wikipedia.org') !== -1) {
                 let linkParts = this.props.question.link.split("/");
                 let wikiPageParts = linkParts[linkParts.length - 1].split("#");
                 let wikiPage = wikiPageParts[0];
@@ -115,6 +129,22 @@ export default class SingleQuestion extends Component {
                 Utils.loadWikipediaImage(wikiPage).then(function(answer) {
                     console.log(['FROM WIKIPEDIA got image',answer]);
                     that.setState({image:answer});
+                    if (answer && answer.length > 0) {
+                        fetch("/api/savewikidata", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json"
+                          },
+                          body: JSON.stringify({_id:that.props.question._id,image:answer})
+                        }).then(function(response) {
+                            return response.json();
+                        }).then(function(token) {
+                            console.log('updated wiki data');
+                        })
+                        .catch(function(err) {
+                            console.log(['ERR',err]);
+                        });
+                    }
                 });                    
             } else {
                 that.setState({image:''});
@@ -152,7 +182,7 @@ export default class SingleQuestion extends Component {
             setTimeout(function() {
                 console.log(['SINGLE VIEW UPDATE MEDIA',media,question.media]);
                     that.setState({media:media});
-                    that.player.load();
+                    if (that.player) that.player.load();
             },100);
 
             //this.setState({media:media});
@@ -234,7 +264,7 @@ export default class SingleQuestion extends Component {
       
       componentDidUpdate(props) {
           //console.log(['SQ UPDATE',JSON.parse(JSON.stringify(props.question)),JSON.parse(JSON.stringify(this.props.question))]);
-          if (this.props.question._id != props.question._id) {
+          if (this.props.question && props.question && this.props.question._id != props.question._id) {
             this.fromWikipedia();
              this.createMedia();
           }
@@ -513,7 +543,7 @@ export default class SingleQuestion extends Component {
                             <div  className='card-text'><b>Answer</b><br/> 
                              
                                 
-                            <span className='shortanswer' style={{fontSize:'1.1em',fontFamily: 'sans_forgeticaregular'}} >{shortanswer}</span>&nbsp;&nbsp;&nbsp;&nbsp;{showLongAnswer && <button style={{display:'inline'}} className="btn btn-primary" onClick={() => this.setVisible('answer')}>...</button>}</div>
+                            <span className='shortanswer' style={{fontSize:'1.1em'}} >{shortanswer}</span>&nbsp;&nbsp;&nbsp;&nbsp;{showLongAnswer && <button style={{display:'inline'}} className="btn btn-primary" onClick={() => this.setVisible('answer')}>...</button>}</div>
                         }
                             
                         </div>

@@ -809,10 +809,10 @@ router.post('/import', (req, res) => {
                             // //console.log(['NEW ID',record._id]);
                         }
                         if (record.mnemonic && record.mnemonic.length > 0) {
-                            record.hasMnemonic = 1;
+                            record.hasMnemonic = true;
                             
                         } else {
-                            record.hasMnemonic = 0;
+                            record.hasMnemonic = false;
                         }
                         thePromise = new Promise(function(resolve,reject) {
                             db.collection('questions').save(record).then(function(resy) {
@@ -883,32 +883,6 @@ router.post('/import', (req, res) => {
         });
     })
                 
-});
-
-router.post('/missingmnemonics', (req, res) => {
-    //console.log(['mmNEM',req.body]);
-    let missingQuestionsByTopic={}
-    let filter={$where: "this.mnemonic.length == 0"}
-    if (req.body.topic) {
-        filter={$and:[{$where: "this.mnemonic.length == 0"},{quiz:req.body.topic}]}
-    } else if (req.body.topics) {
-        
-        let topicFilter = req.body.topics.split(",").map(function(topic) {
-            return {quiz:topic}
-        }) ;
-        filter={$and:[{$where: "this.mnemonic.length == 0"},{$or:topicFilter}]}
-    }
-    db.collection('questions').find(filter).toArray().then(function(questions) {
-        //console.log(['LOADING TOPICS, FOUND MNEM FREE QU',questions,JSON.stringify(filter)]);
-        questions.map(function(question,key) {
-            //console.log(['LOADING TOPICS, FOUND Q',question,key]);
-            if (question.quiz && question.quiz.length > 0) {
-                missingQuestionsByTopic[question.quiz] = (parseInt(missingQuestionsByTopic[question.quiz],10) > 0) ? parseInt(missingQuestionsByTopic[question.quiz],10) + 1 : 1;
-             }
-        });
-        //console.log(['MISSING',missingQuestionsByTopic]);
-        res.send(missingQuestionsByTopic);
-    });    
 });
 
 router.get('/topiccollections', (req, res) => {
@@ -1341,7 +1315,7 @@ router.get('/questions', (req, res) => {
                 let existingMnemonicIds = mnemonics.map(function(mnemonic) {
                     return mnemonic._id;
                 });
-                criteria.push({ $where: "this.mnemonic.length == 0"});
+                criteria.push({ hasMnemonic:{$ne:true}});
                 criteria.push({discoverable:{$ne:'no'}});
                 criteria.push({'_id': {$nin: existingMnemonicIds}});
                 db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({successRate:-1}).toArray(function(err, results) {
@@ -1574,22 +1548,36 @@ router.post('/success', (req, res) => {
     }
 })
 
-router.post('/savemnemonic', (req, res) => {
- //   //console.log(['seen',req.body]);
-    if (req.body.user && req.body.question && req.body.mnemonic && req.body.mnemonic.length > 0) {//   && req.body.technique  && req.body.questionText ) {
-        let user = req.body.user;
-        let question = req.body.question;
-        let id = req.body._id ? ObjectId(req.body._id) : new ObjectId();
-        let toSave = {_id:id,user:ObjectId(req.body.user),question:ObjectId(req.body.question),mnemonic:req.body.mnemonic,questionText:req.body.questionText,technique:req.body.technique};
-        db.collection('mnemonics').save(toSave).then(function(updated) {
-            res.send('updated');
-        }).catch(function(e) {
-            res.send('error on update');
-        });
-    } else {
-        res.send({message:'Invalid request'});
+
+router.post('/missingmnemonics', (req, res) => {
+    console.log(['mmNEM',req.body]);
+    let missingQuestionsByTopic={}
+    let missingMnemonicFilter={hasMnemonic:{$ne:true}};
+    
+    let filter=missingMnemonicFilter
+    if (req.body.topic) {
+        filter={$and:[missingMnemonicFilter,{quiz:req.body.topic}]}
+    } else if (req.body.topics) {
+        
+        let topicFilter = req.body.topics.split(",").map(function(topic) {
+            return {quiz:topic}
+        }) ;
+        filter={$and:[missingMnemonicFilter,{$or:topicFilter}]}
     }
-})
+     console.log(['LOADING MISSING MNEM',JSON.stringify(filter)]);
+    db.collection('questions').find(filter).toArray().then(function(questions) {
+        console.log(['LOADING MISSING MNEM, FOUND MNEM FREE QU',questions,JSON.stringify(filter)]);
+        questions.map(function(question,key) {
+            //console.log(['LOADING TOPICS, FOUND Q',question,key]);
+            if (question.quiz && question.quiz.length > 0) {
+                missingQuestionsByTopic[question.quiz] = (parseInt(missingQuestionsByTopic[question.quiz],10) > 0) ? parseInt(missingQuestionsByTopic[question.quiz],10) + 1 : 1;
+             }
+        });
+        //console.log(['MISSING',missingQuestionsByTopic]);
+        res.send(missingQuestionsByTopic);
+    });    
+});
+
 
 router.post('/mnemonics', (req, res) => {
 //    //console.log(['mnemonics',req.body.question]);
@@ -1616,10 +1604,54 @@ router.post('/mymnemonics', (req, res) => {
     }
 })
 
+
+router.post('/savemnemonic', (req, res) => {
+ //   //console.log(['seen',req.body]);
+    if (req.body.user && req.body.question && req.body.mnemonic && req.body.mnemonic.length > 0) {//   && req.body.technique  && req.body.questionText ) {
+        let user = req.body.user;
+        let question = req.body.question;
+        let id = req.body._id ? ObjectId(req.body._id) : new ObjectId();
+        let toSave = {_id:id,user:ObjectId(req.body.user),question:ObjectId(req.body.question),mnemonic:req.body.mnemonic,questionText:req.body.questionText,technique:req.body.technique};
+        db.collection('mnemonics').save(toSave).then(function(updated) {
+            db.collection('questions').update({_id:ObjectId(req.body.question)},{hasMnemonic:true})
+            res.send('updated');
+        }).catch(function(e) {
+            res.send('error on update');
+        });
+    } else {
+        res.send({message:'Invalid request'});
+    }
+})
+
 router.post('/deletemnemonic', (req, res) => {
     if (req.body._id && req.body._id.length > 0) {
-        db.collection('mnemonics').remove({_id:ObjectId(req.body._id)}).then(function(result) {
-            res.send(result);
+         db.collection('mnemonics').findOne({_id:ObjectId(req.body._id)}).then(function(mnemonic) {
+          //   console.log('REMOVED MNEMONIC '+JSON.stringify(mnemonic));
+            db.collection('mnemonics').remove({_id:ObjectId(req.body._id)}).then(function(result) {
+            //    console.log('REMOVED MNEMONIC '+JSON.stringify(result));
+                // do we still have a mnemonic ?
+                db.collection('questions').findOne({_id:ObjectId(mnemonic.question)}).then(function(question) {
+              //      console.log('REMOVED MNEMONIC FOUND Q '+JSON.stringify(question));
+                    if (question && question.mnemonic && question.mnemonic.length > 0) {
+                        // yes, nothing to do
+                //        console.log('REMOVED MNEMONIC FOUND Q HAS MNEMONIC ');
+                    } else {
+                        db.collection('mnemonics').find({question:ObjectId(mnemonic.question)}).toArray().then(function(mnemonics) {
+                  //          console.log('REMOVED MNEMONIC FOUND MNEMONICS ');
+                            if (mnemonics && mnemonics.length > 0) {
+                                // yes, nothing to do
+                    //            console.log('REMOVED MNEMONIC FOUND some mneem '+mnemonics.length);
+                            } else {
+                      //          console.log('UPDATE QUESTION WITHOUT MNEMONIC');
+                                db.collection('questions').update({_id:ObjectId(mnemonic.question)},{hasMnemonic:false}).then(function() {
+                        //            console.log('REMOVED MNEMONIC UPDATED QUESTION AFTER LOOKUP ');
+                                });
+                            }
+                        });
+                    }
+                });
+                res.send(result);
+            });
         });
     } else {
         res.send({message:'Invalid request'});
@@ -2123,6 +2155,30 @@ router.post('/publishusertopic', (req, res) => {
     }
 })
 
+router.post('/savewikidata', (req, res) => {
+    console.log(['SAVEWIKIDATA',req.body]);
+    let body = req.body; //JSON.parse(req.body)
+ //   //console.log(['seen',req.body]);
+    if (body._id && body._id.length > 0) {//   && req.body.technique  && req.body.questionText ) {
+        console.log('HAVE ID');
+        if ((body.answer && body.answer.length > 0) || (body.image && body.image.length > 0)) {
+            console.log('HAVE DATA');
+            let toSave={}
+            if (body.answer && body.answer.length > 0) toSave.answer = body.answer;
+            if (body.image && body.image.length > 0) toSave.image = body.image;
+            console.log(['SAVEWIKIDATA real',toSave]);
+            db.collection('questions').update({_id:ObjectId(body._id)},{$set:toSave}).then(function(updated) {
+                res.send(['updated',updated]);
+            }).catch(function(e) {
+                res.send('error on update');
+            });            
+        } else {
+            res.send({message:'Invalid request missing data'});
+        }
+    } else {
+        res.send({message:'Invalid request missing id'});
+    }
+})
 
 router.get('/leaderboard', (req, res) => {
     //console.log(['LEADERBOARD',req.query.type]);

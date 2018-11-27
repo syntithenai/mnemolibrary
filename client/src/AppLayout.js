@@ -395,6 +395,7 @@ export default class AppLayout extends Component {
   
 
   refreshLogin (token=null) {
+      console.log(['REFRESH LOGIN']);
       if (!token) {
           token=this.state.token;
       }
@@ -421,7 +422,7 @@ export default class AppLayout extends Component {
             return response.json();
             
         }).then(function(res) {
-            ////console.log(['ddtoken response',res]);
+            console.log(['REFRESH LOGIN response',res]);
             state.token = res;
           //  //console.log(['refreshed token',res]);
 //            that.setState(state);
@@ -432,11 +433,11 @@ export default class AppLayout extends Component {
                 return response.json();
                 
             }).then(function(res) {
-            //    //console.log(['ddtoken response',res]);
+               console.log(['REFRESH LOGIN me',res]);
                 state.user = res.user;
                 state.token = res.token;
                 localStorage.setItem('token',JSON.stringify(res.token));
-                localStorage.setItem('user',JSON.stringify(state.user));
+                localStorage.setItem('user',JSON.stringify(res.user));
                 that.setState(state);
                 that.startMqtt(res.user)
                 //setInterval(function() {
@@ -467,10 +468,11 @@ export default class AppLayout extends Component {
     };
     
   login (user) {
+      console.log(['LOGIN',user]);
       if (user) {
           var state={};
           var that = this;
-          state.user = user;
+          //state.user = user;
           localStorage.setItem('currentTopic',null)
           //state.currentPage = 'home';
           ////console.log('login at root');
@@ -496,8 +498,15 @@ export default class AppLayout extends Component {
                // //console.log(['ddtoken response',res]);
                 state.token = res;
                 localStorage.setItem('token',JSON.stringify(res));
-                localStorage.setItem('user',JSON.stringify(that.state.user));
-                that.startMqtt(that.state.user)
+                fetch("/me?code="+state.token.access_token).then(function(userFull) {
+                    console.log(['LOADED ME',userFull]);
+                    localStorage.setItem('user',JSON.stringify(userFull));
+                    that.startMqtt(userFull);
+                    state.user = userFull;
+                    that.setState(state);
+                    //that.updateProgress(json);
+                });
+                
                 // load progress
                 //fetch('/api/progress')
                   //.then(function(response) {
@@ -532,6 +541,7 @@ export default class AppLayout extends Component {
   };
   
   loginByToken(token) {
+      console.log(['LOGIN by token',token]);
       let state = {token: token};
       let that = this;
       localStorage.setItem('currentTopic',null)
@@ -541,12 +551,13 @@ export default class AppLayout extends Component {
             return response.json();
             
         }).then(function(res) {
-        //    //console.log(['ddtoken response',res]);
+            console.log(['LOGIN TOKEN',res,res.user,res.token]);
             state.user = res.user;
             state.token = res.token;
             localStorage.setItem('token',JSON.stringify(res.token));
-            localStorage.setItem('user',JSON.stringify(state.user));
+            localStorage.setItem('user',JSON.stringify(res.user));
             that.setState(state);
+            
             that.startMqtt(state.user)
             setInterval(function() {
           //      //console.log('toke ref tok');
@@ -554,11 +565,12 @@ export default class AppLayout extends Component {
             },(parseInt(that.state.token.expires_in,10)-1)*1000);
         })
         .catch(function(err) {
-            //console.log(['ERR',err]);
+            console.log(['ERR',err]);
         });
   };
   
     loginByConfirm(token) {
+        console.log(['LOGIN confirm',token]);
       let state = {token: token};
       let that = this;
       localStorage.setItem('currentTopic',null)
@@ -572,7 +584,7 @@ export default class AppLayout extends Component {
             state.user = res.user;
             state.token = res.token;
             localStorage.setItem('token',JSON.stringify(res.token));
-            localStorage.setItem('user',JSON.stringify(state.user));
+            localStorage.setItem('user',JSON.stringify(res.user));
             that.setState(state);
             that.startMqtt(state.user)
             setInterval(function() {
@@ -586,6 +598,7 @@ export default class AppLayout extends Component {
   };
   
     loginByRecovery(token) {
+        console.log(['LOGIN by recovery',token]);
       let state = {token: token};
       let that = this;
       fetch('/login/dorecover?code='+token, {
@@ -598,7 +611,7 @@ export default class AppLayout extends Component {
             state.user = res.user;
             state.token = res.token;
             localStorage.setItem('token',JSON.stringify(res.token));
-            localStorage.setItem('user',JSON.stringify(state.user));
+            localStorage.setItem('user',JSON.stringify(res.user));
             that.setState(state);
             that.startMqtt(state.user)
             setInterval(function() {
@@ -663,7 +676,7 @@ export default class AppLayout extends Component {
             
             child.setState(res);
             //that.setState({users:{default:user}});
-            that.setState({user:user});
+            //that.setState({user:user});
         }).catch(function(err) {
             ////console.log(err);
             child.setState({'warning_message':'Not Saved'});
@@ -888,7 +901,7 @@ export default class AppLayout extends Component {
       //?user='+(this.state.user ? this.state.user._id : '') + '&rand='+Math.random()
       let rand=Math.random()
       fetch('/api/discover',{ method: "POST",headers: {
-    "Content-Type": "application/json"},body:JSON.stringify({user:(this.state.user ? this.state.user._id : ''),rand:rand,blocks:this.state.discoveryBlocks,topic:topic})})
+    "Content-Type": "application/json"},body:JSON.stringify({user:(this.state.user ? this.state.user._id : ''),rand:rand,topic:topic})})
       .then(function(response) {
         // //console.log(['got response', response])
         return response.json()
@@ -1109,7 +1122,7 @@ export default class AppLayout extends Component {
       let that = this;
       //this.setState({'currentQuiz':'1,2,3,4,5'});
       // load initial questions
-      let url='/api/questions?missingMnemonicsOnly=1'
+      let url='/api/questions?limit=100&missingMnemonicsOnly=1'
       
       if (this.state.user) {
           url=url+'&user='+this.state.user._id;
@@ -1441,7 +1454,7 @@ export default class AppLayout extends Component {
   };
 
   // save modified user to state and localstorage
-  updateProgress(user) {
+    updateProgress(user) {
         //let users = {'users':{'default':user}};
         //this.setState(users);
         //localStorage.setItem('users',JSON.stringify(users));

@@ -17,7 +17,7 @@ export default class MnemonicsList extends Component {
         const question = this.props.question;
         this.state={
            defaultMnemonic:'default', 
-           mnemonics:{'default':{question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question}},
+           mnemonics:{},
            suggest_mnemonic:'',
            suggest_technique:'',
            suggest_id:''
@@ -96,40 +96,42 @@ export default class MnemonicsList extends Component {
             ////console.log(['got response', response])
             return response.json()
           }).then(function(json) {
-                //console.log(['got response', json])
+                console.log(['got response', json])
                 let final={};
-                final['default'] = {question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question};
+               // final['default'] = {question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question};
                 let defaultMnemonic='default';
                 let useSubmitted = false;
                 //console.log(['MNEMOLIST mnem',question.mnemonic,json]);
-                if (!question.mnemonic || question.mnemonic.trim().length === 0) {
-                //console.log(['MNEMOLIST mnemI',question.mnemonic,json]);    
-                    if (json.length > 0) {
+                //if (!question.mnemonic || question.mnemonic.trim().length === 0) {
+                ////console.log(['MNEMOLIST mnemI',question.mnemonic,json]);    
+                    //if (json.length > 0) {
                         
-                        //console.log(['MNEMOLIST use submitted']);
-                        // use the first user submitted
-                        useSubmitted = true;
-                    } 
-                }
-                // use first submitted mnemonic if there is none for the question
+                        ////console.log(['MNEMOLIST use submitted']);
+                        //// use the first user submitted
+                        //useSubmitted = true;
+                    //} 
+                //}
+                //// use first submitted mnemonic if there is none for the question
                 let firstSubmitted = null;
                 json.forEach(function(mnemonic) {
-                    if (useSubmitted && firstSubmitted === null) {
+                    if (firstSubmitted === null) {
                         firstSubmitted = mnemonic._id;
-                        //console.log(['MNEMOLIST set first submitted',firstSubmitted]);
+                        ////console.log(['MNEMOLIST set first submitted',firstSubmitted]);
                     }
                     final[mnemonic._id] = mnemonic;
                 });
-                if (firstSubmitted !== null) {
-                    //console.log(['MNEMOLIST assign default']);
-                    defaultMnemonic = firstSubmitted;
-                }
+                //if (firstSubmitted !== null) {
+                    ////console.log(['MNEMOLIST assign default']);
+                    //defaultMnemonic = firstSubmitted;
+                //}
                 //console.log(['MNEMOLIST',defaultMnemonic,final]);
-               // //console.log(['create MNEM indexes', final,that.props.user])
+               console.log(['create MNEM indexes', final,that.props.user])
                 if (that.props.user && that.props.user.selectedMnemonics && that.props.user.selectedMnemonics.hasOwnProperty(question._id) && that.props.user.selectedMnemonics[question._id].length > 0 && final.hasOwnProperty(that.props.user.selectedMnemonics[question._id])) {
                     defaultMnemonic = that.props.user.selectedMnemonics[question._id];
+                } else {
+                    defaultMnemonic = firstSubmitted;
                 }
-                //console.log(['MNEMOLOAD',{defaultMnemonic:defaultMnemonic,mnemonics:final}]);
+                console.log(['MNEMOLOAD',{defaultMnemonic:defaultMnemonic,mnemonics:final}]);
                 that.setState({defaultMnemonic:defaultMnemonic,mnemonics:final});
           }).catch(function(ex) {
             //console.log(['parsing failed', ex])
@@ -241,7 +243,7 @@ export default class MnemonicsList extends Component {
                             if (this.props.showRecallButton) {
                                 techniqueButton = <button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >&nbsp;{mnemonic.technique}&nbsp;</span></button>
                             } else {
-                                techniqueButton = <button className="btn btn-outline btn-primary"   ><Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.props.setDiscoveryBlock('technique',mnemonic.technique)} /><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(mnemonic.technique)} style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{mnemonic.technique}&nbsp;</span></button>                            
+                                techniqueButton = <button className="btn btn-outline btn-primary"   ><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTechnique(mnemonic.technique)} style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{mnemonic.technique}&nbsp;</span></button>                            
                             }
                         }
                         //if (showRecallButton) {
@@ -253,7 +255,7 @@ export default class MnemonicsList extends Component {
                         return  <div className='row' key={mnemonicId} >
                            <div className='col-12' >
                             <hr/>
-                            {(this.props.isAdmin() || (this.props.user && this.props.user._id === mnemonic.user)) && mnemonic._id && mnemonic._id.length > 0 && <span>
+                            {(this.props.isAdmin() || (mnemonic && this.props.user && this.props.user._id === mnemonic.user)) && mnemonic && mnemonic._id && mnemonic._id.length > 0 && mnemonic.user !=="default" && <span>
 
                                 <button style={{float:'right'}}   onClick={() => this.askDeleteSuggestion(mnemonic)} className='btn btn-danger'><Trash size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Delete&nbsp;</span></button>
                                 <button style={{float:'right'}} data-toggle="modal" data-target="#suggestdialog" onClick={() => this.editSuggestion(mnemonic)} className='btn btn-primary'><Edit size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Edit&nbsp;</span></button>
@@ -278,7 +280,7 @@ export default class MnemonicsList extends Component {
             //} 
             //<Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.props.setDiscoveryBlock('technique',this.state.mnemonics[this.state.defaultMnemonic].technique)} />
             var mainTechniqueButton = '';
-            if (this.state.mnemonics[this.state.defaultMnemonic].technique && this.state.mnemonics[this.state.defaultMnemonic].technique.length > 0) {
+            if (this.state.mnemonics.hasOwnProperty(this.state.defaultMnemonic) && this.state.mnemonics[this.state.defaultMnemonic].technique && this.state.mnemonics[this.state.defaultMnemonic].technique.length > 0) {
                 if (this.props.showRecallButton) {
                     mainTechniqueButton=<button className="btn btn-outline btn-primary"   ><span  >{this.state.mnemonics[this.state.defaultMnemonic].technique}</span></button>
                 } else {
@@ -322,10 +324,11 @@ export default class MnemonicsList extends Component {
                       </div>
                     </div>}
                     
-                    
+
+
                     <div className='row' style={{width:'100%',clear:'both'}}>
-                        <pre  className='mnemonic col-12 col-lg-8' >{this.state.mnemonics[this.state.defaultMnemonic].mnemonic}</pre>
-                         {this.state.defaultMnemonic !=="default" && (this.props.isAdmin() || this.props.user._id === selectedMnemonic.user) && selectedMnemonic && selectedMnemonic._id && selectedMnemonic._id.length > 0 && <span>
+                        <pre  className='mnemonic col-12 col-lg-8' >{this.state.mnemonics.hasOwnProperty(this.state.defaultMnemonic) && this.state.mnemonics[this.state.defaultMnemonic].mnemonic}</pre>
+                         {this.state.mnemonics.hasOwnProperty(this.state.defaultMnemonic) && this.state.mnemonics[this.state.defaultMnemonic].user !=="default" && (this.props.isAdmin() || this.props.user._id === selectedMnemonic.user) && selectedMnemonic && selectedMnemonic._id && selectedMnemonic._id.length > 0 && <span>
 
                                 <button style={{float:'right'}}   onClick={() => this.askDeleteSuggestion(selectedMnemonic)} className='btn btn-danger'><Trash size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Delete&nbsp;</span></button>
                                 <button style={{float:'right'}} data-toggle="modal" data-target="#suggestdialog" onClick={() => this.editSuggestion(selectedMnemonic)} className='btn btn-primary'><Edit size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Edit&nbsp;</span></button>
