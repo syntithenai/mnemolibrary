@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 // icons
 import Check from 'react-icons/lib/fa/check';
 import ArrowRight from 'react-icons/lib/fa/arrow-right';
@@ -46,7 +46,7 @@ export default class SingleQuestion extends Component {
         this.toggleMedia = this.toggleMedia.bind(this);
         this.isVisible = this.isVisible.bind(this);
         this.hideAll = this.hideAll.bind(this);
-        this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
+        //this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
         this.swipeLeft = this.swipeLeft.bind(this);
         this.swipeRight = this.swipeRight.bind(this);
         this.disableSwipe = this.disableSwipe.bind(this);
@@ -332,15 +332,15 @@ export default class SingleQuestion extends Component {
         this.props.handleQuestionResponse(question,response);
     };
     
-    setDiscoveryBlock(type,id) {
-        this.hideAll();
-        this.props.setDiscoveryBlock(type,id)
-    };
+    //setDiscoveryBlock(type,id) {
+        //this.hideAll();
+        //this.props.setDiscoveryBlock(type,id)
+    //};
     
-    clearDiscoveryBlock(type,id) {
-        this.hideAll();
-        this.props.clearDiscoveryBlock(type,id)
-    };
+    //clearDiscoveryBlock(type,id) {
+        //this.hideAll();
+        //this.props.clearDiscoveryBlock(type,id)
+    //};
     
     firstSentence (text) {
         if (text) {
@@ -357,20 +357,20 @@ export default class SingleQuestion extends Component {
         let blockedTags = '';
         let blockedTopics = '';
         let blockedTechniques = '';
-        if (!showRecallButton)  {
-            blockedTags = this.props.blocks.tag.map((tag, key) => {
+        //if (!showRecallButton)  {
+            //blockedTags = this.props.blocks.tag.map((tag, key) => {
               
-              return <button className="btn btn-outline btn-primary" key={key}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('tag',tag)} /><span className="hidden-sm-down" >&nbsp;{tag}</span></button>
-            })          
-            blockedTopics = this.props.blocks.topic.map((topic, key) => {
+              //return <button className="btn btn-outline btn-primary" key={key}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('tag',tag)} /><span className="hidden-sm-down" >&nbsp;{tag}</span></button>
+            //})          
+            //blockedTopics = this.props.blocks.topic.map((topic, key) => {
               
-              return <button className="btn btn-outline btn-primary" key={topic}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('topic',topic)} /><span className="hidden-sm-down" >&nbsp;{topic}</span></button>
-            }) 
-            blockedTechniques = this.props.blocks.technique.map((technique, key) => {
+              //return <button className="btn btn-outline btn-primary" key={topic}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('topic',topic)} /><span className="hidden-sm-down" >&nbsp;{topic}</span></button>
+            //}) 
+            //blockedTechniques = this.props.blocks.technique.map((technique, key) => {
               
-              return <button className="btn btn-outline btn-primary" key={technique}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('technique',technique)} /><span className="hidden-sm-down" >&nbsp;{technique}</span></button>
-            }) 
-        }
+              //return <button className="btn btn-outline btn-primary" key={technique}  ><Close size={28} className="badge badge-pill badge-info"  onClick={() => this.clearDiscoveryBlock('technique',technique)} /><span className="hidden-sm-down" >&nbsp;{technique}</span></button>
+            //}) 
+        //}
       
         if (this.props.question) {
           
@@ -405,7 +405,7 @@ export default class SingleQuestion extends Component {
               tags = question.tags.map((tag, key) => {
                   tag=tag.trim().toLowerCase();
                   //<Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('tag',tag)} />
-                  return <button className="btn btn-outline btn-primary" key={key}  ><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTag({text:tag})} style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{tag}&nbsp;</span></button>
+                  return <Link to={"/discover/tag/"+tag} className="btn btn-outline btn-primary" key={key}  ><Search size={28} className="badge badge-pill badge-info"  style={{float:'right'}}/><span className="hidden-sm-down" >&nbsp;{tag}&nbsp;</span></Link>
                 })
             //
         
@@ -550,7 +550,7 @@ export default class SingleQuestion extends Component {
                         <div style={{width:'100%',clear:'both',height:'1em'}}></div>
                        
                         <div ref={(section) => { this.scrollTo.mnemonic = section; }} ></div>
-                    {(this.isVisible('mnemonic')|| !showRecallButton) &&<MnemonicsList isAdmin={this.props.isAdmin} disableSwipe={this.disableSwipe} enableSwipe={this.enableSwipe} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
+                    {(this.isVisible('mnemonic')|| !showRecallButton) &&<MnemonicsList isAdmin={this.props.isAdmin} disableSwipe={this.disableSwipe} enableSwipe={this.enableSwipe} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} user={this.props.user} question={question} showRecallButton={showRecallButton}  setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
                         
                        
                         
@@ -574,7 +574,7 @@ export default class SingleQuestion extends Component {
                             <b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.quiz}</span></button></span><br/>
                         </div>}
                         {((!showRecallButton) && question.quiz) && <div className="card-block topic">
-                            <b>Topic&nbsp;&nbsp;&nbsp;</b><button className="btn btn-outline btn-primary"   ><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTopic(question.quiz)} style={{float:'right'}}/> <span className="hidden-sm-down" >{question.quiz}</span></button><br/>
+                            <b>Topic&nbsp;&nbsp;&nbsp;</b><Link to={"/discover/topic/"+question.quiz} className="btn btn-outline btn-primary"   ><Search size={28} className="badge badge-pill badge-info"  style={{float:'right'}}/> <span className="hidden-sm-down" >{question.quiz}</span></Link><br/>
                         </div>}
                         
                         {(!showRecallButton) && <div   className="card-block tags" >
@@ -612,12 +612,7 @@ export default class SingleQuestion extends Component {
 //            
         } else {
             return <div className="card question container" >
-                <div className='blocked-tags' style={{float:'right'}}>
-                    {((blockedTags && blockedTags.length > 0) || (blockedTopics && blockedTopics.length > 0) || (blockedTechniques && blockedTechniques.length > 0)) && <b>Filter </b>}
-                    {blockedTags && blockedTags.length>0 && <span>Tags </span>} {blockedTags}
-                    {blockedTopics && blockedTopics.length>0 && <span>Topics </span>} {blockedTopics}
-                    {blockedTechniques && blockedTechniques.length>0 && <span>Techniques </span>} {blockedTechniques}
-                </div>
+               
                 <div>No matching questions</div>
             </div>
         }

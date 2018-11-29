@@ -3,7 +3,9 @@
 import React, { Component } from 'react';
 //import AdSense from 'react-adsense';
 //let Paho = require('paho-mqtt')
- 
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
+import PropsRoute from './PropsRoute';
+
 import Navigation from './Navigation';
 //import SingleQuestion from './SingleQuestion';
 import HelpVideos from './HelpVideos';
@@ -34,6 +36,8 @@ import 'whatwg-fetch'
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import mnemoQueries from './mnemoQueries'
+
 //import { confirmAlert } from 'react-confirm-alert'; // Import
 //import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
     
@@ -45,6 +49,7 @@ export default class AppLayout extends Component {
 
   constructor(props) {
       super(props);
+      let that = this;
       let defaultUsers={'default':{
           'seenIntro': false, 
           'questions':{'seen':{},'success':{},'seenTally':{},'successTally':{},'successRate':{},'timeScore':{},'block':{},'likes':{}},
@@ -62,6 +67,10 @@ export default class AppLayout extends Component {
           let data = JSON.parse(userString);
           users = data['users'];
       }
+      Object.keys(mnemoQueries).map(function(key) {
+          that[key] = mnemoQueries[key].bind(that);
+      });
+      
       this.state = {
           title : "Mnemo's Library",
           message: null,
@@ -86,72 +95,87 @@ export default class AppLayout extends Component {
           topicCollections:[],
           discoveryBlocks:{tag:[],topic:[],technique:[]},
       }
-      // make 'this' available in setCurrentPage function
-      this.setCurrentPage = this.setCurrentPage.bind(this);
-      this.setCurrentTopic = this.setCurrentTopic.bind(this);
-      this.getCurrentTopic = this.getCurrentTopic.bind(this);
-      this.setQuiz = this.setQuiz.bind(this);
-      this.setQuizFromQuestion = this.setQuizFromQuestion.bind(this);
-      this.setQuizFromQuestionId = this.setQuizFromQuestionId.bind(this);
-      this.setQuizFromTopic = this.setQuizFromTopic.bind(this);
-      this.setQuizFromMissingMnemonic = this.setQuizFromMissingMnemonic.bind(this);
-      this.setReviewFromTopic = this.setReviewFromTopic.bind(this);
-      this.discoverQuizFromTopic = this.discoverQuizFromTopic.bind(this);
-      this.setQuizFromTag = this.setQuizFromTag.bind(this);
-      this.updateProgress = this.updateProgress.bind(this);
-      this.componentDidMount = this.componentDidMount.bind(this);
-      this.reviewBySuccessBand = this.reviewBySuccessBand.bind(this);
-      this.fetchTopicCollections = this.fetchTopicCollections.bind(this);
-      this.getCurrentBand = this.getCurrentBand.bind(this);
-      this.showCollection = this.showCollection.bind(this);
-      this.hideCollection = this.hideCollection.bind(this);
-      this.collectionVisible = this.collectionVisible.bind(this);
-      //this.getTagsByTitle = this.getTagsByTitle.bind(this);
-      //this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
-      //this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
-      //this.getQuestionsByTopic = this.getQuestionsByTopic.bind(this);
-      
-      //this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
-      //this.getTopicsForReview = this.getTopicsForReview.bind(this);
-      //this.getTagsForReview = this.getTagsForReview.bind(this);
-      //this.getTagsByTitle = this.getTagsByTitle.bind(this);
-      //this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
-      //this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
-      //this.getQuestionsByTopic = this.getQuestionsByTopic.bind(this);
-         
-      // this.finishTopic = this.finishTopic.bind(this);
-       //this.finishReview = this.finishReview.bind(this);
-       this.clearTagFilter = this.clearTagFilter.bind(this);
-       this.setMessage = this.setMessage.bind(this);
-       this.setQuizFromDiscovery = this.setQuizFromDiscovery.bind(this);
-       
-       this.saveSuggestion = this.saveSuggestion.bind(this);
-       this.login = this.login.bind(this);
-       this.isAdmin = this.isAdmin.bind(this);
-       this.refreshLogin = this.refreshLogin.bind(this);
-       this.loginByToken = this.loginByToken.bind(this);
-       this.loginByRecovery = this.loginByRecovery.bind(this);
-       this.loginByConfirm = this.loginByConfirm.bind(this);
-       this.logout = this.logout.bind(this);
-       this.isLoggedIn = this.isLoggedIn.bind(this);
-       this.saveUser = this.saveUser.bind(this);
-       this.loginByLocalStorage = this.loginByLocalStorage.bind(this);
-       this.like = this.like.bind(this);
-       this.import = this.import.bind(this);
-        this.discoverQuestions = this.discoverQuestions.bind(this);
-        this.finishQuiz = this.finishQuiz.bind(this);
-        this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
+
+        this.setCurrentPage = this.setCurrentPage.bind(this);
         this.setCurrentQuestion = this.setCurrentQuestion.bind(this);
         this.setCurrentQuiz = this.setCurrentQuiz.bind(this);
-        this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
-        this.clearDiscoveryBlock = this.clearDiscoveryBlock.bind(this);
-        this.clearDiscoveryBlocks = this.clearDiscoveryBlocks.bind(this);
-        this.setQuizFromTechnique = this.setQuizFromTechnique.bind(this);
-        this.setQuizFromTopics = this.setQuizFromTopics.bind(this);
-        this.setQuizFromDifficulty = this.setQuizFromDifficulty.bind(this);
-         this.openAuth = this.openAuth.bind(this);
+        this.setQuiz = this.setQuiz.bind(this);
+
+        //this.setQuizFromDiscovery = this.setQuizFromDiscovery.bind(this);
+        //this.discoverQuestions = this.discoverQuestions.bind(this);
+        //this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
+        //this.setQuizFromTechnique = this.setQuizFromTechnique.bind(this);
+        //this.setQuizFromTopics = this.setQuizFromTopics.bind(this);
+        //this.setQuizFromDifficulty = this.setQuizFromDifficulty.bind(this);
+        //this.setQuizFromQuestion = this.setQuizFromQuestion.bind(this);
+        //this.setQuizFromQuestionId = this.setQuizFromQuestionId.bind(this);
+        //this.setQuizFromTopic = this.setQuizFromTopic.bind(this);
+        //this.setQuizFromMissingMnemonic = this.setQuizFromMissingMnemonic.bind(this);
+        //this.setReviewFromTopic = this.setReviewFromTopic.bind(this);
+        //this.discoverQuizFromTopic = this.discoverQuizFromTopic.bind(this);
+        //this.setQuizFromTag = this.setQuizFromTag.bind(this);
+        //this.reviewBySuccessBand = this.reviewBySuccessBand.bind(this);
+
+        this.updateProgress = this.updateProgress.bind(this);
+        
+        //this.getCurrentBand = this.getCurrentBand.bind(this);
+        //this.setCurrentTopic = this.setCurrentTopic.bind(this);
+        //this.getCurrentTopic = this.getCurrentTopic.bind(this);
+
+        
+        
+
+        this.clearTagFilter = this.clearTagFilter.bind(this);
+        this.setMessage = this.setMessage.bind(this);
+
         this.shout=this.shout.bind(this);
         this.startMqtt=this.startMqtt.bind(this);
+
+        this.like = this.like.bind(this);
+        this.import = this.import.bind(this);
+
+        //this.finishQuiz = this.finishQuiz.bind(this);
+
+        this.saveSuggestion = this.saveSuggestion.bind(this);
+        // login related
+        this.login = this.login.bind(this);
+        this.isAdmin = this.isAdmin.bind(this);
+        this.refreshLogin = this.refreshLogin.bind(this);
+        this.loginByToken = this.loginByToken.bind(this);
+        this.loginByRecovery = this.loginByRecovery.bind(this);
+        this.loginByConfirm = this.loginByConfirm.bind(this);
+        this.logout = this.logout.bind(this);
+        this.isLoggedIn = this.isLoggedIn.bind(this);
+        this.saveUser = this.saveUser.bind(this);
+        this.loginByLocalStorage = this.loginByLocalStorage.bind(this);
+        this.openAuth = this.openAuth.bind(this);
+        // quiz collections
+        this.fetchTopicCollections = this.fetchTopicCollections.bind(this);
+        this.showCollection = this.showCollection.bind(this);
+        this.hideCollection = this.hideCollection.bind(this);
+        this.collectionVisible = this.collectionVisible.bind(this);
+
+        
+        //this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
+        //this.clearDiscoveryBlock = this.clearDiscoveryBlock.bind(this);
+        //this.clearDiscoveryBlocks = this.clearDiscoveryBlocks.bind(this);
+
+        //this.getTagsByTitle = this.getTagsByTitle.bind(this);
+        //this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
+        //this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
+        //this.getQuestionsByTopic = this.getQuestionsByTopic.bind(this);
+
+        //this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
+        //this.getTopicsForReview = this.getTopicsForReview.bind(this);
+        //this.getTagsForReview = this.getTagsForReview.bind(this);
+        //this.getTagsByTitle = this.getTagsByTitle.bind(this);
+        //this.getTopicsByTitle = this.getTopicsByTitle.bind(this);
+        //this.getQuestionsByTag = this.getQuestionsByTag.bind(this);
+        //this.getQuestionsByTopic = this.getQuestionsByTopic.bind(this);
+
+        // this.finishTopic = this.finishTopic.bind(this);
+        //this.finishReview = this.finishReview.bind(this);
+        
         // listen to messages from child iframe
         //window.addEventListener('message', function(e) {
         //// check message origin
@@ -184,7 +208,7 @@ export default class AppLayout extends Component {
       this.setState({'token':'{}','user':'{}'});
       //    this.GoogleAuth.disconnect();
       
-      
+      // CURRENTPAGE TODO
       this.setCurrentPage('login');
       localStorage.setItem('oauth',service);
       localStorage.setItem('oauth_request',JSON.stringify(authRequest));
@@ -260,9 +284,11 @@ export default class AppLayout extends Component {
                             //}
                             
                         }  else if (json.action==="discover") {
-                            that.discoverFromQuestionId(json.question);
+                            // SR disabled alexa follow after move to routing
+                        //    that.discoverFromQuestionId(json.question);
                         }  else if (json.action==="review") {
-                            that.reviewFromQuestionId(json.question);
+                            // SR disabled alexa follow after move to routing
+                            //that.reviewFromQuestionId(json.question);
                         }
                         //console.log(json);
                      } else {
@@ -343,24 +369,24 @@ export default class AppLayout extends Component {
           that.refreshLogin(token);
       }
     
-    if (window.location.search) {
-        let parts = window.location.search.slice(1).split("&");
-        parts.forEach(function(part) {
-              let iParts=part.split("=");
+    //if (window.location.search) {
+        //let parts = window.location.search.slice(1).split("&");
+        //parts.forEach(function(part) {
+              //let iParts=part.split("=");
 
-              // search on load
-              if (iParts[0]==="page") {
-                  that.setCurrentPage(iParts[1]);
-              } else if (iParts[0]==="question") {
-                  that.setQuizFromQuestionId(iParts[1]);
-              } else if (iParts[0]==="tag") {
-                  that.setQuizFromTag({text:iParts[1]});
-              } else if (iParts[0]==="topic") {
-                  that.setQuizFromTopic(iParts[1]);
-              }
+              //// search on load
+              //if (iParts[0]==="page") {
+                  //that.setCurrentPage(iParts[1]);
+              //} else if (iParts[0]==="question") {
+                  //that.setQuizFromQuestionId(iParts[1]);
+              //} else if (iParts[0]==="tag") {
+                  //that.setQuizFromTag({text:iParts[1]});
+              //} else if (iParts[0]==="topic") {
+                  //that.setQuizFromTopic(iParts[1]);
+              //}
               
-        });
-      }
+        //});
+      //}
       
      
       
@@ -698,15 +724,16 @@ export default class AppLayout extends Component {
   };
   
   setCurrentPage(page) {
-      this.analyticsEvent(page);
-      if (page==="review") {
-          this.getQuestionsForReview();
-      } 
-      //else if (page==="discover") {
-         //this.setQuizFromDiscovery();
-         //page='home'
-      //}
-      this.setState({'message':null,'currentPage': page,title: Navigation.pageTitles[page]});
+      //this.analyticsEvent(page);
+      //if (page==="review") {
+          //this.getQuestionsForReview();
+      //} 
+      ////else if (page==="discover") {
+         ////this.setQuizFromDiscovery();
+         ////page='home'
+      ////}
+      //this.setState({'message':null,'currentPage': page,title: Navigation.pageTitles[page]});
+     // if (this.props.history) this.props.history.push("/"+page);
   };  
  
   setCurrentQuiz(quiz) {
@@ -726,35 +753,6 @@ export default class AppLayout extends Component {
       this.setState({'message':message});
   };
 
-  
-  setDiscoveryBlock(type,id) {
-      this.clearDiscoveryBlock(type,id);
-      let discoveryBlocks = this.state.discoveryBlocks;
-      if (discoveryBlocks.hasOwnProperty(type) && Array.isArray(discoveryBlocks[type])) {
-          discoveryBlocks[type].push(id);
-      }
-      this.setState({'blocks':discoveryBlocks});
-      this.discoverQuestions();
-  };
-  
-  clearDiscoveryBlock(type,id) {
-      let discoveryBlocks = this.state.discoveryBlocks;
-      if (discoveryBlocks.hasOwnProperty(type) && Array.isArray(discoveryBlocks[type])) {
-          discoveryBlocks[type] = discoveryBlocks[type].filter(function(item) { 
-              return item !== id
-          })
-      }
-      this.setState({'blocks':discoveryBlocks});
-      this.discoverQuestions();
-  };
-  
-   clearDiscoveryBlocks() {
-      let discoveryBlocks = {tag:[],topic:[],technique:[]};
-      this.setState({'blocks':discoveryBlocks});
-      this.discoverQuestions();
-  };
-
-  
     saveSuggestion(id,question,mnemonic,technique) {
         let that=this;
         if (this.state.user) {
@@ -790,15 +788,10 @@ export default class AppLayout extends Component {
       },
       body: JSON.stringify({'_id':this.state.user._id,avatar:this.state.user.avatar,selectedMnemonics:userSelections})
     }).then(function() {
-        ////console.log(['applike results']);
         let user=that.state.user;
-        ////console.log(['applike results user',user]);
         user.selectedMnemonics = userSelections;
-        //console.log(['applike results set mn',userSelections]);
-        // that.setState(user:user);
-        //console.log(['set user',user]);
     }).catch(function(err) {
-        //that.setState({'warning_message':'Not Saved'});
+        console.log(err);
     });
     //return false;
   };
@@ -841,614 +834,8 @@ export default class AppLayout extends Component {
       this.setState({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
   };
 
-    
-    finishQuiz() {
-        ////console.log('root finish quiz');
-        //confirmAlert({
-          //title: 'Question set complete',
-          //message: 'Time for review?',
-          //buttons: [
-            //{
-              //label: 'Review',
-              //onClick: () => this.setPage('review')
-            //},
-            //{
-              //label: 'Continue',
-              //onClick: () => this.discoverQuestions()
-            //}
-          //]
-        //})
-            
-    };
-    
-     getQuestionsForReview() {
-    //console.log('getQuestionsForReview');
-      let that = this;
-      ////console.log('get q for review');
-      if (this.state.user) {
-        fetch('/api/review?user='+this.state.user._id)
-          .then(function(response) {
-            ////console.log(['got response', response])
-            return response.json()
-          }).then(function(json) {
-            ////console.log(['create indexes', json])
-            ////console.log(['create indexes', json])
-            let currentQuiz = [];
-            let indexedQuestions= {};
-            for (var questionKey in json['questions']) {
-                const question = json['questions'][questionKey]
-                if (question) {
-                    var id = question._id;
-                    currentQuiz.push(id);
-                    indexedQuestions[id]=questionKey;                    
-                }
-            }
-            that.setState({'currentQuestion':0,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Review'});
-           //console.log(['GETQUESTIONFORREVIEW set state done', that.state])
-          }).catch(function(ex) {
-            console.log(['parsing failed', ex])
-          })
-      }
-  };
-    
-       
-   discoverQuestions(topic='') {
-      this.setCurrentTopic(topic);
-      // //console.log(['discover da questions']);
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      //?user='+(this.state.user ? this.state.user._id : '') + '&rand='+Math.random()
-      let rand=Math.random()
-      fetch('/api/discover',{ method: "POST",headers: {
-    "Content-Type": "application/json"},body:JSON.stringify({user:(this.state.user ? this.state.user._id : ''),rand:rand,topic:topic})})
-      .then(function(response) {
-        // //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-        ////console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-        }
-        that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover'});
-        ////console.log(['set state done', that.state])
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-  }; 
-  
-   
-  
-  setQuizFromDiscovery() {
-      this.setCurrentTopic('');
-     // //console.log(['Setquiz discovery']);
-      this.setCurrentPage('home')
-      this.discoverQuestions() 
-  };
-
-
-  discoverFromQuestionId(questionId) {
-      this.setCurrentTopic('');
-      let that = this;
-      // load selected question
-      fetch('/api/questions?question='+questionId )
-      .then(function(response) {
-        return response.json()
-      }).then(function(json1) {
-//            //console.log(['got response', json1])
-          if (json1.questions && json1.questions.length > 0) {
-            let question=json1.questions[0];
-            if (question) {
-                let id=question._id
-                let currentQuiz=[id];
-                let indexedQuestions={};
-                indexedQuestions[id]=0;
-                let questions=[question];
-                let state={currentPage:"home",'currentQuestion':0,'currentQuiz':currentQuiz, 'questions':questions,'indexedQuestions':indexedQuestions,title: 'Discover'};
-                that.setState(state);
-            }              
-          }
-      });
-  };
-  
-  reviewFromQuestionId(questionId) {
-      this.setCurrentTopic('');
-      //console.log(['SQFQid',questionId]);
-      let that = this;
-      // load selected question
-      fetch('/api/questions?question='+questionId )
-      .then(function(response) {
-        return response.json()
-      }).then(function(json1) {
-      //      //console.log(['got response', json1])
-          if (json1.questions && json1.questions.length > 0) {
-            let question=json1.questions[0];
-            if (question) {
-                let id=question._id
-                let currentQuiz=[id];
-                let indexedQuestions={};
-                indexedQuestions[id]=0;
-                let questions=[question];
-                let state={currentPage:"review",'currentQuestion':0,'currentQuiz':currentQuiz, 'questions':questions,'indexedQuestions':indexedQuestions,title: 'Review'};
-                that.setState(state);
-            }              
-          }
-      });
-  };
-
-  setQuizFromQuestionId(questionId) {
-      this.setCurrentTopic('');
-      //console.log(['SQFQid',questionId]);
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load selected question
-      fetch('/api/questions?question='+questionId )
-      .then(function(response) {
-        ////console.log(['got response', response])
-        return response.json()
-      }).then(function(json1) {
-        let question=json1.questions[0];
-        //console.log(['got response', json1])
-        if (question) {
-            // load questions in topic
-            fetch('/api/questions?topic='+question.quiz )
-            
-            .then(function(response) {
-                ////console.log(['got response', response])
-                return response.json()
-            }).then(function(json) {
-                ////console.log(['create indexes', json])
-                let currentQuiz = [];
-                let indexedQuestions= {};
-                let currentQuestion=0;
-                let j=0;
-                for (var questionKey in json['questions']) {
-                    const question = json['questions'][questionKey]
-                    var id = question._id;
-                    if (questionId && questionId===id) {
-                        currentQuestion=j;
-                        //console.log(['ID match',id, j])
-                    }
-                    currentQuiz.push(id);
-                    indexedQuestions[id]=questionKey;
-                    j++;
-                }
-              //  //console.log(currentQuiz);
-                that.analyticsEvent('discover question')
-                that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover '+question.quiz});
-                ////console.log(['set state done', that.state])    
-            });
-        }
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-      
-  };
-  
-  setQuizFromQuestion(question) {
-      this.setCurrentTopic('');
-      let selectedQuestion=question._id;
-      ////console.log(['set quiz from question',selectedQuestion]);
-      let topic = question.quiz;
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      let url='/api/questions?topic='+topic ;
-      if (this.state.user) {
-          url=url+'&user='+this.state.user._id;
-      }
-      fetch(url)
-      .then(function(response) {
-      //  //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-       // //console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        let currentQuestion=0;
-        let j=0;
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-           // //console.log(['check ID match',j,id, selectedQuestion ])
-            if (selectedQuestion && selectedQuestion===id) {
-                currentQuestion=j;
-             //   //console.log(['ID match',selectedQuestion, j])
-            }
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-            j++;
-        }
-       // //console.log(['currentQuiz',currentQuestion,currentQuiz]);
-        that.analyticsEvent('discover topic')
-        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
-        ////console.log(['set state done', that.state])
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-  };
-  
-   setQuizFromTopic(topic,selectedQuestion) {
-      this.setCurrentTopic(topic);
-      ////console.log(['set quiz from topic',topic,selectedQuestion]);
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      let url='/api/questions?topic='+topic ;
-      if (this.state.user) {
-          url=url+'&user='+this.state.user._id;
-      }
-      
-      fetch(url)
-      .then(function(response) {
-      //  //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-      //  //console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        let currentQuestion=0;
-        let j=0;
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-         //   //console.log(['check ID match',j,id, selectedQuestion ])
-            if (selectedQuestion && selectedQuestion===j) {
-                currentQuestion=j;
-          //      //console.log(['ID match',selectedQuestion, j])
-            }
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-            j++;
-        }
-     //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
-        that.analyticsEvent('discover topic')
-        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
-        ////console.log(['set state done', that.state])
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-      
-  };
-  
-  setQuizFromMissingMnemonic(topic) {
-      this.setCurrentTopic(topic);
-      ////console.log(['set quiz from topic',topic,selectedQuestion]);
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      let url='/api/questions?limit=100&missingMnemonicsOnly=1'
-      
-      if (this.state.user) {
-          url=url+'&user='+this.state.user._id;
-      }
-      if (topic && topic.length > 0) {
-          url = url + '&topic='+topic ;
-      }
-      fetch(url)
-      .then(function(response) {
-      //  //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-      //  //console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        let currentQuestion=0;
-        //let j=0;
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-         //   //console.log(['check ID match',j,id, selectedQuestion ])
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-          //  j++;
-        }
-     //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
-        that.analyticsEvent('discover topic')
-        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
-        ////console.log(['set state done', that.state])
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-      
-  };
-  
-   
   
   
-  
-  discoverQuizFromTopic(topic,selectedQuestion) {
-      this.setCurrentTopic(topic);
-      //console.log(['dissc quiz from topic',topic,selectedQuestion,this.state.user]);
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      let url='/api/discover';
-      let rand=Math.random()
-      fetch(url,{ method: "POST",headers: {
-            "Content-Type": "application/json"
-            },
-            body:JSON.stringify({
-                topic:topic,
-                user:(this.state.user ? this.state.user._id : ''),
-                rand:rand
-            })
-        })
-      .then(function(response) {
-      //  //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-      //  //console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        let currentQuestion=0;
-        let j=0;
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-         //   //console.log(['check ID match',j,id, selectedQuestion ])
-            if (selectedQuestion && selectedQuestion===j) {
-                currentQuestion=j;
-          //      //console.log(['ID match',selectedQuestion, j])
-            }
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-            j++;
-        }
-     //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
-        that.analyticsEvent('discover topic')
-        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
-        ////console.log(['set state done', that.state])
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-      
-  };
-  
-  setQuizFromDifficulty(difficulty) {
-      this.setCurrentTopic('');
-      console.log(['set quiz from difficulyt',difficulty,this.state.user]);
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      let url='/api/discover';
-      let rand=Math.random()
-      fetch(url,{ method: "POST",headers: {
-            "Content-Type": "application/json"
-            },
-            body:JSON.stringify({
-                difficulty:difficulty,
-                user:(this.state.user ? this.state.user._id : ''),
-                rand:rand
-            })
-        })
-      .then(function(response) {
-      //  //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-      //  //console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        let currentQuestion=0;
-        let j=0;
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-         //   //console.log(['check ID match',j,id, selectedQuestion ])
-            //if (selectedQuestion && selectedQuestion===j) {
-                //currentQuestion=j;
-          ////      //console.log(['ID match',selectedQuestion, j])
-            //}
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-            j++;
-        }
-        console.log(['currentQuiz',currentQuestion,currentQuiz]);
-        that.analyticsEvent('discover difficulty '+ difficulty)
-        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover Difficulty Level '+  difficulty});
-        ////console.log(['set state done', that.state])
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-      
-  };
-  
-   setQuizFromTopics(topics) {
-      this.setCurrentTopic('');
-      //console.log(['dissc quiz from topic',topic,selectedQuestion,this.state.user]);
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      let url='/api/discover';
-      let rand=Math.random()
-      fetch(url,{ method: "POST",headers: {
-            "Content-Type": "application/json"
-            },
-            body:JSON.stringify({
-                topics:topics.join(","),
-                user:(this.state.user ? this.state.user._id : ''),
-                rand:rand
-            })
-        })
-      .then(function(response) {
-      //  //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-      //  //console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        let currentQuestion=0;
-        let j=0;
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-         //   //console.log(['check ID match',j,id, selectedQuestion ])
-            //if (selectedQuestion && selectedQuestion===j) {
-                //currentQuestion=j;
-          ////      //console.log(['ID match',selectedQuestion, j])
-            //}
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-            j++;
-        }
-     //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
-        that.analyticsEvent('discover topic')
-        that.setState({currentPage:"home",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Discover'});
-        ////console.log(['set state done', that.state])
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-      
-  };
-  
-  
-  getCurrentBand() {
-      return this.state.currentBand;
-  };
-  
-  reviewBySuccessBand(band) {
-      this.setCurrentTopic('');
-      this.setState({currentBand:band});
-      //console.log(['set review from band',band]);
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      let url='/api/review?band='+band ;
-      if (this.state.user) {
-          url=url+'&user='+this.state.user._id;
-      }
-      fetch(url)
-      .then(function(response) {
-      //  //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-      //  //console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        let currentQuestion=0;
-        //let j=0;
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-         //   //console.log(['check ID match',j,id, selectedQuestion ])
-           
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-           // j++;
-        }
-     //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
-        that.analyticsEvent('discover topic')
-        that.setState({currentPage:"review",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Review Success Band  '+  band});
-        ////console.log(['set state done', that.state])
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-  };
-  
-  setReviewFromTopic(topic,selectedQuestion) {
-      this.setCurrentTopic(topic);
-      //console.log(['set review from topic',topic,selectedQuestion]);
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      let url='/api/review?topic='+topic ;
-      if (this.state.user) {
-          url=url+'&user='+this.state.user._id;
-      }
-      fetch(url)
-      .then(function(response) {
-      //  //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-      //  //console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        let currentQuestion=0;
-        let j=0;
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-         //   //console.log(['check ID match',j,id, selectedQuestion ])
-            if (selectedQuestion && selectedQuestion===j) {
-                currentQuestion=j;
-          //      //console.log(['ID match',selectedQuestion, j])
-            }
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-           j++;
-        }
-     //   //console.log(['currentQuiz',currentQuestion,currentQuiz]);
-        that.analyticsEvent('review topic')
-        that.setState({currentPage:"review",'currentQuestion':currentQuestion,'currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,title: 'Review Topic '+  decodeURI(Utils.snakeToCamel(topic))});
-        ////console.log(['set state done', that.state])
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-      
-  };
-  
-  setQuizFromTag(tag) {
-      this.setCurrentTopic('');
-     ////console.log(['set quiz form tag',tag]);
-      let that = this;
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      fetch('/api/questions?tag='+tag.text )
-      .then(function(response) {
-        ////console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-        ////console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-        }
-        //that.setCurrentPage('home');
-        that.analyticsEvent('discover tag')
-        that.setState({'currentPage':'home','currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Tag '+ decodeURI(tag.text),'tagFilter':tag.text});
-        ////console.log(['set state done', that.state])
-         //that.setState({});
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-  };
-  setQuizFromTechnique(tag) {
-      this.setCurrentTopic('');
-     let that=this;
-     ////console.log(['set quiz form tag',tag]);
-      //this.setState({'currentQuiz':'1,2,3,4,5'});
-      // load initial questions
-      fetch('/api/questions?technique='+tag )
-      .then(function(response) {
-       // //console.log(['got response', response])
-        return response.json()
-      }).then(function(json) {
-        ////console.log(['create indexes', json])
-        let currentQuiz = [];
-        let indexedQuestions= {};
-        for (var questionKey in json['questions']) {
-            const question = json['questions'][questionKey]
-            var id = question._id;
-            currentQuiz.push(id);
-            indexedQuestions[id]=questionKey;
-        }
-        that.setCurrentPage('home');
-        that.setState({'currentQuestion':'0','currentQuiz':currentQuiz, 'questions':json['questions'],'indexedQuestions':indexedQuestions,'title': 'Discover Technique '+ decodeURI(tag)});
-        ////console.log(['set state done', that.state])
-         //that.setState({});
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
-  };  
   clearTagFilter() {
       this.setState({'tagFilter':null});
   };
@@ -1492,123 +879,76 @@ export default class AppLayout extends Component {
         //console.log([authRequest,this.props.token,this.props.user]);
         let auth =JSON.parse(authRequest);
         if (!auth) auth={};
-
+        
+        let searchPage = <div><TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuizFromTopic={this.setQuizFromTopic} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user} showCollection={this.showCollection} hideCollection={this.hideCollection} collectionVisible={this.collectionVisible} collection={this.state.collection} /></div>
+        
+        let topicsPageOptions={ topicCollections:this.state.topicCollections,topics:topics,topicTags:this.state.topicTags,tagFilter:this.state.tagFilter,clearTagFilter:this.clearTagFilter,setQuizFromTopic:this.setQuizFromTopic,setQuiz:this.setQuizFromTopic,questionsMissingMnemonics:this.state.questionsMissingMnemonics,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic,setCurrentPage:this.setCurrentPage,isLoggedIn:this.isLoggedIn,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromQuestionId:this.setQuizFromQuestionId,title:title,user:this.state.user,showCollection:this.showCollection,hideCollection:this.hideCollection,collectionVisible:this.collectionVisible,collection:this.state.collection,setQuizFromQuestionId:this.setQuizFromQuestionId }
+        
+        let profilePageOptions = {token:this.state.token,setCurrentPage:this.setCurrentPage,setQuizFromDiscovery:this.setQuizFromDiscovery,reviewBySuccessBand:this.reviewBySuccessBand,setReviewFromTopic:this.setReviewFromTopic,setQuizFromTopic:this.discoverQuizFromTopic,searchQuizFromTopic:this.setQuizFromTopic, isAdmin:this.isAdmin,saveUser:this.saveUser,user:this.state.user,logout:this.logout,import:this.import,isLoggedIn:this.isLoggedIn}
+        
+        let reviewPageOptions = { isAdmin:this.isAdmin,saveSuggestion:this.saveSuggestion,setCurrentQuestion:this.setCurrentQuestion,setCurrentPage:this.setCurrentPage,setCurrentQuiz:this.setCurrentQuiz,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromTopic:this.setQuizFromTopic,setReviewFromTopic:this.setReviewFromTopic,discoverQuizFromTopic:this.discoverQuizFromTopic,setQuizFromTag:this.setQuizFromTag,blocks:this.state.discoveryBlocks,discoverQuestions:this.discoverQuestions,getQuestionsForReview:this.getQuestionsForReview,mnemonic_techniques:this.state.mnemonic_techniques,questions:this.state.questions,currentQuiz:this.state.currentQuiz,currentQuestion:this.state.currentQuestion,indexedQuestions:this.state.indexedQuestions,topicTags:this.state.topicTags,updateProgress:this.updateProgress,finishQuiz:this.finishReview,isReview:true,setMessage:this.setMessage,like:this.like,user:this.state.user,progress:progress,getCurrentTopic:this.getCurrentTopic,isLoggedIn:this.isLoggedIn,getCurrentBand:this.getCurrentBand,reviewBySuccessBand:this.reviewBySuccessBand,setQuizFromDifficulty:this.setQuizFromDifficulty}
+        
+        
+        let discoverPageOptions ={ isAdmin:this.isAdmin,saveSuggestion:this.saveSuggestion,setCurrentQuestion:this.setCurrentQuestion,setCurrentPage:this.setCurrentPage,setCurrentQuiz:this.setCurrentQuiz,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromTopic:this.setQuizFromTopic,setReviewFromTopic:this.setReviewFromTopic,discoverQuizFromTopic:this.discoverQuizFromTopic,setQuizFromTag:this.setQuizFromTag,discoverQuestions:this.discoverQuestions,getQuestionsForReview:this.getQuestionsForReview,mnemonic_techniques:this.state.mnemonic_techniques,questions:this.state.questions,currentQuiz:this.state.currentQuiz,currentQuestion:this.state.currentQuestion,indexedQuestions:this.state.indexedQuestions,topicTags:this.state.topicTags,updateProgress:this.updateProgress,setMessage:this.setMessage,like:this.like,user:this.state.user,progress:progress,getCurrentTopic:this.getCurrentTopic,isLoggedIn:this.isLoggedIn,getCurrentBand:this.getCurrentBand,reviewBySuccessBand:this.reviewBySuccessBand,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromQuestionId:this.setQuizFromQuestionId  }
+        
+         
+        
         return (
+        <Router>
             <div className="mnemo">
+                
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
-                <Navigation setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection} />
+                
+                <PropsRoute  path="/" component={Navigation}  setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection}  />
+                
+                <PropsRoute  exact={true} path="/help" component={AboutPage}/>
+                <PropsRoute  path="/help/about" component={AboutPage}/>
+                <PropsRoute  path="/help/intro" component={IntroPage}/>
+                <PropsRoute  path="/help/termsofuse" component={TermsOfUse}/>
+                <PropsRoute  path="/help/faq" component={FAQ}/>
+                <PropsRoute  path="/help/create" component={CreateHelp}/>
+                <PropsRoute  path="/help/videos" component={HelpVideos}/>
+                
+                <PropsRoute  path="/create" component={CreatePage} fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
+                
+                <PropsRoute  exact={true} path="/search" component={TopicsPage} {...topicsPageOptions}/>
+                <PropsRoute  exact={true} path="/" component={TopicsPage} {...topicsPageOptions}/>
+                
+                <PropsRoute  path="/search/tags" component={TagsPage}  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
+                
+                <PropsRoute  path="/search/questions" component={SearchPage} mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
                 
                 
+                <PropsRoute  exact={true} path="/discover" component={QuizCarousel} {...discoverPageOptions}  />
+                <PropsRoute  exact={true}  path="/discover/:topic" component={QuizCarousel} {...discoverPageOptions}  />
+                <PropsRoute  exact={true} path="/discover/topic/:topic" component={QuizCarousel} {...discoverPageOptions}  />
+                <PropsRoute  path="/discover/topic/:topic/:topicquestion" component={QuizCarousel} {...discoverPageOptions}  />
+                <PropsRoute  path="/discover/searchtopic/:searchtopic" component={QuizCarousel} {...discoverPageOptions}  />
                 
-                {((this.isCurrentPage('splash')) || (this.isCurrentPage('') && !this.isLoggedIn())) && <div><TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuizFromTopic={this.setQuizFromTopic} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user} showCollection={this.showCollection} hideCollection={this.hideCollection} collectionVisible={this.collectionVisible} collection={this.state.collection} /></div>}
+                <PropsRoute  path="/discover/difficulty/:difficulty" component={QuizCarousel} {...discoverPageOptions}  />
+                <PropsRoute  path="/discover/tag/:tag" component={QuizCarousel} {...discoverPageOptions}  />
+                <PropsRoute  path="/discover/topics/:topics" component={QuizCarousel} {...discoverPageOptions}  />
+                <PropsRoute  path="/discover/technique/:technique" component={QuizCarousel} {...discoverPageOptions}  />
+                <PropsRoute  path="/discover/question/:question" component={QuizCarousel} {...discoverPageOptions}  />
                 
+                 <PropsRoute  exact={true} path="/review" component={ReviewPage} {...reviewPageOptions}  />
+                 <PropsRoute  exact={true}  path="/review/:topic" component={ReviewPage} {...reviewPageOptions}  />
+                 <PropsRoute  exact={true}path="/review/topic/:topic" component={ReviewPage} {...reviewPageOptions}  />
+                 <PropsRoute  path="/review/:topic/:topic/:topicquestion" component={ReviewPage} {...reviewPageOptions}  />
+                 <PropsRoute  path="/review/band/:band" component={ReviewPage} {...reviewPageOptions}  />
                 
-                {this.isCurrentPage('home') && <QuizCarousel 
-                    isAdmin={this.isAdmin}  
-                    setCurrentPage={this.setCurrentPage}  
-                    setCurrentQuestion={this.setCurrentQuestion}   
-                    setCurrentQuiz={this.setCurrentQuiz} 
-                    saveSuggestion={this.saveSuggestion} 
-                    setQuizFromTechnique={this.setQuizFromTechnique} 
-                    setQuizFromTopic={this.setQuizFromTopic} 
-                    setReviewFromTopic={this.setReviewFromTopic}
-                    discoverQuizFromTopic={this.discoverQuizFromTopic}
-                    setDiscoveryBlock={this.setDiscoveryBlock}  
-                    setQuizFromDiscovery={this.setQuizFromDiscovery} 
-                    setQuizFromTag={this.setQuizFromTag} 
-                    clearDiscoveryBlock={this.clearDiscoveryBlock} 
-                    blocks={this.state.discoveryBlocks}  
-                    discoverQuestions={this.discoverQuestions}  
-                    questions={this.state.questions} 
-                    currentQuestion={this.state.currentQuestion} 
-                    currentQuiz={this.state.currentQuiz} 
-                    indexedQuestions={this.state.indexedQuestions} 
-                    user={this.state.user} 
-                    progress={progress}  
-                    updateProgress={this.updateProgress} 
-                    like={this.like} 
-                    isLoggedIn={this.isLoggedIn} 
-                    mnemonic_techniques={this.state.mnemonic_techniques} 
-                    setMessage={this.setMessage} 
-                    getCurrentTopic={this.getCurrentTopic}
-                    isReview={false} /> }
-                
-                {this.isCurrentPage('topics') && <TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuizFromTopic={this.setQuizFromTopic} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user} showCollection={this.showCollection} hideCollection={this.hideCollection} collectionVisible={this.collectionVisible} collection={this.state.collection} />
-                }
-                {this.isCurrentPage('tags') && <TagsPage  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
-                }
-                {this.isCurrentPage('search') && <SearchPage mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
-                }
-                {this.isCurrentPage('review') && <ReviewPage 
-                    isAdmin={this.isAdmin}  
-                    saveSuggestion={this.saveSuggestion} 
-                    setCurrentQuestion={this.setCurrentQuestion} 
-                    setCurrentPage={this.setCurrentPage} 
-                    setCurrentQuiz={this.setCurrentQuiz} 
-                    setQuizFromTechnique={this.setQuizFromTechnique} 
-                    setQuizFromDiscovery={this.setQuizFromDiscovery} 
-                    setQuizFromTopic={this.setQuizFromTopic} 
-                    setReviewFromTopic={this.setReviewFromTopic}
-                    discoverQuizFromTopic={this.discoverQuizFromTopic}
-                    setDiscoveryBlock={this.setDiscoveryBlock} 
-                    setQuizFromTag={this.setQuizFromTag}  
-                    clearDiscoveryBlock={this.clearDiscoveryBlock} 
-                    blocks={this.state.discoveryBlocks} 
-                    discoverQuestions={this.discoverQuestions}  
-                    getQuestionsForReview={this.getQuestionsForReview} 
-                    mnemonic_techniques={this.state.mnemonic_techniques} 
-                    questions={this.state.questions} 
-                    currentQuiz={this.state.currentQuiz} 
-                    currentQuestion={this.state.currentQuestion} 
-                    indexedQuestions={this.state.indexedQuestions} 
-                    topicTags={this.state.topicTags} 
-                    updateProgress={this.updateProgress} 
-                    finishQuiz={this.finishReview}  
-                    isReview={true} 
-                    setMessage={this.setMessage} 
-                    like={this.like} user={this.state.user} 
-                    progress={progress} 
-                    getCurrentTopic={this.getCurrentTopic}
-                    isLoggedIn={this.isLoggedIn}  
-                    getCurrentBand={this.getCurrentBand}
-                    reviewBySuccessBand={this.reviewBySuccessBand}
-                />
-                }
-                {this.isCurrentPage('create') && <CreatePage fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
-                }
-                {this.isCurrentPage('about') && <AboutPage setCurrentPage={this.setCurrentPage} />
-                }
-                {this.isCurrentPage('intro') && <IntroPage setCurrentPage={this.setCurrentPage} />
-                }
-                {this.isCurrentPage('termsofuse') && <TermsOfUse  setCurrentPage={this.setCurrentPage} />
-                }
-                {this.isCurrentPage('faq') && <FAQ  setCurrentPage={this.setCurrentPage} />
-                }
-                {this.isCurrentPage('createhelp') && <CreateHelp  />
-                }
-                {this.isCurrentPage('overview') && <FindQuestions setQuizFromDiscovery={this.setQuizFromDiscovery} setCurrentPage={this.setCurrentPage} title={title}/>
-                }
-                {this.isCurrentPage('helpvideos') && <HelpVideos setCurrentPage={this.setCurrentPage}  />
-                }
-                {(this.isCurrentPage('profile') || (this.isCurrentPage('') && this.isLoggedIn())) && <ProfilePage token={this.state.token} setCurrentPage={this.setCurrentPage} setQuizFromDiscovery={this.setQuizFromDiscovery} reviewBySuccessBand={this.reviewBySuccessBand} setReviewFromTopic={this.setReviewFromTopic} setQuizFromTopic={this.discoverQuizFromTopic} searchQuizFromTopic={this.setQuizFromTopic}  isAdmin={this.isAdmin} saveUser={this.saveUser} user={this.state.user} logout={this.logout} import={this.import} isLoggedIn={this.isLoggedIn}  />
-                }
-                {(showLogin || this.isCurrentPage('forcelogin')) && <LoginPage token={this.state.token} login={this.login} setCurrentPage={this.setCurrentPage}/>
-                }<br/>
+                 <PropsRoute  path="/login" component={LoginPage} token={this.state.token} isLoggedIn={this.isLoggedIn} login={this.login} setCurrentPage={this.setCurrentPage} />
+                 <PropsRoute  path="/profile" component={ProfilePage} {...profilePageOptions}/>
+                 <br/>
                 
                 
                 <Footer/>
                 
             </div>
-            
+            </Router>
         );
         
     }
   }
 }
-//<b>{this.getCurrentTopic()}</b>
-                
- 
-//<AdSense.Google
-              //client='ca-pub-8152690534650306'
-              //slot='5452746977'
-            ///>
+

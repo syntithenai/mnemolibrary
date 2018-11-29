@@ -2,6 +2,7 @@ import React from 'react';
 import { ResponsivePie } from '@nivo/pie'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 
 export default class TopicsChart extends React.Component {
  
@@ -12,7 +13,8 @@ export default class TopicsChart extends React.Component {
                 labels:[],
                 series:[],
                 archiveSeries:[],
-                show: 'chart'
+                show: 'chart',
+                exitRedirect:null
         } 
         this.loadData = this.loadData.bind(this);
         this.blockTopic = this.blockTopic.bind(this);
@@ -163,18 +165,22 @@ export default class TopicsChart extends React.Component {
       //  return;
         if (search===true) {
              //console.log(['SEARCH ',a.topic,a]);
-            this.props.searchQuizFromTopic(a.topic);
+            //this.props.searchQuizFromTopic(a.topic);
+            this.setState({'exitRedirect':'/discover/searchtopic/'+a.topic});
         } else if (a.questions === a.total || forceReview===true) {
             // review
             //console.log(['REVIEW ',a.topic,a]);
-            this.props.setReviewFromTopic(a.topic);
+            //this.props.setReviewFromTopic(a.topic);
+            this.setState({'exitRedirect':'/review/topic/'+a.topic});
         } else {
             // discover
             //console.log(['DISCO ',a]);
             if (a.questions <= a.total) {
-                this.props.setQuizFromTopic(a.topic);
+                //this.props.setQuizFromTopic(a.topic);
+                this.setState({'exitRedirect':'/discover/topic/'+a.topic});
             } else {
-                this.props.setReviewFromTopic(a.topic);
+                this.setState({'exitRedirect':'/review/topic/'+a.topic});
+                //this.props.setReviewFromTopic(a.topic);
             }
         }
     }; 
@@ -262,11 +268,11 @@ export default class TopicsChart extends React.Component {
         return false;
     };
     
-    setQuizFromDiscovery() {
-        //console.log('setQuizFromDiscovery');
-        this.props.setQuizFromDiscovery();
-        return false;
-    };
+    //setQuizFromDiscovery() {
+        ////console.log('setQuizFromDiscovery');
+        //this.props.setQuizFromDiscovery();
+        //return false;
+    //};
     
     //clickTopic(e) {
         ////console.log(['REDISCOVER ', e.target.textContent]);
@@ -278,144 +284,147 @@ export default class TopicsChart extends React.Component {
     //tooltip={function(e) {//console.log(['TT',e]); return (<b>dddd</b>);}}
                 //onClick={this.clickTopic.bind(this)}
     render() {
-            
-        let that = this;
-        if (this.state.series) {
-            if (this.state.show==="list") {
-                let topicsList = '';
-                if (this.state.series.length > 0) {
-                    let topicsItems = this.state.series.map(function(val,key) {
-                        let continueButton='';
-                        let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0;
-                        if (val.total > val.questions) {
-                            continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val)}>Continue&nbsp; <span className="badge badge-light">{val.questions}/{val.total}</span>&nbsp;</a>);
-                        } else {
-                            continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,false,true)}>Rediscover</a>);
-                        }
-                        let reviewButton=''
-                        if (val.questions > 0) {
-                            reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;<span className="badge badge-light">{successRate}%</span>&nbsp;</a>);
-                        }
-                        return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' >{continueButton}{reviewButton}<a style={{color:'white'}} className='btn btn-danger' onClick={() => that.blockTopic.bind(that)(val)}>Block</a></span></div>)
-                    });
-                    
-                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
-                    
-                } else {
-                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >No progress yet</div>);
-                }
-                return (<div style={{width: '100%',height: '100%'}} >
-                   <br/><br/>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} >Blocks</a>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} >Archive</a>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
-                   <h4 className='graphTitle' id="topics" >Active Topics</h4>
-                   <br/>
-                    {topicsList}<br/><br/><br/><br/><br/><br/><br/><br/>
-                </div>);
-                
-                    
-            } else if (this.state.show==="archive") {
-                let topicsList = '';
-                if (this.state.series.length > 0) {
-                    let topicsItems = this.state.series.map(function(val,key) {
-                        let reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;&nbsp;</a>);
+        if (this.state.exitRedirect === null) {
+            let that = this;
+            if (this.state.series) {
+                if (this.state.show==="list") {
+                    let topicsList = '';
+                    if (this.state.series.length > 0) {
+                        let topicsItems = this.state.series.map(function(val,key) {
+                            let continueButton='';
+                            let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0;
+                            if (val.total > val.questions) {
+                                continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val)}>Continue&nbsp; <span className="badge badge-light">{val.questions}/{val.total}</span>&nbsp;</a>);
+                            } else {
+                                continueButton=(<a className='btn btn-info' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,false,true)}>Rediscover</a>);
+                            }
+                            let reviewButton=''
+                            if (val.questions > 0) {
+                                reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;<span className="badge badge-light">{successRate}%</span>&nbsp;</a>);
+                            }
+                            return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' >{continueButton}{reviewButton}<a style={{color:'white'}} className='btn btn-danger' onClick={() => that.blockTopic.bind(that)(val)}>Block</a></span></div>)
+                        });
                         
-                        let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0; 
-                        return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a className='btn btn-outline-secondary' style={{color:'black'}}>{val.questions}/{val.total}</a><a className='btn btn-outline-secondary' >{successRate}%</a>{reviewButton}</span></div>)
-                    });
+                        topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
+                        
+                    } else {
+                        topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >No progress yet</div>);
+                    }
+                    return (<div style={{width: '100%',height: '100%'}} >
+                       <br/><br/>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} >Blocks</a>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} >Archive</a>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
+                       <h4 className='graphTitle' id="topics" >Active Topics</h4>
+                       <br/>
+                        {topicsList}<br/><br/><br/><br/><br/><br/><br/><br/>
+                    </div>);
                     
-                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
+                        
+                } else if (this.state.show==="archive") {
+                    let topicsList = '';
+                    if (this.state.series.length > 0) {
+                        let topicsItems = this.state.series.map(function(val,key) {
+                            let reviewButton=(<a className='btn btn-success' style={{color:'white'}} onClick={() => that.clickPie.bind(that)(val,true)}>&nbsp;Review&nbsp;&nbsp;</a>);
+                            
+                            let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0; 
+                            return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a className='btn btn-outline-secondary' style={{color:'black'}}>{val.questions}/{val.total}</a><a className='btn btn-outline-secondary' >{successRate}%</a>{reviewButton}</span></div>)
+                        });
+                        
+                        topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
+                    } else {
+                        topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >No archived questions yet. Keep up the review.</div>);
+                    }
+                    return (<div style={{width: '100%',height: '100%'}} >
+                       <br/><br/>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} >Blocks</a>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} >Current</a>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
+                       
+                       <h4 className='graphTitle' id="topics" >Archived Topics</h4>
+                       <br/>
+                        {topicsList}
+                        <br/><br/><br/><br/><br/><br/><br/><br/>
+                    </div>);
+                } else if (this.state.show==="blocks") {
+                    let topicsList = '';
+                    if (this.state.series.length > 0) {
+                       let topicsItems = this.state.series.map(function(val,key) {
+                            let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0;
+                            return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a style={{color:'white'}} className='btn btn-danger' onClick={() => that.unblockTopic.bind(that)(val.topic)}>Unblock</a></span></div>)
+                        });
+                        topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
+                    
+                    } else {
+                        topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >No blocked questions</div>);
+                    }
+                        
+                    return (<div style={{width: '100%',height: '100%'}} >
+                       <br/><br/>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} >Archive</a>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} >Current</a>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
+                       <h4 className='graphTitle' id="topics" >Blocked Topics</h4>
+                       <br/>
+                        {topicsList}
+                        <br/><br/><br/><br/><br/><br/><br/><br/>
+                    </div>);
                 } else {
-                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >No archived questions yet. Keep up the review.</div>);
-                }
-                return (<div style={{width: '100%',height: '100%'}} >
-                   <br/><br/>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} >Blocks</a>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} >Current</a>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
-                   
-                   <h4 className='graphTitle' id="topics" >Archived Topics</h4>
-                   <br/>
-                    {topicsList}
-                    <br/><br/><br/><br/><br/><br/><br/><br/>
-                </div>);
-            } else if (this.state.show==="blocks") {
-                let topicsList = '';
-                if (this.state.series.length > 0) {
-                   let topicsItems = this.state.series.map(function(val,key) {
-                        let successRate =val.successRate ? parseInt(parseFloat(val.successRate,10)*100,10) : 0;
-                        return (<div href="#" style={{width: '100%',borderBottom:'1px solid black'}} key={val.topic} className="cols-12">{val.topic}   <span style={{float: 'right'}} className='topicbuttons' ><a style={{color:'white'}} className='btn btn-danger' onClick={() => that.unblockTopic.bind(that)(val.topic)}>Unblock</a></span></div>)
-                    });
-                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >{topicsItems}</div>);
-                
-                } else {
-                    topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >No blocked questions</div>);
-                }
                     
-                return (<div style={{width: '100%',height: '100%'}} >
-                   <br/><br/>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} >Archive</a>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} >Current</a>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >Chart</a>
-                   <h4 className='graphTitle' id="topics" >Blocked Topics</h4>
-                   <br/>
-                    {topicsList}
-                    <br/><br/><br/><br/><br/><br/><br/><br/>
-                </div>);
-            } else {
-                
-                let chart=(<ResponsivePie
-                    data={this.state.series}
-                    margin={{
-                        "top": 40,
-                        "right": 80,
-                        "bottom": 80,
-                        "left": 80
-                    }}
-                    height={380}
-                    innerRadius={0.5}
-                    padAngle={0.7}
-                    cornerRadius={3}
-                    colorBy={function(e){return e.color}}
-                    borderColor="inherit:darker(0.6)"
-                    radialLabelsSkipAngle={10}
-                    radialLabelsTextXOffset={6}
-                    radialLabelsTextColor="#333333"
-                    radialLabelsLinkOffset={0}
-                    radialLabelsLinkDiagonalLength={16}
-                    radialLabelsLinkHorizontalLength={24}
-                    radialLabelsLinkStrokeWidth={2}
-                    radialLabelsLinkColor="inherit"
-                    slicesLabelsSkipAngle={10}
-                    slicesLabelsTextColor="#333333"
-                    sliceLabel={function(e){return e.questions+"/"+e.total}}
-                    animate={true}
-                    motionStiffness={90}
-                    motionDamping={15}
-                    onClick={this.clickPie.bind(this)}
-                    />)
-                    
-                return (<div style={{width: '100%',height: '100%'}} >
-                   <br/><br/>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} >Blocks</a>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} >Archive</a>
-                   <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} >List</a>
+                    let chart=(<ResponsivePie
+                        data={this.state.series}
+                        margin={{
+                            "top": 40,
+                            "right": 80,
+                            "bottom": 80,
+                            "left": 80
+                        }}
+                        height={380}
+                        innerRadius={0.5}
+                        padAngle={0.7}
+                        cornerRadius={3}
+                        colorBy={function(e){return e.color}}
+                        borderColor="inherit:darker(0.6)"
+                        radialLabelsSkipAngle={10}
+                        radialLabelsTextXOffset={6}
+                        radialLabelsTextColor="#333333"
+                        radialLabelsLinkOffset={0}
+                        radialLabelsLinkDiagonalLength={16}
+                        radialLabelsLinkHorizontalLength={24}
+                        radialLabelsLinkStrokeWidth={2}
+                        radialLabelsLinkColor="inherit"
+                        slicesLabelsSkipAngle={10}
+                        slicesLabelsTextColor="#333333"
+                        sliceLabel={function(e){return e.questions+"/"+e.total}}
+                        animate={true}
+                        motionStiffness={90}
+                        motionDamping={15}
+                        onClick={this.clickPie.bind(this)}
+                        />)
+                        
+                    return (<div style={{width: '100%',height: '100%'}} >
+                       <br/><br/>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} >Blocks</a>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} >Archive</a>
+                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} >List</a>
 
-                   {this.state.series.length > 0 && <div id="activetopics"  style={{height: '380px',zIndex:'9999'}}><h4 className='graphTitle' id="topics" >Active Topics</h4>
-                   <br/>
-                    <b>Click a slice to continue topic</b>
-                  {chart}</div>}
-                  
-                   {this.state.series.length === 0 && <div id="activetopics"  style={{height: '580px',zIndex:'9999'}}> <h4 className='graphTitle' id="topics" >Welcome to Mnemo's Library</h4><b>To get started you can <button onClick={() => this.setQuizFromDiscovery()} className='btn btn-info' >Discover</button> random questions or <button onClick={() => this.setCurrentPage('topics')} className='btn btn-info' >Search</button> topics or tags.</b>
-                  </div>}
-                </div>);
-                    
+                       {this.state.series.length > 0 && <div id="activetopics"  style={{height: '380px',zIndex:'9999'}}><h4 className='graphTitle' id="topics" >Active Topics</h4>
+                       <br/>
+                        <b>Click a slice to continue topic</b>
+                      {chart}</div>}
+                      
+                       {this.state.series.length === 0 && <div id="activetopics"  style={{height: '580px',zIndex:'9999'}}> <h4 className='graphTitle' id="topics" >Welcome to Mnemo's Library</h4><b>To get started you can <Link to="/discover"  className='btn btn-info' >Discover</Link> random questions or <Link to="/search"  className='btn btn-info' >Search</Link> topics or tags.</b>
+                      </div>}
+                    </div>);
+                        
+                }
+                        
+        
+            } else {
+                return '';
             }
-                    
-    
         } else {
-            return '';
+            return <Redirect to={this.state.exitRedirect} />
         }
     }
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 //import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
-
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 import WikipediaSearchWizard from './WikipediaSearchWizard';
 import QuestionEditor from './QuestionEditor';
 import TopicQuestionsList from './TopicQuestionsList';
@@ -305,12 +305,14 @@ export default class TopicEditor extends Component {
             if (publishResponse.errors) {
                 that.setState({validationErrors:publishResponse.errors,currentView:'questions',message:'Cannot preview yet because some of your questions are missing required information.'});
             } else {
-                //console.log(['PUB RESP',publishResponse,that.state.currentQuestion]);
-                let previewQuestion = that.state.currentQuestion;
+                console.log(['PUB RESP',publishResponse,that.state.currentQuestion]);
+                let previewQuestion = publishResponse.questions[that.state.currentQuestion];
+                
                 //if (publishResponse.questions && publishResponse.questions.length > that.state.currentQuestion && publishResponse.questions[that.state.currentQuestion] && publishResponse.questions[that.state.currentQuestion].hasOwnProperty('_id')) {
                     //previewQuestion = publishResponse.questions[that.state.currentQuestion]._id;
                 //}
-                that.props.setQuizFromTopic('Preview '+that.props.user.avatar+'\'s '+publishResponse.topic,previewQuestion);
+                //that.props.setQuizFromTopic('Preview '+that.props.user.avatar+'\'s '+publishResponse.topic,previewQuestion);
+                that.setState({exitRedirect:'/discover/topic/'+'Preview '+that.props.user.avatar+'\'s '+publishResponse.topic+"/"+previewQuestion._id});
                 //let questions=0;
                 //if (publishResponse.questions) questions =publishResponse.questions.length;
                 //let message='Published '+questions+' questions.';
@@ -478,80 +480,85 @@ export default class TopicEditor extends Component {
     
     
     render() {
-        let currentQuestion = this.state.currentQuestion > 0 ? this.state.currentQuestion : 0;
-       let question = this.state._id && String(this.state._id).length > 4 &&  this.state.questions && this.state.questions.hasOwnProperty(currentQuestion) ? this.state.questions[currentQuestion] : {};
-        return (
-           <div id='topiceditor' className={this.state.topic}>
-                <ShareTopicDialog id="sharetopicdialog"  header="Share Topic"  question={question} shareQuestion={this.state.shareQuestion}/>
-                
-                <div id='topiceditorheader' className='row'>
+        if (this.state.exitRedirect && this.state.exitRedirect.length > 0) {
+            return <Redirect to={this.state.exitRedirect} />
+        } else {
+        
+            let currentQuestion = this.state.currentQuestion > 0 ? this.state.currentQuestion : 0;
+           let question = this.state._id && String(this.state._id).length > 4 &&  this.state.questions && this.state.questions.hasOwnProperty(currentQuestion) ? this.state.questions[currentQuestion] : {};
+            return (
+               <div id='topiceditor' className={this.state.topic}>
+                    <ShareTopicDialog id="sharetopicdialog"  header="Share Topic"  question={question} shareQuestion={this.state.shareQuestion}/>
                     
-                    <div className='col-12 col-lg-6'>
-                        <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} ><ListAlt size={28}/>&nbsp;<span className="d-none d-sm-inline" >Topics</span></button>
-                        {String(this.state._id).length > 0 && <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/>&nbsp;<span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions ? this.state.questions.length : 0}</span></button>}
-                        <button  href='#' onClick={() => this.showHelp()} className='btn btn-info ' ><Question size={28}/>&nbsp;<span className="d-none d-sm-inline" >Help</span></button>
-                       
-                    </div>
-                    <div className='col-12  col-lg-6'>
-                           
-                       
-                            {String(this.state._id).length > 0 && <button  className='btn btn-danger'  onClick={() => this.askDeleteTopic(this.state._id)} style={{float:'right'}} ><Trash size={28}/>&nbsp;<span className="d-none d-sm-inline" >Delete Topic</span> </button>}
-                            
-                              {String(this.state._id).length > 0 &&  this.state.questions && this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Republish</span></button>}
-                             
-                             {String(this.state._id).length > 0 &&  this.state.questions  &&  this.state.questions.length >0 && !this.state.published && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Publish</span></button>}
-                             {String(this.state._id).length > 0 &&  this.state.questions && this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.unpublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Unpublish</span></button>}
-                    </div>
-                </div>
-                <div className='row'>    
-                    <div className='col-12'>
-                            <br/><br/><br/><br/>
-                           
-                            {!this.state.showHelp &&  this.state.currentView==='search' &&
-                                <WikipediaSearchWizard topic={this.state.search}  addResultToQuestions={this.addResultToQuestions} updateResultToQuestion={this.updateResultToQuestion} currentQuestion={this.state.currentQuestion} questions={this.state.questions} />
-                            }
-                            {!this.state.showHelp && this.state.currentView==='topics' && 
-                                <TopicsList topicId={this.state._id} user={this.props.user._id} loadTopic={this.loadTopic} newTopic={this.newTopic} setTopic={this.setTopic} deleteTopic={this.deleteTopic} />
-                            }
-                            {!this.state.showHelp && this.state.currentView==='questions' &&
-                                <span>
-                                 {!this.state.showHelp && this.state.message && <div id="warningmessage" >{this.state.message}</div>}
-                                  <label>&nbsp;<b>Topic&nbsp;</b><input name="topic" onChange={this.setTopicEvent}  value={this.state.topic} /></label>
-                                  
-                                 <button  className='btn btn-success' onClick={this.createQuestion} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >New Question</span></button>
-                                {this.state.topic && <button  className='btn btn-info'  onClick={()=>this.showSearch(this.state.topic)} ><WikipediaW size={28} /><span className="d-none d-sm-inline" >Wikipedia</span></button>}
-                             
-                                {this.state.topic && <a href={'https://www.google.com.au/search?q='+this.state.topic} target="_new"  className='btn btn-info'   ><Google size={28} /><span className="d-none d-sm-inline" >Google</span></a>}
-                             
-                                 {false && String(this.state._id).length > 0 && this.state.questions.length >0 && <button  className='btn btn-warning'  onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
-                              
-                              
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label>Filter <input type='text' onChange={this.updateFilter} /></label>
-                              
-                                <TopicQuestionsList filter={this.state.filter} validationErrors={this.state.validationErrors} editQuestion={this.editQuestion}  questions={this.state.questions} moveQuestion={this.moveQuestion} currentQuestion={this.state.currentQuestion} /></span>
-                            }
-                            {!this.state.showHelp && this.state.currentView==='editor' &&
-                                <QuestionEditor showSearch={this.showSearch} previewTopic={this.previewTopic} createQuestion={this.createQuestion} deleteQuestion={this.deleteQuestion} updateQuestion={this.updateQuestion} mnemonic_techniques={this.props.mnemonic_techniques}  question={question} questions={this.state.questions} _id={this.state._id} currentQuestion={this.state.currentQuestion} shareQuestion={this.shareQuestion} topic={this.state.topic} published={this.state.published}/>
-                            }
-                            {this.state.showHelp &&
-                                <div className="row">
-                                    <div className="col-12  card">
-                                        <form>
-                                            <a  href='#' onClick={() => this.hideHelp()} className='btn btn-info ' style={{'float':'right'}}>
-                                               Close
-                                              </a>
-                                               <h3 className="card-title">Help</h3>
-                                           
-                                            <CreateHelp/>
-                                        </form>
-                                    </div>
-                                </div>
-                            }
+                    <div id='topiceditorheader' className='row'>
                         
+                        <div className='col-12 col-lg-6'>
+                            <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} ><ListAlt size={28}/>&nbsp;<span className="d-none d-sm-inline" >Topics</span></button>
+                            {String(this.state._id).length > 0 && <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/>&nbsp;<span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions ? this.state.questions.length : 0}</span></button>}
+                            <button  href='#' onClick={() => this.showHelp()} className='btn btn-info ' ><Question size={28}/>&nbsp;<span className="d-none d-sm-inline" >Help</span></button>
+                           
+                        </div>
+                        <div className='col-12  col-lg-6'>
+                               
+                           
+                                {String(this.state._id).length > 0 && <button  className='btn btn-danger'  onClick={() => this.askDeleteTopic(this.state._id)} style={{float:'right'}} ><Trash size={28}/>&nbsp;<span className="d-none d-sm-inline" >Delete Topic</span> </button>}
+                                
+                                  {String(this.state._id).length > 0 &&  this.state.questions && this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Republish</span></button>}
+                                 
+                                 {String(this.state._id).length > 0 &&  this.state.questions  &&  this.state.questions.length >0 && !this.state.published && <button  className='btn btn-success' style={{float:'right'}} onClick={() => this.askPublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Publish</span></button>}
+                                 {String(this.state._id).length > 0 &&  this.state.questions && this.state.questions.length >0 && this.state.published===true && <button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.unpublishTopic(this.state._id)} ><Cloud size={28}/>&nbsp;<span className="d-none d-sm-inline" >Unpublish</span></button>}
+                        </div>
+                    </div>
+                    <div className='row'>    
+                        <div className='col-12'>
+                                <br/><br/><br/><br/>
+                               
+                                {!this.state.showHelp &&  this.state.currentView==='search' &&
+                                    <WikipediaSearchWizard topic={this.state.search}  addResultToQuestions={this.addResultToQuestions} updateResultToQuestion={this.updateResultToQuestion} currentQuestion={this.state.currentQuestion} questions={this.state.questions} />
+                                }
+                                {!this.state.showHelp && this.state.currentView==='topics' && 
+                                    <TopicsList topicId={this.state._id} user={this.props.user ? this.props.user._id : null} loadTopic={this.loadTopic} newTopic={this.newTopic} setTopic={this.setTopic} deleteTopic={this.deleteTopic} />
+                                }
+                                {!this.state.showHelp && this.state.currentView==='questions' &&
+                                    <span>
+                                     {!this.state.showHelp && this.state.message && <div id="warningmessage" >{this.state.message}</div>}
+                                      <label>&nbsp;<b>Topic&nbsp;</b><input name="topic" onChange={this.setTopicEvent}  value={this.state.topic} /></label>
+                                      
+                                     <button  className='btn btn-success' onClick={this.createQuestion} ><Plus size={28}/>&nbsp;<span className="d-none d-sm-inline" >New Question</span></button>
+                                    {this.state.topic && <button  className='btn btn-info'  onClick={()=>this.showSearch(this.state.topic)} ><WikipediaW size={28} /><span className="d-none d-sm-inline" >Wikipedia</span></button>}
+                                 
+                                    {this.state.topic && <a href={'https://www.google.com.au/search?q='+this.state.topic} target="_new"  className='btn btn-info'   ><Google size={28} /><span className="d-none d-sm-inline" >Google</span></a>}
+                                 
+                                     {false && String(this.state._id).length > 0 && this.state.questions.length >0 && <button  className='btn btn-warning'  onClick={() => this.previewTopic(this.state._id)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
+                                  
+                                  
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label>Filter <input type='text' onChange={this.updateFilter} /></label>
+                                  
+                                    <TopicQuestionsList filter={this.state.filter} validationErrors={this.state.validationErrors} editQuestion={this.editQuestion}  questions={this.state.questions} moveQuestion={this.moveQuestion} currentQuestion={this.state.currentQuestion} /></span>
+                                }
+                                {!this.state.showHelp && this.state.currentView==='editor' &&
+                                    <QuestionEditor showSearch={this.showSearch} previewTopic={this.previewTopic} createQuestion={this.createQuestion} deleteQuestion={this.deleteQuestion} updateQuestion={this.updateQuestion} mnemonic_techniques={this.props.mnemonic_techniques}  question={question} questions={this.state.questions} _id={this.state._id} currentQuestion={this.state.currentQuestion} shareQuestion={this.shareQuestion} topic={this.state.topic} published={this.state.published}/>
+                                }
+                                {this.state.showHelp &&
+                                    <div className="row">
+                                        <div className="col-12  card">
+                                            <form>
+                                                <a  href='#' onClick={() => this.hideHelp()} className='btn btn-info ' style={{'float':'right'}}>
+                                                   Close
+                                                  </a>
+                                                   <h3 className="card-title">Help</h3>
+                                               
+                                                <CreateHelp/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                            
+                        </div>
                     </div>
                 </div>
-            </div>
-        )
+            )
+        }
     }
 
 };

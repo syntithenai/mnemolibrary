@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import WordCloud from 'react-d3-cloud';
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 
 
 export default class TagsPage extends Component {
     
     constructor(props) {
         super(props);
-        this.state={'tags':this.props.tags,'titleFilter':''};
+        this.state={'tags':this.props.tags,'titleFilter':'',searchTag:null};
         // debounce(500,
         this.setTitleFilter = this.setTitleFilter.bind(this);
         this.filterTags = this.filterTags.bind(this);
+        this.setSearchTag = this.setSearchTag.bind(this);
     };
     
     componentDidMount() {
@@ -73,33 +75,40 @@ export default class TagsPage extends Component {
 //        this.setState({'tags':tags});
     };
     
+    setSearchTag(tag) {
+        this.setState({'searchTag':tag.text});
+    };
+    
     render() {
         const fontSizeMapper = word => 2* Math.log2(word.value+10) * 2;
         const rotate = word => 0; //word.value % 360;
         const wordCloudWidth = window.innerWidth * 0.9;
         const wordCloudHeight = window.innerHeight * 0.5;
         ////console.log(this.state.tags);
-        
-        return (
-        <div>
-                <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</a>
-                  <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</a>
-              
-                <form className="form">
-                  <input className="form-control col-sm-8" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter}  placeholder="Search" aria-label="Search" />
-                </form>
-                {this.state.tags && this.state.tags.length > 0 &&
-                <WordCloud 
-                    height={wordCloudHeight}
-                    width={wordCloudWidth}
-                    data={this.state.tags} 
-                    fontSizeMapper={fontSizeMapper} 
-                    rotate={rotate}
-                    onWordClick={this.props.setQuiz} 
-                >
-                </WordCloud>}
-            </div>
+        if (this.state.searchTag) {
+            return <Redirect to={"/discover/tag/"+this.state.searchTag} />
+        } else {
+            return (
+            <div>
+                    <Link className="btn btn-info" to="/search"  >Topics</Link>
+                      <Link className="btn btn-info" to="/search/questions"  >Questions</Link>
+                  
+                    <form className="form">
+                      <input className="form-control col-sm-8" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter}  placeholder="Search" aria-label="Search" />
+                    </form>
+                    {this.state.tags && this.state.tags.length > 0 &&
+                    <WordCloud 
+                        height={wordCloudHeight}
+                        width={wordCloudWidth}
+                        data={this.state.tags} 
+                        fontSizeMapper={fontSizeMapper} 
+                        rotate={rotate}
+                        onWordClick={this.setSearchTag} 
+                    >
+                    </WordCloud>}
+                </div>
 
-        )
+            )
+        }
     }
 };

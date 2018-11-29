@@ -6,6 +6,7 @@ import QuestionList from './QuestionList';
 import Play from 'react-icons/lib/fa/play';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 
 export default class QuizCarousel extends Component {
     constructor(props) {
@@ -30,12 +31,56 @@ export default class QuizCarousel extends Component {
         this.banQuestion = this.banQuestion.bind(this);
         this.percentageFinished = this.percentageFinished.bind(this);
         this.discoverQuestions = this.discoverQuestions.bind(this);
+        this.goto = this.goto.bind(this);
+        this.onClickListQuestion=this.onClickListQuestion.bind(this);
       //  //console.log(['QUIZ carousel constr']);
     };
     
     componentDidMount() {
-       // //console.log(['QUIZ CAR DID MOUNT',this.state.currentQuiz,this.props.questions]);
-              
+        let that = this;
+        if (this.props.isReview !== true) {
+           console.log(['QUIZ CAR DID MOUNT',this.props,this.props.isReview,this.props.match]); //this.state.currentQuiz,this.props.questions
+            if (this.props.match && this.props.match.params && this.props.match.params.searchtopic && this.props.match.params.searchtopic.length > 0) {
+                // DISCOVERY
+                setTimeout(function() {
+                     that.props.setQuizFromTopic(that.props.match.params.searchtopic);
+                },1000);
+            } else if (this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0) {
+                // DISCOVERY
+                 setTimeout(function() {
+                     that.props.discoverQuizFromTopic(that.props.match.params.topic,that.props.match.params.topicquestion);
+                },1000);
+            } else if (this.props.match &&  this.props.match.params && this.props.match.params.topics && this.props.match.params.topics.length > 0) {
+                // DISCOVERY
+                setTimeout(function() {
+                     that.props.setQuizFromTopics(that.props.match.params.topics.split(","));
+                },1000);
+            } else if (this.props.match &&  this.props.match.params && this.props.match.params.tag && this.props.match.params.tag.length > 0) {
+                // SEARCH
+                setTimeout(function() {
+                     that.props.setQuizFromTag(that.props.match.params.tag);
+                },1000);
+            } else if (this.props.match &&  this.props.match.params && this.props.match.params.difficulty && this.props.match.params.difficulty.length > 0) {
+                // DISCOVERY
+                setTimeout(function() {
+                    that.props.setQuizFromDifficulty(that.props.match.params.difficulty);
+                },1000);
+            } else if (this.props.match &&  this.props.match.params && this.props.match.params.technique && this.props.match.params.technique.length > 0) {
+                // SEARCH
+                setTimeout(function() {
+                    that.props.setQuizFromTechnique(that.props.match.params.technique);
+                },1000);
+            //}  else if (this.props.match &&  this.props.match.params && this.props.match.params.question && this.props.match.params.question.length > 0) {
+                //// SEARCH PLUS TOPIC
+                //this.props.setQuizFromQuestionId(this.props.match.params.question);
+            } else {
+                // DISCOVER ALL
+                setTimeout(function() {
+                    that.props.discoverQuestions();
+                },1000);
+            }      
+        
+        }
     };
     
     
@@ -50,6 +95,10 @@ export default class QuizCarousel extends Component {
   
   percentageFinished()  {
       return (this.props.currentQuiz.length > 0 ? (this.props.currentQuestion/this.props.currentQuiz.length) : 0)*100 + '%';
+  };
+  
+  goto(page) {
+      this.setState({exitRedirect:page});
   };
       
   logStatus(status,question,preview,topic) {
@@ -221,7 +270,7 @@ export default class QuizCarousel extends Component {
                 },
                 {
                   label: 'Search',
-                  onClick: () => this.props.setCurrentPage('topics')
+                  onClick: () => this.goto('/search')
                 }
               ]
             if (this.props.user && String(this.props.user._id).length > 0) {
@@ -246,19 +295,40 @@ export default class QuizCarousel extends Component {
    }; 
    
     discoverQuestions() {
-        //this.props.setQuizFromDiscovery();
-        let topic = this.props.getCurrentTopic();
-        //console.log(['finish quiz',topic]);
-        this.props.discoverQuizFromTopic(topic);
+        //let that = this;
+        ////this.props.setQuizFromDiscovery();
+        ////let topic = this.props.getCurrentTopic();
+        //console.log(['disco quiz',this.props.match.params]);
+        //let query='';
+        //if (this.props.match.params) {
+            //Object.keys(this.props.match.params).map(function(key) {
+                //let val = that.props.match.params[key];query="/"+key+"/"+val;
+            //});
+        //}
+        ////this.props.discoverQuizFromTopic(topic);
+        //query=query+'/'+Math.random();
+        //console.log();
+        //this.setState({exitRedirect:'/discover'+query});
     };
     
     
     reviewQuestions() {
-        let topic = this.props.getCurrentTopic();
-        //console.log(['finish quiz',topic]);
+        //let that = this;
+        ////let topic = this.props.getCurrentTopic();
+        ////console.log(['finish quiz',topic]);
       
-        this.props.setReviewFromTopic(topic);
-        //this.props.setCurrentPage('review')
+        ////this.props.setReviewFromTopic(topic);
+        ////this.props.setCurrentPage('review')
+        //let query='';
+        //if (this.props.match.params) {
+            //Object.keys(this.props.match.params).map(function(key) {
+                //let val = that.props.match.params[key];
+                //query="/"+key+"/"+val;
+            //});
+        //}
+        ////this.props.discoverQuizFromTopic(topic);
+        //query=query+'/'+Math.random();
+        //this.setState({exitRedirect:'/review'+query});
     };
     
     
@@ -284,42 +354,51 @@ export default class QuizCarousel extends Component {
         }
     };
     
+    onClickListQuestion(question) {
+        this.setQuizQuestion(question)
+    };
+    
     render() {
-        //let questions = this.props.currentQuiz;
-        ////console.log(['RENDER CAROUS',questions]);
-        //if (Array.isArray(questions) && questions.length > 0) {
-            
-        //} else if (this.props.discoverQuestions) {
-            //questions = this.props.discoverQuestions();
-        //}
-      //  //console.log(['RENDER CAROUS2',questions]);
-        let content = '';
-        const question = this.currentQuestion();
-      //  //console.log(['RENDER CAROUS2',question,questions]);
-      //  if (Array.isArray(questions) && questions.length > 0 && Utils.isObject(question)) {
-            if (this.state.showList) {
-                let listQuestions = this.getQuestions(this.props.currentQuiz);
-                let label='Start' ;
-                if (parseInt(this.props.currentQuestion,10) > 0) {
-                    label='Continue' ;
-                }
-                content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList isReview={this.state.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  ></QuestionList></div>);
-            } else {
-                // single question
-                content = (<SingleQuestion percentageFinished={this.percentageFinished} isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} setDiscoveryBlock={this.props.setDiscoveryBlock} clearDiscoveryBlock={this.props.clearDiscoveryBlock} blocks={this.props.blocks}  setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn}/> )
-            }
-        
-        //} else {
-            //////console.log(['ren',question,questions]);
-           //// content = (<div>{JSON.stringify(question)} - {questions} </div>)
-            //// no matching questions
-            //content = (<div><FindQuestions discoverQuestions={this.props.discoverQuestions} setCurrentPage={this.props.setCurrentPage} /></div>)
-        //}
+        if (this.state.exitRedirect && this.state.exitRedirect.length > 0) {
+            return <Redirect to={this.state.exitRedirect} />
+        } else {
+            //let questions = this.props.currentQuiz;
+            ////console.log(['RENDER CAROUS',questions]);
+            //if (Array.isArray(questions) && questions.length > 0) {
                 
-        return (
-            <div className='quiz-carousel'>
-                {content}
-            </div>
-        )
+            //} else if (this.props.discoverQuestions) {
+                //questions = this.props.discoverQuestions();
+            //}
+          //  //console.log(['RENDER CAROUS2',questions]);
+            let content = '';
+            const question = this.currentQuestion();
+          //  //console.log(['RENDER CAROUS2',question,questions]);
+          //  if (Array.isArray(questions) && questions.length > 0 && Utils.isObject(question)) {
+                if (this.state.showList) {
+                    let listQuestions = this.getQuestions(this.props.currentQuiz);
+                    let label='Start' ;
+                    if (parseInt(this.props.currentQuestion,10) > 0) {
+                        label='Continue' ;
+                    }
+                    content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList isReview={this.state.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  onClick={this.onClickListQuestion}></QuestionList></div>);
+                } else {
+                    // single question
+                    content = (<SingleQuestion percentageFinished={this.percentageFinished} isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic}   setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn}/> )
+                }
+            
+            //} else {
+                //////console.log(['ren',question,questions]);
+               //// content = (<div>{JSON.stringify(question)} - {questions} </div>)
+                //// no matching questions
+                //content = (<div><FindQuestions discoverQuestions={this.props.discoverQuestions} setCurrentPage={this.props.setCurrentPage} /></div>)
+            //}
+                    
+            return (
+                <div className='quiz-carousel'>
+                    {content}
+                </div>
+            )
+            
+        }
     }
 };

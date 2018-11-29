@@ -5,7 +5,7 @@ import QuestionList from './QuestionList';
 import DebounceInput from 'react-debounce-input';
 // icons
 import Search from 'react-icons/lib/fa/search';
-
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 
 export default class SearchPage extends Component {
     
@@ -88,8 +88,8 @@ export default class SearchPage extends Component {
             })
         return (
         <div>
-                <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</a>
-                  <a className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</a>
+                <Link className="btn btn-info" to="/search/topics" >Topics</Link>
+                  <Link className="btn btn-info"  to="/search/tags"  >Tags</Link>
               
             
               

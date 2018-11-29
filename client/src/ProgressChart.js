@@ -1,4 +1,5 @@
 import React from 'react';
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 import { ResponsiveBar } from '@nivo/bar'
 
 export default class ProgressChart extends React.Component {
@@ -8,6 +9,7 @@ export default class ProgressChart extends React.Component {
         super(props);
         this.state = {
             labels:[],
+            searchBand:null
         } 
     }
     componentDidMount() {
@@ -84,97 +86,103 @@ export default class ProgressChart extends React.Component {
     
     clickPie(a) {
       //console.log(a); 
-      this.props.reviewBySuccessBand(a.index); 
+      //this.props.reviewBySuccessBand(a.index);
+      this.setState({searchBand:a.index}); 
     };
          
     // make sure parent container have a defined height when using responsive component,
     // otherwise height will be 0 and no chart will be rendered.
     render() {
-        if (this.state.series && this.state.series.length > 0) {
-            return <div style={{height: '300px'}}>
-                <h4  id="progress"  className='graphTitle' >Recall Distribution</h4>
-                 <b>Click to review a success band</b>
-                <ResponsiveBar
-                    data={this.state.series}
-                     keys={[
-                    "y",
-                ]}
-                height={300}
-                indexBy="x"
-                margin={{
-                    "top": 50,
-                    "right": 130,
-                    "bottom": 50,
-                    "left": 61
-                }}
-                padding={0.3}
-            colors="set1"
-            colorBy={({ id, data }) => data[`${id}Color`]}
-            defs={[
-                {
-                    "id": "dots",
-                    "type": "patternDots",
-                    "background": "inherit",
-                    "color": "#38bcb2",
-                    "size": 4,
-                    "padding": 1,
-                    "stagger": true
-                },
-                {
-                    "id": "lines",
-                    "type": "patternLines",
-                    "background": "inherit",
-                    "color": "#eed312",
-                    "rotation": -45,
-                    "lineWidth": 6,
-                    "spacing": 10
-                }
-            ]}
-
-                borderWidth={1}
-                borderColor="inherit:darker(1.6)"
-                axisBottom={{
-                    "orient": "bottom",
-                    "tickSize": 5,
-                    "tickPadding": 5,
-                    "tickRotation": 0,
-                    "legend": "Success Tally",
-                    "legendPosition": "center",
-                    "legendOffset": 36
-                }}
-                axisLeft={{
-                    "orient": "left",
-                    "tickSize": 5,
-                    "tickPadding": 5,
-                    "tickRotation": 0,
-                    "legend": "Questions",
-                    "legendPosition": "center",
-                    "legendOffset": -40
-                }}
-                labelSkipWidth={12}
-                labelSkipHeight={12}
-                labelTextColor="inherit:darker(1.6)"
-                animate={true}
-                motionStiffness={90}
-                motionDamping={15}
-                theme={{
-                    "tooltip": {
-                        "container": {
-                            "fontSize": "13px"
-                        }
-                    },
-                    "labels": {
-                        "textColor": "#555"
-                    }
-                }}
-                onClick={this.clickPie.bind(this)}
-                    
-                />  
-                
-            </div>
-            
+        if (this.state.searchBand != null) {
+            return <Redirect to={"/review/band/"+(parseInt(this.state.searchBand,10)) } />
         } else {
-            return '';
+            if (this.state.series && this.state.series.length > 0) {
+                return <div style={{height: '300px'}}>
+                    <h4  id="progress"  className='graphTitle' >Recall Distribution</h4>
+                     <b>Click to review a success band</b>
+                    <ResponsiveBar
+                        data={this.state.series}
+                         keys={[
+                        "y",
+                    ]}
+                    height={300}
+                    indexBy="x"
+                    margin={{
+                        "top": 50,
+                        "right": 130,
+                        "bottom": 50,
+                        "left": 61
+                    }}
+                    padding={0.3}
+                colors="set1"
+                colorBy={({ id, data }) => data[`${id}Color`]}
+                defs={[
+                    {
+                        "id": "dots",
+                        "type": "patternDots",
+                        "background": "inherit",
+                        "color": "#38bcb2",
+                        "size": 4,
+                        "padding": 1,
+                        "stagger": true
+                    },
+                    {
+                        "id": "lines",
+                        "type": "patternLines",
+                        "background": "inherit",
+                        "color": "#eed312",
+                        "rotation": -45,
+                        "lineWidth": 6,
+                        "spacing": 10
+                    }
+                ]}
+
+                    borderWidth={1}
+                    borderColor="inherit:darker(1.6)"
+                    axisBottom={{
+                        "orient": "bottom",
+                        "tickSize": 5,
+                        "tickPadding": 5,
+                        "tickRotation": 0,
+                        "legend": "Success Tally",
+                        "legendPosition": "center",
+                        "legendOffset": 36
+                    }}
+                    axisLeft={{
+                        "orient": "left",
+                        "tickSize": 5,
+                        "tickPadding": 5,
+                        "tickRotation": 0,
+                        "legend": "Questions",
+                        "legendPosition": "center",
+                        "legendOffset": -40
+                    }}
+                    labelSkipWidth={12}
+                    labelSkipHeight={12}
+                    labelTextColor="inherit:darker(1.6)"
+                    animate={true}
+                    motionStiffness={90}
+                    motionDamping={15}
+                    theme={{
+                        "tooltip": {
+                            "container": {
+                                "fontSize": "13px"
+                            }
+                        },
+                        "labels": {
+                            "textColor": "#555"
+                        }
+                    }}
+                    onClick={this.clickPie.bind(this)}
+                        
+                    />  
+                    
+                </div>
+                
+            } else {
+                return '';
+            }
+            
         }
     }
 }

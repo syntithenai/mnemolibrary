@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 
 export default class CreateHelp extends Component {
-
     render() {
+        let haveUser = this.props.isLoggedIn && this.props.isLoggedIn() ? true : false;
+    
         return (<div id='createhelp'>
         <div>Extracting key points of encyclopedic, news, or academic articles focuses your reading and we find that the challenge of making mnemonic puns and rhymes is fun and addictive. 
         <br/><br/>
-        <b>To add your own questions&nbsp;<button className="btn btn-info" onClick={() => this.props.setCurrentPage('login')}    >Join The Library</button> </b>
+        
+        {haveUser && <b>To add your own questions&nbsp;<Link className="btn btn-info" to='create' >Create</Link> </b>}
+        {!haveUser && <b>To add your own questions&nbsp;<Link className="btn btn-info" to='login'  >Join The Library</Link> </b>}
+        
         <br/>
         </div>
         
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/x1K2NZyvr4g" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        
+          
         <h4>Guidelines</h4>
         <ul>
             <li>No obscene, abusive or discriminatory entries</li>
@@ -68,3 +72,5 @@ export default class CreateHelp extends Component {
         </div>)
     }
 }
+  //<iframe width="560" height="315" src="https://www.youtube.com/embed/x1K2NZyvr4g" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    

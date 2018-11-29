@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Utils from './Utils';
 import FaChild from 'react-icons/lib/fa/child';
-
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 export default class QuizList extends Component {
     
     constructor( props) {
@@ -98,11 +98,11 @@ export default class QuizList extends Component {
             let quizzes = Object.keys(this.props.quizzes).sort().map((quiz, key) => {
               var title = Utils.snakeToCamel(quiz)
               let missingCount = this.state.questionsMissingMnemonics && this.state.questionsMissingMnemonics.hasOwnProperty(quiz) ? this.state.questionsMissingMnemonics[quiz] : 0;
-              return <div onClick={() => this.props.setQuiz(quiz)} className='list-group-item' key={quiz} >
+              return <Link to={"/discover/topic/"+quiz}  className='list-group-item' key={quiz} >
               
-              <a href='#'>{title}</a>
+              <span>{title}</span>
               <div>{this.state.description[quiz]}</div>
-              {missingCount > 0 && this.props.isLoggedIn && this.props.isLoggedIn() && <button className='btn btn-success' style={{float:'right'}} onClick={() => this.props.setQuizFromMissingMnemonic(quiz)} ><FaChild size="22" /> {missingCount}</button>}</div>
+              {missingCount > 0 && this.props.isLoggedIn && this.props.isLoggedIn() && <button className='btn btn-success' style={{float:'right'}} onClick={() => this.props.setQuizFromMissingMnemonic(quiz)} ><FaChild size="22" /> {missingCount}</button>}</Link>
               
             })
             return (

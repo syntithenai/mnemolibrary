@@ -988,10 +988,29 @@ router.post('/discover', (req, res) => {
         db.collection('questions').find({$and:criteria})
         //db.collection('questions').aggregate({$match:{$nin:notThese}})
         .sort(sortFilter).limit(limit).toArray().then(function( questions) {
-           console.log(['user res',questions ? questions.length : 0]);    
-            res.send({questions:questions});
+           console.log(['user res',questions ? questions.length : 0]); 
+           
+           console.log(['disco selqiest',req.body.selectedQuestion]);
+            if (req.body.selectedQuestion && req.body.selectedQuestion.length > 0) {
+                console.log(['disco selqiest',req.body.selectedQuestion]);
+                db.collection('questions').findOne({_id:ObjectId(req.body.selectedQuestion)}).then(function(question) {
+                    console.log(['disco selqiest found',question]);
+                    questions.unshift(question);
+                    console.log(['disco send found',questions]);
+                    res.send({questions:questions.slice(0,10)});
+                });
+            } else {
+                res.send({questions:questions});
+            }
+           
+              
+            
         })
     };
+     // block selected question for specific lookup as second query
+     if (req.body.selectedQuestion && req.body.selectedQuestion.length > 0) {
+         criteria.push({_id:{$ne:ObjectId(req.body.selectedQuestion)}});
+     }
     
     if (req.body.userTopic && req.body.userTopic.length > 0) {
         criteria.push({userTopic:{$exists:true}});
@@ -1009,6 +1028,13 @@ router.post('/discover', (req, res) => {
         orderBy = '-successRate';
     } else if (req.body.topic) {
         criteria.push({quiz:{$eq:req.body.topic}});
+        orderBy = 'sort';
+    } else if (req.body.tag) {
+        let tag = req.body.tag.trim().toLowerCase(); 
+        criteria.push({'tags': {$in:[tag]}});
+        orderBy = 'sort';
+    } else if (req.body.technique) {
+        criteria.push({technique:{$eq:req.body.technique}});
         orderBy = 'sort';
     } else {
         criteria.push({discoverable :{$ne:'no'}});
@@ -1045,6 +1071,9 @@ router.post('/discover', (req, res) => {
                             notThese.push(ObjectId(progress[seenId].question));
                         };
                         criteria.push({'_id': {$nin: notThese}});
+                        criteria.push({discoverable :{$ne:'no'}});
+                        console.log(['discover',criteria]);
+                        discoverQuery();
                     }
                     
                 }).catch(function(e) {
@@ -1055,25 +1084,27 @@ router.post('/discover', (req, res) => {
         });
     } else {
         criteria.push({access :{$eq:'public'}});
+        criteria.push({discoverable :{$ne:'no'}});
+        console.log(['discover',criteria]);
+        discoverQuery();
       //  criteria.push({discoverable :{$ne:'no'}});
         
     }
-    criteria.push({discoverable :{$ne:'no'}});
-    console.log(['discover',criteria]);
-    discoverQuery();
+    
     
    // //console.log(['discover',user]);
     
 })
 
 router.get('/review', (req, res) => {
-    ////console.log('review');
+    console.log('review');
     let limit=10;
      let orderBy = (req.query.orderBy == 'successRate') ? 'successRate' : 'timeScore'
      let orderMeBy = {};
      orderMeBy[orderBy] = 1;          
      let criteria=[];
      if (req.query.band && req.query.band.length > 0) {
+         console.log('FILTER BY BAND '+req.query.band );
          if (parseInt(req.query.band,10) > 0) {
              criteria.push({successTally:{$eq:parseInt(req.query.band,10)}});
          } else {
@@ -1108,7 +1139,7 @@ router.get('/review', (req, res) => {
      ////console.log({seen:{$lt:oneHourBack}});
      if (req.query.user && req.query.user.length > 0) {
          // sort by successTally and then most recently seen first
-      //   //console.log(JSON.stringify(criteria));
+        console.log(JSON.stringify(criteria));
         db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(limit).toArray().then(function(questions,error) {
             ////console.log('llll');
             ////console.log(questions);
@@ -1189,7 +1220,7 @@ router.get('/review', (req, res) => {
  //               }
                 
                 
-         //       console.log(['REVItEW',successAndDateOrderedIds]);
+                console.log(['REVItEW',successAndDateOrderedIds]);
                 db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).toArray(function(err,results) {
                    // //console.log([err,results]);
                    
@@ -1306,7 +1337,7 @@ router.get('/questions', (req, res) => {
                 criteria.push({'_id': ObjectId(question)});
                // //console.log(['search by id',criteria,question]);
                 db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({question:1}).toArray(function(err, results) {
-                 console.log(['search by id res',results]);
+               //  console.log(['search by id res',results]);
                     res.send({'questions':results});
                 })
             //}
@@ -1566,7 +1597,7 @@ router.post('/missingmnemonics', (req, res) => {
     }
      console.log(['LOADING MISSING MNEM',JSON.stringify(filter)]);
     db.collection('questions').find(filter).toArray().then(function(questions) {
-        console.log(['LOADING MISSING MNEM, FOUND MNEM FREE QU',questions,JSON.stringify(filter)]);
+       // console.log(['LOADING MISSING MNEM, FOUND MNEM FREE QU',questions,JSON.stringify(filter)]);
         questions.map(function(question,key) {
             //console.log(['LOADING TOPICS, FOUND Q',question,key]);
             if (question.quiz && question.quiz.length > 0) {

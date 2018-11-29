@@ -32,9 +32,9 @@ export default class ShareTopicDialog extends Component {
         // fallback to generated link back to nemo
         let shareLink=';'      
         if (question) {
-            shareLink = window.location.protocol+'//'+window.location.host+"/?question="+question._id;    
+            shareLink = window.location.protocol+'//'+window.location.host+"/discover/question/"+question._id;    
         } else {
-            shareLink = window.location.protocol+'//'+window.location.host+"/?topic="+this.props.topic;    
+            shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+this.props.topic;    
         }
         
         let title="Mnemo's Library -"+(this.props.question.mnemonic ? this.props.question.mnemonic : '') + " - \n" + question.interrogative+ ' ' +question.question + '?';

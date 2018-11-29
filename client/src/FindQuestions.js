@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 import HomeCarousel from './HomeCarousel';
 import HelpNavigation from './HelpNavigation';
 
@@ -14,7 +14,7 @@ export default class FindQuestions extends Component {
     render() {
         return  (
             <div className='findquestions'>
-                <HelpNavigation setCurrentPage={this.props.setCurrentPage}/>
+                <HelpNavigation />
                 <span id="firstvideo" ></span>
                 <br/> 
 
@@ -22,20 +22,20 @@ export default class FindQuestions extends Component {
                 <HomeCarousel/>
                 <br/>
                 <br/>
-                 <b>To save and review your progress across devices<br/><button className="btn btn-info" onClick={() => this.props.setCurrentPage('login')}    >Join The Library</button> </b>
+                 <b>To save and review your progress across devices<br/><Link className="btn btn-info" to="/login"    >Join The Library</Link> </b>
                 
                  <br/> 
                 <b>Learn something new</b>
                 <br/> 
-                <button className="btn btn-info" href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</button>
-                <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</button>
-                <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</button>
-                <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</button>
+                <Link className="btn btn-info" to="/discover" >Discover</Link>
+                <Link className="btn btn-info" to="/search" >Topics</Link>
+                <Link className="btn btn-info" to="/search/tags" >Tags</Link>
+                <Link className="btn btn-info" to="/search/questions" >Questions</Link>
                 <br/> 
                 <br/>
                 <b>Lock down those memories</b>
                 <br/> 
-                    <button className="btn  btn-info" href="#"  onClick={() => this.props.setCurrentPage('review')} >Review</button>
+                    <Link className="btn  btn-info" to="/review" >Review</Link>
                    <br/>  <br/>  <br/> 
                    
             </div>

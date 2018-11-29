@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 //const config=require('../../config');
 import TopicEditor from './TopicEditor';
 
-
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'     
 
 export default class CreatePage extends Component {
     
@@ -30,9 +30,14 @@ export default class CreatePage extends Component {
     };
     
     render() {
+        if (this.props.user && this.props.user._id && this.props.user._id.length > 0) {
             return <div>
                 <TopicEditor fetchTopicCollections={this.props.fetchTopicCollections} user={this.props.user} setQuizFromTopic={this.props.setQuizFromTopic} mnemonic_techniques={this.props.mnemonic_techniques}  setCurrentPage={this.props.setCurrentPage} />
             </div>
+        } else {
+            return <Redirect to="login" />
+        }
+            
         
     }
     

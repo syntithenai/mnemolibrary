@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Utils from './Utils';
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 
 export default class QuestionList extends Component {
     render() {
@@ -13,11 +14,17 @@ export default class QuestionList extends Component {
                     if (this.props.isReview===false) {
                         excerpt='-->' + question.answer.split(' ').slice(0,3).join(' ')+'...';
                     } 
-       
-                  return <div className='list-group-item' key={question._id} >
-                  <a onClick={() => this.props.setQuiz(question)}  href="#"   >{title} ? {excerpt}</a>
+                    if (this.props.onClick) {
+                       return <div className='list-group-item' key={question._id} >
+                        <span onClick={(e) => this.props.onClick(question)}  >{title} ? {excerpt}</span>
+                        </div>
+                    } else {
+                         return <div className='list-group-item' key={question._id} >
+                        <Link to={"/discover/topic/"+question.quiz+"/"+question._id}  >{title} ? {excerpt}</Link>
+                        </div>
+                    }
                   
-                  </div>
+                  
                 }
                 return '';
             })

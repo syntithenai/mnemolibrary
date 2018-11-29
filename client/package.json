@@ -29,6 +29,7 @@
     "react-google-login-component": "^0.9.3",
     "react-google-signin": "^1.0.1",
     "react-icons": "^2.2.7",
+    "react-router-dom": "^4.3.1",
     "react-scripts": "^0.9.5",
     "react-scroll-to-component": "^1.0.2",
     "react-share": "^2.1.0",

@@ -5,6 +5,7 @@ import QuizCarousel from './QuizCarousel';
 import 'whatwg-fetch'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 
 export default class ReviewPage extends Component {
 
@@ -22,6 +23,25 @@ export default class ReviewPage extends Component {
     };
 
     componentDidMount() {
+        let that = this;
+        console.log(['REVIEW PAGE DID MOUNT',this.props.match]); 
+        //setTimeout(function() {
+            if (this.props.match && this.props.match.params.topic && this.props.match.params.topic.length > 0) {
+                setTimeout(function() {
+                    console.log(['REVIEW PAGE call ',that.props.match]); 
+                    that.props.setReviewFromTopic(that.props.match.params.topic,that.props.match.params.topicquestion);
+                },1000);
+            } else if (this.props.match && this.props.match.params && this.props.match.params.band && this.props.match.params.band.length > 0) {
+                setTimeout(function() {
+                    console.log(['REV review from band',that.props.match.params.band,that.props.reviewBySuccessBand]);
+                    that.props.reviewBySuccessBand(that.props.match.params.band);
+                },1000);
+            } else {
+                setTimeout(function() {
+                    that.props.getQuestionsForReview();
+                },1000);
+            }
+        //},1000);
       // this.getQuestionsForReview();
     }
         
@@ -36,21 +56,21 @@ export default class ReviewPage extends Component {
     
     discoverQuestions() {
         //this.props.setQuizFromDiscovery();
-        let topic = this.props.getCurrentTopic();
-        //console.log(['finish quiz',topic]);
-        this.props.discoverQuizFromTopic(topic);
+        //let topic = this.props.getCurrentTopic();
+        ////console.log(['finish quiz',topic]);
+        //this.props.discoverQuizFromTopic(topic);
     };
     
     
     reviewQuestions() {
-        let topic = this.props.getCurrentTopic();
-        //console.log(['REVUIEW PAGEfinish quiz',topic,this.props.setReviewFromTopic]);
-        if (topic && topic.length > 0) {
-            this.props.setReviewFromTopic(topic);
-        } else {
-            let band = this.props.getCurrentBand();
-            this.props.reviewBySuccessBand(band);
-        }
+        //let topic = this.props.getCurrentTopic();
+        ////console.log(['REVUIEW PAGEfinish quiz',topic,this.props.setReviewFromTopic]);
+        //if (topic && topic.length > 0) {
+            //this.props.setReviewFromTopic(topic);
+        //} else {
+            //let band = this.props.getCurrentBand();
+            //this.props.reviewBySuccessBand(band);
+        //}
         
         //this.props.setCurrentPage('review')
     };
@@ -74,7 +94,7 @@ export default class ReviewPage extends Component {
             },
             {
               label: 'Search',
-              onClick: () => this.props.setCurrentPage('topics')
+              onClick: () => this.props.setCurrentPage('search')
             },
             {
               label: 'Profile',
@@ -90,25 +110,25 @@ export default class ReviewPage extends Component {
         ////console.log(['REVIEW',this.props.user]);
        if (this.props.isLoggedIn()) {
             ////console.log(['REVIEW USER',this.props.questions]);
-            if (this.props.questions.length > 0) {
+            if (this.props.questions && this.props.questions.length > 0) {
                //  //console.log(['REVIEW questions']);
                 return (
                 <div>
-                    <QuizCarousel isAdmin={this.props.isAdmin}  saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} discoverQuizFromTopic={this.props.discoverQuizFromTopic} setReviewFromTopic={this.props.setReviewFromTopic} setDiscoveryBlock={this.props.setDiscoveryBlock} clearDiscoveryBlock={this.props.clearDiscoveryBlock} blocks={this.props.blocks} setQuizFromTag={this.props.setQuizFromTag}  setCurrentQuestion={this.props.setCurrentQuestion} discoverQuestions={this.props.discoverQuestions}  questions={this.props.questions} currentQuiz={this.props.currentQuiz} currentQuestion={this.props.currentQuestion} finishQuiz={this.finishReview} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.props.setCurrentQuiz} />
+                    <QuizCarousel isAdmin={this.props.isAdmin}  saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} discoverQuizFromTopic={this.props.discoverQuizFromTopic} setReviewFromTopic={this.props.setReviewFromTopic}  setQuizFromTag={this.props.setQuizFromTag}  setCurrentQuestion={this.props.setCurrentQuestion} discoverQuestions={this.props.discoverQuestions}  questions={this.props.questions} currentQuiz={this.props.currentQuiz} currentQuestion={this.props.currentQuestion} finishQuiz={this.finishReview} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.props.setCurrentQuiz} isReview={true} />
                 </div>
                 )
             } else {
                 return (
-                <div><br/><b>You have no questions available for review. <br/>Note that questions that you have seen in the last hour are excluded from review. <br/><br/>Time to discover something new ! </b> <br/><br/><button className="btn btn-info" href="#"  onClick={() => this.props.setQuizFromDiscovery()}>Discover</button>
-                <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('topics')}>Topics</button>
-                <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('tags')}>Tags</button>
-                <button className="btn btn-info" href="#"  onClick={() => this.props.setCurrentPage('search')}>Questions</button>
+                <div><br/><b>You have no questions available for review. <br/>Note that questions that you have seen in the last hour are excluded from review. <br/><br/>Time to discover something new ! </b> <br/><br/><Link className="btn btn-info" to="/discover" >Discover</Link>
+                <Link className="btn btn-info" to="/search" >Topics</Link>
+                <Link className="btn btn-info" to="/search/tags" >Tags</Link>
+                <Link className="btn btn-info" to="/search/questions" >Questions</Link>
                </div>
                 )
             }
       } else {
         return (
-            <div><b><a onClick={() => this.props.setCurrentPage('login')} className="btn btn-info"   >Join</a> the library to build your knowledge bank.</b></div>
+            <div><b><Link to="/login" className="btn btn-info"   >Join</Link> the library to build your knowledge bank.</b></div>
         );
       }
     }
