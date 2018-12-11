@@ -10,9 +10,9 @@ import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-d
 export default class TopicsPage extends Component {
     constructor(props) {
         super(props);
-        this.state={'topics':this.props.topics,'titleFilter':'',tagFilter:this.props.tagFilter};
+        this.state={'topics':this.props.topics,tagFilter:this.props.tagFilter};
         // debounce(500,
-        this.setTitleFilter = this.setTitleFilter.bind(this);
+        this.setTitleFilter = this.props.setTitleFilter;
         this.filterQuizzes = this.filterQuizzes.bind(this);
         this.clearTagFilter = this.clearTagFilter.bind(this);
         //this.filterQuizzes('');
@@ -21,22 +21,31 @@ export default class TopicsPage extends Component {
     };
     
     componentDidMount() {
+		this.filterQuizzes(this.props.titleFilter) 
        scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
        // this.filterQuizzes('');
     }
     
-    setTitleFilter(event) {
-        let title = event.target.value;
-        let newState={'titleFilter':title};
-        this.setState(newState);
-        this.filterQuizzes(title);
-    };
+	
+	componentDidUpdate(props) {
+		if (this.props.titleFilter != props.titleFilter) {
+			 this.filterQuizzes(this.props.titleFilter) 
+		}
+		//this.setState({titleFilter:this.props.titleFilter)
+	}
+    
+    //setTitleFilter(event) {
+        //let title = event.target.value;
+        //let newState={'titleFilter':title};
+        //this.setState(newState);
+        //this.filterQuizzes(title);
+    //};
     
     clearTagFilter() {
        // //console.log('CLEAR FILTER');
         //this.props.clearTagFilter();
         this.setState({'tagFilter':null});
-        this.filterQuizzes(this.state.titleFilter);
+        this.filterQuizzes(this.props.titleFilter);
     };
     
     filterQuizzes(title) {
@@ -82,17 +91,17 @@ export default class TopicsPage extends Component {
             <div>
                 <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                 <form className="form-inline" style={{width:'100%'}}>
-                  <input className="form-control" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter}  placeholder="Search" aria-label="Search" />
+                  <input className="form-control" type="text" value={this.props.titleFilter} onChange={this.props.setTitleFilter}  placeholder="Search" aria-label="Search" />
                   
                   
                 </form>
-                {this.state.titleFilter.length>0 && <div><span>Search for &nbsp;
+                {this.props.titleFilter.length>0 && <div><span>Search for &nbsp;
                     <Link className="btn btn-info" to="/search/tags" >Tags</Link>&nbsp;or&nbsp; 
                   <Link className="btn btn-info" to="/search/questions" >Questions</Link>&nbsp;instead.</span>
                    
                 
                     <QuizList quizzes={this.state.topics} setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics} isLoggedIn={this.props.isLoggedIn} ></QuizList></div>}
-                {this.state.titleFilter.length === 0 && <QuizCollection topicCollections={this.props.topicCollections}  topicTags={this.props.topicTags} tagFilter={this.props.tagFilter}  clearTagFilter={this.props.clearTagFilter} setQuizFromTopic={this.props.setQuizFromTopic} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} setCurrentPage={this.props.setCurrentPage} isLoggedIn={this.props.isLoggedIn} setQuizFromDiscovery={this.props.setQuizFromDiscovery} setQuizFromDifficulty={this.props.setQuizFromDifficulty} setQuizFromTopics={this.props.setQuizFromTopics}  setQuizFromQuestionId={this.props.setQuizFromQuestionId}  user={this.props.user} showCollection={this.props.showCollection} hideCollection={this.props.hideCollection} collectionVisible={this.props.collectionVisible} collection={this.props.collection}  ></QuizCollection>}
+                {this.props.titleFilter.length === 0 && <QuizCollection topicCollections={this.props.topicCollections}  topicTags={this.props.topicTags} tagFilter={this.props.tagFilter}  clearTagFilter={this.props.clearTagFilter} setQuizFromTopic={this.props.setQuizFromTopic} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} setCurrentPage={this.props.setCurrentPage} isLoggedIn={this.props.isLoggedIn} setQuizFromDiscovery={this.props.setQuizFromDiscovery} setQuizFromDifficulty={this.props.setQuizFromDifficulty} setQuizFromTopics={this.props.setQuizFromTopics}  setQuizFromQuestionId={this.props.setQuizFromQuestionId}  user={this.props.user} showCollection={this.props.showCollection} hideCollection={this.props.hideCollection} collectionVisible={this.props.collectionVisible} collection={this.props.collection}  ></QuizCollection>}
             </div>
         )
     }

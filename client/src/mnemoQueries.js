@@ -124,7 +124,7 @@ let mnemoQueries = {
       .then(function(response) {
         return response.json()
       }).then(function(json) {
-        let result = createIdIndex(json['questions']);
+        let result = createIdIndex(json['questions'],selectedQuestion);
         that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
         console.log(['set state done', that.state])
       }).catch(function(ex) {
@@ -324,19 +324,19 @@ let mnemoQueries = {
       //})
   //},
   
-   setQuizFromTopic : function(topic) {  //,selectedQuestion
+   setQuizFromTopic : function(topic,selectedQuestion) {  //
       let that = this;
       let url='/api/questions?topic='+topic ;
       if (this.state.user) {
           url=url+'&user='+this.state.user._id;
       }
-      //if (selectedQuestion && selectedQuestion.length > 0) {
-          //url=url+'&selectedQuestion='+selectedQuestion;
-      //}
+      if (selectedQuestion && selectedQuestion.length > 0) {
+          url=url+'&selectedQuestion='+selectedQuestion;
+      }
       fetch(url).then(function(response) {
         return response.json()
       }).then(function(json) {
-        let result = createIdIndex(json['questions']);
+        let result = createIdIndex(json['questions'],selectedQuestion);
         that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
@@ -353,6 +353,7 @@ let mnemoQueries = {
       if (topic && topic.length > 0) {
           url = url + '&topic='+topic ;
       }
+      url=url + '&rand='+Math.random()
       fetch(url).then(function(response) {
         return response.json()
       }).then(function(json) {

@@ -44,7 +44,6 @@ import mnemoQueries from './mnemoQueries'
 
 import Utils from './Utils';
 var config = require('../../config')
-    
 export default class AppLayout extends Component {
 
   constructor(props) {
@@ -88,6 +87,7 @@ export default class AppLayout extends Component {
           users: users ? users : defaultUsers,  // really progress vs user/token below
           currentQuiz: [],
           tagFilter : null,
+          titleFilter: '',
           response : null,
           user:null,
           token:null,
@@ -99,7 +99,7 @@ export default class AppLayout extends Component {
         this.setCurrentPage = this.setCurrentPage.bind(this);
         this.setCurrentQuestion = this.setCurrentQuestion.bind(this);
         this.setCurrentQuiz = this.setCurrentQuiz.bind(this);
-        this.setQuiz = this.setQuiz.bind(this);
+        //this.setQuiz = this.setQuiz.bind(this);
 
         //this.setQuizFromDiscovery = this.setQuizFromDiscovery.bind(this);
         //this.discoverQuestions = this.discoverQuestions.bind(this);
@@ -122,7 +122,7 @@ export default class AppLayout extends Component {
         //this.setCurrentTopic = this.setCurrentTopic.bind(this);
         //this.getCurrentTopic = this.getCurrentTopic.bind(this);
 
-        
+        this.setTitleFilter = this.setTitleFilter.bind(this)
         
 
         this.clearTagFilter = this.clearTagFilter.bind(this);
@@ -306,7 +306,7 @@ export default class AppLayout extends Component {
     };
     
     componentDidMount() {
-      let that = this;
+	  let that = this;
       ReactGA.initialize(config.analyticsKey);
         
         const script = document.createElement("script");
@@ -724,7 +724,7 @@ export default class AppLayout extends Component {
   };
   
   setCurrentPage(page) {
-      //this.analyticsEvent(page);
+	  //this.analyticsEvent(page);
       //if (page==="review") {
           //this.getQuestionsForReview();
       //} 
@@ -819,20 +819,20 @@ export default class AppLayout extends Component {
   
  
 
-  // SET QUIZ
-  setQuiz(title,questionIds) {
-      let newIds = [];
-      let that = this;
-     // //console.log(questionIds);
-      questionIds.forEach(function(questionId) {
-       //   //console.log(questionId,questionIds[questionId]);
-        //  //console.log(that.state.users.default.questions.block);
-          if (!that.state.users.default.questions.block.hasOwnProperty(questionId)) newIds.push(questionId);
-      });
-      ////console.log({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
-      this.analyticsEvent('discover')
-      this.setState({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
-  };
+  //// SET QUIZ
+  //setQuiz(title,questionIds) {
+      //let newIds = [];
+      //let that = this;
+     //// //console.log(questionIds);
+      //questionIds.forEach(function(questionId) {
+       ////   //console.log(questionId,questionIds[questionId]);
+        ////  //console.log(that.state.users.default.questions.block);
+          //if (!that.state.users.default.questions.block.hasOwnProperty(questionId)) newIds.push(questionId);
+      //});
+      //////console.log({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
+      //this.analyticsEvent('discover')
+      //this.setState({'currentPage':'home','currentQuiz':newIds,'title': Utils.snakeToCamel(title)});
+  //};
 
   
   
@@ -860,7 +860,14 @@ export default class AppLayout extends Component {
         return this.state.collection;
     };
     
-    
+    setTitleFilter(event) {
+		let filter    = event.target.value;
+        
+		console.log(['filter',filter])
+		
+		this.setState({titleFilter:filter});
+	}
+	
     
   render() {
     const progress = this.state.users.default;
@@ -882,14 +889,14 @@ export default class AppLayout extends Component {
         
         let searchPage = <div><TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuizFromTopic={this.setQuizFromTopic} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user} showCollection={this.showCollection} hideCollection={this.hideCollection} collectionVisible={this.collectionVisible} collection={this.state.collection} /></div>
         
-        let topicsPageOptions={ topicCollections:this.state.topicCollections,topics:topics,topicTags:this.state.topicTags,tagFilter:this.state.tagFilter,clearTagFilter:this.clearTagFilter,setQuizFromTopic:this.setQuizFromTopic,setQuiz:this.setQuizFromTopic,questionsMissingMnemonics:this.state.questionsMissingMnemonics,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic,setCurrentPage:this.setCurrentPage,isLoggedIn:this.isLoggedIn,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromQuestionId:this.setQuizFromQuestionId,title:title,user:this.state.user,showCollection:this.showCollection,hideCollection:this.hideCollection,collectionVisible:this.collectionVisible,collection:this.state.collection,setQuizFromQuestionId:this.setQuizFromQuestionId }
+        let topicsPageOptions={ titleFilter:this.state.titleFilter,setTitleFilter:this.setTitleFilter,topicCollections:this.state.topicCollections,topics:topics,topicTags:this.state.topicTags,tagFilter:this.state.tagFilter,clearTagFilter:this.clearTagFilter,setQuizFromTopic:this.setQuizFromTopic,setQuiz:this.setQuizFromTopic,questionsMissingMnemonics:this.state.questionsMissingMnemonics,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic,setCurrentPage:this.setCurrentPage,isLoggedIn:this.isLoggedIn,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromQuestionId:this.setQuizFromQuestionId,title:title,user:this.state.user,showCollection:this.showCollection,hideCollection:this.hideCollection,collectionVisible:this.collectionVisible,collection:this.state.collection,setQuizFromQuestionId:this.setQuizFromQuestionId }
         
         let profilePageOptions = {token:this.state.token,setCurrentPage:this.setCurrentPage,setQuizFromDiscovery:this.setQuizFromDiscovery,reviewBySuccessBand:this.reviewBySuccessBand,setReviewFromTopic:this.setReviewFromTopic,setQuizFromTopic:this.discoverQuizFromTopic,searchQuizFromTopic:this.setQuizFromTopic, isAdmin:this.isAdmin,saveUser:this.saveUser,user:this.state.user,logout:this.logout,import:this.import,isLoggedIn:this.isLoggedIn}
         
         let reviewPageOptions = { isAdmin:this.isAdmin,saveSuggestion:this.saveSuggestion,setCurrentQuestion:this.setCurrentQuestion,setCurrentPage:this.setCurrentPage,setCurrentQuiz:this.setCurrentQuiz,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromTopic:this.setQuizFromTopic,setReviewFromTopic:this.setReviewFromTopic,discoverQuizFromTopic:this.discoverQuizFromTopic,setQuizFromTag:this.setQuizFromTag,blocks:this.state.discoveryBlocks,discoverQuestions:this.discoverQuestions,getQuestionsForReview:this.getQuestionsForReview,mnemonic_techniques:this.state.mnemonic_techniques,questions:this.state.questions,currentQuiz:this.state.currentQuiz,currentQuestion:this.state.currentQuestion,indexedQuestions:this.state.indexedQuestions,topicTags:this.state.topicTags,updateProgress:this.updateProgress,finishQuiz:this.finishReview,isReview:true,setMessage:this.setMessage,like:this.like,user:this.state.user,progress:progress,getCurrentTopic:this.getCurrentTopic,isLoggedIn:this.isLoggedIn,getCurrentBand:this.getCurrentBand,reviewBySuccessBand:this.reviewBySuccessBand,setQuizFromDifficulty:this.setQuizFromDifficulty}
         
         
-        let discoverPageOptions ={ isAdmin:this.isAdmin,saveSuggestion:this.saveSuggestion,setCurrentQuestion:this.setCurrentQuestion,setCurrentPage:this.setCurrentPage,setCurrentQuiz:this.setCurrentQuiz,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromTopic:this.setQuizFromTopic,setReviewFromTopic:this.setReviewFromTopic,discoverQuizFromTopic:this.discoverQuizFromTopic,setQuizFromTag:this.setQuizFromTag,discoverQuestions:this.discoverQuestions,getQuestionsForReview:this.getQuestionsForReview,mnemonic_techniques:this.state.mnemonic_techniques,questions:this.state.questions,currentQuiz:this.state.currentQuiz,currentQuestion:this.state.currentQuestion,indexedQuestions:this.state.indexedQuestions,topicTags:this.state.topicTags,updateProgress:this.updateProgress,setMessage:this.setMessage,like:this.like,user:this.state.user,progress:progress,getCurrentTopic:this.getCurrentTopic,isLoggedIn:this.isLoggedIn,getCurrentBand:this.getCurrentBand,reviewBySuccessBand:this.reviewBySuccessBand,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromQuestionId:this.setQuizFromQuestionId  }
+        let discoverPageOptions ={ isAdmin:this.isAdmin,saveSuggestion:this.saveSuggestion,setCurrentQuestion:this.setCurrentQuestion,setCurrentPage:this.setCurrentPage,setCurrentQuiz:this.setCurrentQuiz,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromTopic:this.setQuizFromTopic,setReviewFromTopic:this.setReviewFromTopic,discoverQuizFromTopic:this.discoverQuizFromTopic,setQuizFromTag:this.setQuizFromTag,discoverQuestions:this.discoverQuestions,getQuestionsForReview:this.getQuestionsForReview,mnemonic_techniques:this.state.mnemonic_techniques,questions:this.state.questions,currentQuiz:this.state.currentQuiz,currentQuestion:this.state.currentQuestion,indexedQuestions:this.state.indexedQuestions,topicTags:this.state.topicTags,updateProgress:this.updateProgress,setMessage:this.setMessage,like:this.like,user:this.state.user,progress:progress,getCurrentTopic:this.getCurrentTopic,isLoggedIn:this.isLoggedIn,getCurrentBand:this.getCurrentBand,reviewBySuccessBand:this.reviewBySuccessBand,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromQuestionId:this.setQuizFromQuestionId ,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic }
         
          
         
@@ -916,14 +923,15 @@ export default class AppLayout extends Component {
                 
                 <PropsRoute  path="/search/tags" component={TagsPage}  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
                 
-                <PropsRoute  path="/search/questions" component={SearchPage} mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
+                <PropsRoute  path="/search/questions" component={SearchPage}  titleFilter={this.state.titleFilter} setTitleFilter={this.setTitleFilter} mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
                 
-                
+                <PropsRoute  path="/missing/:missingtopic" component={QuizCarousel} {...discoverPageOptions}  />
                 <PropsRoute  exact={true} path="/discover" component={QuizCarousel} {...discoverPageOptions}  />
                 <PropsRoute  exact={true}  path="/discover/:topic" component={QuizCarousel} {...discoverPageOptions}  />
                 <PropsRoute  exact={true} path="/discover/topic/:topic" component={QuizCarousel} {...discoverPageOptions}  />
                 <PropsRoute  path="/discover/topic/:topic/:topicquestion" component={QuizCarousel} {...discoverPageOptions}  />
-                <PropsRoute  path="/discover/searchtopic/:searchtopic" component={QuizCarousel} {...discoverPageOptions}  />
+                <PropsRoute  exact={true}  path="/discover/searchtopic/:searchtopic" component={QuizCarousel} {...discoverPageOptions}  />
+                <PropsRoute  path="/discover/searchtopic/:searchtopic/:topicquestion" component={QuizCarousel} {...discoverPageOptions}  />
                 
                 <PropsRoute  path="/discover/difficulty/:difficulty" component={QuizCarousel} {...discoverPageOptions}  />
                 <PropsRoute  path="/discover/tag/:tag" component={QuizCarousel} {...discoverPageOptions}  />
@@ -951,4 +959,3 @@ export default class AppLayout extends Component {
     }
   }
 }
-

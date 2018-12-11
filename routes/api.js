@@ -319,9 +319,9 @@ router.get('/recenttopics', (req, res) => {
                 });
                 // UPDATE USERS WITH TALLY
                 //console.log(['UPDATE USER TOTLAL' ,req.query.user,totalQuestions]);
-                db.collection('users').updateOne({_id:{$eq:ObjectId(req.query.user)}},{$set:{questions:totalQuestions}}).then(function() {
-                  //  console.log('UPDATED');
-                });
+                //db.collection('users').updateOne({_id:{$eq:ObjectId(req.query.user)}},{$set:{questions:totalQuestions}}).then(function() {
+                  ////  console.log('UPDATED');
+                //});
                // //console.log(['topics',topics]);
                     //'quiz': {$in:[topics]} ,
                 let topicCriteria={}
@@ -1115,9 +1115,9 @@ router.get('/review', (req, res) => {
      if (req.query.topic && req.query.topic.length > 0) {
         criteria.push({topic:{$eq:req.query.topic}});
      }
-     if ((req.query.topic && req.query.topic.length > 0) || (req.query.band && req.query.band.length > 0)) {
-         // no time filter for search based
-     } else {
+     //if ((req.query.topic && req.query.topic.length > 0) || (req.query.band && req.query.band.length > 0)) {
+         //// no time filter for search based
+     //} else {
         let oneHourBack = new Date().getTime() - 3600000;
         let oneDayBack = new Date().getTime() - 86400000;
         //criteria.push({seen:{$lt:oneHourBack}});   
@@ -1127,7 +1127,7 @@ router.get('/review', (req, res) => {
              {$and:[{seen:{$lt:oneDayBack}},{successTally:{$gt:2}}]},
              {successTally:{$not:{$gt:0}}}
         ]});    
-     }
+     //}
      //else {
     
     criteria.push({$or:[{block :{$lte:0}},{block :{$exists:false}}]});
@@ -1268,7 +1268,7 @@ router.get('/review', (req, res) => {
 router.get('/questions', (req, res) => {
     //console.log('search questions');
     //console.log(req.query);
-    let limit = 20;
+    let limit = 10;
     let skip = 0;
     if (req.query.limit && req.query.limit > 0) {
         limit = req.query.limit;
@@ -1315,7 +1315,7 @@ router.get('/questions', (req, res) => {
             if (req.query.missingMnemonicsOnly > 0) {
                 criteria.push({ $where: "this.mnemonic.length == 0"});
             } 
-            db.collection('questions').find({$and:criteria}).sort({sort:1}).toArray(function(err, results) {
+            db.collection('questions').find({$and:criteria}).limit(limit*10).sort({sort:1}).toArray(function(err, results) {
               res.send({'questions':results});
             })
         // SEARCH BY tag
@@ -1488,15 +1488,19 @@ function updateUserQuestionProgress(user,question,quiz,tags,ok_for_alexa,tallySu
         progress.block=0;
         db.collection('userquestionprogress').save(progress).then(function() {
             
-        });
-    
+        });    
   }).catch(function(e) {
       //console.log(['err',e]);
   });
-    
 }
 
-
+function updateUserStats(userId,question,tallySuccess) {
+     db.collection('user').findOne({'_id': {$eq:ObjectId(userId)}}).then(function(user) {
+         
+     }).catch(function(e) {
+         console.log(e);
+     });
+}
 
 router.post('/seen', (req, res) => {
     ////console.log(['seen',req.body]);
@@ -1644,7 +1648,7 @@ router.post('/savemnemonic', (req, res) => {
         let id = req.body._id ? ObjectId(req.body._id) : new ObjectId();
         let toSave = {_id:id,user:ObjectId(req.body.user),question:ObjectId(req.body.question),mnemonic:req.body.mnemonic,questionText:req.body.questionText,technique:req.body.technique};
         db.collection('mnemonics').save(toSave).then(function(updated) {
-            db.collection('questions').update({_id:ObjectId(req.body.question)},{hasMnemonic:true})
+            db.collection('questions').update({_id:ObjectId(req.body.question)},{$set:{hasMnemonic:true}})
             res.send('updated');
         }).catch(function(e) {
             res.send('error on update');
@@ -1657,25 +1661,25 @@ router.post('/savemnemonic', (req, res) => {
 router.post('/deletemnemonic', (req, res) => {
     if (req.body._id && req.body._id.length > 0) {
          db.collection('mnemonics').findOne({_id:ObjectId(req.body._id)}).then(function(mnemonic) {
-          //   console.log('REMOVED MNEMONIC '+JSON.stringify(mnemonic));
+             console.log('found MNEMONIC '+JSON.stringify(mnemonic));
             db.collection('mnemonics').remove({_id:ObjectId(req.body._id)}).then(function(result) {
-            //    console.log('REMOVED MNEMONIC '+JSON.stringify(result));
+                console.log('REMOVED MNEMONIC '+JSON.stringify(result));
                 // do we still have a mnemonic ?
                 db.collection('questions').findOne({_id:ObjectId(mnemonic.question)}).then(function(question) {
-              //      console.log('REMOVED MNEMONIC FOUND Q '+JSON.stringify(question));
+                    console.log('REMOVED MNEMONIC FOUND Q '+JSON.stringify(question));
                     if (question && question.mnemonic && question.mnemonic.length > 0) {
                         // yes, nothing to do
-                //        console.log('REMOVED MNEMONIC FOUND Q HAS MNEMONIC ');
+                        console.log('REMOVED MNEMONIC FOUND Q HAS MNEMONIC ');
                     } else {
                         db.collection('mnemonics').find({question:ObjectId(mnemonic.question)}).toArray().then(function(mnemonics) {
-                  //          console.log('REMOVED MNEMONIC FOUND MNEMONICS ');
+                            console.log('REMOVED MNEMONIC FOUND MNEMONICS ');
                             if (mnemonics && mnemonics.length > 0) {
                                 // yes, nothing to do
-                    //            console.log('REMOVED MNEMONIC FOUND some mneem '+mnemonics.length);
+                                console.log('REMOVED MNEMONIC FOUND some mneem '+mnemonics.length);
                             } else {
-                      //          console.log('UPDATE QUESTION WITHOUT MNEMONIC');
-                                db.collection('questions').update({_id:ObjectId(mnemonic.question)},{hasMnemonic:false}).then(function() {
-                        //            console.log('REMOVED MNEMONIC UPDATED QUESTION AFTER LOOKUP ');
+                                console.log('UPDATE QUESTION WITHOUT MNEMONIC');
+                                db.collection('questions').update({_id:ObjectId(mnemonic.question)},{$set:{hasMnemonic:false}}).then(function() {
+                                    console.log('REMOVED MNEMONIC UPDATED QUESTION AFTER LOOKUP ');
                                 });
                             }
                         });
@@ -1931,6 +1935,25 @@ function updateTags(tags) {
 }
 
 
+
+
+function updateMnemonics(mnemonics) {
+	console.log(['update mnemonics',mnemonics]);
+	mnemonics.map(function(mnemonic) {
+		// use importId -1 to flag userTopic mnemonics 
+		db.collection('mnemonics').remove({$and:[{importId:-1},{question:{$eq:ObjectId(mnemonic.question)}}]}).then(function(delresult) {
+		   mnemonic.importId = -1;
+		   db.collection('mnemonics').insert(mnemonic).then(function() {
+			   console.log('inserted');
+			});
+		}).catch(function(e) {
+			//console.log({'erri1':e});
+		});
+	});
+
+}
+
+
 router.post('/unpublishusertopic', (req, res) => {
     ////console.log(['del usrtop',req.body]);
     if (req.body._id && req.body._id.length > 0) {
@@ -2040,7 +2063,7 @@ router.post('/publishusertopic', (req, res) => {
     ////console.log(['pub usrtop',req.body]);
     let preview=req.body.preview;
     let tags={}
-                         
+    let mnemonics=[];                      
     if (req.body._id && req.body._id.length > 0) {
         db.collection('userTopics').findOne({$and:[{user:ObjectId(req.body.user)},{_id:ObjectId(req.body._id)}]}).then(function(userTopic) {
             db.collection('users').findOne({_id:ObjectId(userTopic.user)}).then(function(user) {
@@ -2085,9 +2108,10 @@ router.post('/publishusertopic', (req, res) => {
                             question.userQuestion=true;
                             question.userTopic=ObjectId(req.body._id);
                             if (question.mnemonic && question.mnemonic.length > 0) {
-                                question.hasMnemonic = 1;
+                                question.hasMnemonic = true;
+                                mnemonics.push({user:question.user,question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question});
                             } else {
-                                question.hasMnemonic = 0;
+                                question.hasMnemonic = false;
                             }
                              if (Array.isArray(question.tags)) {
                                    question.tags.map(function(tag,key) {
@@ -2152,6 +2176,7 @@ router.post('/publishusertopic', (req, res) => {
                                  
                                 Promise.all(promises).then(function() {
                                     updateTags(tags);
+                                    updateMnemonics(mnemonics);
                                 });  
                                 // save usertopic
                                 db.collection('userTopics').save(userTopic).then(function(result) {

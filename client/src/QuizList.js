@@ -63,7 +63,7 @@ export default class QuizList extends Component {
                 return quiz;
             });
             // var title = Utils.snakeToCamel(quiz)
-            let url='/api/missingmnemonics';
+            let url='/api/missingmnemonics?rand='+Math.random();
             fetch(url,{ method: "POST",headers: {
                 "Content-Type": "application/json"
                 },
@@ -98,11 +98,14 @@ export default class QuizList extends Component {
             let quizzes = Object.keys(this.props.quizzes).sort().map((quiz, key) => {
               var title = Utils.snakeToCamel(quiz)
               let missingCount = this.state.questionsMissingMnemonics && this.state.questionsMissingMnemonics.hasOwnProperty(quiz) ? this.state.questionsMissingMnemonics[quiz] : 0;
-              return <Link to={"/discover/topic/"+quiz}  className='list-group-item' key={quiz} >
+              return (<span key={quiz}  className='list-group-item'>
+				  <Link to={"/discover/searchtopic/"+quiz}   >
+					<span>{title}</span>
+				  </Link>
+				  {missingCount > 0 && this.props.isLoggedIn && this.props.isLoggedIn() && <a href={"/missing/"+quiz} className='btn btn-success' style={{float:'right'}}  ><FaChild size="22" /> {missingCount}</a>}
               
-              <span>{title}</span>
-              <div>{this.state.description[quiz]}</div>
-              {missingCount > 0 && this.props.isLoggedIn && this.props.isLoggedIn() && <button className='btn btn-success' style={{float:'right'}} onClick={() => this.props.setQuizFromMissingMnemonic(quiz)} ><FaChild size="22" /> {missingCount}</button>}</Link>
+				  <div>{this.state.description[quiz]}</div>
+              </span>);
               
             })
             return (

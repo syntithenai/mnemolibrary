@@ -6,7 +6,10 @@
     font-style: normal;
 
 }
-
+a:hover, a:visited, a:link, a:active
+{
+    text-decoration: none;
+}
 body {
   margin: 0;
   padding: 0;
@@ -86,6 +89,9 @@ body {
     padding-right: 0;
     margin-left: 0;
     padding-left: 0;
+}
+.questionwrap .question.review {
+    margin-top:4em;
 }
 .dddquestionwrap .blocked-tags {
 margin-top:2em;

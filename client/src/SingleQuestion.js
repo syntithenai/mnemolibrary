@@ -382,7 +382,7 @@ export default class SingleQuestion extends Component {
           let target=false;
           if (question.link && question.link.length > 0) {
              //if (question.link.indexOf('wikipedia.org') > 0) {
-             if (question.link.indexOf('wikipedia.org') > 0 || question.link.indexOf('unistudyguides.com') > 0 ) {
+             if (question.link.indexOf('wikipedia.org') > 0  ) {
                  let parts = question.link.split('#');
                  if (parts.length>1) {
                     link = parts.slice(0,-1) + '?printable=yes#' + parts.slice(-1);
@@ -469,8 +469,10 @@ export default class SingleQuestion extends Component {
                 shortLink = question.link.slice(0,endDomain);
             }
             let hasMedia=this.hasMedia(question);
-              
-                   
+            let cardClassName = "card question container";
+            if (this.props.isReview) cardClassName = "card question container review";
+            let shortAnswerStyle={fontSize:'1.1em',fontFamily:'sans_forgeticaregular'};
+            if (this.props.isReview)   shortAnswerStyle={fontSize:'1.1em'};
            return (
             <div className="questionwrap" >
             <ShareDialog id="sharedialog"  header={header}  question={question}/>
@@ -508,7 +510,7 @@ export default class SingleQuestion extends Component {
                 </div>
                 
                 
-                <div className="card question container" style={{backgroundColor: '#add8e6'}}>
+                <div className={cardClassName} style={{backgroundColor: '#add8e6'}}>
                      <div id="spacerforsmall" className='d-none d-sm-block d-md-none' ><br/><br/> </div>
                     <div id="progressbar" style={{backgroundColor: 'blue',width: '100%',height:'0.3em'}} > <div id="innerprogressbar" style={{backgroundColor: 'red',height:'0.3em',width: this.props.percentageFinished()}} >&nbsp;</div></div>
                     
@@ -526,7 +528,7 @@ export default class SingleQuestion extends Component {
                             <button style={{marginTop:'1em',float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button></span>}
                         
                         
-                        <div style={{fontSize:'1.2em'}} className="card-title">{header}?</div>
+                        <div style={{fontSize:'1.2em'}} className="card-title">{this.props.isReview && <br/>}{header}?</div>
                         <div className="card-block">
                             {(this.isVisible('media') || question.autoplay_media==="YES") && question.mediaattribution && hasMedia  && <div className="card-block mediaattribution">
                             <div  className='card-text ' style={{fontSize:'0.85em'}}><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
@@ -543,7 +545,7 @@ export default class SingleQuestion extends Component {
                             <div  className='card-text'><b>Answer</b><br/> 
                              
                                 
-                            <span className='shortanswer' style={{fontSize:'1.1em'}} >{shortanswer}</span>&nbsp;&nbsp;&nbsp;&nbsp;{showLongAnswer && <button style={{display:'inline'}} className="btn btn-primary" onClick={() => this.setVisible('answer')}>...</button>}</div>
+                            <span className='shortanswer' style={shortAnswerStyle} >{shortanswer}</span>&nbsp;&nbsp;&nbsp;&nbsp;{showLongAnswer && <button style={{display:'inline'}} className="btn btn-primary" onClick={() => this.setVisible('answer')}>...</button>}</div>
                         }
                             
                         </div>
@@ -613,7 +615,7 @@ export default class SingleQuestion extends Component {
         } else {
             return <div className="card question container" >
                
-                <div>No matching questions</div>
+                <div>No new/matching questions</div>
             </div>
         }
         

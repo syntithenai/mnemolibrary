@@ -7,8 +7,9 @@ import Play from 'react-icons/lib/fa/play';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
-
-export default class QuizCarousel extends Component {
+import { withRouter } from "react-router-dom";
+    
+export default withRouter( class QuizCarousel extends Component {
     constructor(props) {
         super(props);
         this.state={
@@ -18,7 +19,7 @@ export default class QuizCarousel extends Component {
             //'currentQuestion':this.props.currentQuestion,
             'quizComplete': false,
             'showList':false,
-            'isReview': this.props.isReview,
+          //  'isReview': this.props.isReview,
             'success' : [],
             'logged':{seen:{},success:{}}
         };
@@ -33,17 +34,25 @@ export default class QuizCarousel extends Component {
         this.discoverQuestions = this.discoverQuestions.bind(this);
         this.goto = this.goto.bind(this);
         this.onClickListQuestion=this.onClickListQuestion.bind(this);
+        this.initialiseFromParams = this.initialiseFromParams.bind(this);
       //  //console.log(['QUIZ carousel constr']);
     };
     
     componentDidMount() {
-        let that = this;
         if (this.props.isReview !== true) {
-           console.log(['QUIZ CAR DID MOUNT',this.props,this.props.isReview,this.props.match]); //this.state.currentQuiz,this.props.questions
+           this.initialiseFromParams();     
+        
+        }
+    };
+    
+    
+    initialiseFromParams() {
+		let that = this;
+			console.log(['QUIZ CAR DID MOUNT',this.props,this.props.isReview,this.props.match]); //this.state.currentQuiz,this.props.questions
             if (this.props.match && this.props.match.params && this.props.match.params.searchtopic && this.props.match.params.searchtopic.length > 0) {
                 // DISCOVERY
                 setTimeout(function() {
-                     that.props.setQuizFromTopic(that.props.match.params.searchtopic);
+                     that.props.setQuizFromTopic(that.props.match.params.searchtopic,that.props.match.params.topicquestion);
                 },1000);
             } else if (this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0) {
                 // DISCOVERY
@@ -73,16 +82,18 @@ export default class QuizCarousel extends Component {
             //}  else if (this.props.match &&  this.props.match.params && this.props.match.params.question && this.props.match.params.question.length > 0) {
                 //// SEARCH PLUS TOPIC
                 //this.props.setQuizFromQuestionId(this.props.match.params.question);
+            } else if (this.props.match && this.props.match.params && this.props.match.params.missingtopic && this.props.match.params.missingtopic.length > 0) {
+                // DISCOVERY
+                setTimeout(function() {
+                     that.props.setQuizFromMissingMnemonic(that.props.match.params.missingtopic);
+                },1000);
             } else {
                 // DISCOVER ALL
                 setTimeout(function() {
                     that.props.discoverQuestions();
                 },1000);
-            }      
-        
-        }
-    };
-    
+            } 
+    }
     
   isQuizFinished(quiz) {
       //if (this.props.isReview) {
@@ -266,7 +277,7 @@ export default class QuizCarousel extends Component {
                 },
                 {
                   label: 'Continue',
-                  onClick: () => this.discoverQuestions()
+                  onClick: () => this.initialiseFromParams()
                 },
                 {
                   label: 'Search',
@@ -276,7 +287,7 @@ export default class QuizCarousel extends Component {
             if (this.props.user && String(this.props.user._id).length > 0) {
                 buttons.push({
                   label: 'Profile',
-                  onClick: () => this.props.setCurrentPage('profile')
+                  onClick: () => this.goto('profile')
                 })
             }
             
@@ -313,21 +324,27 @@ export default class QuizCarousel extends Component {
     
     
     reviewQuestions() {
-        //let that = this;
-        ////let topic = this.props.getCurrentTopic();
-        ////console.log(['finish quiz',topic]);
-      
-        ////this.props.setReviewFromTopic(topic);
-        ////this.props.setCurrentPage('review')
-        //let query='';
-        //if (this.props.match.params) {
-            //Object.keys(this.props.match.params).map(function(key) {
-                //let val = that.props.match.params[key];
-                //query="/"+key+"/"+val;
-            //});
-        //}
-        ////this.props.discoverQuizFromTopic(topic);
-        //query=query+'/'+Math.random();
+       
+       let that = this;
+			 if (this.props.match && this.props.match.params.topic && this.props.match.params.topic.length > 0) {
+               // setTimeout(function() {
+                    //console.log(['REVIEW PAGE call ',that.props.match]); 
+                    //that.props.setReviewFromTopic(that.props.match.params.topic,that.props.match.params.topicquestion);
+                    that.goto("/review/"+that.props.match.params.topic);
+                //},1000);
+            } else if (this.props.match && this.props.match.params && this.props.match.params.band && this.props.match.params.band.length > 0) {
+                //setTimeout(function() {
+                    //console.log(['REV review from band',that.props.match.params.band,that.props.reviewBySuccessBand]);
+                    //that.props.reviewBySuccessBand(that.props.match.params.band);
+                    that.goto("/review/band/"+that.props.match.params.topic);
+                //},1000);
+            } else {
+                //setTimeout(function() {
+                    //that.props.getQuestionsForReview();
+                    that.goto("/review")
+                //},1000);
+            }
+       
         //this.setState({exitRedirect:'/review'+query});
     };
     
@@ -380,10 +397,10 @@ export default class QuizCarousel extends Component {
                     if (parseInt(this.props.currentQuestion,10) > 0) {
                         label='Continue' ;
                     }
-                    content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList isReview={this.state.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  onClick={this.onClickListQuestion}></QuestionList></div>);
+                    content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList isReview={this.props.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  onClick={this.onClickListQuestion}></QuestionList></div>);
                 } else {
                     // single question
-                    content = (<SingleQuestion percentageFinished={this.percentageFinished} isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic}   setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn}/> )
+                    content = (<SingleQuestion percentageFinished={this.percentageFinished} isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic}   setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} isReview={this.props.isReview} /> )
                 }
             
             //} else {
@@ -401,4 +418,4 @@ export default class QuizCarousel extends Component {
             
         }
     }
-};
+});

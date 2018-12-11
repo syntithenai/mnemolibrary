@@ -11,44 +11,58 @@ export default class SearchPage extends Component {
     
     constructor(props) {
         super(props);
-        this.state={'titleFilter':'','techniqueFilter':''};
+        this.state={'techniqueFilter':''};
         // debounce(500,
-        this.setTitleFilter = this.setTitleFilter.bind(this);
+        this.setTitleFilter = this.props.setTitleFilter;
         this.setTechniqueFilter = this.setTechniqueFilter.bind(this);
         this.filterQuestions = this.filterQuestions.bind(this);
     };
     
-    setTitleFilter(event) {
-        let title = event.target.value;
-        let newState={'titleFilter':title,'techniqueFilter':this.state.techniqueFilter};
-        this.setState(newState);
-        this.filterQuestions(newState);
-    };
+    //setTitleFilter(event) {
+        //let title = event.target.value;
+        //let newState={'titleFilter':title,'techniqueFilter':this.state.techniqueFilter};
+        //this.setState(newState);
+        //this.filterQuestions(newState);
+    //};
     
     setTechniqueFilter(event) {
         let technique    = event.target.value;
-        let newState={'titleFilter':this.state.titleFilter,'techniqueFilter':technique};
+        let newState={'titleFilter':this.props.titleFilter,'techniqueFilter':technique};
         this.setState(newState);
         this.filterQuestions(newState);
     };
     
+    componentDidMount() {
+		//this.setState({titleFilter:this.props.titleFilter)
+		this.filterQuestions({titleFilter:this.props.titleFilter,techniqueFilter:this.state.techniqueFilter}) 
+	}
+	
+	componentDidUpdate(props) {
+		if (this.props.titleFilter != props.titleFilter) {
+			 this.filterQuestions({titleFilter:this.props.titleFilter,techniqueFilter:this.state.techniqueFilter}) 
+		}
+		//this.setState({titleFilter:this.props.titleFilter)
+	}
     
     filterQuestions(filters) {
       let that = this;
-      // load mnemonics and collate tags, topics
-      fetch('/api/questions?search='+filters.titleFilter+'&technique='+filters.techniqueFilter.toLowerCase())
-      .then(function(response) {
-        //  //console.log(['got response', response])
-        return response.json()
-        }).then(function(json) {
-          ////console.log(['set state', json])
-          if (json.questions) {
-            //  //console.log(['set state', json])
-            that.setState({'questions':json.questions});
-          }
-      }).catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
+      if ((filters.titleFilter && filters.titleFilter.length > 0) || (filters.techniqueFilter && filters.techniqueFilter.length > 0)) {
+		   console.log(['filter questions'])
+		  // load mnemonics and collate tags, topics
+		  fetch('/api/questions?search='+filters.titleFilter+'&technique='+filters.techniqueFilter.toLowerCase())
+		  .then(function(response) {
+		 console.log(['got response', response])
+			return response.json()
+			}).then(function(json) {
+			  console.log(['set state', json])
+			  if (json.questions) {
+				console.log(['set state', json])
+				that.setState({'questions':json.questions});
+			  }
+		  }).catch(function(ex) {
+			console.log(['parsing failed', ex])
+		  })
+	  }
   }
     
     //filterQuestions(filters) {
@@ -88,13 +102,13 @@ export default class SearchPage extends Component {
             })
         return (
         <div>
-                <Link className="btn btn-info" to="/search/topics" >Topics</Link>
+                <Link className="btn btn-info" to="/search" >Topics</Link>
                   <Link className="btn btn-info"  to="/search/tags"  >Tags</Link>
               
             
               
                 <form className="form-inline" onSubmit={(e) => e.preventDefault()}>
-                  <DebounceInput className="form-control" type="text" value={this.state.titleFilter} onChange={this.setTitleFilter} placeholder="Search" aria-label="Search" debounceTimeout={300} />
+                  <DebounceInput className="form-control" type="text" value={this.props.titleFilter} onChange={this.setTitleFilter} placeholder="Search" aria-label="Search" debounceTimeout={300} />
                   <select className="form-control" value={this.state.techniqueFilter}  onChange={this.setTechniqueFilter} ><option></option>{techniques}</select>
                   <button className="btn btn-outline-success" type="submit" ><Search/></button>
                 </form>
