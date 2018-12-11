@@ -65,14 +65,14 @@ export default class SingleQuestion extends Component {
         // subscribe state change
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
-        //setTimeout(function() {
-			//console.log('timeout on sing leod now wiki')
-			//if (that.props.question) {
-				//console.log('timeout on sing leod now wiki RELLY')
-				//that.fromWikipedia();
-				//that.createMedia();
-			//}
-		//},1000);
+        setTimeout(function() {
+			console.log('timeout on sing leod now wiki')
+			if (that.props.question) {
+				console.log('timeout on sing leod now wiki RELLY')
+				that.fromWikipedia();
+				that.createMedia();
+			}
+		},1000);
       } 
       
       componentDidUpdate(props) {
@@ -364,6 +364,7 @@ export default class SingleQuestion extends Component {
         if (text) {
             text = text.replace('...',', ');
             text = text.replace('.[','. ');
+            text = text.replace('."','". ');
             return String(text).split('. ')[0];
         } else return '';
     };
