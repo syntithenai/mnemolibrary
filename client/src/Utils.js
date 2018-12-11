@@ -32,7 +32,7 @@ Utils.getQuestionTitle = function(question) {
 
 Utils.loadWikipediaIntro = function(question) {
     if (question && question.length > 0) {
-        let url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles='+question;
+        let url = 'https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles='+question;
         return fetch(url)
           .then(function(response) {
             ////console.log(['got response', response])
@@ -65,7 +65,7 @@ Utils.loadWikipediaImage = function(question) {
    // console.log(['wiki load image', question])
     if (question && question.length > 0) {
         // LOOKUP IMAGE
-        let url = 'https://en.wikipedia.org/w/api.php?origin=*&action=query&prop=pageimages&format=json&piprop=original&titles='+question
+        let url = 'https://en.wikipedia.org/w/api.php?origin=*&redirects=true&action=query&prop=pageimages&format=json&piprop=original&titles='+question
         //let url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&origin=*&prop=images&titles='+question;
         return fetch(url)
           .then(function(response) {

@@ -347,9 +347,10 @@ let mnemoQueries = {
   setQuizFromMissingMnemonic : function(topic) {
       let that = this;
       let url='/api/questions?limit=100&missingMnemonicsOnly=1'
-      if (this.state.user) {
-          url=url+'&user='+this.state.user._id;
-      }
+      
+      //if (this.state.user) {
+          //url=url+'&user='+this.state.user._id;
+      //}
       if (topic && topic.length > 0) {
           url = url + '&topic='+topic ;
       }

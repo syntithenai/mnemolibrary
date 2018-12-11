@@ -1270,8 +1270,8 @@ router.get('/questions', (req, res) => {
     //console.log(req.query);
     let limit = 10;
     let skip = 0;
-    if (req.query.limit && req.query.limit > 0) {
-        limit = req.query.limit;
+    if (req.query.limit && parseInt(req.query.limit,10) != NaN) {
+        limit = parseInt(req.query.limit,10);
     }
     if (req.query.skip && req.query.skip > 0) {
         skip = req.query.skip;
@@ -1299,7 +1299,6 @@ router.get('/questions', (req, res) => {
           res.send({'questions':results});
         })
     } else {
-        
         // SEARCH BY technique
         if (req.query.technique && req.query.technique.length > 0) {
             criteria.push({'mnemonic_technique': {$eq:req.query.technique}});
@@ -1307,14 +1306,33 @@ router.get('/questions', (req, res) => {
               res.send({'questions':results});
             })
         // SEARCH BY topic
+        } else if (req.query.missingMnemonicsOnly > 0) {
+			console.log(['search by missing mnem '+ req.query.topic]);
+            //db.collection('mnemonics').find({}).toArray(function(err, mnemonics) {
+                //let existingMnemonicIds = mnemonics.map(function(mnemonic) {
+                    //return mnemonic._id;
+                //});
+                if (req.query.topic) { 
+					let topic = req.query.topic; 
+					criteria.push({ hasMnemonic:{$ne:true}});
+					criteria.push({quiz:{$eq:topic}});
+				   // criteria.push({'_id': {$nin: existingMnemonicIds}});
+					console.log(['search by missing mnem have toic',criteria]);
+					
+					db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({successRate:-1}).toArray(function(err, results) {
+						console.log(['search by missing mnem',results]);
+					  res.send({'questions':results});
+					})
+				}
+            //})
         } else  if (req.query.topic && req.query.topic.length > 0) {
             ////console.log(['topic search',req.query.topic,{'quiz': {$eq:req.query.topic}}]);
             let topic = req.query.topic.trim(); //.toLowerCase(); 
             criteria.push({'quiz': {$eq:topic}});
           //  //console.log(['topic search C    ',criteria]);
-            if (req.query.missingMnemonicsOnly > 0) {
-                criteria.push({ $where: "this.mnemonic.length == 0"});
-            } 
+            //if (req.query.missingMnemonicsOnly > 0) {
+                //criteria.push({ $where: "this.hasMnemonic !== true"});
+            //} 
             db.collection('questions').find({$and:criteria}).limit(limit*10).sort({sort:1}).toArray(function(err, results) {
               res.send({'questions':results});
             })
@@ -1341,19 +1359,7 @@ router.get('/questions', (req, res) => {
                     res.send({'questions':results});
                 })
             //}
-        } else if (req.query.missingMnemonicsOnly > 0) {
-            db.collection('mnemonics').find({}).toArray(function(err, mnemonics) {
-                let existingMnemonicIds = mnemonics.map(function(mnemonic) {
-                    return mnemonic._id;
-                });
-                criteria.push({ hasMnemonic:{$ne:true}});
-                criteria.push({discoverable:{$ne:'no'}});
-                criteria.push({'_id': {$nin: existingMnemonicIds}});
-                db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({successRate:-1}).toArray(function(err, results) {
-                  res.send({'questions':results});
-                })
-            })
-        } else {
+        }  else {
             res.send({'questions':[]});
         //db.collection('questions').find({}).sort({question:1}).toArray(function(err, results) {
           //res.send({'questions':results});
@@ -1642,14 +1648,21 @@ router.post('/mymnemonics', (req, res) => {
 
 router.post('/savemnemonic', (req, res) => {
  //   //console.log(['seen',req.body]);
+ console.log(['save mnem']);
     if (req.body.user && req.body.question && req.body.mnemonic && req.body.mnemonic.length > 0) {//   && req.body.technique  && req.body.questionText ) {
+		console.log(['save mnem have params']);
         let user = req.body.user;
         let question = req.body.question;
         let id = req.body._id ? ObjectId(req.body._id) : new ObjectId();
         let toSave = {_id:id,user:ObjectId(req.body.user),question:ObjectId(req.body.question),mnemonic:req.body.mnemonic,questionText:req.body.questionText,technique:req.body.technique};
+        console.log(['save mnem',toSave]);
         db.collection('mnemonics').save(toSave).then(function(updated) {
-            db.collection('questions').update({_id:ObjectId(req.body.question)},{$set:{hasMnemonic:true}})
-            res.send('updated');
+			console.log(['saved mnem']);
+            db.collection('questions').update({_id:ObjectId(req.body.question)},{$set:{hasMnemonic:true}}).then(function() {
+				console.log(['updated question',req.body.question]);
+				//res.send('updated question '+req.body.question);
+			});
+            res.send('updated question '+req.body.question);
         }).catch(function(e) {
             res.send('error on update');
         });

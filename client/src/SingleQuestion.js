@@ -96,21 +96,25 @@ export default class SingleQuestion extends Component {
                 console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD',wikiPage,wikiPageParts]);
                 Utils.loadWikipediaIntro(wikiPage).then(function(answer) {
                     console.log(['FROM WIKIPEDIA got',answer]);
-                    that.setState({answer:answer});
-                    fetch("/api/savewikidata", {
-                       method: "POST",
-                       headers: {
-                        "Content-Type": "application/json"
-                        },
-                      body: JSON.stringify({_id:that.props.question._id,answer:answer})
-                    }).then(function(response) {
-                        return response.json();
-                    }).then(function(token) {
-                        console.log('updated wiki data');
-                    })
-                    .catch(function(err) {
-                        console.log(['ERR',err]);
-                    });
+                    if (answer && answer.length > 0) {
+						that.setState({answer:answer});
+						fetch("/api/savewikidata", {
+						   method: "POST",
+						   headers: {
+							"Content-Type": "application/json"
+							},
+						  body: JSON.stringify({_id:that.props.question._id,answer:answer})
+						}).then(function(response) {
+							return response.json();
+						}).then(function(token) {
+							console.log('updated wiki data');
+						})
+						.catch(function(err) {
+							console.log(['ERR',err]);
+						});
+					} else {
+						that.setState({answer:''});
+					}
                 });                    
             } else {
                 that.setState({answer:''});
@@ -144,7 +148,9 @@ export default class SingleQuestion extends Component {
                         .catch(function(err) {
                             console.log(['ERR',err]);
                         });
-                    }
+                    } else {
+						that.setState({image:''});
+					}
                 });                    
             } else {
                 that.setState({image:''});
@@ -194,7 +200,9 @@ export default class SingleQuestion extends Component {
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
         setTimeout(function() {
+			console.log('timeout on sing leod now wiki')
 			if (that.props.question) {
+				console.log('timeout on sing leod now wiki RELLY')
 				that.fromWikipedia();
 				that.createMedia();
 			}
@@ -265,7 +273,7 @@ export default class SingleQuestion extends Component {
       }
       
       componentDidUpdate(props) {
-          //console.log(['SQ UPDATE',JSON.parse(JSON.stringify(props.question)),JSON.parse(JSON.stringify(this.props.question))]);
+          console.log(['SQ UPDATE']);
           if (this.props.question && props.question && this.props.question._id != props.question._id) {
             this.fromWikipedia();
              this.createMedia();
