@@ -193,10 +193,12 @@ export default class SingleQuestion extends Component {
         // subscribe state change
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
-        if (this.props.question) {
-            that.fromWikipedia();
-            that.createMedia();
-        }
+        setTimeout(function() {
+			if (this.props.question) {
+				that.fromWikipedia();
+				that.createMedia();
+			}
+		},1000);
       }
       
       hasMedia(question) {
