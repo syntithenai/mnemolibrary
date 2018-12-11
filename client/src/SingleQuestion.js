@@ -194,7 +194,7 @@ export default class SingleQuestion extends Component {
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
         setTimeout(function() {
-			if (this.props.question) {
+			if (that.props.question) {
 				that.fromWikipedia();
 				that.createMedia();
 			}
