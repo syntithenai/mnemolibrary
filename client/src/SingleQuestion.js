@@ -57,6 +57,50 @@ export default class SingleQuestion extends Component {
         this.scrollTo={};
         this.questionmessage='';
     };
+
+    
+      componentDidMount() {
+          let that = this;
+           console.log(['SQ MOUNT',that.props.question]);
+        // subscribe state change
+        //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
+        scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
+        //setTimeout(function() {
+			//console.log('timeout on sing leod now wiki')
+			//if (that.props.question) {
+				//console.log('timeout on sing leod now wiki RELLY')
+				//that.fromWikipedia();
+				//that.createMedia();
+			//}
+		//},1000);
+      } 
+      
+      componentDidUpdate(props) {
+          console.log(['SQ UPDATE',props,this.props]);
+          let newId = this.props.question ? this.props.question._id : null;
+          let oldId = props.question ? props.question._id : null;
+          if (oldId !== newId) {
+			  console.log(['SQ UPDATE change question',oldId,newId]);
+             this.fromWikipedia();
+             this.createMedia();
+          }
+      };
+    
+     componentWillReceiveProps(props) {
+         let that=this;
+        // console.log(['rcv props',props]);
+       // if (this.refs.player) this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
+        scrollToComponent(this.scrollTo['media'],{align:'top',offset:-230});
+        //if (props.question) {
+            ////that.fromWikipedia();
+          ////  that.createMedia();
+            
+        //}
+        //this.toggleMedia();
+        //this.toggleMedia();
+    };
+    
+
     
     disableSwipe() {
         this.setState({swipeable:false});
@@ -193,21 +237,6 @@ export default class SingleQuestion extends Component {
 
             //this.setState({media:media});
     };
-    
-      componentDidMount() {
-          let that = this;
-        // subscribe state change
-        //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
-        scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
-        setTimeout(function() {
-			console.log('timeout on sing leod now wiki')
-			if (that.props.question) {
-				console.log('timeout on sing leod now wiki RELLY')
-				that.fromWikipedia();
-				that.createMedia();
-			}
-		},1000);
-      }
       
       hasMedia(question) {
          // console.log(['HASMEDIA',question]);
@@ -271,28 +300,7 @@ export default class SingleQuestion extends Component {
           //player: state
         //});
       }
-      
-      componentDidUpdate(props) {
-          console.log(['SQ UPDATE']);
-          if (this.props.question && props.question && this.props.question._id != props.question._id) {
-            this.fromWikipedia();
-             this.createMedia();
-          }
-      };
-    
-     componentWillReceiveProps(props) {
-         let that=this;
-        // console.log(['rcv props',props]);
-       // if (this.refs.player) this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
-        scrollToComponent(this.scrollTo['media'],{align:'top',offset:-230});
-        if (props.question) {
-            //that.fromWikipedia();
-          //  that.createMedia();
-            
-        }
-        //this.toggleMedia();
-        //this.toggleMedia();
-    };
+
     
     removeA(arr) {
         var what, a = arguments, L = a.length, ax;
