@@ -126,80 +126,82 @@ export default class SingleQuestion extends Component {
     fromWikipedia() {
         let that = this;
         console.log(['FROM WIKIPEDIA']);
-        if (this.props.question.answer && this.props.question.answer.length > 0) {
-            console.log(['FROM WIKIPEDIA HAVE ANSWER']);
-            this.setState({answer:this.props.question.answer});
-        } else {
-            console.log(['FROM WIKIPEDIA LOOKUP ANSWER']);
-            if (this.props.question.link && this.props.question.link.length > 0 && (this.props.question.link.indexOf('wikipedia.org') !== -1 ||this.props.question.link.indexOf('wiktionary.org') !== -1)) {
-                console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD']);
-                let linkParts = this.props.question.link.split("/");
-                let wikiPageParts = linkParts[linkParts.length - 1].split("#");
-                let wikiPage = wikiPageParts[0];
-                // wikilookup
-                console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD',wikiPage,wikiPageParts]);
-                Utils.loadWikipediaIntro(wikiPage).then(function(answer) {
-                    console.log(['FROM WIKIPEDIA got',answer]);
-                    if (answer && answer.length > 0) {
-						that.setState({answer:answer});
-						fetch("/api/savewikidata", {
-						   method: "POST",
-						   headers: {
-							"Content-Type": "application/json"
-							},
-						  body: JSON.stringify({_id:that.props.question._id,answer:answer})
-						}).then(function(response) {
-							return response.json();
-						}).then(function(token) {
-							console.log('updated wiki data');
-						})
-						.catch(function(err) {
-							console.log(['ERR',err]);
-						});
-					} else {
-						that.setState({answer:''});
-					}
-                });                    
-            } else {
-                that.setState({answer:''});
-            }
-        }
-        if (this.props.question.image && this.props.question.image.length > 0) {
-            this.setState({image:this.props.question.image});
-        } else if (this.props.question.image_png && this.props.question.image_png.length > 0) {
-            this.setState({image:this.props.question.image_png});
-        } else {
-            if (this.props.question.link && this.props.question.link.length > 0 &&  this.props.question.link.indexOf('wikipedia.org') !== -1) {
-                let linkParts = this.props.question.link.split("/");
-                let wikiPageParts = linkParts[linkParts.length - 1].split("#");
-                let wikiPage = wikiPageParts[0];
-                // wikilookup
-                Utils.loadWikipediaImage(wikiPage).then(function(answer) {
-                    console.log(['FROM WIKIPEDIA got image',answer]);
-                    that.setState({image:answer});
-                    if (answer && answer.length > 0) {
-                        fetch("/api/savewikidata", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json"
-                          },
-                          body: JSON.stringify({_id:that.props.question._id,image:answer})
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(token) {
-                            console.log('updated wiki data');
-                        })
-                        .catch(function(err) {
-                            console.log(['ERR',err]);
-                        });
-                    } else {
-						that.setState({image:''});
-					}
-                });                    
-            } else {
-                that.setState({image:''});
-            }
-        }
+        if (this.props.question) {
+			if (this.props.question.answer && this.props.question.answer.length > 0) {
+				console.log(['FROM WIKIPEDIA HAVE ANSWER']);
+				this.setState({answer:this.props.question.answer});
+			} else {
+				console.log(['FROM WIKIPEDIA LOOKUP ANSWER']);
+				if (this.props.question.link && this.props.question.link.length > 0 && (this.props.question.link.indexOf('wikipedia.org') !== -1 ||this.props.question.link.indexOf('wiktionary.org') !== -1)) {
+					console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD']);
+					let linkParts = this.props.question.link.split("/");
+					let wikiPageParts = linkParts[linkParts.length - 1].split("#");
+					let wikiPage = wikiPageParts[0];
+					// wikilookup
+					console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD',wikiPage,wikiPageParts]);
+					Utils.loadWikipediaIntro(wikiPage).then(function(answer) {
+						console.log(['FROM WIKIPEDIA got',answer]);
+						if (answer && answer.length > 0) {
+							that.setState({answer:answer});
+							fetch("/api/savewikidata", {
+							   method: "POST",
+							   headers: {
+								"Content-Type": "application/json"
+								},
+							  body: JSON.stringify({_id:that.props.question._id,answer:answer})
+							}).then(function(response) {
+								return response.json();
+							}).then(function(token) {
+								console.log('updated wiki data');
+							})
+							.catch(function(err) {
+								console.log(['ERR',err]);
+							});
+						} else {
+							that.setState({answer:''});
+						}
+					});                    
+				} else {
+					that.setState({answer:''});
+				}
+			}
+			if (this.props.question.image && this.props.question.image.length > 0) {
+				this.setState({image:this.props.question.image});
+			} else if (this.props.question.image_png && this.props.question.image_png.length > 0) {
+				this.setState({image:this.props.question.image_png});
+			} else {
+				if (this.props.question.link && this.props.question.link.length > 0 &&  this.props.question.link.indexOf('wikipedia.org') !== -1) {
+					let linkParts = this.props.question.link.split("/");
+					let wikiPageParts = linkParts[linkParts.length - 1].split("#");
+					let wikiPage = wikiPageParts[0];
+					// wikilookup
+					Utils.loadWikipediaImage(wikiPage).then(function(answer) {
+						console.log(['FROM WIKIPEDIA got image',answer]);
+						that.setState({image:answer});
+						if (answer && answer.length > 0) {
+							fetch("/api/savewikidata", {
+							  method: "POST",
+							  headers: {
+								"Content-Type": "application/json"
+							  },
+							  body: JSON.stringify({_id:that.props.question._id,image:answer})
+							}).then(function(response) {
+								return response.json();
+							}).then(function(token) {
+								console.log('updated wiki data');
+							})
+							.catch(function(err) {
+								console.log(['ERR',err]);
+							});
+						} else {
+							that.setState({image:''});
+						}
+					});                    
+				} else {
+					that.setState({image:''});
+				}
+			}			
+		}
     };
     
     
