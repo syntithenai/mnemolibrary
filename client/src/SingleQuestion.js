@@ -208,36 +208,38 @@ export default class SingleQuestion extends Component {
     createMedia() {
         let sources=[]
         let question=this.props.question
-        if (question.media && question.media.length > 0) sources.push(<source src={question.media} />)
-        if (question.media_ogg && question.media_ogg.length > 0) sources.push(<source src={question.media_ogg} />)
-        if (question.media_webm && question.media_webm.length > 0) sources.push(<source src={question.media_webm} />)
-        if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source src={question.media_mp4} />)
-            
-        if (question.media_mp3 && question.media_mp3.length > 0) sources.push(<source src={question.media_mp3} />)
-        if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source src={question.media_mp4} />)
-        if (question.media_webmvideo && question.media_webmvideo.length > 0) sources.push(<source src={question.media_webmvideo} />)
-        if (question.media_webmaudio && question.media_webmaudio.length > 0) sources.push(<source src={question.media_webmaudio} />)
-            
-        console.log(['SINGLE VIEW CREATE MEDIA from q',this.props.question]);
-        let that = this;
-            let media=<Player
-              ref={this.setPlayerRef}
-              playsInline
-              autoPlay={true}
-              height={this.state.playerHeight}
-              width={this.state.playerWidth}
-              fluid={false}
-            >
-            {sources}
-            </Player>
-            console.log(['SINGLE VIEW CREATE MEDIA',media]);
-            setTimeout(function() {
-                console.log(['SINGLE VIEW UPDATE MEDIA',media,question.media]);
-                    that.setState({media:media});
-                    if (that.player) that.player.load();
-            },100);
+        if (question) {
+			if (question.media && question.media.length > 0) sources.push(<source src={question.media} />)
+			if (question.media_ogg && question.media_ogg.length > 0) sources.push(<source src={question.media_ogg} />)
+			if (question.media_webm && question.media_webm.length > 0) sources.push(<source src={question.media_webm} />)
+			if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source src={question.media_mp4} />)
+				
+			if (question.media_mp3 && question.media_mp3.length > 0) sources.push(<source src={question.media_mp3} />)
+			if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source src={question.media_mp4} />)
+			if (question.media_webmvideo && question.media_webmvideo.length > 0) sources.push(<source src={question.media_webmvideo} />)
+			if (question.media_webmaudio && question.media_webmaudio.length > 0) sources.push(<source src={question.media_webmaudio} />)
+				
+			console.log(['SINGLE VIEW CREATE MEDIA from q',this.props.question]);
+			let that = this;
+				let media=<Player
+				  ref={this.setPlayerRef}
+				  playsInline
+				  autoPlay={true}
+				  height={this.state.playerHeight}
+				  width={this.state.playerWidth}
+				  fluid={false}
+				>
+				{sources}
+				</Player>
+				console.log(['SINGLE VIEW CREATE MEDIA',media]);
+				setTimeout(function() {
+					console.log(['SINGLE VIEW UPDATE MEDIA',media,question.media]);
+						that.setState({media:media});
+						if (that.player) that.player.load();
+				},100);
 
-            //this.setState({media:media});
+				//this.setState({media:media});
+		}
     };
       
       hasMedia(question) {
