@@ -43,7 +43,7 @@ export default class ShareTopicDialog extends Component {
         
         let title="Mnemo's Library -"+(this.props.question.mnemonic ? this.props.question.mnemonic : '') + " - \n" + question.interrogative+ ' ' +question.question + '?';
         let longTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + '?' ;
-        let twitterTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + "?\n" + question.link ;
+        let twitterTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + "?\n" + shareLink ;
         
         
         //let allTogether = title + "  \n" + otherLink  + "  \n" + mainLink ;
@@ -63,7 +63,7 @@ export default class ShareTopicDialog extends Component {
                   <div className="modal-body">
                     <a className='btn btn-primary' href={mailTo} target='_new' ><Email size={26} />&nbsp;Email</a>
                     <br/>
-                    <br/><TwitterShareButton className='btn btn-primary' title={twitterTitle}  url={shareLink}  hashtags={["MnemosLibrary"]}><Twitter size={26} />&nbsp;Twitter</TwitterShareButton>
+                    <br/><TwitterShareButton className='btn btn-primary' title={twitterTitle}  url={question.link}  hashtags={["MnemosLibrary"]}><Twitter size={26} />&nbsp;Twitter</TwitterShareButton>
                     <br/><br/><FacebookShareButton className='btn btn-primary' quote={longTitle} url={shareLink}  ><Facebook size={26} />&nbsp;Facebook</FacebookShareButton>
                     
                   </div>
