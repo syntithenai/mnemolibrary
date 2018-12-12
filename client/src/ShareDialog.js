@@ -59,7 +59,7 @@ export default class ShareDialog extends Component {
                   <div className="modal-body">
                     <a className='btn btn-primary' href={mailTo} target='_new' ><Email size={26} />&nbsp;Email</a>
                     <br/>
-                    <br/><TwitterShareButton className='btn btn-primary' title={twitterTitle}  hashtags={["MnemosLibrary"]}><Twitter size={26} />&nbsp;Twitter</TwitterShareButton>
+                    <br/><TwitterShareButton className='btn btn-primary' title={twitterTitle} url={shareLink} hashtags={["MnemosLibrary"]}><Twitter size={26} />&nbsp;Twitter</TwitterShareButton>
                     <br/><br/><FacebookShareButton className='btn btn-primary' quote={longTitle} url={shareLink}  ><Facebook size={26} />&nbsp;Facebook</FacebookShareButton>
                     
                   </div>
