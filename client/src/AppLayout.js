@@ -853,7 +853,7 @@ export default class AppLayout extends Component {
     };
     
     hideCollection() {
-        this.setState({collection:null});
+        this.setState({collection:null,titleFilter:''});
     };
     
     collectionVisible() {

@@ -46,6 +46,29 @@ export default withRouter( class QuizCarousel extends Component {
     };
     
     
+    componentDidUpdate(props) {
+		console.log(['QUIZ CAR DID UPDATE',props.match,this.props.match]);
+        if (this.props.isReview !== true) {
+            // ensure existence old and new match.params    
+			if (this.props.match && props.match && this.props.match.params && props.match.params) {
+				console.log(['QUIZ CAR DID UPDATE start']);
+				if (this.props.match.topic !== props.match.topic 
+					|| this.props.match.searchtopic !== props.match.searchtopic 
+					|| this.props.match.topicquestion !== props.match.topicquestion 
+					|| this.props.match.tag !== props.match.tag
+					|| this.props.match.difficulty !== props.match.difficulty
+					|| this.props.match.technique !== props.match.technique
+					|| this.props.match.missingtopic !== props.match.missingtopic
+					|| this.props.match.topics !== props.match.topics 
+					|| this.props.match.url != props.match.url
+					) {
+						console.log(['QUIZ CAR DID UPDATE REALLY',props.match,this.props.match]);
+					  this.initialiseFromParams(); 
+				}
+			}
+        }
+    };
+    
     initialiseFromParams() {
 		let that = this;
 			console.log(['QUIZ CAR DID MOUNT',this.props,this.props.isReview,this.props.match]); //this.state.currentQuiz,this.props.questions
@@ -66,6 +89,7 @@ export default withRouter( class QuizCarousel extends Component {
                 },1000);
             } else if (this.props.match &&  this.props.match.params && this.props.match.params.tag && this.props.match.params.tag.length > 0) {
                 // SEARCH
+                console.log(['QUIZ CAR FROMTAG',that.props.match.params.tag]);
                 setTimeout(function() {
                      that.props.setQuizFromTag(that.props.match.params.tag);
                 },1000);
