@@ -32,7 +32,7 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "^0.9.5",
     "react-scroll-to-component": "^1.0.2",
-    "react-share": "^2.1.0",
+    "react-share": "^2.4.0",
     "react-swipe-component": "^1.4.0",
     "react-swipeable": "^4.2.1",
     "underscore": "^1.8.3",

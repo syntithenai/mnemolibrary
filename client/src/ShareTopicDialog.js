@@ -31,15 +31,19 @@ export default class ShareTopicDialog extends Component {
         // use the question link as the main link if available (so article images show on social network)
         // fallback to generated link back to nemo
         let shareLink=';'      
+        //let shareLinkTwitter='' 
+        
         if (question) {
-            shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+this.props.topic+"/"+question._id;    
+            //shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+this.props.topic+"/"+question._id;    
+            shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+encodeURIComponent(this.props.topic)+"/"+question._id;    
         } else {
-            shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+this.props.topic;    
+            //shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+this.props.topic;    
+            shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+encodeURIComponent(this.props.topic);    
         }
         
         let title="Mnemo's Library -"+(this.props.question.mnemonic ? this.props.question.mnemonic : '') + " - \n" + question.interrogative+ ' ' +question.question + '?';
         let longTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + '?' ;
-        let twitterTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + "?\n" +question.link  ;
+        let twitterTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + "?\n" +shareLink  + " " + question.link ;
         
         
         //let allTogether = title + "  \n" + otherLink  + "  \n" + mainLink ;
@@ -59,7 +63,7 @@ export default class ShareTopicDialog extends Component {
                   <div className="modal-body">
                     <a className='btn btn-primary' href={mailTo} target='_new' ><Email size={26} />&nbsp;Email</a>
                     <br/>
-                    <br/><TwitterShareButton className='btn btn-primary' title={twitterTitle} url={shareLink} hashtags={["MnemosLibrary"]}><Twitter size={26} />&nbsp;Twitter</TwitterShareButton>
+                    <br/><TwitterShareButton className='btn btn-primary' title={twitterTitle} hashtags={["MnemosLibrary"]}><Twitter size={26} />&nbsp;Twitter</TwitterShareButton>
                     <br/><br/><FacebookShareButton className='btn btn-primary' quote={longTitle} url={shareLink}  ><Facebook size={26} />&nbsp;Facebook</FacebookShareButton>
                     
                   </div>

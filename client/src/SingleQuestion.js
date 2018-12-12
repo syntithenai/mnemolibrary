@@ -134,6 +134,7 @@ export default class SingleQuestion extends Component {
         that.setState({answer:''});
         that.setState({image:''});
         if (this.props.question) {
+			let questionId = this.props.question._id;
 			if (this.props.question.answer && this.props.question.answer.length > 0) {
 				console.log(['FROM WIKIPEDIA HAVE ANSWER']);
 				this.setState({answer:this.props.question.answer});
@@ -155,7 +156,7 @@ export default class SingleQuestion extends Component {
 							   headers: {
 								"Content-Type": "application/json"
 								},
-							  body: JSON.stringify({_id:that.props.question._id,answer:answer})
+							  body: JSON.stringify({_id:questionId,answer:answer})
 							}).then(function(response) {
 								return response.json();
 							}).then(function(token) {
@@ -191,7 +192,7 @@ export default class SingleQuestion extends Component {
 							  headers: {
 								"Content-Type": "application/json"
 							  },
-							  body: JSON.stringify({_id:that.props.question._id,image:answer})
+							  body: JSON.stringify({_id:questionId,image:answer})
 							}).then(function(response) {
 								return response.json();
 							}).then(function(token) {
@@ -376,6 +377,8 @@ export default class SingleQuestion extends Component {
             text = text.replace('...',', ');
             text = text.replace('.[','. ');
             text = text.replace('."','". ');
+            text = text.replace('.\n','". ');
+            text = text.replace('_c._','_c.');
             return String(text).split('. ')[0];
         } else return '';
     };
