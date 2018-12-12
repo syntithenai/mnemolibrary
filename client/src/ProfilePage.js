@@ -38,6 +38,25 @@ export default class ProfilePage extends Component {
         this.addAward = this.addAward.bind(this);
        // //console.log(['constr',this.state]);
     };
+    
+    componentDidMount() {
+		// load recent user into state
+		let that = this;
+		fetch('/login/me?code='+this.props.token.access_token, {
+		  method: 'GET',
+		}).then(function(response) {
+			return response.json();
+			
+		}).then(function(res) {
+		   console.log(['REFRESH LOGIN me',res]);
+			let state={};
+			state.user = res.user;
+			that.setState(state);
+		})
+		.catch(function(err) {
+			//console.log(['ERR',err]);
+		});
+	}
 
     addAward(type,awardData) {
         //console.log(['ADDAWARD',type,awardData]);
@@ -49,9 +68,9 @@ export default class ProfilePage extends Component {
             newState[type] = awardData;
             this.setState(newState);
             
-            this.saveUser().then(function() {
-                    that.setState({'warning_message':''});
-            });
+            //this.saveUser().then(function() {
+                    //that.setState({'warning_message':''});
+            //});
             
         }
         function getGreenToRed(percent){
@@ -358,13 +377,13 @@ export default class ProfilePage extends Component {
                             </div>
                             <div className="col-12" style={{height: '660px'}} >
                                 <h4 id="leaderboard" className='graphTitle' >Leaderboards</h4>
-                                <LeaderBoard type="streak" user={this.props.user} />
+                                <LeaderBoard type="streak" user={this.state.user} />
                             </div>
                             <div className="col-12" style={{height: '660px'}} >
-                               <LeaderBoard type="questions" user={this.props.user}  />
+                               <LeaderBoard type="questions" user={this.state.user}  />
                             </div>
                             <div className="col-12" style={{height: '660px'}} >
-                               <LeaderBoard type="recall" user={this.props.user} />
+                               <LeaderBoard type="recall" user={this.state.user} />
                             </div>
                             
                             <div className="col-12">

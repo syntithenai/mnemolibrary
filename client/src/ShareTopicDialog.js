@@ -32,7 +32,7 @@ export default class ShareTopicDialog extends Component {
         // fallback to generated link back to nemo
         let shareLink=';'      
         if (question) {
-            shareLink = window.location.protocol+'//'+window.location.host+"/discover/question/"+question._id;    
+            shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+this.props.topic+"/"+question._id;    
         } else {
             shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+this.props.topic;    
         }

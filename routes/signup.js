@@ -314,7 +314,7 @@ router.post('/signup', function(req, res) {
 
                                 To confirm your registration, please click the link below.<br/>
 
-                                <a href="{{link}}" >Confirm registration</a><br/>
+                                <a href="{{link}}" >Confirm registration</a> ({{link}})<br/>
 
                                 If you did not recently register with Mnemo's Library, please ignore this email.<br/><br/>
 

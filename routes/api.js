@@ -1324,7 +1324,7 @@ router.get('/questions', (req, res) => {
 				   // criteria.push({'_id': {$nin: existingMnemonicIds}});
 					console.log(['search by missing mnem have toic',criteria]);
 					
-					db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({successRate:-1}).toArray(function(err, results) {
+					db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({sort:1}).toArray(function(err, results) {
 						console.log(['search by missing mnem',results]);
 					  res.send({'questions':results});
 					})
@@ -1463,20 +1463,25 @@ router.post('/block', (req, res) => {
 
 // update question stats into the questions collection
 function updateQuestionTallies(user,question,tallySuccess=false) {
+	//console.log(['update question tallies']);
     db.collection('questions').findOne({_id:ObjectId(question)}).then(function(result) {
             if (result && result._id) {
                 let data={};
                 data.seenTally = result.seenTally ? parseInt(result.seenTally,10) + 1 : 1;
-                let successTally = result.successTally ? parseInt(result.successTally,10) + 1 : (tallySuccess?1:0);
+                let successTally = result.successTally > 0 ? result.successTally : 0 ;
+                if (tallySuccess) {
+					successTally = parseInt(successTally,10) + 1 ;
+				}
                 data.successTally = successTally;
                 data.successRate = data.seenTally > 0 ? successTally/data.seenTally : 0;
                 db.collection('questions').update({_id: question},{$set:data}).then(function(qres) {
-                   // //console.log(['saved question',qres]);
+                ///   console.log(['saved questions',qres]);
                 });
                 updateUserQuestionProgress(user,question,result.quiz,result.tags,result.ok_for_alexa,tallySuccess);
+              //  console.log(['update question tallies done']);
             }
     }).catch(function(e) {
-        //console.log(['update q err',e]);
+        console.log(['update q err',e]);
     });
      
 
@@ -1484,6 +1489,7 @@ function updateQuestionTallies(user,question,tallySuccess=false) {
 
 // update per user progress stats into the userquestionprogress collection
 function updateUserQuestionProgress(user,question,quiz,tags,ok_for_alexa,tallySuccess) {
+	//console.log(['update progress',user,question,quiz,tags,ok_for_alexa,tallySuccess]);
     db.collection('userquestionprogress').findOne({$and:[{'user': {$eq:ObjectId(user)}},{question:ObjectId(question)} , {block:{ $not: { $gt: 0 } }}]}).then(function(progress) {
         if (!progress) progress = {user:ObjectId(user),question:ObjectId(question)};
         progress.topic=quiz;
@@ -1497,17 +1503,72 @@ function updateUserQuestionProgress(user,question,quiz,tags,ok_for_alexa,tallySu
         }
         progress.successRate = (parseInt(progress.successTally,10) > 0 && parseInt(progress.seenTally,10) > 0) ? progress.successTally/progress.seenTally : 0;
         progress.block=0;
+       // console.log(['update progress',progress]);
         db.collection('userquestionprogress').save(progress).then(function() {
-            
+            updateUserStats(user,question,tallySuccess)
         });    
   }).catch(function(e) {
-      //console.log(['err',e]);
+      console.log(['err',e]);
   });
 }
 
 function updateUserStats(userId,question,tallySuccess) {
-     db.collection('user').findOne({'_id': {$eq:ObjectId(userId)}}).then(function(user) {
-         
+	//console.log(['update stats',userId,question,tallySuccess]);
+	let criteria = {_id: new ObjectId(userId)};
+	//console.log(['update stats have criteria ',criteria]);
+     db.collection('users').findOne(criteria).then(function(user) {
+	//	console.log(['update stats have user',user]);
+		
+		if (user) {
+			 //user.seen = user.seen > 0 : user.seen + 1 : 1;
+			 //let userSuccess = user.success > 0 : user.success  : 0;
+			 //if (tallySuccess) {
+				 //userSuccess += 1;
+			 //}
+			 //user.success = userSuccess;
+			 //user.successRate = user.seen > 0 ? userSuccess/user.seen : 0;
+			 // total unique questions seen
+			 //let lastSeen = 0;
+			 db.collection('userquestionprogress').find({$and:[{user: {$eq:ObjectId(userId)}}]}).toArray().then(function(uniqueQuestionResults) {
+				user.questions = uniqueQuestionResults ? uniqueQuestionResults.length : 0;
+				let seen = 0;
+				let success = 0;
+				uniqueQuestionResults.map(function(progress) {
+					//console.log(['SEENSUCC II',progress.successTally])
+					if (parseInt(progress.seenTally,10) > 0) seen += parseInt(progress.seenTally,10);
+					if (parseInt(progress.successTally,10) > 0) success += parseInt(progress.successTally,10);
+					//lastSeen = Math.max(lastSeen,progress.seen);
+				});
+				//console.log(['SEENSUCC',seen,success])
+				if (seen > 0) {
+					user.recall =  success/seen ; 
+				} else {
+					user.recall =  0; 
+				}
+				//console.log('set recall '+user.recall);
+				// streak
+				let now = new Date().getTime();
+				let startStreak = user.startStreak > 0 ? user.startStreak : new Date().getTime();
+				let lastSeen = user.lastSeen > 0 ? user.lastSeen : 0;
+				// more that 48 hours and we lose our streak
+				if (now - lastSeen > 172800000) {
+					startStreak = new Date().getTime(); 
+				}
+				user.startStreak = startStreak;
+				// days
+				user.streak = parseInt((now - startStreak)/86400000,10);
+				user.lastSeen = new Date().getTime();
+				//console.log(['update stats save user',user]);
+				db.collection('users').save(user).then(function(res) {
+					//console.log(['SAVED USER',res])
+				}).catch(function(e) {
+					console.log(e);
+				}); ;
+			}).catch(function(e) {
+				console.log(e);
+			});    
+				
+		}
      }).catch(function(e) {
          console.log(e);
      });
