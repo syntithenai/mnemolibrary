@@ -76,6 +76,7 @@ export default class QuizCollection extends Component {
             "Content-Type": "application/json"
             },
             body:JSON.stringify({
+                restrictDiscoverable:"true",
                 topics:topics.join(","),
                 user:(that.props.user ? that.props.user._id : ''),
                 rand:rand,
@@ -108,7 +109,7 @@ export default class QuizCollection extends Component {
             "Content-Type": "application/json"
             },
             body:JSON.stringify({
-                user:(that.props.user ? that.props.user._id : ''),
+				user:(that.props.user ? that.props.user._id : ''),
                 rand:rand,
                 limit:50
             })

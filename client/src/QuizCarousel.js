@@ -287,7 +287,7 @@ export default withRouter( class QuizCarousel extends Component {
             if (this.props.user && String(this.props.user._id).length > 0) {
                 buttons.push({
                   label: 'Profile',
-                  onClick: () => this.goto('profile')
+                  onClick: () => this.goto('/profile')
                 })
             }
             

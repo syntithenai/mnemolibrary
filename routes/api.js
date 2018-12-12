@@ -1016,6 +1016,9 @@ router.post('/discover', (req, res) => {
         criteria.push({userTopic:{$exists:true}});
         orderBy = 'sort';
     } else if (req.body.topics) {
+		if (req.body.restrictDiscoverable === "true") {
+			criteria.push({discoverable :{$ne:'no'}});
+		}
         let topics = req.body.topics.split(",");
         let orCriteria=[];
         topics.map(function(topic) {
@@ -1024,6 +1027,8 @@ router.post('/discover', (req, res) => {
         criteria.push({$or:orCriteria});
         orderBy = 'sort';
     } else if (req.body.difficulty) {
+		// difficulty search limited to discoverable
+		criteria.push({discoverable :{$ne:'no'}});
         criteria.push({difficulty:{$eq:String(req.body.difficulty)}});
         orderBy = '-successRate';
     } else if (req.body.topic) {
@@ -1071,7 +1076,7 @@ router.post('/discover', (req, res) => {
                             notThese.push(ObjectId(progress[seenId].question));
                         };
                         criteria.push({'_id': {$nin: notThese}});
-                        criteria.push({discoverable :{$ne:'no'}});
+                        //criteria.push({discoverable :{$ne:'no'}});
                         console.log(['discover',criteria]);
                         discoverQuery();
                     }
@@ -1084,7 +1089,7 @@ router.post('/discover', (req, res) => {
         });
     } else {
         criteria.push({access :{$eq:'public'}});
-        criteria.push({discoverable :{$ne:'no'}});
+        //criteria.push({discoverable :{$ne:'no'}});
         console.log(['discover',criteria]);
         discoverQuery();
       //  criteria.push({discoverable :{$ne:'no'}});
