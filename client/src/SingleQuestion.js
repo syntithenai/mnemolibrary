@@ -62,6 +62,8 @@ export default class SingleQuestion extends Component {
       componentDidMount() {
           let that = this;
            console.log(['SQ MOUNT',that.props.question]);
+        that.setState({answer:''});
+        that.setState({image:''});
         // subscribe state change
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
@@ -76,11 +78,14 @@ export default class SingleQuestion extends Component {
       } 
       
       componentDidUpdate(props) {
+          let that = this;
           console.log(['SQ UPDATE',props,this.props]);
           let newId = this.props.question ? this.props.question._id : null;
           let oldId = props.question ? props.question._id : null;
           if (oldId !== newId) {
-			  console.log(['SQ UPDATE change question',oldId,newId]);
+			 that.setState({answer:''});
+			that.setState({image:''});
+			console.log(['SQ UPDATE change question',oldId,newId]);
              this.fromWikipedia();
              this.createMedia();
           }
@@ -126,6 +131,8 @@ export default class SingleQuestion extends Component {
     fromWikipedia() {
         let that = this;
         console.log(['FROM WIKIPEDIA']);
+        that.setState({answer:''});
+        that.setState({image:''});
         if (this.props.question) {
 			if (this.props.question.answer && this.props.question.answer.length > 0) {
 				console.log(['FROM WIKIPEDIA HAVE ANSWER']);

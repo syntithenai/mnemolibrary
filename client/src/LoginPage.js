@@ -250,7 +250,7 @@ export default class LoginPage extends Component {
                         <div style={{paddingLeft:'1em'}} >
                         
                             <h3 className="card-title">Login</h3>
-                            <div className="" style={{fontWeight:'bold',fontSize:'large'}} >By logging into Mnemo's Library, you are agreeing to our <a style={{textDecoration:'underline',color: 'blue', paddingLeft:'0.3em'}} onClick={() => this.props.setCurrentPage('help/termsofuse')} > terms and conditions</a><br/><br/></div>
+                            <div className="" style={{fontWeight:'bold',fontSize:'large'}} >By logging into Mnemo's Library, you are agreeing to our <a href="/help/termsofuse" style={{textDecoration:'underline',color: 'blue', paddingLeft:'0.3em'}}  > terms and conditions</a><br/><br/></div>
                            <span style={{float:'right'}}><GoogleLogin 
                                 clientId={config.googleClientId}
                                 onSuccess={this.googleLogin}
