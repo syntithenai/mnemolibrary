@@ -68,14 +68,14 @@ export default class SingleQuestion extends Component {
         // subscribe state change
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
-        setTimeout(function() {
+       // setTimeout(function() {
 			console.log('timeout on sing leod now wiki')
 			if (that.props.question) {
 				console.log('timeout on sing leod now wiki RELLY')
 				that.fromWikipedia();
 				that.createMedia();
 			}
-		},1000);
+		//},1000);
       } 
       
       componentDidUpdate(props) {
