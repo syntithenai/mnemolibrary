@@ -800,10 +800,11 @@ router.post('/import', (req, res) => {
                        //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
                         // remove and restore id to allow update
                         let thePromise = null;
+                        let recordExists = false;
                         // convert to ObjectId or create new 
                         if (json.questions[a].hasOwnProperty('_id')&& String(json.questions[a]._id).length > 0) {
                             record._id = ObjectId(json.questions[a]._id); 
-                            
+                            recordExists = true;
                         } else {
                              record._id = ObjectId();  
                             // //console.log(['NEW ID',record._id]);
@@ -814,23 +815,43 @@ router.post('/import', (req, res) => {
                         } else {
                             record.hasMnemonic = false;
                         }
-                        thePromise = new Promise(function(resolve,reject) {
-                            db.collection('questions').save(record).then(function(resy) {
-                               // console.log(['UPDATE']);
-                                //let newRecord={_id:record._id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
-                                if (record.hasMnemonic) {
-                                    let newMnemonic = {user:'default',question:record._id,mnemonic:record.mnemonic,questionText:record.question,technique:record.mnemonic_technique,importId:importId};
-                                    mnemonics.push(newMnemonic);
-                                }
-                                resolve(record._id);
-                                
-                            }).catch(function(e) {
-                                //console.log(['array update err',e]);
-                                reject();
-                            });
-                            
-                        })   
-                        promises.push(thePromise);
+                        function saveQuestion() {
+							//console.log('SAVE QUESTION')
+							thePromise = new Promise(function(resolve,reject) {
+								db.collection('questions').save(record).then(function(resy) {
+								   // console.log(['UPDATE']);
+									//let newRecord={_id:record._id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
+									if (record.hasMnemonic) {
+										let newMnemonic = {user:'default',question:record._id,mnemonic:record.mnemonic,questionText:record.question,technique:record.mnemonic_technique,importId:importId};
+										mnemonics.push(newMnemonic);
+									}
+									//console.log(['SAVED QUESTION',record])
+									resolve(record._id);
+									
+								}).catch(function(e) {
+									//console.log(['array update err',e]);
+									reject();
+								});
+								
+							})   
+							promises.push(thePromise);
+						}
+                        
+                        
+                        if (recordExists && !record.hasMnemonic) {
+							//console.log('CHECK EXISTING RECORD FOR MNEMONICS')
+							db.collection('mnemonics').find({question:record._id}).toArray().then(function(resy) {
+								
+								if (resy.length > 0) {
+									console.log('CHECK EXISTING RECORD FOR MNEMONICS FOUND',resy)
+									record.hasMnemonic = true;
+								}
+								saveQuestion();
+							});
+						} else {
+							saveQuestion();
+						}
+
                         
                     }
                 }
@@ -1779,78 +1800,76 @@ router.post('/saveusertopic', (req, res) => {
     //console.log(['SAVEUSERTOP',body]);
     if (body.user  && Array.isArray(body.questions) && body.topic) {
         let id = body._id && String(body._id).length > 0 ? new ObjectId(body._id) : new ObjectId();
-        let user = body.user;
-        //console.log('POSTED');
-        //console.log(body.questions);
-        let questions = Array.isArray(body.questions) ? body.questions : [];
-        //console.log('THEN');
-        //console.log(questions);
-        //console.log('DONE');
-        // validation info
-        let errors={};
-        let foundIndex=null;
-        questions.map(function(question,key) {
-            if (req.body.deleteQuestion && String(req.body.deleteQuestion).length > 0 && questions[key]._id === req.body.deleteQuestion) {
-                // skip
-                //console.log('skip');
-                foundIndex = key;
-                //delete questions[key];
-            } else {
-                //console.log('add');
-                // ensure id
-                
-                questions[key]._id = questions[key]._id && String(questions[key]._id).length > 0 ? new ObjectId(questions[key]._id) : new ObjectId();
-            
-                // required question fields
-                if (question.mnemonic && question.mnemonic.length === 0) {
-                    if (!errors.hasOwnProperty(key)) errors[key]=[];
-                    errors[key].push('mnemonic');
-                }
-                if (question.shortanswer && question.shortanswer.length === 0) {
-                    if (!errors.hasOwnProperty(key)) errors[key]=[];
-                    errors[key].push('shortanswer');
-                }
-                if (question.question && question.question.length === 0) {
-                    if (!errors.hasOwnProperty(key)) errors[key]=[];
-                    errors[key].push('question');
-                }
-                //if (question.tags.length === 0) {
-                    //if (!errors.hasOwnProperty(key)) errors[key]=[];
-                    //errors[key].push('tags');
-                //}                
-            }
+        db.collection('users').findOne({_id:ObjectId(body.user)}).then(function(user) {
+			//console.log(['deleted question',result]);
+			let questions = Array.isArray(body.questions) ? body.questions : [];
+			let errors={};
+			let foundIndex=null;
+			questions.map(function(question,key) {
+				if (req.body.deleteQuestion && String(req.body.deleteQuestion).length > 0 && questions[key]._id === req.body.deleteQuestion) {
+					// skip
+					//console.log('skip');
+					foundIndex = key;
+					//delete questions[key];
+				} else {
+					//console.log('add');
+					// ensure id
+					
+					questions[key]._id = questions[key]._id && String(questions[key]._id).length > 0 ? new ObjectId(questions[key]._id) : new ObjectId();
+				
+					// required question fields
+					if (question.mnemonic && question.mnemonic.length === 0) {
+						if (!errors.hasOwnProperty(key)) errors[key]=[];
+						errors[key].push('mnemonic');
+					}
+					if (question.shortanswer && question.shortanswer.length === 0) {
+						if (!errors.hasOwnProperty(key)) errors[key]=[];
+						errors[key].push('shortanswer');
+					}
+					if (question.question && question.question.length === 0) {
+						if (!errors.hasOwnProperty(key)) errors[key]=[];
+						errors[key].push('question');
+					}
+					//if (question.tags.length === 0) {
+						//if (!errors.hasOwnProperty(key)) errors[key]=[];
+						//errors[key].push('tags');
+					//}                
+				}
 
-        });
-        //console.log(questions);
-        if (foundIndex != null && !isNaN(foundIndex) && foundIndex >= 0) {
-            ////questions = questions.slice(0,foundIndex);
-            //questions.splice(foundIndex,1);
-            //console.log(['SPLICE',foundIndex,questions,questions.slice(0,foundIndex), questions.slice(foundIndex+1)]);
-            questions = questions.slice(0,foundIndex).concat(questions.slice(foundIndex+1));
-        }
-        
-        let toSave = {_id:id,user:ObjectId(user),questions:questions,topic:body.topic,publishedTopic:body.publishedTopic};
-        toSave.updated=new Date().getTime();
-        //console.log(['saveusertopic']);
-        //console.log(JSON.stringify(toSave));
-        //console.log(questions);
-        if (req.body.deleteQuestion && String(req.body.deleteQuestion).length > 0) {
-            db.collection('questions').remove({_id:ObjectId(req.body.deleteQuestion)}).then(function(result) {
-                //console.log(['deleted question',result]);
-                
-            }).catch(function(err) {
-                console.log(['del q usertopic ERR',err]);
-            });
-            
-        }
-        
-        db.collection('userTopics').save(toSave).then(function(result) {
-            //console.log(['saved usertopic',result]);
-            res.send({id:id,errors:errors,questions:questions});
-        }).catch(function(err) {
-          //  //console.log(['save usertopic ERR',err]);
-            res.send({message:'Invaddlid request ERR'});
-        });
+			});
+			//console.log(questions);
+			if (foundIndex != null && !isNaN(foundIndex) && foundIndex >= 0) {
+				////questions = questions.slice(0,foundIndex);
+				//questions.splice(foundIndex,1);
+				//console.log(['SPLICE',foundIndex,questions,questions.slice(0,foundIndex), questions.slice(foundIndex+1)]);
+				questions = questions.slice(0,foundIndex).concat(questions.slice(foundIndex+1));
+			}
+			
+			let toSave = {_id:id,user:ObjectId(user._id),questions:questions,topic:body.topic,publishedTopic:user.avatar + "'s "+body.topic};
+			toSave.updated=new Date().getTime();
+			//console.log(['saveusertopic']);
+			//console.log(JSON.stringify(toSave));
+			//console.log(questions);
+			if (req.body.deleteQuestion && String(req.body.deleteQuestion).length > 0) {
+				db.collection('questions').remove({_id:ObjectId(req.body.deleteQuestion)}).then(function(result) {
+					//console.log(['deleted question',result]);
+					
+				}).catch(function(err) {
+					console.log(['del q usertopic ERR',err]);
+				});
+				
+			}
+			
+			db.collection('userTopics').save(toSave).then(function(result) {
+				//console.log(['saved usertopic',result]);
+				res.send({id:id,errors:errors,questions:questions});
+			}).catch(function(err) {
+			  //  //console.log(['save usertopic ERR',err]);
+				res.send({message:'Invaddlid request ERR'});
+			});
+		}).catch(function(err) {
+			console.log(['del q usertopic ERR',err]);
+		});
     } else {
         res.send({message:'Invaddlid request'});
     }
@@ -2237,8 +2256,8 @@ router.post('/publishusertopic', (req, res) => {
                                     if (preview) {
                                         question.quiz = "Preview "+question.quiz;
                                         question._id=new ObjectId();
-                                        question.isPreview=true;
-                                        question.access=user._id;
+                                        question.isPreview = true;
+                                        question.access = user._id;
                                     }
                                     db.collection('questions').save(question).then(function() {
                                         ////console.log(['saved q',question]);

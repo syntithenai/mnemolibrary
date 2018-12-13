@@ -177,7 +177,7 @@ export default class TopicEditor extends Component {
         //debounce(100,function() {
             let that=this;
             let publishedTopic=this.props.user.avatar+'\'s '+this.state.topic;
-            let params = {_id:this.state._id,user:this.props.user._id,topic:this.state.topic,questions:this.state.questions,deleteQuestion:deleteQuestion,publishedTopic:publishedTopic}
+            let params = {_id:this.state._id,user:this.props.user._id,topic:this.state.topic,questions:this.state.questions,deleteQuestion:deleteQuestion,publishedTopic:this.props.user.avatar+"'s "+this.state.topic}
             return fetch("/api/saveusertopic", {
               method: 'POST',
               headers: {
