@@ -2242,6 +2242,7 @@ router.post('/publishusertopic', (req, res) => {
                             if (!preview) {
                                userTopic.published = true;
                                userTopic.questions = newQuestions; 
+                               userTopic.publishedTopic = user.avatar+'\'s '+userTopic.topic;
                             }
                             // save questions
                             // clear previous preview q
