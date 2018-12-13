@@ -4,6 +4,7 @@ import Utils from './Utils';
 import SingleQuestion from './SingleQuestion';
 import QuestionList from './QuestionList';
 import Play from 'react-icons/lib/fa/play';
+import ShowAll from 'react-icons/lib/fa/asterisk';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
@@ -421,10 +422,18 @@ export default withRouter( class QuizCarousel extends Component {
                     if (parseInt(this.props.currentQuestion,10) > 0) {
                         label='Continue' ;
                     }
-                    content = (<div><button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   ><Play size={25} /> {label}</button><QuestionList isReview={this.props.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  onClick={this.onClickListQuestion}></QuestionList></div>);
+                    content = (<div>
+                    <button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   >
+                    <Play size={25} /> {label}
+                    </button>
+                    {this.props.match.params.topic && <a style={{float:'right'}} className='btn btn-info' href={'/discover/searchtopic/'+this.props.match.params.topic} >
+                    <ShowAll size={25} /> Show All
+                    </a>}
+                    <QuestionList isReview={this.props.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  onClick={this.onClickListQuestion}></QuestionList>
+                    </div>);
                 } else {
                     // single question
-                    content = (<SingleQuestion percentageFinished={this.percentageFinished} isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic}   setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} isReview={this.props.isReview} /> )
+                    content = (<SingleQuestion match={this.props.match} percentageFinished={this.percentageFinished} isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic}   setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} isReview={this.props.isReview} /> )
                 }
             
             //} else {

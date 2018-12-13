@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 // icons
+import ShowAll from 'react-icons/lib/fa/asterisk';
 import Check from 'react-icons/lib/fa/check';
 import ArrowRight from 'react-icons/lib/fa/arrow-right';
 import ArrowLeft from 'react-icons/lib/fa/arrow-left';
@@ -649,6 +650,12 @@ export default class SingleQuestion extends Component {
             return <div className="card question container" >
                
                 <div>No new/matching questions</div>
+                <br/>
+                {this.props.match.params.topic && <a style={{float:'right'}} className='btn btn-info lg-2' href={'/discover/searchtopic/'+this.props.match.params.topic} >
+				<ShowAll size={25} /> Show All Questions In This Topic
+				</a>}
+                
+                
             </div>
         }
         

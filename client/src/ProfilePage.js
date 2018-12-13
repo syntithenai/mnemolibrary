@@ -26,8 +26,8 @@ export default class ProfilePage extends Component {
                 username:this.props.user && this.props.user.username?this.props.user.username:'',
                 difficulty:this.props.user && this.props.user.difficulty?this.props.user.difficulty:'',
                 avatar:this.props.user && this.props.user.avatar?this.props.user.avatar:'',
-                password:this.props.user && this.props.user.password?this.props.user.password:'',
-                password2:this.props.user && this.props.user.password2?this.props.user.password:'',
+                password:'',//this.props.user && this.props.user.password?this.props.user.password:'',
+                password2:'',//this.props.user && this.props.user.password?this.props.user.password:'',
             },
             questions_award:'',
             topics_award:'',
@@ -42,20 +42,22 @@ export default class ProfilePage extends Component {
     componentDidMount() {
 		// load recent user into state
 		let that = this;
-		fetch('/login/me?code='+this.props.token.access_token, {
-		  method: 'GET',
-		}).then(function(response) {
-			return response.json();
-			
-		}).then(function(res) {
-		   console.log(['REFRESH LOGIN me',res]);
-			let state={};
-			state.user = res.user;
-			that.setState(state);
-		})
-		.catch(function(err) {
-			//console.log(['ERR',err]);
-		});
+		if (this.props.token) {
+			fetch('/login/me?code='+this.props.token.access_token, {
+			  method: 'GET',
+			}).then(function(response) {
+				return response.json();
+				
+			}).then(function(res) {
+			   console.log(['REFRESH LOGIN me',res]);
+				let state={};
+				state.user = res.user;
+				that.setState(state);
+			})
+			.catch(function(err) {
+				console.log(['ERR',err]);
+			});
+		}
 	}
 
     addAward(type,awardData) {
@@ -183,19 +185,18 @@ export default class ProfilePage extends Component {
             data.password2= this.state.user.password2
             if (data.password !== data.password2) {
                 that.setState({'warning_message':'Passwords do not match'});
-            } else {
                 return;
             }
           }
-          if (this.state.questions) {
-              data.questions=this.state.questions;
-          }
-          if (this.state.streak) {
-              data.streak=this.state.streak;
-          }
-          if (this.state.recall) {
-              data.recall=this.state.recall;
-          }          
+          //if (this.state.questions) {
+              //data.questions=this.state.questions;
+          //}
+          //if (this.state.streak) {
+              //data.streak=this.state.streak;
+          //}
+          //if (this.state.recall) {
+              //data.recall=this.state.recall;
+          //}          
           return this.props.saveUser(data,this);  
             
     };
@@ -391,12 +392,12 @@ export default class ProfilePage extends Component {
                                 <div className='col-12 warning-message'>{this.state.warning_message}</div>
                             
                                   <a id="edit"></a>
-                                   <label htmlFor="name" className='row'>Name </label><input autoComplete="false" id="name" type='text' name='name' onChange={this.change} value={this.state.user.name} />
-                                    <label htmlFor="avatar" className='row'>Avatar </label><input autoComplete="false" id="avatar" type='text' name='avatar' onChange={this.change} value={this.state.user.avatar} />
+                                   <label htmlFor="name" className='row'>Name </label><input autoComplete="falsename" id="name" type='text' name='name' onChange={this.change} value={this.state.user.name} />
+                                    <label htmlFor="avatar" className='row'>Avatar </label><input autoComplete="falseavatar" id="avatar" type='text' name='avatar' onChange={this.change} value={this.state.user.avatar} />
                                 
-                                    <label htmlFor="username" className='row'>Email </label><input autoComplete="false" id="username" readOnly="true" type='email' name='username' onChange={this.change} value={this.state.user.username}  />
-                                    <label htmlFor="password" className='row'>Password</label> <input  autoComplete="false" id="password" type='password' name='fake_password' onChange={this.change}  value={this.state.user.password}  />
-                                    <label htmlFor="password2" className='row'>Repeat Password</label><input  autoComplete="false" id="password2" type='password' name='fake_password2' onChange={this.change} value={this.state.user.password2} />
+                                    <label htmlFor="username" className='row'>Email </label><input autoComplete="falseusername" id="username" readOnly="true" type='email' name='username' onChange={this.change} value={this.state.user.username}  />
+                                    <label htmlFor="password" className='row'>Password</label> <input  autoComplete="falsepassword" id="password" type='password' name='fake_password' onChange={this.change}  value={this.state.user.password}  />
+                                    <label htmlFor="password2" className='row'>Repeat Password</label><input  autoComplete="falsepassword2" id="password2" type='password' name='fake_password2' onChange={this.change} value={this.state.user.password2} />
                                     <input id="id" type='hidden' name='_id' value={this.state.user._id} />
                                     <br/>
                                     <br/>

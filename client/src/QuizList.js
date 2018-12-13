@@ -99,7 +99,7 @@ export default class QuizList extends Component {
               var title = Utils.snakeToCamel(quiz)
               let missingCount = this.state.questionsMissingMnemonics && this.state.questionsMissingMnemonics.hasOwnProperty(quiz) ? this.state.questionsMissingMnemonics[quiz] : 0;
               return (<span key={quiz}  className='list-group-item'>
-				  <Link to={"/discover/searchtopic/"+quiz}   >
+				  <Link to={"/discover/topic/"+quiz}   >
 					<span>{title}</span>
 				  </Link>
 				  {missingCount > 0 && this.props.isLoggedIn && this.props.isLoggedIn() && <a href={"/missing/"+quiz} className='btn btn-success' style={{float:'right'}}  ><FaChild size="22" /> {missingCount}</a>}

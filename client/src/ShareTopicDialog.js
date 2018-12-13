@@ -64,7 +64,6 @@ export default class ShareTopicDialog extends Component {
                     <a className='btn btn-primary' href={mailTo} target='_new' ><Email size={26} />&nbsp;Email</a>
                     <br/>
                     <br/><TwitterShareButton className='btn btn-primary' title={twitterTitle}  url={question.link}  hashtags={["MnemosLibrary"]}><Twitter size={26} />&nbsp;Twitter</TwitterShareButton>
-                    <br/><br/><FacebookShareButton className='btn btn-primary' quote={longTitle} url={shareLink}  ><Facebook size={26} />&nbsp;Facebook</FacebookShareButton>
                     
                   </div>
                 </div>
@@ -75,6 +74,8 @@ export default class ShareTopicDialog extends Component {
     };
     
 }
+// <br/><br/><FacebookShareButton className='btn btn-primary' quote={longTitle} url={shareLink}  ><Facebook size={26} />&nbsp;Facebook</FacebookShareButton>
+                   
 // Link <a href={shareLink} >{shareLink}</a><br/>
                    
 //<GooglePlusShareButton />

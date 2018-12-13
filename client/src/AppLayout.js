@@ -702,9 +702,9 @@ export default class AppLayout extends Component {
             
             child.setState(res);
             //that.setState({users:{default:user}});
-            that.setState({user:Object.extend(this.state.user,user)});
+            that.setState({user:Object.assign(that.state.user,user)});
         }).catch(function(err) {
-            ////console.log(err);
+            console.log(err);
             child.setState({'warning_message':'Not Saved'});
         });
     };

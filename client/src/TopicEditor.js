@@ -459,9 +459,7 @@ export default class TopicEditor extends Component {
             //console.log(['really update que',question,this.state.currentQuestion]);
             questions.splice(this.state.currentQuestion,1,updatedQuestion);
             this.setState({questions:questions});
-            this.saveTopic().then(function() {
-                
-            });
+            this.saveTopic()
         }
     };
      
