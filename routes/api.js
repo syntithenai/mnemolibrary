@@ -807,7 +807,7 @@ router.post('/import', (req, res) => {
                             recordExists = true;
                         } else {
                              record._id = ObjectId();  
-                            // //console.log(['NEW ID',record._id]);
+                             console.log(['NEW ID',record._id]);
                         }
                         if (record.mnemonic && record.mnemonic.length > 0) {
                             record.hasMnemonic = true;
@@ -825,11 +825,11 @@ router.post('/import', (req, res) => {
 										let newMnemonic = {user:'default',question:record._id,mnemonic:record.mnemonic,questionText:record.question,technique:record.mnemonic_technique,importId:importId};
 										mnemonics.push(newMnemonic);
 									}
-									//console.log(['SAVED QUESTION',record])
+									console.log(['SAVED QUESTION'])
 									resolve(record._id);
 									
 								}).catch(function(e) {
-									//console.log(['array update err',e]);
+									console.log(['import error saving question',e]);
 									reject();
 								});
 								
@@ -838,19 +838,19 @@ router.post('/import', (req, res) => {
 						}
                         
                         
-                        if (recordExists && !record.hasMnemonic) {
+                        //if (recordExists && !record.hasMnemonic) {
 							//console.log('CHECK EXISTING RECORD FOR MNEMONICS')
-							db.collection('mnemonics').find({question:record._id}).toArray().then(function(resy) {
+							//db.collection('mnemonics').find({question:record._id}).toArray().then(function(resy) {
 								
-								if (resy.length > 0) {
-									console.log('CHECK EXISTING RECORD FOR MNEMONICS FOUND',resy)
-									record.hasMnemonic = true;
-								}
-								saveQuestion();
-							});
-						} else {
+								//if (resy.length > 0) {
+									//console.log('CHECK EXISTING RECORD FOR MNEMONICS FOUND',resy)
+									//record.hasMnemonic = true;
+								//}
+								//saveQuestion();
+							//});
+						//} else {
 							saveQuestion();
-						}
+						//}
 
                         
                     }
@@ -861,7 +861,7 @@ router.post('/import', (req, res) => {
                     let unparsed = Papa.unparse(json.questions,{quotes: true});
                     res.send(unparsed);
                 
-                  //  console.log(['IMPORT ALL DONE MNEMONICS ',mnemonics]);
+                    console.log(['IMPORT ALL DONE now MNEMONICS ',ids,mnemonics]);
                    // clear default user mnemonics
                     db.collection('mnemonics').remove({$and:[{user:'default'},{importId:importId}]}).then(function(dresults) {
                    // bulk save mnemonics 
@@ -870,8 +870,8 @@ router.post('/import', (req, res) => {
                    // console.log(['del ids',ids]);
                     // delete all questions that are not in this updated set (except userTopic questions)
                     db.collection('questions').remove({$and:[{importId:importId},{_id:{$nin:ids}},{userTopic:{$not:{$exists:true}}}]}).then(function(dresults) {
-                       // //console.log('DELETEd THESE');
-                       // //console.log(ids);
+                       console.log('DELETEd THESE');
+                       console.log(ids);
                         // update tags
                        // console.log('UPDATE TAGS and indexes');
                         ////console.log(Object.keys(json.tags));
