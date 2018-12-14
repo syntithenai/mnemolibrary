@@ -913,7 +913,7 @@ export default class AppLayout extends Component {
                 <PropsRoute  path="/help/intro" component={IntroPage}/>
                 <PropsRoute  path="/help/termsofuse" component={TermsOfUse}/>
                 <PropsRoute  path="/help/faq" component={FAQ}/>
-                <PropsRoute  path="/help/create" component={CreateHelp}/>
+                <PropsRoute  path="/help/create" isLoggedIn={this.isLoggedIn} component={CreateHelp}/>
                 <PropsRoute  path="/help/videos" component={HelpVideos}/>
                 
                 <PropsRoute  path="/create" component={CreatePage} fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />

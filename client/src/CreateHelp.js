@@ -9,8 +9,8 @@ export default class CreateHelp extends Component {
         <div>Extracting key points of encyclopedic, news, or academic articles focuses your reading and we find that the challenge of making mnemonic puns and rhymes is fun and addictive. 
         <br/><br/>
         
-        {haveUser && <b>To add your own questions&nbsp;<Link className="btn btn-info" to='create' >Create</Link> </b>}
-        {!haveUser && <b>To add your own questions&nbsp;<Link className="btn btn-info" to='login'  >Join The Library</Link> </b>}
+        {haveUser && <b>To add your own questions&nbsp;<Link className="btn btn-info" to='/create' >Create</Link> </b>}
+        {!haveUser && <b>To add your own questions&nbsp;<Link className="btn btn-info" to='/login'  >Join The Library</Link> </b>}
         
         <br/>
         </div>

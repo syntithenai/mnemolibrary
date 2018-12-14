@@ -25,27 +25,27 @@ export default class Navigation extends Component {
         //this.isAdmin = this.isAdmin.bind(this);
     };
     
-    authorize() {
-     //   //console.log(['AUTHORIZE'])
-        //fetch('/oauth/token',{method: 'POST',headers: {
+    //authorize() {
+     ////   //console.log(['AUTHORIZE'])
+        ////fetch('/oauth/token',{method: 'POST',headers: {
+    ////'Content-Type': 'application/x-www-form-urlencoded'
+  ////}})
+       //fetch('/oauth/authorize',{method: 'GET',headers: {
     //'Content-Type': 'application/x-www-form-urlencoded'
   //}})
-       fetch('/oauth/authorize',{method: 'GET',headers: {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  }})
-      .then(function(response) {
-       // //console.log(['got response', response.text()])
-      //  return response.json()
-      })
-      //.then(function(json) {
-          ////console.log(['create indexes', json])
-        //that.createIndexes(json);
+      //.then(function(response) {
+       //// //console.log(['got response', response.text()])
+      ////  return response.json()
       //})
-      .catch(function(ex) {
-        //console.log(['parsing failed', ex])
-      })
+      ////.then(function(json) {
+          //////console.log(['create indexes', json])
+        ////that.createIndexes(json);
+      ////})
+      //.catch(function(ex) {
+        ////console.log(['parsing failed', ex])
+      //})
  
-    };
+    //};
     
 
     
@@ -62,6 +62,20 @@ export default class Navigation extends Component {
                    //Tutorial
                   //</a>}</div>
     render() {
+		console.log(['RENDER NAV',window.locationpathname])
+		let pathName = window.location.pathname ? window.location.pathname.replace('/',' ').trim() : '';
+		let parts = pathName.split('/');
+		
+		let capitalisedParts = parts.map(function(part) {
+			console.log(['CAPS',part.slice(0,1),part.slice(1)]);
+			return [part.slice(0,1).toUpperCase(),decodeURI(part.slice(1))].join('');
+		})
+		console.log(['CAPSp',capitalisedParts]);
+		let pageTitle = capitalisedParts.join(' ').trim().length > 0 ? capitalisedParts.join(' ') : "Mnemo's Library"
+        if (parts[0] === "help") {
+			pageTitle = "Help";
+		}
+        
         return  (
         <div className="navbar-dark fixed-top bg-dark" >
             
@@ -69,7 +83,7 @@ export default class Navigation extends Component {
        <div className="navbar-brand" >
           <Link  to="/" onClick={this.goHome}><img alt="Mnemos' Library" src="/mnemoicon-100.png"  data-toggle="collapse" data-target="#navbarCollapse" style={{float:'left',clear:'right' ,height:'4em'}}  /></Link>
        
-       <div className='page-title' style={{color:'yellow',fontSize:'0.9em',  zIndex:99, marginTop: '0.1em'}} >&nbsp;&nbsp;{this.props.title}&nbsp;&nbsp;&nbsp;</div>
+       <div className='page-title' style={{color:'yellow',fontSize:'0.9em',  zIndex:99, marginTop: '0.1em'}} >&nbsp;&nbsp;{pageTitle}&nbsp;&nbsp;&nbsp;</div>
           
               <span style={{marginLeft:'1em'}} className="dcol-4">
                 <Link className="btn btn-secondary" to="/review"  >{reviewIcon} <span  className="d-none d-sm-inline">Review</span></Link>

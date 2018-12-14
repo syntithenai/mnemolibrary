@@ -233,7 +233,7 @@ export default class SingleQuestion extends Component {
 				let media=<Player
 				  ref={this.setPlayerRef}
 				  playsInline
-				  autoPlay={true}
+				  autoPlay={question.autoplay_media==="YES" ? true : false}
 				  height={this.state.playerHeight}
 				  width={this.state.playerWidth}
 				  fluid={false}
