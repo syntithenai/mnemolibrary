@@ -742,6 +742,7 @@ router.post('/import', (req, res) => {
     let that = this;
     let url = ''; //config.masterSpreadsheet;
     let mnemonics = [];
+    let checkMnemonics=[];
     let importId = req.body.importId && req.body.importId > 0 ? parseInt(req.body.importId,10) : 0;
     if (config.importSheets && config.importSheets.length > importId) {
         url = config.importSheets[importId];
@@ -837,21 +838,11 @@ router.post('/import', (req, res) => {
 							promises.push(thePromise);
 						}
                         
-                        
-                        //if (recordExists && !record.hasMnemonic) {
-							//console.log('CHECK EXISTING RECORD FOR MNEMONICS')
-							//db.collection('mnemonics').find({question:record._id}).toArray().then(function(resy) {
-								
-								//if (resy.length > 0) {
-									//console.log('CHECK EXISTING RECORD FOR MNEMONICS FOUND',resy)
-									//record.hasMnemonic = true;
-								//}
-								//saveQuestion();
-							//});
-						//} else {
-							saveQuestion();
-						//}
-
+                        saveQuestion();
+						
+                       if (recordExists && !record.hasMnemonic) {
+						   checkMnemonics.push(record._id);
+						}
                         
                     }
                 }
@@ -891,6 +882,24 @@ router.post('/import', (req, res) => {
                             db.collection('words').createIndex({
                                 text: "text"                    
                             }); 
+                            console.log('CHECK EXISTING RECORD FOR MNEMONICS')
+							checkMnemonics.map(function(questionId) {
+								db.collection('mnemonics').find({question:ObjectId(questionId)}).toArray().then(function(resy) {
+									if (resy.length > 0) {
+										console.log('CHECK EXISTING RECORD FOR MNEMONICS FOUND',resy)
+										//record.hasMnemonic = true;
+										db.collection('questions').updateOne({_id:ObjectId(questionId)},{$set:{hasMnemonic:true}}).then(function() {
+											console.log('UPDATED QUESTIONS SET HASMNEMONIC TRUES')
+										});
+									}
+								});
+							});
+							//
+								//saveQuestion();
+							//});
+
+                            
+                            
                           //  console.log('created indexes');                            
                         });
                        
