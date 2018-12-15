@@ -20,6 +20,7 @@ export default class ActivityChart extends React.Component {
            let that = this;
         //usersuccessprogress
         //useractivity
+        let user = this.props.user;
         fetch('/api/useractivity?user='+this.props.user._id)
         .then(function(response) {
             return response.json()
@@ -67,27 +68,27 @@ export default class ActivityChart extends React.Component {
             // calculate awards
             //let successRateTotal=0;
             //let successRateCount=0;
-            let maxStreakDays=0;
-            let streaks=[];
-            for (var key in seriesObject) {
-                if (seriesObject[key].seen && seriesObject[key].seen > 0 && seriesObject[key].success && seriesObject[key].success > 0) {
-                    maxStreakDays++;
-                    streaks.push(maxStreakDays);
-                    //successRateTotal+=seriesObject[key].success/seriesObject[key].seen;
-                    //successRateCount++;
-                } else if (seriesObject[key].seen && seriesObject[key].seen > 0) {
-                    maxStreakDays++;
-                    streaks.push(maxStreakDays);
-                } else if (seriesObject[key].success && seriesObject[key].success > 0) {
-                    maxStreakDays++;
-                    streaks.push(maxStreakDays);
-                } else {
-                    streaks.push(maxStreakDays);
-                    maxStreakDays=0;
-                }
-            }
-            //console.log(['ACT CHART MOUNT',seriesObject,streaks,Math.max(...streaks),successRateTotal,successRateCount]);
-            that.props.addAward('streak',Math.max(...streaks));
+            //let maxStreakDays=0;
+            //let streaks=[];
+            //for (var key in seriesObject) {
+                //if (seriesObject[key].seen && seriesObject[key].seen > 0 && seriesObject[key].success && seriesObject[key].success > 0) {
+                    //maxStreakDays++;
+                    //streaks.push(maxStreakDays);
+                    ////successRateTotal+=seriesObject[key].success/seriesObject[key].seen;
+                    ////successRateCount++;
+                //} else if (seriesObject[key].seen && seriesObject[key].seen > 0) {
+                    //maxStreakDays++;
+                    //streaks.push(maxStreakDays);
+                //} else if (seriesObject[key].success && seriesObject[key].success > 0) {
+                    //maxStreakDays++;
+                    //streaks.push(maxStreakDays);
+                //} else {
+                    //streaks.push(maxStreakDays);
+                    //maxStreakDays=0;
+                //}
+            //}
+            console.log(['ADD STREAK AWARD ',user.streak,that.props.user])
+            that.props.addAward('streak',user.streak); //Math.max(...streaks));
            // that.props.addAward('recall',successRateTotal/successRateCount);
             //json.seen//
             //console.log(['ACT CHART MOUNT',seriesObject]);

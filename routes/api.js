@@ -739,6 +739,7 @@ router.get('/indexes', (req, res) => {
 
 router.post('/import', (req, res) => {
   console.log(['import']);
+  console.log(['import']);
     let that = this;
     let url = ''; //config.masterSpreadsheet;
     let mnemonics = [];
@@ -826,7 +827,7 @@ router.post('/import', (req, res) => {
 										let newMnemonic = {user:'default',question:record._id,mnemonic:record.mnemonic,questionText:record.question,technique:record.mnemonic_technique,importId:importId};
 										mnemonics.push(newMnemonic);
 									}
-									console.log(['SAVED QUESTION'])
+									//console.log(['SAVED QUESTION'])
 									resolve(record._id);
 									
 								}).catch(function(e) {
@@ -994,7 +995,7 @@ router.get('/topiccollections', (req, res) => {
 
 
 router.post('/discover', (req, res) => {
-   console.log(['discover',req.body]);
+  // console.log(['discover',req.body]);
     let orderBy = req.body.orderBy ? req.body.orderBy : 'successRate';
     let sortFilter={};
     let limit = req.body.limit ? req.body.limit : 10;
@@ -1014,19 +1015,19 @@ router.post('/discover', (req, res) => {
         }
         
         
-        console.log(['disco criteria',JSON.stringify(criteria)]);
+      //  console.log(['disco criteria',JSON.stringify(criteria)]);
         db.collection('questions').find({$and:criteria})
         //db.collection('questions').aggregate({$match:{$nin:notThese}})
         .sort(sortFilter).limit(limit).toArray().then(function( questions) {
-           console.log(['user res',questions ? questions.length : 0]); 
+          // console.log(['user res',questions ? questions.length : 0]); 
            
-           console.log(['disco selqiest',req.body.selectedQuestion]);
+           //console.log(['disco selqiest',req.body.selectedQuestion]);
             if (req.body.selectedQuestion && req.body.selectedQuestion.length > 0) {
-                console.log(['disco selqiest',req.body.selectedQuestion]);
+             //   console.log(['disco selqiest',req.body.selectedQuestion]);
                 db.collection('questions').findOne({_id:ObjectId(req.body.selectedQuestion)}).then(function(question) {
-                    console.log(['disco selqiest found',question]);
+               //     console.log(['disco selqiest found',question]);
                     questions.unshift(question);
-                    console.log(['disco send found',questions]);
+                 //   console.log(['disco send found',questions]);
                     res.send({questions:questions.slice(0,10)});
                 });
             } else {
@@ -1107,7 +1108,7 @@ router.post('/discover', (req, res) => {
                         };
                         criteria.push({'_id': {$nin: notThese}});
                         //criteria.push({discoverable :{$ne:'no'}});
-                        console.log(['discover',criteria]);
+                       // console.log(['discover',criteria]);
                         discoverQuery();
                     }
                     
@@ -1120,7 +1121,7 @@ router.post('/discover', (req, res) => {
     } else {
         criteria.push({access :{$eq:'public'}});
         //criteria.push({discoverable :{$ne:'no'}});
-        console.log(['discover',criteria]);
+       // console.log(['discover',criteria]);
         discoverQuery();
       //  criteria.push({discoverable :{$ne:'no'}});
         
@@ -1132,14 +1133,14 @@ router.post('/discover', (req, res) => {
 })
 
 router.get('/review', (req, res) => {
-    console.log('review');
+    //console.log('review');
     let limit=10;
      let orderBy = (req.query.orderBy == 'successRate') ? 'successRate' : 'timeScore'
      let orderMeBy = {};
      orderMeBy[orderBy] = 1;          
      let criteria=[];
      if (req.query.band && req.query.band.length > 0) {
-         console.log('FILTER BY BAND '+req.query.band );
+         //console.log('FILTER BY BAND '+req.query.band );
          if (parseInt(req.query.band,10) > 0) {
              criteria.push({successTally:{$eq:parseInt(req.query.band,10)}});
          } else {
@@ -1174,7 +1175,7 @@ router.get('/review', (req, res) => {
      ////console.log({seen:{$lt:oneHourBack}});
      if (req.query.user && req.query.user.length > 0) {
          // sort by successTally and then most recently seen first
-        console.log(JSON.stringify(criteria));
+        //console.log(JSON.stringify(criteria));
         db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(limit).toArray().then(function(questions,error) {
             ////console.log('llll');
             ////console.log(questions);
@@ -1255,7 +1256,7 @@ router.get('/review', (req, res) => {
  //               }
                 
                 
-                console.log(['REVItEW',successAndDateOrderedIds]);
+               // console.log(['REVItEW',successAndDateOrderedIds]);
                 db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).toArray(function(err,results) {
                    // //console.log([err,results]);
                    
@@ -1342,7 +1343,7 @@ router.get('/questions', (req, res) => {
             })
         // SEARCH BY topic
         } else if (req.query.missingMnemonicsOnly > 0) {
-			console.log(['search by missing mnem '+ req.query.topic]);
+			//console.log(['search by missing mnem '+ req.query.topic]);
             //db.collection('mnemonics').find({}).toArray(function(err, mnemonics) {
                 //let existingMnemonicIds = mnemonics.map(function(mnemonic) {
                     //return mnemonic._id;
@@ -1352,10 +1353,10 @@ router.get('/questions', (req, res) => {
 					criteria.push({ hasMnemonic:{$ne:true}});
 					criteria.push({quiz:{$eq:topic}});
 				   // criteria.push({'_id': {$nin: existingMnemonicIds}});
-					console.log(['search by missing mnem have toic',criteria]);
+					//console.log(['search by missing mnem have toic',criteria]);
 					
 					db.collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({sort:1}).toArray(function(err, results) {
-						console.log(['search by missing mnem',results]);
+						//console.log(['search by missing mnem',results]);
 					  res.send({'questions':results});
 					})
 				}
@@ -1586,7 +1587,7 @@ function updateUserStats(userId,question,tallySuccess) {
 				}
 				user.startStreak = startStreak;
 				// days
-				user.streak = parseInt((now - startStreak)/86400000,10);
+				user.streak = parseInt((now - startStreak)/86400000,10) + 1;
 				user.lastSeen = new Date().getTime();
 				//console.log(['update stats save user',user]);
 				db.collection('users').save(user).then(function(res) {
@@ -1687,7 +1688,7 @@ router.post('/success', (req, res) => {
 
 
 router.post('/missingmnemonics', (req, res) => {
-    console.log(['mmNEM',req.body]);
+    //console.log(['mmNEM',req.body]);
     let missingQuestionsByTopic={}
     let missingMnemonicFilter={hasMnemonic:{$ne:true}};
     
@@ -1701,7 +1702,7 @@ router.post('/missingmnemonics', (req, res) => {
         }) ;
         filter={$and:[missingMnemonicFilter,{$or:topicFilter}]}
     }
-     console.log(['LOADING MISSING MNEM',JSON.stringify(filter)]);
+    // console.log(['LOADING MISSING MNEM',JSON.stringify(filter)]);
     db.collection('questions').find(filter).toArray().then(function(questions) {
        // console.log(['LOADING MISSING MNEM, FOUND MNEM FREE QU',questions,JSON.stringify(filter)]);
         questions.map(function(question,key) {
@@ -1744,18 +1745,18 @@ router.post('/mymnemonics', (req, res) => {
 
 router.post('/savemnemonic', (req, res) => {
  //   //console.log(['seen',req.body]);
- console.log(['save mnem']);
+// console.log(['save mnem']);
     if (req.body.user && req.body.question && req.body.mnemonic && req.body.mnemonic.length > 0) {//   && req.body.technique  && req.body.questionText ) {
-		console.log(['save mnem have params']);
+		//console.log(['save mnem have params']);
         let user = req.body.user;
         let question = req.body.question;
         let id = req.body._id ? ObjectId(req.body._id) : new ObjectId();
         let toSave = {_id:id,user:ObjectId(req.body.user),question:ObjectId(req.body.question),mnemonic:req.body.mnemonic,questionText:req.body.questionText,technique:req.body.technique};
-        console.log(['save mnem',toSave]);
+       // console.log(['save mnem',toSave]);
         db.collection('mnemonics').save(toSave).then(function(updated) {
-			console.log(['saved mnem']);
+			//console.log(['saved mnem']);
             db.collection('questions').update({_id:ObjectId(req.body.question)},{$set:{hasMnemonic:true}}).then(function() {
-				console.log(['updated question',req.body.question]);
+				//console.log(['updated question',req.body.question]);
 				//res.send('updated question '+req.body.question);
 			});
             res.send('updated question '+req.body.question);
@@ -1770,25 +1771,25 @@ router.post('/savemnemonic', (req, res) => {
 router.post('/deletemnemonic', (req, res) => {
     if (req.body._id && req.body._id.length > 0) {
          db.collection('mnemonics').findOne({_id:ObjectId(req.body._id)}).then(function(mnemonic) {
-             console.log('found MNEMONIC '+JSON.stringify(mnemonic));
+             //console.log('found MNEMONIC '+JSON.stringify(mnemonic));
             db.collection('mnemonics').remove({_id:ObjectId(req.body._id)}).then(function(result) {
-                console.log('REMOVED MNEMONIC '+JSON.stringify(result));
+               // console.log('REMOVED MNEMONIC '+JSON.stringify(result));
                 // do we still have a mnemonic ?
                 db.collection('questions').findOne({_id:ObjectId(mnemonic.question)}).then(function(question) {
-                    console.log('REMOVED MNEMONIC FOUND Q '+JSON.stringify(question));
+                   // console.log('REMOVED MNEMONIC FOUND Q '+JSON.stringify(question));
                     if (question && question.mnemonic && question.mnemonic.length > 0) {
                         // yes, nothing to do
-                        console.log('REMOVED MNEMONIC FOUND Q HAS MNEMONIC ');
+                       // console.log('REMOVED MNEMONIC FOUND Q HAS MNEMONIC ');
                     } else {
                         db.collection('mnemonics').find({question:ObjectId(mnemonic.question)}).toArray().then(function(mnemonics) {
                             console.log('REMOVED MNEMONIC FOUND MNEMONICS ');
                             if (mnemonics && mnemonics.length > 0) {
                                 // yes, nothing to do
-                                console.log('REMOVED MNEMONIC FOUND some mneem '+mnemonics.length);
+                               // console.log('REMOVED MNEMONIC FOUND some mneem '+mnemonics.length);
                             } else {
                                 console.log('UPDATE QUESTION WITHOUT MNEMONIC');
                                 db.collection('questions').update({_id:ObjectId(mnemonic.question)},{$set:{hasMnemonic:false}}).then(function() {
-                                    console.log('REMOVED MNEMONIC UPDATED QUESTION AFTER LOOKUP ');
+                                    //console.log('REMOVED MNEMONIC UPDATED QUESTION AFTER LOOKUP ');
                                 });
                             }
                         });
@@ -2045,16 +2046,16 @@ function updateTags(tags) {
 
 
 function updateMnemonics(mnemonics) {
-	console.log(['update mnemonics',mnemonics]);
+	//console.log(['update mnemonics',mnemonics]);
 	mnemonics.map(function(mnemonic) {
 		// use importId -1 to flag userTopic mnemonics 
 		db.collection('mnemonics').remove({$and:[{importId:-1},{question:{$eq:ObjectId(mnemonic.question)}}]}).then(function(delresult) {
 		   mnemonic.importId = -1;
 		   db.collection('mnemonics').insert(mnemonic).then(function() {
-			   console.log('inserted');
+			   //console.log('inserted');
 			});
 		}).catch(function(e) {
-			//console.log({'erri1':e});
+			console.log({'erri1':e});
 		});
 	});
 
@@ -2320,19 +2321,19 @@ router.post('/publishusertopic', (req, res) => {
 })
 
 router.post('/savewikidata', (req, res) => {
-    console.log(['SAVEWIKIDATA',req.body]);
+    //console.log(['SAVEWIKIDATA',req.body]);
     let body = req.body; //JSON.parse(req.body)
  //   //console.log(['seen',req.body]);
     if (body._id && body._id.length > 0) {//   && req.body.technique  && req.body.questionText ) {
-        console.log('HAVE ID');
+      //  console.log('HAVE ID');
         if ((body.answer && body.answer.length > 0) || (body.image && body.image.length > 0)) {
-            console.log('HAVE DATA');
+           // console.log('HAVE DATA');
             let toSave={}
             if (body.answer && body.answer.length > 0) toSave.answer = body.answer;
             if (body.image && body.image.length > 0) toSave.image = body.image;
-            console.log(['SAVEWIKIDATA real',toSave]);
+           // console.log(['SAVEWIKIDATA real',toSave]);
             db.collection('questions').update({_id:ObjectId(body._id)},{$set:toSave}).then(function(updated) {
-                res.send(['updated',updated]);
+              //  res.send(['updated',updated]);
             }).catch(function(e) {
                 res.send('error on update');
             });            

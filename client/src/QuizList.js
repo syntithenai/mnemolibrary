@@ -37,7 +37,7 @@ export default class QuizList extends Component {
                 .then(function(response) {
                     return response.json()
                 }).then(function(json) {
-                    console.log(['LOAD QUIZ DETAILS',json]);
+                   // console.log(['LOAD QUIZ DETAILS',json]);
                   if (json && json.length > 0 && json[0].description && json[0].description.length > 0) {
                       let descriptionState = that.state.description;
                       descriptionState[quiz] = json[0].description;

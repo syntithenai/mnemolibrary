@@ -50,7 +50,7 @@ let mnemoQueries = {
     },
   
    reviewBySuccessBand : function(band) {
-      console.log(['set review from band',band]);
+      //console.log(['set review from band',band]);
       let that = this;
       let url='/api/review?band='+band ;
       if (this.state.user) {
@@ -68,7 +68,7 @@ let mnemoQueries = {
   },
   
   setReviewFromTopic : function(topic,selectedQuestion) {
-      console.log(['REVIEW PAGE applayout',topic,selectedQuestion]); 
+     // console.log(['REVIEW PAGE applayout',topic,selectedQuestion]); 
       let that = this;
       let url='/api/review?topic='+topic ;
       if (this.state.user) {
@@ -106,7 +106,7 @@ let mnemoQueries = {
   }, 
     
   discoverQuizFromTopic : function(topic,selectedQuestion) {
-      console.log(['dissc quiz from topic',topic,selectedQuestion,this.state.user]);
+    //  console.log(['dissc quiz from topic',topic,selectedQuestion,this.state.user]);
       let that = this;
       let url='/api/discover';
       
@@ -126,7 +126,7 @@ let mnemoQueries = {
       }).then(function(json) {
         let result = createIdIndex(json['questions'],selectedQuestion);
         that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
-        console.log(['set state done', that.state])
+       // console.log(['set state done', that.state])
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })
@@ -134,7 +134,7 @@ let mnemoQueries = {
   },
   
   setQuizFromDifficulty : function(difficulty) {
-      console.log(['set quiz from difficulyt',difficulty,this.state.user]);
+      //console.log(['set quiz from difficulyt',difficulty,this.state.user]);
       let that = this;
       let url='/api/discover';
       let rand=Math.random()
@@ -384,7 +384,7 @@ let mnemoQueries = {
   
   setQuizFromTechnique : function(tag) {
      let that=this;
-     console.log(['set quiz form technique',tag]);
+     //console.log(['set quiz form technique',tag]);
        fetch('/api/discover',{ method: "POST",headers: {"Content-Type": "application/json"},body:JSON.stringify({technique:tag})})
       .then(function(response) {
         return response.json()

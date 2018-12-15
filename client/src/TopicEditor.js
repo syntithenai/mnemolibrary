@@ -187,18 +187,18 @@ export default class TopicEditor extends Component {
             }).then(function(response) {
                 return response.json();
             }).then(function(id) {
-                console.log(['saved topic',id,id.id,id.questions]);
+               // console.log(['saved topic',id,id.id,id.questions]);
                 that.setState({_id:id.id});
                 if ((id.errors && Object.keys(id.errors).length > 0) || id.message) {
-                    console.log(['ERROR MESSSAGE ON SAVE TOPIC']);
+                   // console.log(['ERROR MESSSAGE ON SAVE TOPIC']);
                     that.setState({validationErrors:id.errors,message:'Some of your questions are missing required information.'});
                 } else {
-                    console.log(['really saved topic',that.state.questions]);
+                   // console.log(['really saved topic',that.state.questions]);
                     let idsUpdate = that.state.questions;
                     idsUpdate.map(function(value,key) {
-                        console.log(['really saved topic check',value,key]);
+                       // console.log(['really saved topic check',value,key]);
                         if (!idsUpdate[key]._id) {
-                            console.log(['really saved topic update id',id.questions[key]._id]);
+                            //console.log(['really saved topic update id',id.questions[key]._id]);
                             idsUpdate[key]._id = id.questions[key]._id;
                         }
                         return null;
@@ -305,7 +305,7 @@ export default class TopicEditor extends Component {
             if (publishResponse.errors) {
                 that.setState({validationErrors:publishResponse.errors,currentView:'questions',message:'Cannot preview yet because some of your questions are missing required information.'});
             } else {
-                console.log(['PUB RESP',publishResponse,that.state.currentQuestion]);
+                //console.log(['PUB RESP',publishResponse,that.state.currentQuestion]);
                 let previewQuestion = publishResponse.questions[that.state.currentQuestion];
                 
                 //if (publishResponse.questions && publishResponse.questions.length > that.state.currentQuestion && publishResponse.questions[that.state.currentQuestion] && publishResponse.questions[that.state.currentQuestion].hasOwnProperty('_id')) {

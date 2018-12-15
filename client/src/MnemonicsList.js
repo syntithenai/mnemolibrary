@@ -96,7 +96,7 @@ export default class MnemonicsList extends Component {
             ////console.log(['got response', response])
             return response.json()
           }).then(function(json) {
-                console.log(['got response', json])
+               // console.log(['got response', json])
                 let final={};
                // final['default'] = {question:question._id,mnemonic:question.mnemonic,technique:question.mnemonic_technique,questionText:question.question};
                 let defaultMnemonic='default';
@@ -125,13 +125,13 @@ export default class MnemonicsList extends Component {
                     //defaultMnemonic = firstSubmitted;
                 //}
                 //console.log(['MNEMOLIST',defaultMnemonic,final]);
-               console.log(['create MNEM indexes', final,that.props.user])
+             //  console.log(['create MNEM indexes', final,that.props.user])
                 if (that.props.user && that.props.user.selectedMnemonics && that.props.user.selectedMnemonics.hasOwnProperty(question._id) && that.props.user.selectedMnemonics[question._id].length > 0 && final.hasOwnProperty(that.props.user.selectedMnemonics[question._id])) {
                     defaultMnemonic = that.props.user.selectedMnemonics[question._id];
                 } else {
                     defaultMnemonic = firstSubmitted;
                 }
-                console.log(['MNEMOLOAD',{defaultMnemonic:defaultMnemonic,mnemonics:final}]);
+                //console.log(['MNEMOLOAD',{defaultMnemonic:defaultMnemonic,mnemonics:final}]);
                 that.setState({defaultMnemonic:defaultMnemonic,mnemonics:final});
           }).catch(function(ex) {
             //console.log(['parsing failed', ex])

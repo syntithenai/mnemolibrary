@@ -20,15 +20,16 @@ export default class ProfilePage extends Component {
         this.change = this.change.bind(this);
         this.state = {
             warning_message: '',
-            user : {
-                _id: this.props.user && this.props.user._id?this.props.user._id:'',
-                name:this.props.user && this.props.user.name?this.props.user.name:'',
-                username:this.props.user && this.props.user.username?this.props.user.username:'',
-                difficulty:this.props.user && this.props.user.difficulty?this.props.user.difficulty:'',
-                avatar:this.props.user && this.props.user.avatar?this.props.user.avatar:'',
-                password:'',//this.props.user && this.props.user.password?this.props.user.password:'',
-                password2:'',//this.props.user && this.props.user.password?this.props.user.password:'',
-            },
+            //user : {
+                //_id: this.props.user && this.props.user._id?this.props.user._id:'',
+                //name:this.props.user && this.props.user.name?this.props.user.name:'',
+                //username:this.props.user && this.props.user.username?this.props.user.username:'',
+                //difficulty:this.props.user && this.props.user.difficulty?this.props.user.difficulty:'',
+                //avatar:this.props.user && this.props.user.avatar?this.props.user.avatar:'',
+                //password:'',//this.props.user && this.props.user.password?this.props.user.password:'',
+                //password2:'',//this.props.user && this.props.user.password?this.props.user.password:'',
+            //},
+            user:this.props.user,
             questions_award:'',
             topics_award:'',
             recall_award:'',
@@ -49,7 +50,7 @@ export default class ProfilePage extends Component {
 				return response.json();
 				
 			}).then(function(res) {
-			   console.log(['REFRESH LOGIN me',res]);
+			 //  console.log(['REFRESH LOGIN me',res]);
 				let state={};
 				state.user = res.user;
 				that.setState(state);
@@ -178,7 +179,7 @@ export default class ProfilePage extends Component {
           if (this.state.user.name)  data.name= this.state.user.name;
           if (this.state.user.avatar)  data.avatar= this.state.user.avatar;
           if (this.state.user.username)  data.username= this.state.user.username;  
-          if (this.state.user.difficulty) data.difficulty=this.state.user.difficulty
+          //if (this.state.user.difficulty) data.difficulty=this.state.user.difficulty
             
           if (this.state.user.password && this.state.user.password.length > 0 && this.state.user.password2 && this.state.user.password2.length > 0) {
             data.password= this.state.user.password
@@ -374,7 +375,7 @@ export default class ProfilePage extends Component {
                                   <ProgressChart addAward={this.addAward} reviewBySuccessBand={this.props.reviewBySuccessBand} user={this.props.user} />
                             </div>
                             <div className="col-12" style={{height: '700px'}}>
-                                  <ActivityChart addAward={this.addAward} user={this.props.user}  />
+                                  <ActivityChart addAward={this.addAward} user={this.state.user}  />
                             </div>
                             <div className="col-12" style={{height: '660px'}} >
                                 <h4 id="leaderboard" className='graphTitle' >Leaderboards</h4>

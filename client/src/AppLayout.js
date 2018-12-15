@@ -421,7 +421,7 @@ export default class AppLayout extends Component {
   
 
   refreshLogin (token=null) {
-      console.log(['REFRESH LOGIN']);
+     // console.log(['REFRESH LOGIN']);
       if (!token) {
           token=this.state.token;
       }
@@ -448,7 +448,7 @@ export default class AppLayout extends Component {
             return response.json();
             
         }).then(function(res) {
-            console.log(['REFRESH LOGIN response',res]);
+            //console.log(['REFRESH LOGIN response',res]);
             state.token = res;
           //  //console.log(['refreshed token',res]);
 //            that.setState(state);
@@ -459,7 +459,7 @@ export default class AppLayout extends Component {
                 return response.json();
                 
             }).then(function(res) {
-               console.log(['REFRESH LOGIN me',res]);
+             //  console.log(['REFRESH LOGIN me',res]);
                 state.user = res.user;
                 state.token = res.token;
                 localStorage.setItem('token',JSON.stringify(res.token));
@@ -494,7 +494,7 @@ export default class AppLayout extends Component {
     };
     
   login (user) {
-      console.log(['LOGIN',user]);
+     // console.log(['LOGIN',user]);
       if (user) {
           var state={};
           var that = this;
@@ -524,8 +524,8 @@ export default class AppLayout extends Component {
                // //console.log(['ddtoken response',res]);
                 state.token = res;
                 localStorage.setItem('token',JSON.stringify(res));
-                fetch("/me?code="+state.token.access_token).then(function(userFull) {
-                    console.log(['LOADED ME',userFull]);
+                fetch("/login/me?code="+state.token.access_token).then(function(userFull) {
+                   // console.log(['LOADED ME',userFull]);
                     localStorage.setItem('user',JSON.stringify(userFull));
                     that.startMqtt(userFull);
                     state.user = userFull;
@@ -567,7 +567,7 @@ export default class AppLayout extends Component {
   };
   
   loginByToken(token) {
-      console.log(['LOGIN by token',token]);
+      //console.log(['LOGIN by token',token]);
       let state = {token: token};
       let that = this;
       localStorage.setItem('currentTopic',null)
@@ -577,7 +577,7 @@ export default class AppLayout extends Component {
             return response.json();
             
         }).then(function(res) {
-            console.log(['LOGIN TOKEN',res,res.user,res.token]);
+          //  console.log(['LOGIN TOKEN',res,res.user,res.token]);
             state.user = res.user;
             state.token = res.token;
             localStorage.setItem('token',JSON.stringify(res.token));
@@ -596,7 +596,7 @@ export default class AppLayout extends Component {
   };
   
     loginByConfirm(token) {
-        console.log(['LOGIN confirm',token]);
+      //  console.log(['LOGIN confirm',token]);
       let state = {token: token};
       let that = this;
       localStorage.setItem('currentTopic',null)
@@ -624,7 +624,7 @@ export default class AppLayout extends Component {
   };
   
     loginByRecovery(token) {
-        console.log(['LOGIN by recovery',token]);
+       // console.log(['LOGIN by recovery',token]);
       let state = {token: token};
       let that = this;
       fetch('/login/dorecover?code='+token, {
@@ -863,7 +863,7 @@ export default class AppLayout extends Component {
     setTitleFilter(event) {
 		let filter    = event.target.value;
         
-		console.log(['filter',filter])
+		//console.log(['filter',filter])
 		
 		this.setState({titleFilter:filter});
 	}

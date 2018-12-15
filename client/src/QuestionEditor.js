@@ -216,7 +216,7 @@ export default class QuestionEditor extends Component {
     //};
     
     finishUploadMedia(signResult) {
-        console.log(signResult);
+        //console.log(signResult);
         console.log("Uppt media finished: " + signResult.publicUrl)
         let state = {...this.props.question};
         for (var key in signResult) {

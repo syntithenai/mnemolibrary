@@ -62,16 +62,16 @@ export default class SingleQuestion extends Component {
     
       componentDidMount() {
           let that = this;
-           console.log(['SQ MOUNT',that.props.question]);
+        //   console.log(['SQ MOUNT',that.props.question]);
         that.setState({answer:''});
         that.setState({image:''});
         // subscribe state change
         //this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
         scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-230});
        // setTimeout(function() {
-			console.log('timeout on sing leod now wiki')
+		//console.log('timeout on sing leod now wiki')
 			if (that.props.question) {
-				console.log('timeout on sing leod now wiki RELLY')
+				//console.log('timeout on sing leod now wiki RELLY')
 				that.fromWikipedia();
 				that.createMedia();
 			}
@@ -80,13 +80,13 @@ export default class SingleQuestion extends Component {
       
       componentDidUpdate(props) {
           let that = this;
-          console.log(['SQ UPDATE',props,this.props]);
+         // console.log(['SQ UPDATE',props,this.props]);
           let newId = this.props.question ? this.props.question._id : null;
           let oldId = props.question ? props.question._id : null;
           if (oldId !== newId) {
 			 that.setState({answer:''});
 			that.setState({image:''});
-			console.log(['SQ UPDATE change question',oldId,newId]);
+			//console.log(['SQ UPDATE change question',oldId,newId]);
              this.fromWikipedia();
              this.createMedia();
           }
@@ -131,25 +131,25 @@ export default class SingleQuestion extends Component {
     
     fromWikipedia() {
         let that = this;
-        console.log(['FROM WIKIPEDIA']);
+       // console.log(['FROM WIKIPEDIA']);
         that.setState({answer:''});
         that.setState({image:''});
         if (this.props.question) {
 			let questionId = this.props.question._id;
 			if (this.props.question.answer && this.props.question.answer.length > 0) {
-				console.log(['FROM WIKIPEDIA HAVE ANSWER']);
+				//console.log(['FROM WIKIPEDIA HAVE ANSWER']);
 				this.setState({answer:this.props.question.answer});
 			} else {
-				console.log(['FROM WIKIPEDIA LOOKUP ANSWER']);
+				//console.log(['FROM WIKIPEDIA LOOKUP ANSWER']);
 				if (this.props.question.link && this.props.question.link.length > 0 && (this.props.question.link.indexOf('wikipedia.org') !== -1 ||this.props.question.link.indexOf('wiktionary.org') !== -1)) {
-					console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD']);
+					//console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD']);
 					let linkParts = this.props.question.link.split("/");
 					let wikiPageParts = linkParts[linkParts.length - 1].split("#");
 					let wikiPage = wikiPageParts[0];
 					// wikilookup
-					console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD',wikiPage,wikiPageParts]);
+					//console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD',wikiPage,wikiPageParts]);
 					Utils.loadWikipediaIntro(wikiPage).then(function(answer) {
-						console.log(['FROM WIKIPEDIA got',answer]);
+						//console.log(['FROM WIKIPEDIA got',answer]);
 						if (answer && answer.length > 0) {
 							that.setState({answer:answer});
 							fetch("/api/savewikidata", {
@@ -161,7 +161,7 @@ export default class SingleQuestion extends Component {
 							}).then(function(response) {
 								return response.json();
 							}).then(function(token) {
-								console.log('updated wiki data');
+								//console.log('updated wiki data');
 							})
 							.catch(function(err) {
 								console.log(['ERR',err]);
@@ -185,7 +185,7 @@ export default class SingleQuestion extends Component {
 					let wikiPage = wikiPageParts[0];
 					// wikilookup
 					Utils.loadWikipediaImage(wikiPage).then(function(answer) {
-						console.log(['FROM WIKIPEDIA got image',answer]);
+						//console.log(['FROM WIKIPEDIA got image',answer]);
 						that.setState({image:answer});
 						if (answer && answer.length > 0) {
 							fetch("/api/savewikidata", {
@@ -197,7 +197,7 @@ export default class SingleQuestion extends Component {
 							}).then(function(response) {
 								return response.json();
 							}).then(function(token) {
-								console.log('updated wiki data');
+								//console.log('updated wiki data');
 							})
 							.catch(function(err) {
 								console.log(['ERR',err]);
@@ -228,7 +228,7 @@ export default class SingleQuestion extends Component {
 			if (question.media_webmvideo && question.media_webmvideo.length > 0) sources.push(<source src={question.media_webmvideo} />)
 			if (question.media_webmaudio && question.media_webmaudio.length > 0) sources.push(<source src={question.media_webmaudio} />)
 				
-			console.log(['SINGLE VIEW CREATE MEDIA from q',this.props.question]);
+			//console.log(['SINGLE VIEW CREATE MEDIA from q',this.props.question]);
 			let that = this;
 				let media=<Player
 				  ref={this.setPlayerRef}
@@ -240,9 +240,9 @@ export default class SingleQuestion extends Component {
 				>
 				{sources}
 				</Player>
-				console.log(['SINGLE VIEW CREATE MEDIA',media]);
+				//console.log(['SINGLE VIEW CREATE MEDIA',media]);
 				setTimeout(function() {
-					console.log(['SINGLE VIEW UPDATE MEDIA',media,question.media]);
+					//console.log(['SINGLE VIEW UPDATE MEDIA',media,question.media]);
 						that.setState({media:media});
 						if (that.player) that.player.load();
 				},100);
@@ -496,7 +496,7 @@ export default class SingleQuestion extends Component {
             if (shortanswer.length < that.state.answer.length) {
                 showLongAnswer = true;
             }
-            console.log(['RENDER SINGLE',that.state.answer,shortanswer,showLongAnswer,media]);
+            //console.log(['RENDER SINGLE',that.state.answer,shortanswer,showLongAnswer,media]);
             let shortLink = ""
             if (question.link) {
                 let endDomain=question.link.indexOf("/",9);

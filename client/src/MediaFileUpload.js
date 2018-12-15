@@ -319,7 +319,7 @@ class MediaFileUpload extends React.Component {
                                 that._wavesurfer.load(URL.createObjectURL(f));
                                 //console.log(that._wavesurfer.regions);
                                 that._wavesurfer.on('ready', function () {
-                                    console.log(['ready',that.props.audioMaxLength,that._wavesurfer.getDuration(),Math.min(that.props.audioMaxLength,that._wavesurfer.getDuration())]);
+                                    //console.log(['ready',that.props.audioMaxLength,that._wavesurfer.getDuration(),Math.min(that.props.audioMaxLength,that._wavesurfer.getDuration())]);
                                     that.addRange(0,Math.min(that.props.audioMaxLength,that._wavesurfer.getDuration()));
                                     that.setState({cropStart:0,cropEnd:Math.min(that.props.audioMaxLength,that._wavesurfer.getDuration())});
                                 });
@@ -330,7 +330,7 @@ class MediaFileUpload extends React.Component {
                                 that._wavesurfer.load(URL.createObjectURL(f));
                                 //console.log(that._wavesurfer.regions);
                                 that._wavesurfer.on('ready', function () {
-                                    console.log(['ready',that.props.videoMaxLength,that._wavesurfer.getDuration(),Math.min(that.props.videoMaxLength,that._wavesurfer.getDuration())]);
+                                    //console.log(['ready',that.props.videoMaxLength,that._wavesurfer.getDuration(),Math.min(that.props.videoMaxLength,that._wavesurfer.getDuration())]);
                                     that.addRange(0,Math.min(that.props.videoMaxLength,that._wavesurfer.getDuration()));
                                     that.setState({cropStart:0,cropEnd:Math.min(that.props.videoMaxLength,that._wavesurfer.getDuration())});
                                 });

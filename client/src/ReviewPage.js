@@ -25,7 +25,7 @@ export default class ReviewPage extends Component {
 
     componentDidMount() {
         let that = this;
-        console.log(['REVIEW PAGE DID MOUNT',this.props.match]); 
+     //   console.log(['REVIEW PAGE DID MOUNT',this.props.match]); 
         //setTimeout(function() {
            this.reviewQuestions();
         //},1000);
@@ -70,12 +70,12 @@ export default class ReviewPage extends Component {
 		let that = this;
 		 if (this.props.match && this.props.match.params.topic && this.props.match.params.topic.length > 0) {
                 setTimeout(function() {
-                    console.log(['REVIEW PAGE call ',that.props.match]); 
+                   // console.log(['REVIEW PAGE call ',that.props.match]); 
                     that.props.setReviewFromTopic(that.props.match.params.topic,that.props.match.params.topicquestion);
                 },1000);
             } else if (this.props.match && this.props.match.params && this.props.match.params.band && this.props.match.params.band.length > 0) {
                 setTimeout(function() {
-                    console.log(['REV review from band',that.props.match.params.band,that.props.reviewBySuccessBand]);
+                   // console.log(['REV review from band',that.props.match.params.band,that.props.reviewBySuccessBand]);
                     that.props.reviewBySuccessBand(that.props.match.params.band);
                 },1000);
             } else {

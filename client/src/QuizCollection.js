@@ -236,7 +236,7 @@ export default class QuizCollection extends Component {
                         onClickFunction=null;
                         link  = "/discover/topics/"+collection.topics;
                     }
-                    console.log(['rtc',collection,key,this.props.immediateDiscover,onClickFunction]);
+                 //  console.log(['rtc',collection,key,this.props.immediateDiscover,onClickFunction]);
                   return <QuizCollectionItem key={key}  color={collection.color} backgroundColor={collection.backgroundColor}  icon={collection.icon} name={collection.name} topics={collection.topics} onClick={(e) => onClickFunction(collection)} loadQuestionByTopics={that.discoverOneByTopics} setQuizFromQuestionId={that.props.setQuizFromQuestionId} immediateDiscover={collection.immediateDiscover} setQuizFromTopics={that.props.setQuizFromTopics} hideSingleQuestionInCollectionView={collection.hideSingleQuestionInCollectionView ? true : false}  link={link} /> 
                 })
             }
