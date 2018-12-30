@@ -14,7 +14,7 @@ export default class LoginPage extends Component {
         //return <iframe src="http://localhost:4000/login" style={{height: "40em", border: 0,  paddingLeft: '1em'}} />
     //};
     constructor(props) {
-        super(props);
+		super(props);
         this.state={
             warning_message:'',
             signin_warning_message:'',
@@ -37,7 +37,7 @@ export default class LoginPage extends Component {
         this.forgotPassword = this.forgotPassword.bind(this);
         this.unforgotPassword = this.unforgotPassword.bind(this);
         this.recoverPassword = this.recoverPassword.bind(this);
-        
+        this.props.analyticsEvent('login page');
     };
     
     checkStatus(response) {

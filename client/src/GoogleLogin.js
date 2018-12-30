@@ -159,6 +159,7 @@ export default class GoogleLogin extends Component {
                     ////console.log(['LW started']);
                     var props = {idtoken:id_token,name:profile.getName(),image:profile.getImageUrl() ,email: profile.getEmail() };
              //       //console.log(['g login success',props]);
+					//this.props.analyticsEvent('google login');
                     this.props.onSuccess(props);
                         
                 }

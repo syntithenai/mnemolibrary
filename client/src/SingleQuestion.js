@@ -33,6 +33,8 @@ import ExclamationTriangle from 'react-icons/lib/fa/exclamation-triangle';
 import "video-react/dist/video-react.css"; // import css
 import { Player } from 'video-react';
 
+import sanitizeHtml from 'sanitize-html';
+
 export default class SingleQuestion extends Component {
     
     constructor(props,context) {
@@ -71,6 +73,7 @@ export default class SingleQuestion extends Component {
        // setTimeout(function() {
 		//console.log('timeout on sing leod now wiki')
 			if (that.props.question) {
+				if (that.props.question && that.props.question._id)  that.props.analyticsEvent('view question '+that.props.question._id);
 				//console.log('timeout on sing leod now wiki RELLY')
 				that.fromWikipedia();
 				that.createMedia();
@@ -86,6 +89,7 @@ export default class SingleQuestion extends Component {
           if (oldId !== newId) {
 			 that.setState({answer:''});
 			that.setState({image:''});
+			if (that.props.question && that.props.question._id) that.props.analyticsEvent('view question '+that.props.question._id);
 			//console.log(['SQ UPDATE change question',oldId,newId]);
              this.fromWikipedia();
              this.createMedia();
@@ -328,9 +332,15 @@ export default class SingleQuestion extends Component {
     
     // which question parts are visible - mnemonic, answer, moreinfo
     setVisible(toShow) {
+		console.log(['setvisible',toShow]);
         let visible = this.state.visible;
-        visible.push(toShow);
-        this.setState({'visible':visible});
+        if (toShow=="all") {
+			visible=['mnemonic','answer','moreinfo','media'];
+		} else {
+			visible.push(toShow);
+		}
+		this.setState({'visible':visible});
+		console.log(['didsetvis',visible]);
         //console.log(['scroll to ',toShow,this.scrollTo[toShow],this.scrollTo]);
         //setTimeout(function(toShow) {
             scrollToComponent(this.scrollTo[toShow],{align:'top',offset:-230});
@@ -492,6 +502,13 @@ export default class SingleQuestion extends Component {
                 attribution=(<a href={mediaAttribution} >{shortAttribution}</a>)
             }
             let shortanswer = this.firstSentence(that.state.answer);
+            let cleanShortAnswer = sanitizeHtml(shortanswer, {
+			allowedTags: ['b', 'i', 'em', 'strong', 'a','span','kanji'],
+			allowedAttributes: {
+			  a: ['href', 'target','className']
+			}
+		  });
+
             let showLongAnswer = false;
             if (shortanswer.length < that.state.answer.length) {
                 showLongAnswer = true;
@@ -505,8 +522,8 @@ export default class SingleQuestion extends Component {
             let hasMedia=this.hasMedia(question);
             let cardClassName = "card question container";
             if (this.props.isReview) cardClassName = "card question container review";
-            let shortAnswerStyle={fontSize:'1.1em',fontFamily:'sans_forgeticaregular'};
-            if (this.props.isReview)   shortAnswerStyle={fontSize:'1.1em'};
+            let shortAnswerStyle={}; //fontSize:'1.1em',fontFamily:'sans_forgeticaregular'};
+            if (this.props.isReview)   shortAnswerStyle={}; //fontSize:'1.1em'
            return (
             <div className="questionwrap" >
             <ShareDialog id="sharedialog"  header={header}  question={question}/>
@@ -527,7 +544,7 @@ export default class SingleQuestion extends Component {
                                            
                             {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Mnemonic</span></button>
                             }&nbsp;
-                            {question.answer && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
+                            {question.answer && <button className='btn btn-primary' onClick={() => this.setVisible('all')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
                             }&nbsp;
                             {imageLink && <button  className='btn btn-primary' onClick={() => this.setVisible('image')}><Image size={26} />&nbsp;<span className="d-none d-md-inline-block">Image</span></button>
                             }&nbsp;
@@ -562,7 +579,7 @@ export default class SingleQuestion extends Component {
                             <button style={{marginTop:'1em',float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button></span>}
                         
                         
-                        <div style={{fontSize:'1.2em'}} className="card-title">{this.props.isReview && <br/>}{header}?</div>
+                        <div  className="card-title questionheader">{this.props.isReview && <br/>}{header}?</div>
                         <div className="card-block">
                             {(this.isVisible('media') || question.autoplay_media==="YES") && question.mediaattribution && hasMedia  && <div className="card-block mediaattribution">
                             <div  className='card-text ' style={{fontSize:'0.85em'}}><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
@@ -579,7 +596,7 @@ export default class SingleQuestion extends Component {
                             <div  className='card-text'><b>Answer</b><br/> 
                              
                                 
-                            <span className='shortanswer' style={shortAnswerStyle} >{shortanswer}</span>&nbsp;&nbsp;&nbsp;&nbsp;{showLongAnswer && <button style={{display:'inline'}} className="btn btn-primary" onClick={() => this.setVisible('answer')}>...</button>}</div>
+                            <span className='shortanswer' style={shortAnswerStyle} dangerouslySetInnerHTML={{__html: cleanShortAnswer}} ></span>&nbsp;&nbsp;&nbsp;&nbsp;{showLongAnswer && <button style={{display:'inline'}} className="btn btn-primary" onClick={() => this.setVisible('answer')}>...</button>}</div>
                         }
                             
                         </div>

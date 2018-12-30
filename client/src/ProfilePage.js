@@ -43,6 +43,7 @@ export default class ProfilePage extends Component {
     componentDidMount() {
 		// load recent user into state
 		let that = this;
+		this.props.analyticsEvent('profile page');
 		if (this.props.token) {
 			fetch('/login/me?code='+this.props.token.access_token, {
 			  method: 'GET',

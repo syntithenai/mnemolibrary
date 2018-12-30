@@ -1,11 +1,11 @@
-@font-face {
+/*@font-face {
     font-family: 'sans_forgeticaregular';
     src: url('sansforgetica-regular-webfont.woff2') format('woff2'),
          url('sansforgetica-regular-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 
-}
+}*/
 a:hover, a:visited, a:link, a:active
 {
     text-decoration: none;
@@ -16,6 +16,11 @@ body {
   font-family: sans-serif;
   padding-top: 8rem;
   padding-left: 0rem;
+  
+}
+kanji {
+  font-size: 1.4em;
+  letter-spacing: 0.3em;
   
 }
 .media-preview label,.media-preview input {
@@ -130,7 +135,13 @@ margin-top:2em;
 .question .buttons button {  }
 
 .question .answer span {
-    font-size: 1.3em;
+    font-size: 1.2em;
+}
+
+.shortanswer {
+    font-size: 1.2em;
+    font-style: italic;
+    font-weight: bold;
 }
 
 .container {
@@ -168,7 +179,7 @@ iframe#wikiiframe {
     margin-right: 1em;
 }
 
-.question .card-title {
+.question .card-title.questionheader {
     color: blue;
     background-color: lightblue;
     width: 100%;
@@ -176,11 +187,12 @@ iframe#wikiiframe {
     margin-right: 0px;
     padding: 1rem;
     sborder: 1px solid black;
+    font-size: 1.3em;   
 }
 
 .warning-message {
   color: red;
-  font-size: 1.5em;   
+  font-size: 1.6em;   
 }
 .row {
     margin-left: 0rem !important;
@@ -207,11 +219,11 @@ pre {
 }
 pre.mnemonic {
     color :  red;
-    font-size: 1.1em;
+    font-size: 1.2em;
 }
 pre.mnemonicalternative {
     color :  black;
-    font-size: 1.0em;
+    font-size: 1.2em;
 
 }
 .loginbutton {

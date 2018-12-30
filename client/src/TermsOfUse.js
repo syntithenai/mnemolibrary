@@ -4,6 +4,7 @@ import HelpNavigation from './HelpNavigation';
 export default class TermsOfUse extends Component {
     
     render() {
+		this.props.analyticsEvent('help - terms of use');
         return  (
         <div className="termsofuse" >
         

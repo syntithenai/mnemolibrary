@@ -13,7 +13,7 @@ export default class CreatePage extends Component {
         this.state = {
             showHelp:false,
         }
-        
+        this.props.analyticsEvent('create');
        // //console.log(['constr',this.state]);
     
     };

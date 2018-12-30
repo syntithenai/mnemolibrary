@@ -29,6 +29,7 @@ export default class ProblemReport extends Component {
               body: JSON.stringify({question:this.props.question,user:this.props.user,problem:this.state.problem})
             }).then(function() {
                 //console.log('reprted');
+                that.props.analyticsEvent('problem reported  '+JSON.stringify({question:that.props.question,user:that.props.user,problem:that.state.problem}));
                 that.setState({'problem':''});                
             });
       };

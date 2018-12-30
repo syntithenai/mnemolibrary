@@ -5,6 +5,7 @@ import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-d
 export default class HelpNavigation extends Component {
     
     render() {
+		
         return  (
             <nav className='nav'    >
                 <Link to="/help/about" className='btn btn-info' >About</Link>

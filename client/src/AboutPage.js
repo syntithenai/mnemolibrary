@@ -3,6 +3,7 @@ import HelpNavigation from './HelpNavigation';
 export default class AboutPage extends Component {
     
     render() {
+		this.props.analyticsEvent('help - about');
         return  (
         <div className="aboutpage" >
         

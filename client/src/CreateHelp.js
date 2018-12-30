@@ -4,7 +4,7 @@ import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-d
 export default class CreateHelp extends Component {
     render() {
         let haveUser = this.props.isLoggedIn && this.props.isLoggedIn() ? true : false;
-    
+		this.props.analyticsEvent('help - create');
         return (<div id='createhelp'>
         <div>Extracting key points of encyclopedic, news, or academic articles focuses your reading and we find that the challenge of making mnemonic puns and rhymes is fun and addictive. 
         <br/><br/>

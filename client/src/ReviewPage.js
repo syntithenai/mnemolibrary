@@ -24,6 +24,7 @@ export default class ReviewPage extends Component {
     };
 
     componentDidMount() {
+		this.props.analyticsEvent('start review');
         let that = this;
      //   console.log(['REVIEW PAGE DID MOUNT',this.props.match]); 
         //setTimeout(function() {
@@ -97,6 +98,7 @@ export default class ReviewPage extends Component {
     
     finishReview(questions,success) {
       // //console.log('finish review');
+      this.props.analyticsEvent('finish review');
        //this.setCurrentPage('review');
        //let topic = this.props.getCurrentTopic();
        //console.log(['finish review',topic]);
@@ -137,7 +139,7 @@ export default class ReviewPage extends Component {
 				   //  //console.log(['REVIEW questions']);
 					return (
 					<div>
-						<QuizCarousel isAdmin={this.props.isAdmin}  saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} discoverQuizFromTopic={this.props.discoverQuizFromTopic} setReviewFromTopic={this.props.setReviewFromTopic}  setQuizFromTag={this.props.setQuizFromTag}  setCurrentQuestion={this.props.setCurrentQuestion} discoverQuestions={this.props.discoverQuestions}  questions={this.props.questions} currentQuiz={this.props.currentQuiz} currentQuestion={this.props.currentQuestion} finishQuiz={this.finishReview} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.props.setCurrentQuiz} isReview={true} />
+						<QuizCarousel analyticsEvent={this.props.analyticsEvent}  isAdmin={this.props.isAdmin}  saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic} discoverQuizFromTopic={this.props.discoverQuizFromTopic} setReviewFromTopic={this.props.setReviewFromTopic}  setQuizFromTag={this.props.setQuizFromTag}  setCurrentQuestion={this.props.setCurrentQuestion} discoverQuestions={this.props.discoverQuestions}  questions={this.props.questions} currentQuiz={this.props.currentQuiz} currentQuestion={this.props.currentQuestion} finishQuiz={this.finishReview} indexedQuestions={this.props.indexedQuestions} user={this.props.user}  progress={this.props.progress} updateProgress={this.props.updateProgress} setCurrentPage={this.props.setCurrentPage} successButton={true} setMessage={this.props.setMessage}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} setCurrentQuiz={this.props.setCurrentQuiz} isReview={true} />
 					</div>
 					)
 				} else {

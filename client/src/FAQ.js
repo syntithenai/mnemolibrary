@@ -4,6 +4,7 @@ import HelpNavigation from './HelpNavigation';
 export default class FAQ extends Component {
     
     render() {
+		this.props.analyticsEvent('help - faq');
         return  (
         <div className="faq" >
            <HelpNavigation setCurrentPage={this.props.setCurrentPage}/> 

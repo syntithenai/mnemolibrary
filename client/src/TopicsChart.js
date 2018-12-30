@@ -88,11 +88,12 @@ export default class TopicsChart extends React.Component {
             url='/api/archivedtopics?user='+this.props.user._id;
         }
         let promise = new Promise(function(resolve,reject) {
+			console.log(['TOPICS FETCH',url]);
             fetch(url)
             .then(function(response) {
                 return response.json()
             }).then(function(json) {
-               //console.log(['got CORE response', json]);
+               console.log(['got CORE response', json]);
 
                 let series=[];
                 let totalSeen=0;
@@ -147,7 +148,7 @@ export default class TopicsChart extends React.Component {
                    // that.props.addAward('questions',totalSeen);
                     that.props.addAward('recall',totalSuccess/countSuccess);
                 }
-                //console.log(['SET DATA',series]);
+                console.log(['SET DATA',series]);
                 that.setState({series:series});
                 resolve();
                     

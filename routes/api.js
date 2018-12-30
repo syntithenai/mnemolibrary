@@ -280,7 +280,6 @@ router.get('/unblocktopic', (req, res) => {
     }
 });
 
-
     // 'successTally':{$lt : 4}}  // retire topics after all questions have successTally 4
            
 router.get('/recenttopics', (req, res) => {
@@ -307,10 +306,11 @@ router.get('/recenttopics', (req, res) => {
                 return;
             }
             result.toArray().then(function(final) {
-               // //console.log(['RECENT TOPICS',final]);
+               //console.log(['RECENT TOPICS',final]);
                 let topics = [];
                 let totalQuestions = 0;
                 final.map(function(val,key) {
+					// require topic, skip archived (success > 0.7)
                     if (val.successRate<0.7 && val.topic && String(val.topic).length > 0) {
                         collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
                         topics.push({quiz:{$eq:val.topic}});                        
@@ -353,8 +353,8 @@ router.get('/recenttopics', (req, res) => {
                             if (collatedTopics[val.topic]) collatedTopics[val.topic].total=val.questions;
                         };
                         let finalTopics={};
-                        // filter fully blocked topics
                         
+                        // filter fully blocked topics
                         Object.keys(collatedTopics).map(function(key) {
                             let val = collatedTopics[key];
                             if (val.blocks < val.total) {
@@ -1003,7 +1003,7 @@ router.post('/discover', (req, res) => {
     
     function discoverQuery() {
         //sortFilter[orderBy]=-1;
-        let sortFilter={hasMnemonic:1};
+        let sortFilter={};
         // missing mnemonic as last choice
         sortFilter['hasMnemonic']=-1;
         // allow for asc/desc (- as first letter)
@@ -1369,7 +1369,7 @@ router.get('/questions', (req, res) => {
             //if (req.query.missingMnemonicsOnly > 0) {
                 //criteria.push({ $where: "this.hasMnemonic !== true"});
             //} 
-            db.collection('questions').find({$and:criteria}).limit(limit*10).sort({sort:1}).toArray(function(err, results) {
+            db.collection('questions').find({$and:criteria}).limit(limit*40).sort({sort:1}).toArray(function(err, results) {
               res.send({'questions':results});
             })
         // SEARCH BY tag
@@ -1378,7 +1378,7 @@ router.get('/questions', (req, res) => {
                 let tag = req.query.tag.trim().toLowerCase(); 
                 criteria.push({'tags': {$in:[tag]}});
               //console.log(['search by tag',criteria,tag]);
-                db.collection('questions').find({$and:criteria}).limit(limit*10).skip(skip).sort({question:1}).toArray(function(err, results) {
+                db.collection('questions').find({$and:criteria}).limit(limit*40).skip(skip).sort({question:1}).toArray(function(err, results) {
                     //console.log(['search by tag res',results]);
                   res.send({'questions':results});
                 })
@@ -1560,8 +1560,9 @@ function updateUserStats(userId,question,tallySuccess) {
 			 //user.successRate = user.seen > 0 ? userSuccess/user.seen : 0;
 			 // total unique questions seen
 			 //let lastSeen = 0;
-			 db.collection('userquestionprogress').find({$and:[{user: {$eq:ObjectId(userId)}}]}).toArray().then(function(uniqueQuestionResults) {
+			 db.collection('userquestionprogress').find({$and:[{user: {$eq:ObjectId(userId)}}]}).sort({seen:-1}).limit(100).toArray().then(function(uniqueQuestionResults) {
 				user.questions = uniqueQuestionResults ? uniqueQuestionResults.length : 0;
+				console.log('UPDATING USER STATS '+(uniqueQuestionResults ? uniqueQuestionResults.length: 0));
 				let seen = 0;
 				let success = 0;
 				uniqueQuestionResults.map(function(progress) {
