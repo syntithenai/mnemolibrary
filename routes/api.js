@@ -1560,12 +1560,12 @@ function updateUserStats(userId,question,tallySuccess) {
 			 //user.successRate = user.seen > 0 ? userSuccess/user.seen : 0;
 			 // total unique questions seen
 			 //let lastSeen = 0;
-			 db.collection('userquestionprogress').find({$and:[{user: {$eq:ObjectId(userId)}}]}).sort({seen:-1}).limit(100).toArray().then(function(uniqueQuestionResults) {
+			 db.collection('userquestionprogress').find({$and:[{user: {$eq:ObjectId(userId)}}]}).sort({seen:-1}).toArray().then(function(uniqueQuestionResults) {
 				user.questions = uniqueQuestionResults ? uniqueQuestionResults.length : 0;
 				console.log('UPDATING USER STATS '+(uniqueQuestionResults ? uniqueQuestionResults.length: 0));
 				let seen = 0;
 				let success = 0;
-				uniqueQuestionResults.map(function(progress) {
+				uniqueQuestionResults.slice(0,100).map(function(progress) {
 					//console.log(['SEENSUCC II',progress.successTally])
 					if (parseInt(progress.seenTally,10) > 0) seen += parseInt(progress.seenTally,10);
 					if (parseInt(progress.successTally,10) > 0) success += parseInt(progress.successTally,10);

@@ -334,8 +334,10 @@ export default class SingleQuestion extends Component {
     setVisible(toShow) {
 		console.log(['setvisible',toShow]);
         let visible = this.state.visible;
+        let show = toShow;
         if (toShow=="all") {
-			visible=['mnemonic','answer','moreinfo','media'];
+			visible=['mnemonic','answer','moreinfo','media','image','tags'];
+			show = 'answer';
 		} else {
 			visible.push(toShow);
 		}
@@ -343,7 +345,7 @@ export default class SingleQuestion extends Component {
 		console.log(['didsetvis',visible]);
         //console.log(['scroll to ',toShow,this.scrollTo[toShow],this.scrollTo]);
         //setTimeout(function(toShow) {
-            scrollToComponent(this.scrollTo[toShow],{align:'top',offset:-230});
+            scrollToComponent(this.scrollTo[show],{align:'top',offset:-230});
         //},1000) 
     };
     
@@ -387,8 +389,8 @@ export default class SingleQuestion extends Component {
         if (text) {
             text = text.replace('...',', ');
             text = text.replace('.[','. ');
-            text = text.replace('."','". ');
-            text = text.replace('.\n','". ');
+            text = text.replace('."','. ');
+            text = text.replace('.\n','. ');
             text = text.replace('_c._','_c.');
             return String(text).split('. ')[0];
         } else return '';
@@ -592,6 +594,7 @@ export default class SingleQuestion extends Component {
                             <img   alt={question.question} onClick={() => this.setVisible('image')} style={{ float:'left', maxHeight:'150px', maxWidth:'150px',border: "0px",clear:'both', paddingRight: '1em'}} src={imageLink} />
                             }
                         
+                        <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
                         {(this.isVisible('answer') || !showRecallButton)  && shortanswer.length > 0  && 
                             <div  className='card-text'><b>Answer</b><br/> 
                              
@@ -608,7 +611,7 @@ export default class SingleQuestion extends Component {
                        
                         
                     <div className="card-block">
-                        <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
+                        
                         {(this.isVisible('answer') || !showRecallButton) && showLongAnswer && <div  className='card-text'><span style={{fontSize:'1.4em'}}><pre>{this.state.answer}</pre></span></div>}
                          
                         <div  className='card-text' style={{fontSize:'0.85em'}}>
