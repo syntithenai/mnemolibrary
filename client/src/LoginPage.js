@@ -216,8 +216,11 @@ export default class LoginPage extends Component {
              return (
                 <div className="row">
                      <h3 className="col-12 card-title">Signed Up</h3>
-                     
+                    
                     <div className='col-12 warning-message'>Check your email for a link to confirm your registration.</div>
+                    <br/>
+                    <b>! If the message doesn't arrive, check your spam folder</b>
+                                    
                 </div>
                 )
         } else if (this.state.forgotPassword) {
@@ -249,13 +252,15 @@ export default class LoginPage extends Component {
                         <div className='warning-message'>{this.state.warning_message}</div>
                         <div style={{paddingLeft:'1em'}} >
                         
-                            <h3 className="card-title">Login</h3>
+                            <h3 className="card-title">Login</h3> 
+                            <a className="btn btn-info" style={{float:'right' }} href="#register_form" >I'm a new user</a>
+                            <div className="" style={{fontWeight:'bold',fontSize:'large'}} >To track your progress and see graphs and feedback to guide your learning, you need to sign in to the website.</div>
                             <div className="" style={{fontWeight:'bold',fontSize:'large'}} >By logging into Mnemo's Library, you are agreeing to our <a href="/help/termsofuse" style={{textDecoration:'underline',color: 'blue', paddingLeft:'0.3em'}}  > terms and conditions</a><br/><br/></div>
                            <span style={{float:'right'}}><GoogleLogin 
                                 clientId={config.googleClientId}
                                 onSuccess={this.googleLogin}
                            /></span>
-                           <div style={{paddingLeft: '2em'}}>
+                           <div id="register_form" style={{paddingLeft: '2em'}}>
                                 <form method="POST" onSubmit={this.submitSignIn} className="form-group">
                                     <div className='warning-message'>{this.state.signin_warning_message}</div>
                             
@@ -263,11 +268,11 @@ export default class LoginPage extends Component {
                                     <label htmlFor="password_login" className="row">Password </label><input  autoComplete='falsepass' id="password_login" type='password' name='password_login'  onChange={this.change} value={this.state.password_login}  autoComplete="false"  />
                                     <br/><br/>
                                     <button  className='btn btn-info'>Login</button>
-                                    <button onClick={this.forgotPassword} className='btn btn-info'>Forgot</button>
+                                    <button onClick={this.forgotPassword} className='btn btn-info'>Forgot Password</button>
                                 </form>
                             </div>
                         </div>
-                        <div style={{paddingLeft:'1em'}}>
+                        <div style={{paddingLeft:'1em'}} >
                            
                             <form method="POST"  autoComplete='false' onSubmit={this.submitSignUp}  >
                                   <h3 className="card-title">Registration</h3>

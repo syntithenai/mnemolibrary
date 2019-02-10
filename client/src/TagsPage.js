@@ -7,7 +7,7 @@ export default class TagsPage extends Component {
     
     constructor(props) {
         super(props);
-        this.state={'tags':this.props.tags,'titleFilter':'',searchTag:null};
+        this.state={'tags':this.props.tags,'titleFilter':this.props.titleFilter,searchTag:null};
         // debounce(500,
         this.setTitleFilter = this.setTitleFilter.bind(this);
         this.filterTags = this.filterTags.bind(this);
@@ -15,7 +15,7 @@ export default class TagsPage extends Component {
     };
     
     componentDidMount() {
-        this.filterTags();
+        this.filterTags(this.props.titleFilter);
     };
     
     setTitleFilter(event) {

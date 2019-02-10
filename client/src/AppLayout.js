@@ -921,7 +921,7 @@ export default class AppLayout extends Component {
                 <PropsRoute  exact={true} path="/search" component={TopicsPage} {...topicsPageOptions}/>
                 <PropsRoute  exact={true} path="/" component={TopicsPage} {...topicsPageOptions}/>
                 
-                <PropsRoute  path="/search/tags" analyticsEvent={this.analyticsEvent} component={TagsPage}  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
+                <PropsRoute  path="/search/tags" analyticsEvent={this.analyticsEvent} component={TagsPage}   titleFilter={this.state.titleFilter} setTitleFilter={this.setTitleFilter}  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
                 
                 <PropsRoute  path="/search/questions" analyticsEvent={this.analyticsEvent} component={SearchPage}  titleFilter={this.state.titleFilter} setTitleFilter={this.setTitleFilter} mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
                 

@@ -594,7 +594,6 @@ export default class SingleQuestion extends Component {
                             <img   alt={question.question} onClick={() => this.setVisible('image')} style={{ float:'left', maxHeight:'150px', maxWidth:'150px',border: "0px",clear:'both', paddingRight: '1em'}} src={imageLink} />
                             }
                         
-                        <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
                         {(this.isVisible('answer') || !showRecallButton)  && shortanswer.length > 0  && 
                             <div  className='card-text'><b>Answer</b><br/> 
                              
@@ -611,6 +610,7 @@ export default class SingleQuestion extends Component {
                        
                         
                     <div className="card-block">
+                        <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
                         
                         {(this.isVisible('answer') || !showRecallButton) && showLongAnswer && <div  className='card-text'><span style={{fontSize:'1.4em'}}><pre>{this.state.answer}</pre></span></div>}
                          

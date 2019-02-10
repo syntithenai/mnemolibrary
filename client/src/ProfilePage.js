@@ -124,25 +124,25 @@ export default class ProfilePage extends Component {
                 let buttonStyle={backgroundColor:borderColor,borderColor:borderColor ,color: 'black',fontWeight: 'bold'}
                 
                 if (parseFloat(awardData)<= 0.1)  {
-                    award=<button style={buttonStyle} className="btn-outline-primary btn" >1. Novice Numbat</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >1. Novice Nautilus</button>
                 } else if (parseFloat(awardData) <= 0.2)  {
-                    award=<button style={buttonStyle} className="btn-outline-primary btn" >2. Beginner Bandicoot</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >2. Beginner Barnacle</button>
                 } else if (parseFloat(awardData) <= 0.3)  {
-                    award=<button style={buttonStyle} className="btn-outline-primary btn" >3. Initiate Ibis</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >3. Initiate Irukandji</button>
                 } else if (parseFloat(awardData) <= 0.4)  {
-                    award=<button style={buttonStyle} className="btn-outline-primary btn" >4. Student Sloth</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >4. Student Shark</button>
                 } else if (parseFloat(awardData) <= 0.5)  {
-                    award=<button style={buttonStyle} className="btn-outline-primary btn" >5. Expert Echidna</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >5. Expert Eel</button>
                 } else if (parseFloat(awardData) <= 0.6)  {
-                    award=<button style={buttonStyle} className="btn-outline-primary btn" >6. Master Magpie</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >6. Master Mackeral</button>
                 } else if (parseFloat(awardData) <= 0.7)  {
-                    award=<button style={buttonStyle} className="btn-outline-primary btn" >7. Wizard Water Dragon</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >7. Wizard Walrus</button>
                 } else if (parseFloat(awardData) <= 0.8)  {
-                    award=<button style={buttonStyle} className="btn-outline-primary btn" >8. Guru Goanna</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >8. Guru Grouper</button>
                 } else if (parseFloat(awardData) <= 0.9)  {
                     award=<button style={buttonStyle} className="btn-outline-primary btn" >9. Superstar Seal</button>
                 } else {
-                    award=<button style={buttonStyle} className="btn-outline-primary btn" >10. Perfect Platypus</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >10. Perfect Porpoise</button>
                 }
             } else {
                 award=null;

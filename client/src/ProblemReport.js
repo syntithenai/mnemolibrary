@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-//import CreateHelp from './CreateHelp';
+import Utils from './Utils';
  
 
 export default class ProblemReport extends Component {
@@ -8,7 +8,7 @@ export default class ProblemReport extends Component {
         //let question = this.props.question ? this.props.question : {};
         
         this.state={
-            problem:''
+            problem:Utils.getQuestionTitle(this.props.question)
         };
         this.change = this.change.bind(this);
     };

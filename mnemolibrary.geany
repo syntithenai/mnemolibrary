@@ -28,7 +28,7 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=71
+current_page=75
 FILE_NAME_0=0;JSON;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fpackage.json;0;4
 FILE_NAME_1=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fconfig.js;0;4
 FILE_NAME_2=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fserver.js;0;4
@@ -38,7 +38,7 @@ FILE_NAME_5=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibra
 FILE_NAME_6=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Ftemplate.js;0;4
 FILE_NAME_7=0;None;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fdocker-compose.yml.sample;0;4
 FILE_NAME_8=0;None;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2FDockerfile;0;4
-FILE_NAME_9=45112;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Froutes%2Fapi.js;0;4
+FILE_NAME_9=71884;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Froutes%2Fapi.js;0;4
 FILE_NAME_10=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Froutes%2Fsignup.js;0;4
 FILE_NAME_11=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2FProfilePage.js;0;4
 FILE_NAME_12=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2FActivityChart.js;0;4
@@ -55,7 +55,7 @@ FILE_NAME_22=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibr
 FILE_NAME_23=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2FMediaFileUpload.js;0;4
 FILE_NAME_24=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2FQuestionEditor.js;0;4
 FILE_NAME_25=5495;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2FReviewPage.js;0;4
-FILE_NAME_26=13981;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2FSingleQuestion.js;0;4
+FILE_NAME_26=28394;Javascript;0;EUTF-8;1;1;1;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2FSingleQuestion.js;0;4
 FILE_NAME_27=324;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2FCreateHelp.js;0;4
 FILE_NAME_28=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2FShareTopicDialog.js;0;4
 FILE_NAME_29=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2FShareDialog.js;0;4
@@ -100,7 +100,13 @@ FILE_NAME_67=162;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemoli
 FILE_NAME_68=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fclient%2Fsrc%2Fs3upload.js;0;4
 FILE_NAME_69=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fpublicapi%2Froutes%2Fsignup.js;0;4
 FILE_NAME_70=0;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fmnemolibrary%2Fpublicapi%2Froutes%2Foauth.js;0;4
-FILE_NAME_71=0;Sh;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fopensnips%2Fdocker-images%2Fsnips%2Fsnips-entrypoint.sh;0;4
+FILE_NAME_71=121;Sh;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fopensnips%2Fdocker-images%2Fsnips%2Fsnips-entrypoint.sh;0;4
+FILE_NAME_72=0;None;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2FDesktop%2Fsessionquestion.txt;0;4
+FILE_NAME_73=0;None;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2FDesktop%2Fsnipslog.official.txt;0;4
+FILE_NAME_74=0;None;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2FDesktop%2Fsnipsquestions-nov18.txt;0;4
+FILE_NAME_75=0;None;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2FDesktop%2Fsnipstags.url;0;4
+FILE_NAME_76=0;None;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2FDownloads%2Fquestions.csv;0;4
+FILE_NAME_77=19541;Markdown;0;EUTF-8;1;1;0;%2Fhome%2Fstever%2Fprojects%2Fopensnips%2FREADME-mess.md;0;4
 
 [VTE]
 last_dir=/home/stever
