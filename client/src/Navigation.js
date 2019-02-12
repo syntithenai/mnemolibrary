@@ -66,13 +66,18 @@ export default class Navigation extends Component {
 		//console.log(['RENDER NAV',window.locationpathname])
 		let pathName = window.location.pathname ? window.location.pathname.replace('/',' ').trim() : '';
 		let parts = pathName.split('/').slice(0,3);
-		
+		if (parts[0]==="discover" && parts[1]==="searchtopic") {
+			let newParts = parts.slice(2);
+			newParts.unshift('topic')
+			newParts.unshift('search')
+			parts=newParts;
+		}
 		let capitalisedParts = parts.map(function(part) {
 			//console.log(['CAPS',part.slice(0,1),part.slice(1)]);
 			return [part.slice(0,1).toUpperCase(),decodeURI(part.slice(1))].join('');
 		})
 		//console.log(['CAPSp',capitalisedParts]);
-		let pageTitle = capitalisedParts.join(' ').trim().length > 0 ? capitalisedParts.join(' ') : "Mnemo's Library"
+		let pageTitle = capitalisedParts.join(' ').trim().length > 0 ? capitalisedParts.join(' ') : " Mnemo's Library"
         if (parts[0] === "help") {
 			pageTitle = "Help";
 		}

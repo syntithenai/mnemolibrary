@@ -45,6 +45,8 @@ export default  class TopicPassword extends Component {
 				// redirect
 				that.setState({'exitRedirect':'/discover/topic/'+that.props.match.params.topic+(that.props.match.params.topicquestion ? '/'+that.props.match.params.topicquestion : '')})
 			});			
+		}).catch(function(e) {
+			that.setState({'warning_message':"Sorry, that's not the password I'm looking for."})
 		});			
 	
 		

@@ -1019,7 +1019,7 @@ initdb().then(function() {
 			}
 			
 			
-		  //  console.log(['disco criteria',JSON.stringify(criteria)]);
+		    console.log(['disco criteria',JSON.stringify(criteria)]);
 			db().collection('questions').find({$and:criteria})
 			//db().collection('questions').aggregate({$match:{$nin:notThese}})
 			.sort(sortFilter).limit(limit).toArray().then(function( questions) {
@@ -1132,7 +1132,7 @@ initdb().then(function() {
 							};
 							criteria.push({'_id': {$nin: notThese}});
 							//criteria.push({discoverable :{$ne:'no'}});
-						   //console.log(['discover',criteria]);
+						   console.log(['NOT THESE',notThese.length]);
 							discoverQuery(fullUser);
 						}
 						
