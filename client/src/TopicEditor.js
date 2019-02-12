@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 //import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
@@ -41,11 +42,15 @@ export default class TopicEditor extends Component {
             showHelp: false,
             validationErrors:{},
             shareQuestion:{},
-            filter:''
+            filter:'',
+            password:props.passsword ? props.passsword : '',
+            restriction:props.restriction ? props.restriction : ''
         };
         this.updateFilter = this.updateFilter.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.setTopicEvent = this.setTopicEvent.bind(this);
+        this.setPasswordEvent = this.setPasswordEvent.bind(this);
+        this.setRestrictionEvent = this.setRestrictionEvent.bind(this);
         this.setTopic = this.setTopic.bind(this);
         this.addResultToQuestions = this.addResultToQuestions.bind(this);
         this.showSearch = this.showSearch.bind(this);
@@ -101,7 +106,25 @@ export default class TopicEditor extends Component {
         this.setState({topic:e.target.value});
         this.saveTopic();
     };
-    
+    setPasswordEvent(e) {
+        //console.log(['topicevent',e.target.value]);
+        this.setState({topicpassword:e.target.value});
+        this.saveTopic();
+    };
+    setRestrictionEvent(e) {
+		let state = this.state;
+        if (this.state.restriction === "YES") {
+            state.restriction=""
+        } else {
+            state.restriction="YES"
+        }
+		this.setState(state);
+        this.saveTopic();
+        return true;
+        ////console.log(['topicevent',e.target.value]);
+        //this.setState({restricted:e.target.value});
+        //this.saveTopic();
+    };    
     setTopic(topic) {
         //this.setState({topic:topic});
         //this.saveTopic();
@@ -177,7 +200,7 @@ export default class TopicEditor extends Component {
         //debounce(100,function() {
             let that=this;
             let publishedTopic=this.props.user.avatar+'\'s '+this.state.topic;
-            let params = {_id:this.state._id,user:this.props.user._id,topic:this.state.topic,questions:this.state.questions,deleteQuestion:deleteQuestion,publishedTopic:this.props.user.avatar+"'s "+this.state.topic}
+            let params = {_id:this.state._id,user:this.props.user._id,topic:this.state.topic,questions:this.state.questions,deleteQuestion:deleteQuestion,publishedTopic:this.props.user.avatar+"'s "+this.state.topic,restriction:this.state.restriction,topicpassword:this.state.topicpassword}
             return fetch("/api/saveusertopic", {
               method: 'POST',
               headers: {
@@ -276,7 +299,7 @@ export default class TopicEditor extends Component {
                     //console.log(['loaded topic',topic]);
                     //res.send({user:user,token:token});
                     localStorage.setItem('currentTopic',topic._id);
-                    that.setState({topic:topic.topic,_id:topic._id,published:topic.published,questions:topic.questions,currentView:'questions',validationErrors:{},message:' '});                
+                    that.setState({topic:topic.topic,_id:topic._id,published:topic.published,questions:topic.questions,currentView:'questions',validationErrors:{},message:' ',restriction:topic.restriction,topicpassword:topic.topicpassword});                
                 }
             })
             .catch(function(err) {
@@ -531,6 +554,14 @@ export default class TopicEditor extends Component {
                                   
                                   
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label>Filter <input type='text' onChange={this.updateFilter} /></label>
+                                    <div style={{float:'right'}}>
+										{this.state.restriction && <label>
+											Password <input onChange={this.setPasswordEvent}  value={this.state.topicpassword}  type='text'/>
+										</label>}&nbsp;&nbsp;
+										<label>
+											<input onChange={this.setRestrictionEvent}  checked={this.state.restriction?'true':''}  type='checkbox'/> Restrict Access
+										</label>
+                                    </div>
                                   
                                     <TopicQuestionsList filter={this.state.filter} validationErrors={this.state.validationErrors} editQuestion={this.editQuestion}  questions={this.state.questions} moveQuestion={this.moveQuestion} currentQuestion={this.state.currentQuestion} /></span>
                                 }

@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 import ActivityChart from './ActivityChart'
 import TopicsChart from './TopicsChart'
@@ -134,7 +135,7 @@ export default class ProfilePage extends Component {
                 } else if (parseFloat(awardData) <= 0.5)  {
                     award=<button style={buttonStyle} className="btn-outline-primary btn" >5. Expert Eel</button>
                 } else if (parseFloat(awardData) <= 0.6)  {
-                    award=<button style={buttonStyle} className="btn-outline-primary btn" >6. Master Mackeral</button>
+                    award=<button style={buttonStyle} className="btn-outline-primary btn" >6. Master Mackerel</button>
                 } else if (parseFloat(awardData) <= 0.7)  {
                     award=<button style={buttonStyle} className="btn-outline-primary btn" >7. Wizard Walrus</button>
                 } else if (parseFloat(awardData) <= 0.8)  {

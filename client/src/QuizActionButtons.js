@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 import Check from 'react-icons/lib/fa/check';
 import ArrowRight from 'react-icons/lib/fa/arrow-right';

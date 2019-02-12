@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 import WordCloud from 'react-d3-cloud';
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'

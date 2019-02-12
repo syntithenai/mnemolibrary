@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 import QuizList from './QuizList';
 import QuizCollection from './QuizCollection';

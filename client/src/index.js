@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 console.clear=function() {}
 
 import React from 'react';

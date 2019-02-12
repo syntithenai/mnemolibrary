@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 import getIcon from './collectionIcons';
 import QuizCollectionItem from './QuizCollectionItem';
@@ -13,7 +14,10 @@ export default class QuizCollection extends Component {
         this.state={}
         this.showTopics  = this.showTopics.bind(this);
         //this.discoverByDifficulty  = this.discoverByDifficulty.bind(this);
-        //this.discoverOneByDifficulty  = this.discoverOneByDifficulty.bind(this);
+        this.discoverOneByDifficulty  = this.discoverOneByDifficulty.bind(this);
+        this.discoverOneByCommunity  = this.discoverOneByCommunity.bind(this);
+        this.discoverOne  = this.discoverOne.bind(this);
+        
         //this.discoverByTopics  = this.discoverByTopics.bind(this);
         this.discoverOneByTopics  = this.discoverOneByTopics.bind(this);
     }
@@ -44,7 +48,7 @@ export default class QuizCollection extends Component {
             },
             body:JSON.stringify({
                 difficulty:difficulty,
-                user:(this.props.user ? this.props.user._id : ''),
+                user:(that.props.user ? that.props.user._id : ''),
                 rand:rand,
                 limit:20
             })
@@ -156,7 +160,7 @@ export default class QuizCollection extends Component {
               json.questions[selected].postfix = json.questions[selected].postfix ? json.questions[selected].postfix + '?' : '?'
               return json.questions[selected];
           } else {
-              return {postfix:"You've seen all these questions"}
+              return {question:"You've seen all these questions"}
           }
         
       }).catch(function(ex) {
@@ -177,7 +181,7 @@ export default class QuizCollection extends Component {
               return <div  >
                     <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                       <h4>{collection.name}</h4>
-                      <QuizList quizzes={collatedTopics} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics}   setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} isLoggedIn={this.props.isLoggedIn} ></QuizList>
+                      <QuizList quizzes={collatedTopics} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics}   setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} isLoggedIn={this.props.isLoggedIn} collection={collection}></QuizList>
                     </div>
             }
         } else {
@@ -248,9 +252,10 @@ export default class QuizCollection extends Component {
                     <QuizCollectionItem color="white" backgroundColor='#fe0000' icon="chalkBoard" name="Beginner" difficulty="1" link="/discover/difficulty/1"  loadQuestionByDifficulty={this.discoverOneByDifficulty} /> 
                     <QuizCollectionItem color="white" backgroundColor='#f60'  icon="userGraduate" name="Advanced" difficulty="2" link="/discover/difficulty/2"loadQuestionByDifficulty={this.discoverOneByDifficulty} /> 
                     <QuizCollectionItem color="black" backgroundColor='#fe9900'  icon="brain" name="Genius" difficulty="3" link="/discover/difficulty/3"  loadQuestionByDifficulty={this.discoverOneByDifficulty}/> 
+                    
                     {renderedTopicCollections}
                                  
-                    <QuizCollectionItem color="white" backgroundColor='#cd0067'  icon="starOfLife" name="All"  onClick={(e) => this.props.showCollection(all)} loadQuestionByAll={this.discoverOne} setQuizFromQuestionId={this.props.setQuizFromQuestionId} hideSingleQuestionInCollectionView={true} /> 
+                    <QuizCollectionItem color="white" backgroundColor='#cd0067'  icon="starOfLife" name="All" style={{height:'100%'}} onClick={(e) => this.props.showCollection(all)} loadQuestionByAll={this.discoverOne} setQuizFromQuestionId={this.props.setQuizFromQuestionId} hideSingleQuestionInCollectionView={true} /> 
                 </div>
             </div>
         )

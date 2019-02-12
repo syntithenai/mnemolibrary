@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 import 'whatwg-fetch'
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'

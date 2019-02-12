@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 // icons
@@ -57,8 +58,13 @@ export default class SingleQuestion extends Component {
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.fromWikipedia = this.fromWikipedia.bind(this);
         this.createMedia = this.createMedia.bind(this);
+        this.isWikiApi = this.isWikiApi.bind(this);
+        this.wikiBaseUrl = this.wikiBaseUrl.bind(this);
         this.scrollTo={};
         this.questionmessage='';
+        // most specific first
+        this.wikiSites = ['https://simple.wikipedia.org','https://en.wikipedia.org','https://wikipedia.org','https://en.wiktionary.org','https://wiktionary.org'] 
+		
     };
 
     
@@ -133,26 +139,50 @@ export default class SingleQuestion extends Component {
         }
     };
     
+    isWikiApi(link) {
+		console.log(['ISWIKIAPI',link]);
+		if (link && link.length > 0 ) {
+			let found = false;
+			for (var i in this.wikiSites) {
+				if (link.indexOf(this.wikiSites[i]) === 0) {
+					return true
+				}
+			}
+		}
+		return false;
+	}
+	
+	wikiBaseUrl(link) {
+		if (link && link.length > 0 ) {
+			for (var i in this.wikiSites) {
+				if (link.indexOf(this.wikiSites[i]) === 0) {
+					return this.wikiSites[i];
+				}
+			}
+		}
+		
+	}
+    
     fromWikipedia() {
         let that = this;
-       // console.log(['FROM WIKIPEDIA']);
+       console.log(['FROM WIKIPEDIA']);
         that.setState({answer:''});
         that.setState({image:''});
         if (this.props.question) {
 			let questionId = this.props.question._id;
 			if (this.props.question.answer && this.props.question.answer.length > 0) {
-				//console.log(['FROM WIKIPEDIA HAVE ANSWER']);
+				console.log(['FROM WIKIPEDIA HAVE ANSWER']);
 				this.setState({answer:this.props.question.answer});
 			} else {
-				//console.log(['FROM WIKIPEDIA LOOKUP ANSWER']);
-				if (this.props.question.link && this.props.question.link.length > 0 && (this.props.question.link.indexOf('wikipedia.org') !== -1 ||this.props.question.link.indexOf('wiktionary.org') !== -1)) {
-					//console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD']);
+				console.log(['FROM WIKIPEDIA LOOKUP ANSWER']);
+				if (this.isWikiApi(this.props.question.link)) {
+					console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD']);
 					let linkParts = this.props.question.link.split("/");
 					let wikiPageParts = linkParts[linkParts.length - 1].split("#");
 					let wikiPage = wikiPageParts[0];
 					// wikilookup
-					//console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD',wikiPage,wikiPageParts]);
-					Utils.loadWikipediaIntro(wikiPage).then(function(answer) {
+					console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD',wikiPage,wikiPageParts]);
+					Utils.loadWikipediaIntro(wikiPage,this.wikiBaseUrl(this.props.question.link)).then(function(answer) {
 						//console.log(['FROM WIKIPEDIA got',answer]);
 						if (answer && answer.length > 0) {
 							that.setState({answer:answer});
@@ -179,16 +209,24 @@ export default class SingleQuestion extends Component {
 				}
 			}
 			if (this.props.question.image && this.props.question.image.length > 0) {
+				console.log(['FROM WIKIPEDIA have image']);
 				this.setState({image:this.props.question.image});
 			} else if (this.props.question.image_png && this.props.question.image_png.length > 0) {
+				console.log(['FROM WIKIPEDIA have png image']);
 				this.setState({image:this.props.question.image_png});
 			} else {
-				if (this.props.question.link && this.props.question.link.length > 0 &&  this.props.question.link.indexOf('wikipedia.org') !== -1) {
+				console.log(['FROM WIKIPEDIA try LOOKUP image']);
+				
+				if (this.isWikiApi(this.props.question.link)) {
+					console.log(['FROM WIKIPEDIA is wiki  api']);
+				
 					let linkParts = this.props.question.link.split("/");
 					let wikiPageParts = linkParts[linkParts.length - 1].split("#");
 					let wikiPage = wikiPageParts[0];
 					// wikilookup
-					Utils.loadWikipediaImage(wikiPage).then(function(answer) {
+					console.log(['FROM WIKIPEDIA LOOKUP IMAGE']);
+				
+					Utils.loadWikipediaImage(wikiPage,this.wikiBaseUrl(this.props.question.link)).then(function(answer) {
 						//console.log(['FROM WIKIPEDIA got image',answer]);
 						that.setState({image:answer});
 						if (answer && answer.length > 0) {
@@ -332,6 +370,7 @@ export default class SingleQuestion extends Component {
     
     // which question parts are visible - mnemonic, answer, moreinfo
     setVisible(toShow) {
+		let that = this;
 		console.log(['setvisible',toShow]);
         let visible = this.state.visible;
         let show = toShow;
@@ -344,9 +383,12 @@ export default class SingleQuestion extends Component {
 		this.setState({'visible':visible});
 		console.log(['didsetvis',visible]);
         //console.log(['scroll to ',toShow,this.scrollTo[toShow],this.scrollTo]);
-        //setTimeout(function(toShow) {
-            scrollToComponent(this.scrollTo[show],{align:'top',offset:-230});
-        //},1000) 
+        if (toShow==='image') {
+			setTimeout(function() {
+				console.log('SCROLL TO IMAGE')
+				scrollToComponent(that.scrollTo['image'],{align:'top',offset:-230});
+			},300) 
+		}
     };
     
     toggleMedia() {
@@ -661,6 +703,8 @@ export default class SingleQuestion extends Component {
                     
                     
                 </div>
+                 <div ref={(section) => { this.scrollTo.end = section; }} ></div>
+                       
             </div>
           
           

@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 /* global WaveSurfer */
 
 import Cropper from 'react-cropper';

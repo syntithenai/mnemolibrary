@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import _range from 'underscore';
 import React, { PropTypes } from 'react';
 

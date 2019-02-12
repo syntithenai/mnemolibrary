@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import "react-bootstrap-toggle/dist/bootstrap2-toggle.css";
 
 import React, { Component } from 'react';
@@ -463,7 +464,7 @@ export default class QuestionEditor extends Component {
                             {this.state.showAnswerDetails && <button style={{float: 'right'}} className="btn btn-info" onClick={() => this.setState({showAnswerDetails:false})} aria-expanded="false" aria-controls="answerDetails">
                               Hide Details
                             </button>}
-                            <label htmlFor="shortanswer" >* Answer </label>
+                            <label htmlFor="shortanswer" >Answer </label>
                             <textarea autoComplete="false" id="answer" type='text' name='answer' onChange={this.change} value={this.props.question.answer} className='form-control' ></textarea>
                             
                             

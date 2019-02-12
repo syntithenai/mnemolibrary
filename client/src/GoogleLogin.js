@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 /* global gapi */
 import React, { Component } from 'react';
 import Google from 'react-icons/lib/fa/google';

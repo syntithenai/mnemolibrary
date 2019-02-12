@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 //const config=require('../../config');
 import TopicEditor from './TopicEditor';

@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 /* global gapi */
 /* global Paho */
 import React, { Component } from 'react';
@@ -26,6 +27,7 @@ import FindQuestions from './FindQuestions';
 import CreateHelp from './CreateHelp';
 import QuizCollection from './QuizCollection';
 
+import TopicPassword from './TopicPassword';
 import FAQ from './FAQ';
 import ReactGA from 'react-ga';
 //import { BrowserRouter as Router, Route, Link } from "react-router-dom";
@@ -941,7 +943,7 @@ export default class AppLayout extends Component {
                 
                  <PropsRoute  exact={true} path="/review" component={ReviewPage} {...reviewPageOptions}  />
                  <PropsRoute  exact={true}  path="/review/:topic" component={ReviewPage} {...reviewPageOptions}  />
-                 <PropsRoute  exact={true}path="/review/topic/:topic" component={ReviewPage} {...reviewPageOptions}  />
+                 <PropsRoute  exact={true} path="/review/topic/:topic" component={ReviewPage} {...reviewPageOptions}  />
                  <PropsRoute  path="/review/:topic/:topic/:topicquestion" component={ReviewPage} {...reviewPageOptions}  />
                  <PropsRoute  path="/review/band/:band" component={ReviewPage} {...reviewPageOptions}  />
                 
@@ -949,6 +951,9 @@ export default class AppLayout extends Component {
                  <PropsRoute  path="/profile" component={ProfilePage} {...profilePageOptions} analyticsEvent={this.analyticsEvent}/>
                  <br/>
                 
+                 <PropsRoute  exact={true} path="/access/topic/:topic" component={TopicPassword}  user={this.state.user} saveUser={this.saveUser} />
+                 <PropsRoute  path="/access/:topic/:topic/:topicquestion" component={TopicPassword} user={this.state.user} saveUser={this.saveUser} />
+                 
                 
                 <Footer/>
                 

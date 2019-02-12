@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 //import 'whatwg-fetch'
 import GoogleLogin from './GoogleLogin'

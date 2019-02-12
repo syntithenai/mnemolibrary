@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 import Utils from './Utils';
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'

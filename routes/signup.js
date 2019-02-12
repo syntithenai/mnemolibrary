@@ -85,7 +85,7 @@ router.get('/me',function(req,res) {
 router.post('/saveuser', function(req, res) {
    // //console.log(req.body);
     if (req.body._id && req.body._id.length > 0) {
-        if (req.body.password2 != req.body.password)  {
+        if (req.body.password && req.body.password.trim().length > 0 && req.body.password2 != req.body.password)  {
             res.send({warning_message:'Passwords do not match'});
         } else {
             ////console.log(['find on saveuser',req.body._id]);
@@ -102,9 +102,11 @@ router.post('/saveuser', function(req, res) {
                   if (req.body.streak) item.streak=req.body.streak;
                   if (req.body.questions) item.questions=req.body.questions;
                   if (req.body.recall) item.recall=req.body.recall;
+                  console.log(['TPPW',req.body.topicPasswords])
+                  if (req.body.topicPasswords) item.topicPasswords=req.body.topicPasswords;
                   // update avatar only when changed
                  // //console.log(['CHECK AVATORA',item.avatar,req.body.avatar]);
-                  if (item.avatar != req.body.avatar) {
+                  if (req.body.avatar && req.body.avatar.length > 0 && item.avatar != req.body.avatar) {
                       db.collection(userModelName).findOne({avatar:{$eq:req.body.avatar}}, function(err, avUser) {
                           if (avUser!=null) {
                              // //console.log('FOUND');

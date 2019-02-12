@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React from 'react';
 import { ResponsivePie } from '@nivo/pie'
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -146,7 +147,7 @@ export default class TopicsChart extends React.Component {
                 if (type!=='blocks' && type!=='archive') {
                     that.props.addAward('topics',completedTopics.length);
                    // that.props.addAward('questions',totalSeen);
-                    that.props.addAward('recall',totalSuccess/countSuccess);
+                    that.props.addAward('recall',totalSuccess/countSuccess + totalSeen/1000) ;
                 }
                 console.log(['SET DATA',series]);
                 that.setState({series:series});

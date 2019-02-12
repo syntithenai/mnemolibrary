@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 import Utils from './Utils';
 import FaChild from 'react-icons/lib/fa/child';
@@ -98,8 +99,13 @@ export default class QuizList extends Component {
             let quizzes = Object.keys(this.props.quizzes).sort().map((quiz, key) => {
               var title = Utils.snakeToCamel(quiz)
               let missingCount = this.state.questionsMissingMnemonics && this.state.questionsMissingMnemonics.hasOwnProperty(quiz) ? this.state.questionsMissingMnemonics[quiz] : 0;
+              let linkTo="/discover/topic/"+quiz;
+              if (this.props.collection && this.props.collection.restricted) {
+				  linkTo="/access/topic/"+quiz;
+			  }
+              
               return (<span key={quiz}  className='list-group-item'>
-				  <Link to={"/discover/topic/"+quiz}   >
+				  <Link to={linkTo}   >
 					<span>{title}</span>
 				  </Link>
 				  {missingCount > 0 && this.props.isLoggedIn && this.props.isLoggedIn() && <a href={"/missing/"+quiz} className='btn btn-success' style={{float:'right'}}  ><FaChild size="22" /> {missingCount}</a>}

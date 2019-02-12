@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { Component } from 'react';
 import Github from 'react-icons/lib/fa/github';
 import Twitter from 'react-icons/lib/fa/twitter';
