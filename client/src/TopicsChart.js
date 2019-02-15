@@ -14,7 +14,7 @@ export default class TopicsChart extends React.Component {
                 labels:[],
                 series:[],
                 archiveSeries:[],
-                show: 'chart',
+                show: 'list',
                 exitRedirect:null
         } 
         this.loadData = this.loadData.bind(this);
@@ -46,11 +46,11 @@ export default class TopicsChart extends React.Component {
    */
   updateDimensions() {
       ////console.log(['U',window.innerWidth,this.state.series.length]);
-    if (window.innerWidth < 700 || this.state.series.length > 17) {
-        this.setState({show:'list'});
-    } else {
-        this.setState({show:'chart'});
-    }
+    //if (window.innerWidth < 700 || this.state.series.length > 17) {
+        //this.setState({show:'list'});
+    //} else {
+        //this.setState({show:'chart'});
+    //}
   }
 
   
