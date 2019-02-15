@@ -409,7 +409,7 @@ export default class TopicEditor extends Component {
         if (this.state.questions.length > 0 && this.state.topic.length > 0) {
 			let publishMessage = 'By publishing this topic you are agreeing to release your questions and mnemonics into the public domain. (See the help section for details)';
 			if (this.state.restriction === "YES") {
-				publishMessage='By publishing this topic you are making it available to users who have the password at http://mnemolibrary.com/access/'+this.props.user.avatar+"'s "+this.state.topic;
+				publishMessage='By publishing this topic you are making it available to users who have the password at http://mnemolibrary.com/access/topic/'+this.props.user.avatar+"'s "+this.state.topic;
 				publishMessage+='                                                                                    ';
 				//'\n\nIf you want to feature your topic, you can contact the site admin mnemoslibrary@gmail.com to ask about curating your topic into one of our restricted collections.'
 			} 
