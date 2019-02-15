@@ -1103,27 +1103,31 @@ initdb().then(function() {
 							allowedTopicCriteria.push({$and:[{quiz:{$eq:key}},{topicpassword:{$eq:fullUser.topicPasswords[key]}}]})
 						});
 					}
-					
+					let andParts=[{access :{$eq:'restricted'}}]
+					if (allowedTopicCriteria.length > 0) {
+						andParts.push({$or:allowedTopicCriteria})
+					}
+					let orParts = [
+						{access:{$eq:ObjectId(req.body.user)}},
+						{access :{$eq:'public'}},
+					];
+					if (allowedTopicCriteria.length > 0) {
+							orParts.push({$and:andParts})
+					}
 				    criteria.push({
-						$or:[
-							{access:{$eq:ObjectId(req.body.user)}},
-							{access :{$eq:'public'}},
-							{$and:[
-								{access :{$eq:'restricted'}},
-								{$or:allowedTopicCriteria}
-							]}
-							
-						]
+						$or:orParts
 					})
-			
-					db().collection('userquestionprogress').find({
-							$and:[
-								{'user': {$eq:ObjectId(user)}} , 
-								{$or:[
-									{block: {$gt:0}}, 
-									{seen: {$gt:0}}, 
-								]}
-								]}).toArray().then(function(progress) {
+				    
+					let andCriteria  = [
+					{'user': {$eq:ObjectId(user)}} , 
+					{$or:[
+						{block: {$gt:0}}, 
+						{seen: {$gt:0}}, 
+					]}
+					]
+					if (req.body.topic && req.body.topic.length > 0) andCriteria.push({topic:{$eq:req.body.topic}})
+
+					db().collection('userquestionprogress').find({$and:andCriteria}).toArray().then(function(progress) {
 						 if (progress) {
 							// //console.log(['progress res',progress]);
 							let notThese = [];
@@ -1438,17 +1442,19 @@ initdb().then(function() {
 							allowedTopicCriteria.push({$and:[{quiz:{$eq:key}},{topicpassword:{$eq:fullUser.topicPasswords[key]}}]})
 						});
 					}
-					
+					let andParts=[{access :{$eq:'restricted'}}]
+					if (allowedTopicCriteria.length > 0) {
+						andParts.push({$or:allowedTopicCriteria})
+					}
+					let orParts = [
+						{access:{$eq:ObjectId(req.body.user)}},
+						{access :{$eq:'public'}},
+					];
+					if (allowedTopicCriteria.length > 0) {
+							orParts.push({$and:andParts})
+					}
 				    criteria.push({
-						$or:[
-							{access:{$eq:ObjectId(req.body.user)}},
-							{access :{$eq:'public'}},
-							{$and:[
-								{access :{$eq:'restricted'}},
-								{$or:allowedTopicCriteria}
-							]}
-							
-						]
+						$or:orParts
 					})
 					console.log(['criteria',JSON.stringify(criteria)]);
 					
@@ -1471,8 +1477,8 @@ initdb().then(function() {
 	   console.log(['checktopicpassword']);
 		if (req.body.topic && req.body.topic.length > 0 && req.body.password && String(req.body.password).length > 0) {
 		  //  //console.log(['ok']);
-			let topic = req.body.topic;
-			let password = req.body.password;
+			let topic = req.body.topic.replace(/\\\"/g, '"').replace(/\\\'/g, "'");
+			let password = req.body.password.replace(/\\\"/g, '"').replace(/\\\'/g, "'");
 			let criteria = {$and:[
 								{topicpassword:{$eq:password}},
 								{publishedTopic:{$eq:topic}},
