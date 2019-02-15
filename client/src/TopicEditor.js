@@ -46,6 +46,7 @@ export default class TopicEditor extends Component {
             password:props.passsword ? props.passsword : '',
             restriction:props.restriction ? props.restriction : ''
         };
+        this.askPublishTopic = this.askPublishTopic.bind(this);
         this.updateFilter = this.updateFilter.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.setTopicEvent = this.setTopicEvent.bind(this);
@@ -409,15 +410,17 @@ export default class TopicEditor extends Component {
 			let publishMessage = 'By publishing this topic you are agreeing to release your questions and mnemonics into the public domain. (See the help section for details)';
 			if (this.state.restriction === "YES") {
 				publishMessage='By publishing this topic you are making it available to users who have the password at http://mnemolibrary.com/access/'+this.props.user.avatar+"'s "+this.state.topic;
-				publishMessage.='\n\nIf you want to feature your topic, you can contact the site admin mnemoslibrary@gmail.com to ask about curating your topic into one of our restricted collections.'
+				publishMessage+='                                                                                    ';
+				//'\n\nIf you want to feature your topic, you can contact the site admin mnemoslibrary@gmail.com to ask about curating your topic into one of our restricted collections.'
 			} 
             confirmAlert({
               title: 'Publish Topic',
               message: publishMessage + `
               
               You will still be able to change or delete the topic or questions.
-              
-              Do you want to publish?`,
+                                                                          
+                                                                          
+                                                                          Do you want to publish?`,
               buttons: [
                 {
                   label: 'Yes',
