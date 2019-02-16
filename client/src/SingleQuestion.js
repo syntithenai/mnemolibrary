@@ -383,12 +383,12 @@ export default class SingleQuestion extends Component {
 		this.setState({'visible':visible});
 		console.log(['didsetvis',visible]);
         //console.log(['scroll to ',toShow,this.scrollTo[toShow],this.scrollTo]);
-        if (toShow==='image') {
+       // if (toShow==='image') {
 			setTimeout(function() {
 				console.log('SCROLL TO IMAGE')
-				scrollToComponent(that.scrollTo['image'],{align:'top',offset:-230});
+				scrollToComponent(that.scrollTo[toShow],{align:'top',offset:-230});
 			},300) 
-		}
+		//}
     };
     
     toggleMedia() {
