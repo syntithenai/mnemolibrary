@@ -7,6 +7,8 @@ import Check from 'react-icons/lib/fa/check';
 import ArrowRight from 'react-icons/lib/fa/arrow-right';
 import ArrowLeft from 'react-icons/lib/fa/arrow-left';
 import Trash from 'react-icons/lib/fa/trash';
+import EditIcon from 'react-icons/lib/fa/pencil';
+
 import Music from 'react-icons/lib/fa/music';
 import Info from 'react-icons/lib/fa/info';
 import Ellipsis from 'react-icons/lib/fa/ellipsis-v';
@@ -16,16 +18,21 @@ import Image from 'react-icons/lib/fa/image';
 import Search from 'react-icons/lib/fa/search';
 import Tags from 'react-icons/lib/fa/tags';
 import ExternalLink from 'react-icons/lib/fa/external-link';
-import ConnectDevelop from 'react-icons/lib/fa/connectdevelop';
+import ConnectDevelop from 'react-icons/lib/fa/connectdevelop';  
 import Close from 'react-icons/lib/fa/close';
 //import Book from 'react-icons/lib/fa/book';
 import ShareAlt from 'react-icons/lib/fa/share-alt';
+import CommentIcon from 'react-icons/lib/fa/comment';
+
 import ShareDialog from './ShareDialog';
 
 import scrollToComponent from 'react-scroll-to-component';
 import MnemonicsList from './MnemonicsList';
 import Utils from './Utils';
-import ProblemReport from './ProblemReport';
+//import ProblemReport from './ProblemReport';
+import CommentEditor from './CommentEditor';
+import CommentList from './CommentList';
+
 //import Swipe from 'react-swipe-component';
 import Swipeable from 'react-swipeable'
 //import ThumbsDown from 'react-icons/lib/fa/thumbs-down';
@@ -45,7 +52,7 @@ export default class SingleQuestion extends Component {
           this.player = element;
           if (this.player) this.player.subscribeToStateChange(this.handleStateChange.bind(this));
         };
-        this.state = {swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:''}
+        this.state = {comments:[],showCommentDialog: false,swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:''}
         this.setVisible = this.setVisible.bind(this);
         this.toggleMedia = this.toggleMedia.bind(this);
         this.isVisible = this.isVisible.bind(this);
@@ -60,13 +67,18 @@ export default class SingleQuestion extends Component {
         this.createMedia = this.createMedia.bind(this);
         this.isWikiApi = this.isWikiApi.bind(this);
         this.wikiBaseUrl = this.wikiBaseUrl.bind(this);
+        this.toggleCommentDialog = this.toggleCommentDialog.bind(this);
+        this.loadComments = this.loadComments.bind(this);
+        this.editComment = this.editComment.bind(this);
+        this.deleteComment = this.deleteComment.bind(this);
+        
         this.scrollTo={};
         this.questionmessage='';
         // most specific first
         this.wikiSites = ['https://simple.wikipedia.org','https://en.wikipedia.org','https://wikipedia.org','https://en.wiktionary.org','https://wiktionary.org'] 
 		
     };
-
+  
     
       componentDidMount() {
           let that = this;
@@ -83,6 +95,7 @@ export default class SingleQuestion extends Component {
 				//console.log('timeout on sing leod now wiki RELLY')
 				that.fromWikipedia();
 				that.createMedia();
+				that.loadComments(that.props.question._id,that.props.user._id);
 			}
 		//},1000);
       } 
@@ -99,6 +112,7 @@ export default class SingleQuestion extends Component {
 			//console.log(['SQ UPDATE change question',oldId,newId]);
              this.fromWikipedia();
              this.createMedia();
+             that.loadComments(that.props.question._id,that.props.user._id);
           }
       };
     
@@ -117,6 +131,59 @@ export default class SingleQuestion extends Component {
     };
     
 
+    loadComments(question,user) {
+		let that=this;
+		if (question && user) {
+		  fetch('/api/comments?question='+question+'&user='+user)
+		  .then(function(response) {
+			return response.json()
+		  }).then(function(json) {
+			console.log(['loaded comments', json])
+			that.setState({comments:json});
+		  }).catch(function(ex) {
+			console.log(['error loading comments', ex])
+		  })
+		}
+	}
+	
+	toggleCommentDialog() {
+		console.log(['TOGGLE COMMENT',this.state.showCommentDialog])
+		//// 
+		//if (this.state.showCommentDialog) {
+			//this.setState({'editingComment':null})
+		//}
+		this.setState({showCommentDialog: !this.state.showCommentDialog})
+	}
+
+	editComment(comment) {
+		this.setState({commentId:comment._id,commentText:comment.comment,commentType:comment.type})
+		this.toggleCommentDialog()
+	}
+	
+	deleteComment(comment) {
+		// refresh single view comments list
+		let that = this;
+		let toSave = {}
+		toSave.question = this.props.question ? this.props.question._id : null;
+		toSave.user = this.props.user ? this.props.user._id : null
+		toSave.comment = comment ? comment._id : null
+		
+		if (toSave.question && toSave.user && toSave.comment) {
+			fetch('/api/deletecomment', {
+			  method: 'POST',
+			  headers: {
+				'Content-Type': 'application/json'
+			  },
+			  
+			  body: JSON.stringify(toSave)
+			}).then(function() {
+				that.setState({'comment':''});                
+				that.props.toggleVisible();
+				console.log(['NOW RELOAD COMMENTS',that.props.loadComments])
+				that.props.loadComments(that.props.question._id,that.props.user._id)
+			});
+		}
+	} 
     
     disableSwipe() {
         this.setState({swipeable:false});
@@ -412,6 +479,7 @@ export default class SingleQuestion extends Component {
         this.setState({'visible':[]});
     };
     
+
     handleQuestionResponse(question,response) {
         this.hideAll();
         this.props.handleQuestionResponse(question,response);
@@ -571,20 +639,22 @@ export default class SingleQuestion extends Component {
            return (
             <div className="questionwrap" >
             <ShareDialog id="sharedialog"  header={header}  question={question}/>
-            <ProblemReport user={this.props.user} question={this.props.question} />
+            <CommentEditor commentId={this.state.commentId} commentText={this.state.commentText} commentType={this.state.commentType} question={this.props.question} user={this.props.user} visible={this.state.showCommentDialog} user={this.props.user} question={this.props.question}  loadComments={this.loadComments} toggleVisible={this.toggleCommentDialog} />
                 <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                 <div className="row buttons justify-content-between" >
                     <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} />&nbsp;</button>
-                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Prev&nbsp;</span></button>
+                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Back&nbsp;</span></button>
                     <span >&nbsp;</span>
-                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block"> Next</span></button>
+                    {(showRecallButton || !this.props.user) && <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Next&nbsp;</span></button>}
+                    {!showRecallButton && this.props.user && <button className="col-2 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add to Review&nbsp;</span></button>}
+                    
                     {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block"> Recall</span></button>}
                     <span >&nbsp;</span>
-                    {<button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Block</span></button>}
+                    {this.props.user && <button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Not Interested</span></button>}
                     {showRecallButton && <div className="scrollbuttons col-sm-12" >
-                             <button style={{float:'right'}} data-toggle="modal" data-target="#problemdialog" className='btn btn-primary'><ExclamationTriangle size={26} /><span className="d-none d-md-inline-block">&nbsp;Report Problem&nbsp;</span></button>
-                    &nbsp;
                             <button style={{float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
+                            &nbsp;
+                             {this.props.user && <button style={{float:'right'}} onClick={this.toggleCommentDialog} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
                                            
                             {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Mnemonic</span></button>
                             }&nbsp;
@@ -614,13 +684,22 @@ export default class SingleQuestion extends Component {
                         {((!showRecallButton || this.isVisible('media') || question.autoplay_media==="YES") && hasMedia) && <span style={{marginTop:'1em',float:'right'}}>
                             {media}</span> }
                          
-                       {!showRecallButton && <span>  {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
+                         
+
+                         
+                       {!showRecallButton && <span> 
+						   
+                            <button style={{marginTop:'1em',float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
+                         &nbsp;   
+                       {this.props.user &&  <button style={{marginTop:'1em',float:'right'}} onClick={this.toggleCommentDialog} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
+                        
+						&nbsp;
+						
+						    {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
                          }
-                        {(target) && <a style={{float:'right',clear:'both',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
-                        }&nbsp;   
-                        <button style={{marginTop:'1em',float:'right'}} data-toggle="modal" data-target="#problemdialog" className='btn btn-primary'><ExclamationTriangle size={26} /><span className="d-none d-md-inline-block">&nbsp;Report Problem&nbsp;</span></button>
-                    &nbsp;
-                            <button style={{marginTop:'1em',float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button></span>}
+                        {(target) && <a style={{float:'right',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
+                        }
+                        </span>}
                         
                         
                         <div  className="card-title questionheader">{this.props.isReview && <br/>}{header}?</div>
@@ -701,6 +780,9 @@ export default class SingleQuestion extends Component {
                         </div><div   style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div></div>}
                     </div>
                     
+                    <div className="card-block">
+						<CommentList  user={this.props.user} question={this.props.question} comments={this.state.comments}   editComment={this.editComment}  deleteComment={this.deleteComment} />
+					</div>
                     
                 </div>
                  <div ref={(section) => { this.scrollTo.end = section; }} ></div>

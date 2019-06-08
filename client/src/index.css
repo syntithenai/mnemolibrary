@@ -161,9 +161,7 @@ iframe#wikiiframe {
     width: 100%;
     z-index:999;
 }
-#problemdialog {
-    z-index:99999;
-}
+
 #answer {
     min-height: 7em;
 }
@@ -399,4 +397,70 @@ h4.graphTitle::before {
   cursor: auto;
 }
 
+/* The Modal (background) */
+.modaldialog {
+  display: none; /* none Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 100000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
 
+
+
+/* The Close Button */
+.modaldialog-close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+
+/* Modal Header */
+.modaldialog-header {
+  padding: 2px 16px;
+  background-color: black;
+  color: white;
+}
+
+/* Modal Body */
+.modaldialog-body {padding: 2px 16px;}
+
+/* Modal Footer */
+.modaldialog-footer {
+  height: 1.5em;
+  background-color: black;
+  color: white;
+}
+/* Modal Content/Box */
+.modaldialog-content {
+  background-color: #fefefe;
+  margin: 5% auto; /* 15% from the top and centered */
+  padding: 0.2em;
+  border: 1px solid #888;
+  width: 90%; /* Could be more or less, depending on screen size */
+}
+/* Modal Content */
+.smodaldialog-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+/* Add Animation */
+@keyframes animatetop {
+  from {top: -300px; opacity: 0}
+  to {top: 0; opacity: 1}
+}

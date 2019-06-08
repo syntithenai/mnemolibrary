@@ -1,0 +1,66 @@
+intents:
+- goodbye 
+- greet
+- thanks
+- affirm
+- deny
+- name
+- discover
+- review
+- next_question
+- answer_is
+- mnemonic_is
+- i_recall
+- ask_mnemonic
+- ask_answer
+- ask_more_info
+- ask_repeat
+- more_time
+
+
+
+entities:
+- topic
+- tag
+- mnemonics
+- answers
+- questions
+
+
+
+slots:
+  name:
+    type: text
+
+
+actions:
+- action_end
+- utter_name
+- utter_thanks
+- utter_greet
+- utter_goodbye
+- mnemo_discover
+- mnemo_review
+- mnemo_next_question
+- mnemo_answer_is
+- mnemo_guess_answer
+- mnemo_more_time
+- say_mnemonic
+- say_spelling
+- say_more_info
+- say_question
+- say_answer
+
+templates:
+  utter_name:
+  - text: "Hey there! Tell me your name."
+
+  utter_greet:
+  - text: "Nice to meet you {name}. How can I help?"
+
+  utter_goodbye:
+  - text: "Talk to you later!"
+  
+  utter_thanks:
+  - text: "My pleasure."
+  

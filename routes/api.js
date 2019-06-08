@@ -718,11 +718,66 @@ initdb().then(function() {
 
 	router.post('/reportproblem', (req, res) => {
 		let content='Reported By ' + req.body.user.username + '<br/><br/>' + req.body.problem + '<br/><br/>Question: ' + JSON.stringify(req.body.question);
-		db().collection('reportedProblems').save(req.body);
+		let data = req.body;
+		data.createDate = new Date()
+				
+		db().collection('reportedProblems').save(data);
 		////console.log(['report',req.body]);
 		utils.sendMail(config.mailFrom,config.mailFrom,"Problem Content Report from Mnemo's Library ",content);
 		res.send('sent email');
 	});
+
+	router.post('/savecomment', (req, res) => {
+		console.log(['TRY save comment',req.body]);
+			
+		if (req.body.user && (req.body.type === 'note' || req.body.type === 'comment')) {
+			let data = req.body;
+			if (data._id) data._id = ObjectId(data._id)
+			data.user = ObjectId(req.body.user)
+			data.question = ObjectId(req.body.question)
+			data.createDate = new Date()
+			db().collection('comments').save(data).then(function() {
+				console.log(['save comment',data]);
+				res.send({ok:true})
+			});
+		} else {
+			console.log('no save invalid comment')
+			res.send({ok:false})
+		}
+	});
+	
+	router.post('/deletecomment', (req, res) => {
+		if (req.body.user && req.body.question && req.body.comment) {
+			
+			let filter = {$and:[{_id:{$eq:ObjectId(req.body.comment)}},{user:{$eq:ObjectId(req.body.user)}},{question:{$eq:ObjectId(req.body.question)}}]}
+			
+			db().collection('comments').deleteOne(filter);
+			console.log(['delete comment',JSON.stringify(filter)]);
+		} else {
+			console.log('no delete invalid filter')
+		}
+	});
+	
+	router.get('/comments', (req, res) => {
+		console.log(['FIND COMMENTS',req.query])
+			
+		let filter = []
+		if (req.query.question) {
+			filter.push({question : {$eq: ObjectId(req.query.question)}});
+			if (req.query.user) {
+				filter.push({$or:[{type:{$eq:'comment'}},{$and:[{type:{$eq:'note'}},{user:{$eq:ObjectId(req.query.user)}}]}]});
+			} else {
+				filter.push({type:{$eq:'comment'}});
+			}
+			console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
+			db().collection('comments').find({$and:filter}).sort({createDate:1}).toArray(function(err,results) {
+				console.log(['FOUND COMMENTS',err,results])
+				res.send(results)
+			});
+		}
+	});
+
+
 
 	router.get('/indexes', (req, res) => {
 		db().collection('questions').dropIndexes();

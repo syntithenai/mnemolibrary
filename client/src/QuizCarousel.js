@@ -256,19 +256,20 @@ export default withRouter( class QuizCarousel extends Component {
           // flag as blocked
       //    //console.log(['block',id]);
           if (id.length > 0) { 
-              confirmAlert({
-                  title: 'Block Question',
-                  message: 'Are you sure?',
-                  buttons: [
-                    {
-                      label: 'Yes',
-                      onClick: () => this.banQuestion(questions,id,time,question.quiz)
-                    },
-                    {
-                      label: 'No'
-                    }
-                  ]
-                })
+              //confirmAlert({
+                  //title: 'Block Question',
+                  //message: 'Are you sure?',
+                  //buttons: [
+                    //{
+                      //label: 'Yes',
+                      //onClick: () => this.banQuestion(questions,id,time,question.quiz)
+                    //},
+                    //{
+                      //label: 'No'
+                    //}
+                  //]
+                //})
+			this.banQuestion(questions,id,time,question.quiz)
           }
           
       }
