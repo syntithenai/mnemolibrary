@@ -71,6 +71,8 @@ export default class SingleQuestion extends Component {
         this.loadComments = this.loadComments.bind(this);
         this.editComment = this.editComment.bind(this);
         this.deleteComment = this.deleteComment.bind(this);
+        this.scrollToComments = this.scrollToComments.bind(this);
+        this.newComment = this.newComment.bind(this);
         
         this.scrollTo={};
         this.questionmessage='';
@@ -112,7 +114,7 @@ export default class SingleQuestion extends Component {
 			//console.log(['SQ UPDATE change question',oldId,newId]);
              this.fromWikipedia();
              this.createMedia();
-             that.loadComments(that.props.question._id,that.props.user._id);
+             if (that.props.question) that.loadComments(that.props.question._id,that.props.user ? that.props.user._id : null);
           }
       };
     
@@ -156,10 +158,14 @@ export default class SingleQuestion extends Component {
 	}
 
 	editComment(comment) {
-		this.setState({commentId:comment._id,commentText:comment.comment,commentType:comment.type})
+		this.setState({commentId:comment._id,commentText:comment.comment,commentType:comment.type,commentCreateDate:comment.createDate})
 		this.toggleCommentDialog()
 	}
-	
+		
+	newComment() {
+		this.setState({commentId:null,commentText:null,commentType:null,commentCreateDate:null})
+		this.toggleCommentDialog()
+	}
 	deleteComment(comment) {
 		// refresh single view comments list
 		let that = this;
@@ -178,9 +184,9 @@ export default class SingleQuestion extends Component {
 			  body: JSON.stringify(toSave)
 			}).then(function() {
 				that.setState({'comment':''});                
-				that.props.toggleVisible();
-				console.log(['NOW RELOAD COMMENTS',that.props.loadComments])
-				that.props.loadComments(that.props.question._id,that.props.user._id)
+				//that.toggleCommentDialog();
+				console.log(['NOW RELOAD COMMENTS'])
+				that.loadComments(that.props.question._id,that.props.user._id)
 			});
 		}
 	} 
@@ -458,6 +464,12 @@ export default class SingleQuestion extends Component {
 		//}
     };
     
+    scrollToComments() {
+		let that = this;
+		scrollToComponent(that.scrollTo['comments'],{align:'top',offset:-230});
+	}
+
+    
     toggleMedia() {
         ////console.log(['invisible',toHide]);
         let visible = this.state.visible;
@@ -639,24 +651,32 @@ export default class SingleQuestion extends Component {
            return (
             <div className="questionwrap" >
             <ShareDialog id="sharedialog"  header={header}  question={question}/>
-            <CommentEditor commentId={this.state.commentId} commentText={this.state.commentText} commentType={this.state.commentType} question={this.props.question} user={this.props.user} visible={this.state.showCommentDialog} user={this.props.user} question={this.props.question}  loadComments={this.loadComments} toggleVisible={this.toggleCommentDialog} />
+            <CommentEditor commentId={this.state.commentId} commentText={this.state.commentText} commentType={this.state.commentType} commentCreateDate={this.state.commentCreateDate} question={this.props.question} user={this.props.user} visible={this.state.showCommentDialog} user={this.props.user} question={this.props.question}  loadComments={this.loadComments} toggleVisible={this.toggleCommentDialog} />
                 <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                 <div className="row buttons justify-content-between" >
                     <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} />&nbsp;</button>
                     <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Back&nbsp;</span></button>
                     <span >&nbsp;</span>
-                    {(showRecallButton || !this.props.user) && <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Next&nbsp;</span></button>}
-                    {!showRecallButton && this.props.user && <button className="col-2 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add to Review&nbsp;</span></button>}
+                    {(showRecallButton || !this.props.user) && <button className="col-3 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Needs More Review&nbsp;</span></button>}
+
+                    {!this.props.user && <a href='/login' className="col-2 btn btn-outline btn-success" ><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add to Review&nbsp;</span></a>}
+
+                    {!showRecallButton && this.props.user && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add To My Review List&nbsp;</span></button>}
                     
-                    {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block"> Recall</span></button>}
+                    {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block"> Enough Review For Now</span></button>}
                     <span >&nbsp;</span>
                     {this.props.user && <button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Not Interested</span></button>}
                     {showRecallButton && <div className="scrollbuttons col-sm-12" >
                             <button style={{float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
                             &nbsp;
-                             {this.props.user && <button style={{float:'right'}} onClick={this.toggleCommentDialog} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
+                           
+                           
+                             {this.props.user && this.state.comments && this.state.comments.length > 0 && <button style={{float:'right'}}   onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.state.comments.length}&nbsp;Comments&nbsp;</span></button>}
+                             
+                             {this.props.user && (!this.state.comments || this.state.comments.length === 0) && <button style={{float:'right'}} onClick={this.newComment} className='btn btn-success'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
+                             
                                            
-                            {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Mnemonic</span></button>
+                            {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Memory Aid</span></button>
                             }&nbsp;
                             {question.answer && <button className='btn btn-primary' onClick={() => this.setVisible('all')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
                             }&nbsp;
@@ -691,8 +711,10 @@ export default class SingleQuestion extends Component {
 						   
                             <button style={{marginTop:'1em',float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
                          &nbsp;   
-                       {this.props.user &&  <button style={{marginTop:'1em',float:'right'}} onClick={this.toggleCommentDialog} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
-                        
+                              {this.props.user && this.state.comments && this.state.comments.length > 0 && <button style={{marginTop:'1em',float:'right'}} onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.state.comments.length}&nbsp;Comments&nbsp;</span></button>}
+                             
+                             {this.props.user && (!this.state.comments || this.state.comments.length === 0) && <button style={{marginTop:'1em',float:'right'}} onClick={this.newComment} className='btn btn-success'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
+                            
 						&nbsp;
 						
 						    {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
@@ -780,8 +802,8 @@ export default class SingleQuestion extends Component {
                         </div><div   style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div></div>}
                     </div>
                     
-                    <div className="card-block">
-						<CommentList  user={this.props.user} question={this.props.question} comments={this.state.comments}   editComment={this.editComment}  deleteComment={this.deleteComment} />
+                    <div ref={(section) => { this.scrollTo.comments = section; }}  className="card-block">
+						<CommentList  user={this.props.user} question={this.props.question} comments={this.state.comments}   editComment={this.editComment}  deleteComment={this.deleteComment} toggleCommentDialog={this.toggleCommentDialog} newComment={this.newComment}/>
 					</div>
                     
                 </div>

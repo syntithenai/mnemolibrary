@@ -192,7 +192,7 @@ export default class MnemonicsList extends Component {
 
     askDeleteSuggestion(key) {
             confirmAlert({
-              title: 'Delete Suggested Mnemonic',
+              title: 'Delete Suggested Memory Aid',
               message: `Are you sure?`,
               buttons: [
                 {
@@ -292,20 +292,20 @@ export default class MnemonicsList extends Component {
                         // className="modal" tabIndex="-1" role="dialog"
             return (<div   className="card-block mnemonics list-group">
                 <div className='card-text'>
-                    {this.props.isLoggedIn() && <button  className='btn btn-success '  style={{float:'right'}} data-toggle="modal" data-target="#suggestdialog" onClick={this.createSuggestion} ><Plus size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Suggest a Mnemonic&nbsp;</span></button>}
-                    <b>Mnemonics</b>
+                    {this.props.isLoggedIn() && <button  className='btn btn-success '  style={{float:'right'}} data-toggle="modal" data-target="#suggestdialog" onClick={this.createSuggestion} ><Plus size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Suggest a Memory Aid&nbsp;</span></button>}
+                    <b>Memory Aids</b>
                     {this.state.isEditing && <div id="suggestdialog" style={{zIndex:99999,position:'fixed',top:'4em',width:'80%',textAlign:'center'}}>
                       <div className="modal-dialog" role="document">
                         <div className="modal-content">
                           <div className="modal-header">
-                            <h5 className="modal-title">Suggest a mnemonic for this question</h5>
+                            <h5 className="modal-title">Suggest a memory aid for this question</h5>
                             <button type="button" className="close" onClick={this.stopEditing} aria-label="Close">
                               <span aria-hidden="true">&times;</span>
                             </button>
                           </div>
                           <div className="modal-body">
                             <div className='form-group'>    
-                               <label htmlFor="suggest_mnemonic" ><b>Mnemonic&nbsp;</b> </label><textarea autoComplete="false" id="suggest_mnemonic" type='text' name='suggest_mnemonic' onChange={this.changeSuggest} value={this.state.suggest_mnemonic} className='form-control'></textarea>
+                               <label htmlFor="suggest_mnemonic" ><b>Memory Aid&nbsp;</b> </label><textarea autoComplete="false" id="suggest_mnemonic" type='text' name='suggest_mnemonic' onChange={this.changeSuggest} value={this.state.suggest_mnemonic} className='form-control'></textarea>
                                 <br/>
                             </div>
                             

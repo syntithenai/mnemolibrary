@@ -3,14 +3,17 @@ import React, { Component } from 'react';
 import Utils from './Utils';
 import TrashIcon from 'react-icons/lib/fa/trash';
 import EditIcon from 'react-icons/lib/fa/pencil';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 
+import CommentIcon from 'react-icons/lib/fa/comment';
 
 export default class CommentList extends Component {
     constructor(props) {
         super(props);
         //let question = this.props.question ? this.props.question : {};
         
-       
+       this.deleteComment = this.deleteComment.bind(this)
     };
     
     componentDidMount() {
@@ -35,7 +38,23 @@ export default class CommentList extends Component {
             });
       };
     
-    
+    deleteComment(comment) {
+
+            confirmAlert({
+              title: 'Delete Comment',
+              message: 'Are you sure you want to delete this comment?',
+              buttons: [
+                {
+                  label: 'Yes',
+                  onClick: () => {this.props.deleteComment(comment)}
+                },
+                {
+                  label: 'No',
+                  onClick: () => {}
+                }
+              ]
+            })
+	} 
     
     render() {
 		let that = this;
@@ -49,7 +68,7 @@ export default class CommentList extends Component {
 					privateComments.push( <div key={comment._id} >
 						<div style={{float:'right'}}>
 							<button   className="btn btn-primary" onClick={(e) => that.props.editComment(comment)} ><EditIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Edit</span></button>
-							<button   className="btn btn-danger" onClick={(e) => that.props.deleteComment(comment)} ><TrashIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Delete</span></button>
+							<button   className="btn btn-danger" onClick={(e) => that.deleteComment(comment)} ><TrashIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Delete</span></button>
 						</div>
 						<span className='date' style={{fontWeight:'bold',marginRight:'2em'}} >{formatted_date}</span>
 						<div className='comment' >{comment.comment}</div>
@@ -57,10 +76,10 @@ export default class CommentList extends Component {
 					</div>)
 				} else {
 					publicComments.push( <div key={comment._id}>
-						<div style={{float:'right'}}>
+						{that.props.user && comment.user === that.props.user._id && <div style={{float:'right'}}>
 							<button   className="btn btn-primary" onClick={(e) => that.props.editComment(comment)} ><EditIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Edit</span></button>
-							<button   className="btn btn-danger" onClick={(e) => that.props.deleteComment(comment)} ><TrashIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Delete</span></button>
-						</div>
+							<button   className="btn btn-danger" onClick={(e) => that.deleteComment(comment)} ><TrashIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Delete</span></button>
+						</div>}
 						<span className='date' style={{fontWeight:'bold',marginRight:'2em'}} >{formatted_date}</span>
 						<span className='user' >by {comment.userAvatar}</span>
 						<div className='comment' >{comment.comment}</div>
@@ -71,6 +90,8 @@ export default class CommentList extends Component {
 			});
 			
 			return <div style={{marginTop:'1em'}}>
+				{this.props.user && (privateComments.length > 0 ||  publicComments.length > 0) &&  <button style={{float:'right'}} onClick={this.props.newComment} className='btn btn-success'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;New Comment&nbsp;</span></button>}
+				
 				{privateComments.length > 0 && <h3>Notes</h3>}
 				{privateComments}
 				{publicComments.length > 0 && <h3>Comments</h3>}

@@ -13,7 +13,7 @@ export default class CommentEditor extends Component {
         //let question = this.props.question ? this.props.question : {};
         
         this.state={
-            comment:''
+            comment:this.props.commentText
         };
         
         this.change = this.change.bind(this);
@@ -28,14 +28,18 @@ export default class CommentEditor extends Component {
 		componentDidMount() {
 			console.log(['ce mount',this.props.commentId,this.props.commentText])
 			
-			if (this.props.commentId && this.props.commentId.length > 0) this.setState({comment:this.props.commentText ? this.props.commentText : ''})
+			if (this.props.commentId && this.props.commentId.length > 0) {
+				this.setState({comment:this.props.commentText ? this.props.commentText : ''})
+			}
 		}
 		
-		componentDidUpdate(props) {
+		componentWillUpdate(props) {
 			console.log(['ce update',this.props.commentId,this.props.commentText,this.props.commentType])
 			console.log(['ce update',props.commentId,props.commentText])
 
-			if (this.props.commentId && this.props.commentId.length > 0 && this.props.commentId != props.commentId) this.setState({comment:this.props.commentText ? this.props.commentText : ''})
+			if (this.props.commentId && this.props.commentId.length > 0 && this.props.commentId != props.commentId)  {
+				this.setState({comment:this.props.commentText ? this.props.commentText : ''})
+			}
 		}
 
 		savePrivateNote() {
@@ -82,6 +86,7 @@ export default class CommentEditor extends Component {
 			if (toSave.question && toSave.user && toSave.comment && toSave.comment.length > 0) {
 				if (this.props.commentId) {
 				  toSave._id= this.props.commentId;
+				  toSave.createDate = this.props.commentCreateDate;
 				}
 				fetch('/api/savecomment', {
 				  method: 'POST',

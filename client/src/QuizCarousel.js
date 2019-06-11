@@ -20,10 +20,11 @@ export default withRouter( class QuizCarousel extends Component {
             //'currentQuiz':this.props.currentQuiz,
             //'currentQuestion':this.props.currentQuestion,
             'quizComplete': false,
-            'showList':false,
+            'showList':true,
           //  'isReview': this.props.isReview,
             'success' : [],
-            'logged':{seen:{},success:{}}
+            'logged':{seen:{},success:{}},
+            showQuestionListDetails: false
         };
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.currentQuestion = this.currentQuestion.bind(this);
@@ -37,6 +38,11 @@ export default withRouter( class QuizCarousel extends Component {
         this.goto = this.goto.bind(this);
         this.onClickListQuestion=this.onClickListQuestion.bind(this);
         this.initialiseFromParams = this.initialiseFromParams.bind(this);
+        this.showQuestionListDetails = this.showQuestionListDetails.bind(this);
+        this.hideQuestionListDetails = this.hideQuestionListDetails.bind(this);
+		this.showQuestionList = this.showQuestionList.bind(this);
+		this.hideQuestionList = this.hideQuestionList.bind(this);
+      //
       //  //console.log(['QUIZ carousel constr']);
     };
     
@@ -71,6 +77,14 @@ export default withRouter( class QuizCarousel extends Component {
         }
     };
     
+    showQuestionList() {
+		this.setState({showList:true})
+	}
+
+    hideQuestionList() {
+		this.setState({showList:false})
+	}
+    
     initialiseFromParams() {
 		let that = this;
 			//console.log(['QUIZ CAR DID MOUNT',this.props,this.props.isReview,this.props.match]); //this.state.currentQuiz,this.props.questions
@@ -78,27 +92,32 @@ export default withRouter( class QuizCarousel extends Component {
                 // DISCOVERY
                 setTimeout(function() {
                      that.props.setQuizFromTopic(that.props.match.params.searchtopic,that.props.match.params.topicquestion);
+                     if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
                 },1000);
             } else if (this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0) {
                 // DISCOVERY
                  setTimeout(function() {
                      that.props.discoverQuizFromTopic(that.props.match.params.topic,that.props.match.params.topicquestion);
+					if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
                 },1000);
             } else if (this.props.match &&  this.props.match.params && this.props.match.params.topics && this.props.match.params.topics.length > 0) {
                 // DISCOVERY
                 setTimeout(function() {
                      that.props.setQuizFromTopics(that.props.match.params.topics.split(","));
+                     if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
                 },1000);
             } else if (this.props.match &&  this.props.match.params && this.props.match.params.tag && this.props.match.params.tag.length > 0) {
                 // SEARCH
                 console.log(['QUIZ CAR FROMTAG',that.props.match.params.tag]);
                 setTimeout(function() {
                      that.props.setQuizFromTag(that.props.match.params.tag);
+                     if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
                 },1000);
             } else if (this.props.match &&  this.props.match.params && this.props.match.params.difficulty && this.props.match.params.difficulty.length > 0) {
                 // DISCOVERY
                 setTimeout(function() {
                     that.props.setQuizFromDifficulty(that.props.match.params.difficulty);
+                    if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
                 },1000);
             } else if (this.props.match &&  this.props.match.params && this.props.match.params.technique && this.props.match.params.technique.length > 0) {
                 // SEARCH
@@ -402,6 +421,19 @@ export default withRouter( class QuizCarousel extends Component {
         this.setQuizQuestion(question)
     };
     
+    showQuestionListDetails() {
+		this.setState({showQuestionListDetails:true})
+	}
+	
+	hideQuestionListDetails() {
+		this.setState({showQuestionListDetails:false})
+	}
+	
+	
+	sendAllQuestionsForReview() {
+		
+	}
+    
     render() {
         if (this.state.exitRedirect && this.state.exitRedirect.length > 0) {
             return <Redirect to={this.state.exitRedirect} />
@@ -429,9 +461,12 @@ export default withRouter( class QuizCarousel extends Component {
                     <Play size={25} /> {label}
                     </button>
                     {this.props.match.params.topic && <a style={{float:'right'}} className='btn btn-info' href={'/discover/searchtopic/'+this.props.match.params.topic} >
-                    <ShowAll size={25} /> Show All
+                    <ShowAll size={25} /> Load Complete Topic
                     </a>}
-                    <QuestionList isReview={this.props.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  onClick={this.onClickListQuestion}></QuestionList>
+                    {!this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-info' onClick={this.showQuestionListDetails}  >Show Details</button>}
+                    {!this.props.isReview && this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-success' onClick={this.sendAllQuestionsForReview} >Send All To My Review List</button>}
+                    {this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-info' onClick={this.hideQuestionListDetails} >Hide Details</button>}
+                    <QuestionList showQuestionListDetails={this.state.showQuestionListDetails} isReview={this.props.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  onClick={this.onClickListQuestion}></QuestionList>
                     </div>);
                 } else {
                     // single question

@@ -7,6 +7,11 @@ let style={height:'1.2em'}
 const userIcon = 
 <svg style={style}  role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path></svg>
 
+const quizIcon = 
+<svg style={style}  role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
+
+
+
 const reviewIcon = 
 <svg style={style}  role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M336 448H16c-8.84 0-16 7.16-16 16v32c0 8.84 7.16 16 16 16h320c8.84 0 16-7.16 16-16v-32c0-8.84-7.16-16-16-16zm208-320V80c0-8.84-7.16-16-16-16s-16 7.16-16 16v48h-32V80c0-8.84-7.16-16-16-16s-16 7.16-16 16v48h-16c-8.84 0-16 7.16-16 16v32c0 35.76 23.62 65.69 56 75.93v118.49c0 13.95-9.5 26.92-23.26 29.19C431.22 402.5 416 388.99 416 372v-28c0-48.6-39.4-88-88-88h-8V64c0-35.35-28.65-64-64-64H96C60.65 0 32 28.65 32 64v352h288V304h8c22.09 0 40 17.91 40 40v24.61c0 39.67 28.92 75.16 68.41 79.01C481.71 452.05 520 416.41 520 372V251.93c32.38-10.24 56-40.17 56-75.93v-32c0-8.84-7.16-16-16-16h-16zm-283.91 47.76l-93.7 139c-2.2 3.33-6.21 5.24-10.39 5.24-7.67 0-13.47-6.28-11.67-12.92L167.35 224H108c-7.25 0-12.85-5.59-11.89-11.89l16-107C112.9 99.9 117.98 96 124 96h68c7.88 0 13.62 6.54 11.6 13.21L192 160h57.7c9.24 0 15.01 8.78 10.39 15.76z"></path></svg>
 
@@ -58,10 +63,7 @@ export default class Navigation extends Component {
     import(e) {
         this.props.import();
     };
-    //<div style={{position: 'fixed', right: '6.1em',  zIndex:99, marginTop: '0.4em'}}><Speechify/></div>
-          //<div className='page-title' style={{float:'right',color:'yellow',fontSize:'1.2em', position: 'fixed', left: '6.1em',  zIndex:99, marginTop: '0.4em'}} >&nbsp;&nbsp;{this.props.title}&nbsp;&nbsp;&nbsp;{!this.props.isLoggedIn() && <a   onClick={() => this.props.setCurrentPage('splash')} href='#' className='btn btn-outline btn-warning' style={{display:'inline'}}>
-                   //Tutorial
-                  //</a>}</div>
+  
     render() {
 		//console.log(['RENDER NAV',window.locationpathname])
 		let pathName = window.location.pathname ? window.location.pathname.replace('/',' ').trim() : '';
@@ -80,6 +82,8 @@ export default class Navigation extends Component {
 		let pageTitle = capitalisedParts.join(' ').trim().length > 0 ? capitalisedParts.join(' ') : " Mnemo's Library"
         if (parts[0] === "help") {
 			pageTitle = "Help";
+		} else if (parts[0] === 'multiplechoicetopics') {
+			pageTitle = 'Quizzes by Topic'
 		}
         
         return  (
@@ -92,6 +96,10 @@ export default class Navigation extends Component {
        <div className='page-title' style={{color:'yellow',fontSize:'0.9em',  zIndex:99, marginTop: '0.1em'}} >&nbsp;&nbsp;{pageTitle}&nbsp;&nbsp;&nbsp;</div>
           
               <span style={{marginLeft:'1em'}} className="dcol-4">
+                <Link className="btn btn-secondary" to="/multiplechoicetopics"  >{quizIcon} <span  className="d-none d-sm-inline">Quizzes</span></Link>
+              </span>
+              
+              <span  className="dcol-4">
                 <Link className="btn btn-secondary" to="/review"  >{reviewIcon} <span  className="d-none d-sm-inline">Review</span></Link>
               </span>
               
@@ -118,7 +126,7 @@ export default class Navigation extends Component {
     };
     
 }
-Navigation.pageTitles= {'splash':'Mnemo\'s Library', 'home':'Mnemo\'s Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','createhelp':'Create','about':'About Mnemo','info':'Getting Started','login':'','profile':'Profile','intro':'Getting Started','termsofuse':'Terms of Use','faq':'Frequently Asked Questions'}
+Navigation.pageTitles= {'splash':'Mnemo\'s Library', 'home':'Mnemo\'s Library','topics':'Topic Search','tags':'Tag Search','search':'Question Search','review':'Review','create':'Create','createhelp':'Create','about':'About Mnemo','info':'Getting Started','login':'','profile':'Profile','intro':'Getting Started','termsofuse':'Terms of Use','faq':'Frequently Asked Questions','multiplechoicetopics':'Quizzes by Topic'}
 
     //<button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" >
             //<span className="navbar-toggler-icon"></span>

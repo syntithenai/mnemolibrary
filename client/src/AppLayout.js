@@ -26,6 +26,7 @@ import Footer from './Footer';
 import FindQuestions from './FindQuestions';
 import CreateHelp from './CreateHelp';
 import QuizCollection from './QuizCollection';
+import MultipleChoiceTopics from './MultipleChoiceTopics';
 
 import TopicPassword from './TopicPassword';
 import FAQ from './FAQ';
@@ -135,7 +136,8 @@ export default class AppLayout extends Component {
 
         this.like = this.like.bind(this);
         this.import = this.import.bind(this);
-
+		this.importMultipleChoice = this.importMultipleChoice.bind(this);
+	
         //this.finishQuiz = this.finishQuiz.bind(this);
 
         this.saveSuggestion = this.saveSuggestion.bind(this);
@@ -156,7 +158,6 @@ export default class AppLayout extends Component {
         this.showCollection = this.showCollection.bind(this);
         this.hideCollection = this.hideCollection.bind(this);
         this.collectionVisible = this.collectionVisible.bind(this);
-
         
         //this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
         //this.clearDiscoveryBlock = this.clearDiscoveryBlock.bind(this);
@@ -820,6 +821,23 @@ export default class AppLayout extends Component {
   };
   
  
+  // request api import and dowload results as csv
+  importMultipleChoice(importId) {
+      let that = this;
+      fetch('/api/importmultiplechoicequestions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({importId:importId})
+        }).then(function(res) {
+            return res.text();
+        }).then(function(res) {
+            that.setState({'warning_message':'Import Complete'});
+        }).catch(function(err) {
+            that.setState({'warning_message':'Not Saved'});
+        });
+  };
 
   //// SET QUIZ
   //setQuiz(title,questionIds) {
@@ -893,7 +911,7 @@ export default class AppLayout extends Component {
         
         let topicsPageOptions={ analyticsEvent:this.analyticsEvent, titleFilter:this.state.titleFilter,setTitleFilter:this.setTitleFilter,topicCollections:this.state.topicCollections,topics:topics,topicTags:this.state.topicTags,tagFilter:this.state.tagFilter,clearTagFilter:this.clearTagFilter,setQuizFromTopic:this.setQuizFromTopic,setQuiz:this.setQuizFromTopic,questionsMissingMnemonics:this.state.questionsMissingMnemonics,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic,setCurrentPage:this.setCurrentPage,isLoggedIn:this.isLoggedIn,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromQuestionId:this.setQuizFromQuestionId,title:title,user:this.state.user,showCollection:this.showCollection,hideCollection:this.hideCollection,collectionVisible:this.collectionVisible,collection:this.state.collection,setQuizFromQuestionId:this.setQuizFromQuestionId }
         
-        let profilePageOptions = {analyticsEvent:this.analyticsEvent,  token:this.state.token,setCurrentPage:this.setCurrentPage,setQuizFromDiscovery:this.setQuizFromDiscovery,reviewBySuccessBand:this.reviewBySuccessBand,setReviewFromTopic:this.setReviewFromTopic,setQuizFromTopic:this.discoverQuizFromTopic,searchQuizFromTopic:this.setQuizFromTopic, isAdmin:this.isAdmin,saveUser:this.saveUser,user:this.state.user,token:this.state.token,logout:this.logout,import:this.import,isLoggedIn:this.isLoggedIn}
+        let profilePageOptions = {analyticsEvent:this.analyticsEvent,  token:this.state.token,setCurrentPage:this.setCurrentPage,setQuizFromDiscovery:this.setQuizFromDiscovery,reviewBySuccessBand:this.reviewBySuccessBand,setReviewFromTopic:this.setReviewFromTopic,setQuizFromTopic:this.discoverQuizFromTopic,searchQuizFromTopic:this.setQuizFromTopic, isAdmin:this.isAdmin,saveUser:this.saveUser,user:this.state.user,token:this.state.token,logout:this.logout,import:this.import,importMultipleChoice:this.importMultipleChoice,isLoggedIn:this.isLoggedIn}
         
         let reviewPageOptions = { analyticsEvent:this.analyticsEvent, isAdmin:this.isAdmin,saveSuggestion:this.saveSuggestion,setCurrentQuestion:this.setCurrentQuestion,setCurrentPage:this.setCurrentPage,setCurrentQuiz:this.setCurrentQuiz,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromTopic:this.setQuizFromTopic,setReviewFromTopic:this.setReviewFromTopic,discoverQuizFromTopic:this.discoverQuizFromTopic,setQuizFromTag:this.setQuizFromTag,blocks:this.state.discoveryBlocks,discoverQuestions:this.discoverQuestions,getQuestionsForReview:this.getQuestionsForReview,mnemonic_techniques:this.state.mnemonic_techniques,questions:this.state.questions,currentQuiz:this.state.currentQuiz,currentQuestion:this.state.currentQuestion,indexedQuestions:this.state.indexedQuestions,topicTags:this.state.topicTags,updateProgress:this.updateProgress,finishQuiz:this.finishReview,isReview:true,setMessage:this.setMessage,like:this.like,user:this.state.user,progress:progress,getCurrentTopic:this.getCurrentTopic,isLoggedIn:this.isLoggedIn,getCurrentBand:this.getCurrentBand,reviewBySuccessBand:this.reviewBySuccessBand,setQuizFromDifficulty:this.setQuizFromDifficulty}
         
@@ -919,6 +937,8 @@ export default class AppLayout extends Component {
                 <PropsRoute  path="/help/videos" component={HelpVideos} analyticsEvent={this.analyticsEvent} />
                 
                 <PropsRoute  path="/create" analyticsEvent={this.analyticsEvent} component={CreatePage} fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
+                
+                <PropsRoute exact={true} path='/multiplechoicetopics'  component={MultipleChoiceTopics}  />
                 
                 <PropsRoute  exact={true} path="/search" component={TopicsPage} {...topicsPageOptions}/>
                 <PropsRoute  exact={true} path="/" component={TopicsPage} {...topicsPageOptions}/>

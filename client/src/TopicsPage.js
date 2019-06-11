@@ -91,10 +91,10 @@ export default class TopicsPage extends Component {
         return (
             <div>
                 <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
-                <form className="form-inline" style={{width:'100%'}}>
+                <span style={{ paddingLeft:'1em',width: '60%',float:'right'}}>Joe says "hi there"</span>
+                <form className="form-inline" style={{width:'40%'}}>
                   <input className="form-control" type="text" value={this.props.titleFilter} onChange={this.props.setTitleFilter}  placeholder="Search" aria-label="Search" />
-                  
-                  
+				  
                 </form>
                 {this.props.titleFilter.length>0 && <div><span>Search for &nbsp;
                     <Link className="btn btn-info" to="/search/tags" >Tags</Link>&nbsp;or&nbsp; 

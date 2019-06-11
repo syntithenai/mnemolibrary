@@ -407,7 +407,7 @@ export default class TopicEditor extends Component {
     
     askPublishTopic(key) {
         if (this.state.questions.length > 0 && this.state.topic.length > 0) {
-			let publishMessage = 'By publishing this topic you are agreeing to release your questions and mnemonics into the public domain. (See the help section for details)';
+			let publishMessage = 'By publishing this topic you are agreeing to release your questions and memory aids into the public domain. (See the help section for details)';
 			if (this.state.restriction === "YES") {
 				publishMessage='By publishing this topic you are making it available to users who have the password at http://mnemolibrary.com/access/topic/'+this.props.user.avatar+"'s "+this.state.topic;
 				publishMessage+='                                                                                    ';
