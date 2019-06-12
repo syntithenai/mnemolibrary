@@ -8,7 +8,65 @@ var ObjectId = require('mongodb').ObjectID;
 const get = require('simple-get');
 const mustache = require('mustache');
 
+
+
 function initRoutes(router,db) {
+
+
+
+	function updateTags(tags) {
+		//console.log(['UPDATETAGS']);
+		////console.log(tags);
+		let p = new Promise(function(resolve,reject) {
+			let promises=[];
+			Object.keys(tags).map(function(tag,key) {
+			  //  //console.log(['UPDATETAGS matching']);
+				let criteria=[];
+				criteria.push({'tags': {$in:[tag]}});
+				////console.log(criteria);
+				let ip = new Promise(function(iresolve,ireject) {
+					db().collection('questions').find({$and:criteria}).toArray().then(function(result) {
+							////console.log(['UPDATETAGS found']);
+							////console.log(result);
+							if (result.length > 0) {
+								////console.log('UPDATETAGS found questions');
+								db().collection('words').findOne({text:{$eq:tag}}).then(function(word) {
+									////console.log('UPDATETAGS UPDATED WORD');
+									////console.log(word);
+									if (word) {
+										////console.log('UPDATETAGS UPDATED');
+										word.value=result.length;
+										db().collection('words').save(word).then(function(saveres) {
+										  //      //console.log('UPDATETAGS TAG');
+												////console.log(saveres);
+												iresolve();
+										});                            
+									} else {
+										db().collection('words').save({'text':tag,value:result.length}).then(function(saveres) {
+											//    //console.log('UPDATETAGS TAG NEW');
+											   // //console.log(saveres);
+											   iresolve();
+										});                            
+									}
+								});
+							} else {
+								db().collection('words').remove({text:{$eq:tag}}).then(function(word) {
+									////console.log('UPDATETAGS REMOVED TAG');
+								   iresolve();
+								});
+							}
+					 })
+				}) ;
+				promises.push(ip);
+			});
+			Promise.all(promises).then(function() {
+				resolve();
+			});
+			
+		});
+		return p;
+	}
+
 	router.get('/dumpalexa',(req,res) => {    
 		let munge = alexaUtils.munge;    
 		var fs = require('fs');
@@ -353,7 +411,7 @@ function initRoutes(router,db) {
 	});
 
 	router.post('/import', (req, res) => {
-	  console.log(['import']);
+	 // console.log(['import']);
 	  console.log(['import']);
 		let that = this;
 		let url = ''; //config.masterSpreadsheet;
@@ -366,7 +424,7 @@ function initRoutes(router,db) {
 			res.send('Invalid import sheet '+importId);
 			return;
 		}
-		console.log(['IMPORT URL',url]);
+		//console.log(['IMPORT URL',url]);
 		// load mnemonics and collate tags, topics
 		var request = get(url, function(err,response) {
 			if (err) {
@@ -386,7 +444,9 @@ function initRoutes(router,db) {
 				'complete': function(data) {
 					const toImport = {'questions':data.data};
 					let json = utils.createIndexes(toImport);
-					console.log('got indexes');
+					let mcQuestions=[];
+					let recordIndex={};
+					//console.log('got indexes');
 					// iterate questions collecting promises and insert/update as required
 					let promises=[];
 					for (var a in json.questions) {
@@ -401,16 +461,16 @@ function initRoutes(router,db) {
 							}
 							record.importId = importId;
 							
-							record.answer = record.answer.replace('""','"');
-							record.answer = record.answer.replace('""','"');
-							record.answer = record.answer.replace('""','"');
-							record.answer = record.answer.replace('""','"');
-							record.answer = record.answer.replace('""','"');
-							record.answer = record.answer.replace('""','"');
-							record.answer = record.answer.replace('""','"');
-							record.answer = record.answer.replace('""','"');
-							record.answer = record.answer.replace('""','"');
-							record.answer = record.answer.replace('""','"');
+							//record.answer = record.answer.replace('""','"');
+							//record.answer = record.answer.replace('""','"');
+							//record.answer = record.answer.replace('""','"');
+							//record.answer = record.answer.replace('""','"');
+							//record.answer = record.answer.replace('""','"');
+							//record.answer = record.answer.replace('""','"');
+							//record.answer = record.answer.replace('""','"');
+							//record.answer = record.answer.replace('""','"');
+							//record.answer = record.answer.replace('""','"');
+							//record.answer = record.answer.replace('""','"');
 							
 						   //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
 						   //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
@@ -424,7 +484,7 @@ function initRoutes(router,db) {
 								recordExists = true;
 							} else {
 								 record._id = ObjectId();  
-								 console.log(['NEW ID',record._id]);
+								// console.log(['NEW ID',record._id]);
 							}
 							if (record.mnemonic && record.mnemonic.length > 0) {
 								record.hasMnemonic = true;
@@ -442,7 +502,18 @@ function initRoutes(router,db) {
 											let newMnemonic = {user:'default',question:record._id,mnemonic:record.mnemonic,questionText:record.question,technique:record.mnemonic_technique,importId:importId};
 											mnemonics.push(newMnemonic);
 										}
+										if (record.quiz && record.quiz.length > 0
+											&& record.specific_question && record.specific_question.length > 0
+											&& record.specific_answer && record.specific_answer.length > 0
+											&& record.multiple_choices && record.multiple_choices.length > 0
+										) {
+											let newQuestion ={_id:ObjectId(record.mcQuestionId),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,questionId:ObjectId(record.questionId),feedback:record.feedback,importId:'QQ-'+importId,user:'default'}
+											if (record.autoshow_image==="YES") newQuestion.image = record.image;
+											mcQuestions.push(newQuestion)
+										}
 										//console.log(['SAVED QUESTION'])
+										recordIndex[record._id] = record;
+							
 										resolve(record._id);
 										
 									}).catch(function(e) {
@@ -464,21 +535,91 @@ function initRoutes(router,db) {
 					}
 					Promise.all(promises).then(function(ids) {
 						
-						// send import file back before tidy up and indexing
-						let unparsed = Papa.unparse(json.questions,{quotes: true});
-						res.send(unparsed);
+						
+						let mcPromises = [];
+						// update MC questions
+						mcQuestions.map(function(question,key) {
+							let p = new Promise(function(resolve,reject) {
+								if (question._id) {
+									db().collection('multiplechoicequestions').findOne({_id: ObjectId(question._id), importId: 'QQ-'+importId}).then(function(existingQuestion) {
+										// update
+										//console.log(['done find det ins/upd',existingQuestion])
+										if (existingQuestion) {
+											db().collection('multiplechoicequestions').updateOne({_id:existingQuestion._id},{$set:question}).then(function() {
+												//console.log(['UPDATED MC',Object.extend(existingQuestion,question)])
+												resolve(Object.assign(existingQuestion,question));
+											});
+											
+										// insert
+										} else {
+											question.createDate = new Date().getTime();
+											db().collection('multiplechoicequestions').insertOne(question).then(function() {
+												//console.log(['inserted MC',question])
+												resolve(question);
+											});
+										}
+									});
+								} else {
+									// insert
+									db().collection('multiplechoicequestions').insertOne(question).then(function() {
+										//console.log(['inserted MC',question])
+										resolve(question);
+									});
+								}
+								
+							});
+							mcPromises.push(p);
+						})
+						
+						Promise.all(mcPromises).then(function(toDump) {
+							//cleanup
+							//console.log(['MC TODUMPE',toDump])
+								
+							let ids=[];
+							let final=[];
+							console.log(['TODUMPE v',JSON.stringify(recordIndex)])
+									
+							toDump.map(function(val) {
+								if (val) {
+									console.log(['MERGE BACK MC QUESTION IDS',val._id,val.questionId,val.questionId ? recordIndex[val.questionId] : null])
+									//console.log(['TODUMPE v',val])
+									ids.push(ObjectId(val._id));
+									// update main question with mcQuestionId to allow update
+									if (val.questionId && recordIndex.hasOwnProperty(val._questionId)) {
+										recordIndex[val.questionId].mcQuestionId = val._id;
+									}
+									//final.push(Object.assign(val,{mcQuestionId:val._id}))
+								}
+							});
+							
+							// send import file back before tidy up and indexing
+							let unparsed = Papa.unparse(Object.values(recordIndex),{quotes: true});
+							res.send(unparsed);
+							//. cleanup questions for this importId that didn't just get processed (ie no longer in sheet)
+							//console.log(['NOW DELETE',JSON.stringify({$and:[{$id: {$nin:ids}},{user:'default'},{importId:importId}]})])
+							db().collection('multiplechoicequestions').remove({$and:[{$id: {$nin:ids}},{user:'default'},{importId:'QQ-'+importId}]}).then(function(dresults) {
+								console.log('cleanup mc done'); 
+								// download with ids to bring back into google sheet
+								//let unparsed = Papa.unparse(final,{quotes: true});
+								//res.send(unparsed);
+							});
+							
+						})
+						
+						
 					
-						console.log(['IMPORT ALL DONE now MNEMONICS ',ids,mnemonics]);
+						//console.log(['IMPORT ALL DONE now MNEMONICS ',ids,mnemonics]);
 					   // clear default user mnemonics
 						db().collection('mnemonics').remove({$and:[{user:'default'},{importId:importId}]}).then(function(dresults) {
 					   // bulk save mnemonics 
 							db().collection('mnemonics').insertMany(mnemonics);
 						});
+						
 					   // console.log(['del ids',ids]);
 						// delete all questions that are not in this updated set (except userTopic questions)
 						db().collection('questions').remove({$and:[{importId:importId},{_id:{$nin:ids}},{userTopic:{$not:{$exists:true}}}]}).then(function(dresults) {
-						   console.log('DELETEd THESE');
-						   console.log(ids);
+						   //console.log('DELETEd THESE');
+						   //console.log(ids);
 							// update tags
 						   // console.log('UPDATE TAGS and indexes');
 							////console.log(Object.keys(json.tags));
@@ -498,14 +639,14 @@ function initRoutes(router,db) {
 								db().collection('words').createIndex({
 									text: "text"                    
 								}); 
-								console.log('CHECK EXISTING RECORD FOR MNEMONICS')
+							//	console.log('CHECK EXISTING RECORD FOR MNEMONICS')
 								checkMnemonics.map(function(questionId) {
 									db().collection('mnemonics').find({question:ObjectId(questionId)}).toArray().then(function(resy) {
 										if (resy.length > 0) {
-											console.log('CHECK EXISTING RECORD FOR MNEMONICS FOUND',resy)
+											//console.log('CHECK EXISTING RECORD FOR MNEMONICS FOUND',resy)
 											//record.hasMnemonic = true;
 											db().collection('questions').updateOne({_id:ObjectId(questionId)},{$set:{hasMnemonic:true}}).then(function() {
-												console.log('UPDATED QUESTIONS SET HASMNEMONIC TRUES')
+												//console.log('UPDATED QUESTIONS SET HASMNEMONIC TRUES')
 											});
 										}
 									});
@@ -542,11 +683,11 @@ function initRoutes(router,db) {
 		if (config && config.importMultipleChoice && config.importMultipleChoice.length > importId) {
 			url = config.importMultipleChoice[importId];
 		} else {
-			console.log([config.importMultipleChoice,importId]);
-			res.send('Invalid import sheet '+importId);
+			//console.log([config.importMultipleChoice,importId]);
+			res.send('Invalid import sheet '+'MC-'+importId);
 			return;
 		}
-		console.log(['IMPORT URL',url]);
+		//console.log(['IMPORT URL',url]);
 		// load mnemonics and collate tags, topics
 		var request = get(url, function(err,response) {
 			if (err) {
@@ -568,30 +709,86 @@ function initRoutes(router,db) {
 					//console.log(['IMPORTED',data.data]);
 					console.log(['IMPORTED','Errors ->',data.errors]);
 					let toSave=[];
+					let toDump=[];
+					let promises=[];
 					if (data && data.data) {
 						data.data.map(function(mcQuestion) {
+							//console.log(mcQuestion);
 							if (mcQuestion) {
 								if (mcQuestion.topic && mcQuestion.topic.length > 0
 									&& mcQuestion.specific_question && mcQuestion.specific_question.length > 0
 									&& mcQuestion.specific_answer && mcQuestion.specific_answer.length > 0
 									&& mcQuestion.multiple_choices && mcQuestion.multiple_choices.length > 0
 								) {
-									toSave.push({topic:mcQuestion.topic,question:mcQuestion.specific_question,answer:mcQuestion.specific_answer,multiple_choices:mcQuestion.multiple_choices,questionId:ObjectId(mcQuestion.questionId),feedback:mcQuestion.feedback,importId:importId,user:'default',createDate:0})
+									toSave.push({_id:ObjectId(mcQuestion._id),topic:mcQuestion.topic,question:mcQuestion.specific_question,answer:mcQuestion.specific_answer,multiple_choices:mcQuestion.multiple_choices,questionId:ObjectId(mcQuestion.questionId),feedback:mcQuestion.feedback,importId:'MC-'+importId,user:'default',image:mcQuestion.image})
 								}
 							}
 						});
-						// clear all from previous imports of this sheet then save all
-						db().collection('multiplechoicequestions').remove({$and:[{user:'default'},{importId:importId}]}).then(function(dresults) {
-							db().collection('multiplechoicequestions').insertMany(toSave).then(function() {
-								console.log('Saved mc questions '+toSave.length);
-								res.send({ok:true});
-							}).catch(function(err) {
-								console.log(err)
-								res.send({ok:false});
+						//console.log(['TOSAVE',toSave,toSave.length])
+						toSave.map(function(question,key) {
+							let p = new Promise(function(resolve,reject) {
+								if (question._id) {
+									db().collection('multiplechoicequestions').findOne({_id: ObjectId(question._id), importId: 'MC-'+importId}).then(function(existingQuestion) {
+										// update
+										//console.log(['done find det ins/upd',existingQuestion])
+										if (existingQuestion) {
+											db().collection('multiplechoicequestions').updateOne({_id:existingQuestion._id},{$set:question}).then(function() {
+												//console.log(['UPDATED MC',Object.extend(existingQuestion,question)])
+												resolve(Object.assign(existingQuestion,question));
+											});
+											
+										// insert
+										} else {
+											question.createDate = new Date().getTime();
+											db().collection('multiplechoicequestions').insertOne(question).then(function() {
+												//console.log(['inserted MC',question])
+												resolve(question);
+											});
+										}
+									});
+								} else {
+									// insert
+									db().collection('multiplechoicequestions').insertOne(question).then(function() {
+										//console.log(['inserted MC',question])
+										resolve(question);
+									});
+								}
+								
 							});
-						});
+							promises.push(p);
+						})
+						
+						Promise.all(promises).then(function(toDump) {
+							//cleanup
+							//console.log(['TODUMPE',toDump])
+								
+							let ids=[];
+							let final=[];
+							toDump.map(function(val) {
+								//console.log(['TODUMPE v',val])
+								ids.push(ObjectId(val._id));
+								final.push({
+									_id:ObjectId(val._id),
+									topic:val.topic,
+									questionId:ObjectId(val.questionId),
+									specific_question:val.question,
+									specific_answer:val.answer,
+									multiple_choices:val.multiple_choices,
+									feedback:val.feedback,
+									image:val.image,
+									importId: val.importId,
+									createDate:val.createDate
+								});
+							});
+							//console.log(['NOW DELETE',JSON.stringify({$and:[{$id: {$nin:ids}},{user:'default'},{importId:importId}]})])
+							db().collection('multiplechoicequestions').remove({$and:[{$id: {$nin:ids}},{user:'default'},{importId:'MC-'+importId}]}).then(function(dresults) {
+								console.log('cleanup done'); 
+							});
+							// download with ids to bring back into google sheet
+							let unparsed = Papa.unparse(final,{quotes: true});
+							res.send(unparsed);
+						})
 					}
-
 				}
 			});
 		})

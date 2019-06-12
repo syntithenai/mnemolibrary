@@ -218,6 +218,10 @@ export default class ProfilePage extends Component {
               onClick: () => this.props.import(1)
             },
             {
+              label: 'Test',
+              onClick: () => this.props.import(2)
+            },
+            {
 			  label: 'Multiple Choice Questions',
               onClick: () => this.props.importMultipleChoice(0)
             },

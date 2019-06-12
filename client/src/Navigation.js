@@ -84,6 +84,8 @@ export default class Navigation extends Component {
 			pageTitle = "Help";
 		} else if (parts[0] === 'multiplechoicetopics') {
 			pageTitle = 'Quizzes by Topic'
+		} else if (parts[0] === 'multiplechoicequestions') {
+			pageTitle = decodeURI(parts[1]) + ' Quiz'
 		}
         
         return  (

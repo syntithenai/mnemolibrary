@@ -22,7 +22,7 @@ function initRoutes(router,db) {
 	});
 
 	router.post('/savecomment', (req, res) => {
-		console.log(['TRY save comment',req.body]);
+		//console.log(['TRY save comment',req.body]);
 			
 		if (req.body.user && (req.body.type === 'note' || req.body.type === 'comment')) {
 			let data = req.body;
@@ -34,7 +34,7 @@ function initRoutes(router,db) {
 			data.user = ObjectId(req.body.user)
 			data.question = ObjectId(req.body.question)
 			db().collection('comments').save(data).then(function() {
-				console.log(['save comment',data]);
+				//console.log(['save comment',data]);
 				res.send({ok:true})
 			});
 		} else {
@@ -49,7 +49,7 @@ function initRoutes(router,db) {
 			let filter = {$and:[{_id:{$eq:ObjectId(req.body.comment)}},{user:{$eq:ObjectId(req.body.user)}},{question:{$eq:ObjectId(req.body.question)}}]}
 			
 			db().collection('comments').deleteOne(filter).then(function() {
-				console.log(['deleted comment',JSON.stringify(filter)]);
+				//console.log(['deleted comment',JSON.stringify(filter)]);
 					res.send({ok:true})
 				});
 		} else {
@@ -59,7 +59,7 @@ function initRoutes(router,db) {
 	});
 	
 	router.get('/comments', (req, res) => {
-		console.log(['FIND COMMENTS',req.query])
+		//console.log(['FIND COMMENTS',req.query])
 			
 		let filter = []
 		// filter by question
@@ -70,15 +70,15 @@ function initRoutes(router,db) {
 			} else {
 				filter.push({type:{$eq:'comment'}});
 			}
-			console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
+			//console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
 			db().collection('comments').find({$and:filter}).sort({createDate:-1}).toArray(function(err,results) {
-				console.log(['FOUND COMMENTS',err,results])
+				//console.log(['FOUND COMMENTS',err,results])
 				res.send(results)
 			});
 		// recent comments
 		} else {
 			let limit = req.query.limit && req.query.limit > 0 ? req.query.limit : 10;
-			console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
+			//console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
 			db().collection('comments').find().sort({createDate:-1}).limit(limit).toArray(function(err,results) {
 				console.log(['FOUND COMMENTS',err,results])
 				res.send(results)

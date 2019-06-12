@@ -14,7 +14,7 @@ let databaseConnection = null;
 var initUtilsRoutes = require('./api_utils')
 var initCommentsRoutes = require('./api_comments')
 var initMnemonicsRoutes = require('./api_mnemonics')
-var initUserTopicsRoutes = require('./api_topics')
+var initUserTopicsRoutes = require('./api_usertopics')
 var initMultipleChoiceQuestionsRoutes = require('./api_multiplechoicequestions')
 
 function initdb() {
@@ -484,7 +484,7 @@ initdb().then(function() {
 			}
 			
 			
-		    console.log(['disco criteria',JSON.stringify(criteria)]);
+		  //  console.log(['disco criteria',JSON.stringify(criteria)]);
 			db().collection('questions').find({$and:criteria})
 			//db().collection('questions').aggregate({$match:{$nin:notThese}})
 			.sort(sortFilter).limit(limit).toArray().then(function( questions) {
@@ -601,7 +601,7 @@ initdb().then(function() {
 							};
 							criteria.push({'_id': {$nin: notThese}});
 							//criteria.push({discoverable :{$ne:'no'}});
-						   console.log(['NOT THESE',notThese.length]);
+						  // console.log(['NOT THESE',notThese.length]);
 							discoverQuery(fullUser);
 						}
 						
@@ -794,8 +794,8 @@ initdb().then(function() {
 
 	// search questions
 	router.get('/questions', (req, res) => {
-		console.log('search questions');
-		console.log(req.query);
+		//console.log('search questions');
+		//console.log(req.query);
 		let limit = 10;
 		let skip = 0;
 		if (req.query.limit && parseInt(req.query.limit,10) != NaN) {
@@ -806,7 +806,7 @@ initdb().then(function() {
 		}
 		
 		function theRest() {
-			console.log(['THEREST']);
+			//console.log(['THEREST']);
 		   // //console.log(['questions request',req.query.search,req.query.technique]);
 			if (req.query.search && req.query.search.trim().length > 0) {
 				// SEARCH BY technique and text query
@@ -893,12 +893,12 @@ initdb().then(function() {
 		// tags and topics
 		let criteria=[];
 		if (req.query.user) {
-			console.log(['user',req.query.user]);
+			//console.log(['user',req.query.user]);
 			let user = req.query.user ? req.query.user : null;
 			db().collection('users').find({_id:ObjectId(user)}).toArray().then(function(users) {
 				if (users.length > 0) {
 					let fullUser=users[0];
-					console.log(['loaded user',fullUser]);
+					//console.log(['loaded user',fullUser]);
 					let allowedTopicCriteria=[]
 				
 					// unwind user topicPasswords into filter
@@ -921,7 +921,7 @@ initdb().then(function() {
 				    criteria.push({
 						$or:orParts
 					})
-					console.log(['criteria',JSON.stringify(criteria)]);
+					//console.log(['criteria',JSON.stringify(criteria)]);
 					
 					theRest()
 			
@@ -939,7 +939,7 @@ initdb().then(function() {
 
 
 	router.post('/checktopicpassword', (req, res) => {
-	   console.log(['checktopicpassword']);
+	 //  console.log(['checktopicpassword']);
 		if (req.body.topic && req.body.topic.length > 0 && req.body.password && String(req.body.password).length > 0) {
 		  //  //console.log(['ok']);
 			let topic = req.body.topic.replace(/\\\"/g, '"').replace(/\\\'/g, "'");
@@ -948,7 +948,7 @@ initdb().then(function() {
 								{topicpassword:{$eq:password}},
 								{publishedTopic:{$eq:topic}},
 							]}
-			console.log([topic,password,JSON.stringify(criteria)])
+			//console.log([topic,password,JSON.stringify(criteria)])
 			db().collection('userTopics').find(criteria).limit(1).toArray(function(err, results) {
 		   //  console.log(['search by id res',results]);
 				res.send({'passwordOK':(results && results.length > 0)});
@@ -1117,7 +1117,7 @@ initdb().then(function() {
 				 //let lastSeen = 0;
 				 db().collection('userquestionprogress').find({$and:[{user: {$eq:ObjectId(userId)}}]}).sort({seen:-1}).toArray().then(function(uniqueQuestionResults) {
 					user.questions = uniqueQuestionResults ? uniqueQuestionResults.length : 0;
-					console.log('UPDATING USER STATS '+(uniqueQuestionResults ? uniqueQuestionResults.length: 0));
+				//	console.log('UPDATING USER STATS '+(uniqueQuestionResults ? uniqueQuestionResults.length: 0));
 					let seen = 0;
 					let success = 0;
 					uniqueQuestionResults.slice(0,100).map(function(progress) {

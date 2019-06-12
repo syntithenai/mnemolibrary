@@ -27,6 +27,8 @@ import FindQuestions from './FindQuestions';
 import CreateHelp from './CreateHelp';
 import QuizCollection from './QuizCollection';
 import MultipleChoiceTopics from './MultipleChoiceTopics';
+import MultipleChoiceQuestions from './MultipleChoiceQuestions';
+
 
 import TopicPassword from './TopicPassword';
 import FAQ from './FAQ';
@@ -834,6 +836,9 @@ export default class AppLayout extends Component {
             return res.text();
         }).then(function(res) {
             that.setState({'warning_message':'Import Complete'});
+            var FileSaver = require('file-saver');
+            var blob = new Blob([res], {type: "text/plain;charset=utf-8"});
+            FileSaver.saveAs(blob, "mcquestions.csv");
         }).catch(function(err) {
             that.setState({'warning_message':'Not Saved'});
         });
@@ -881,10 +886,7 @@ export default class AppLayout extends Component {
     };
     
     setTitleFilter(event) {
-		let filter    = event.target.value;
-        
-		//console.log(['filter',filter])
-		
+		let filter    = event.target.value;        
 		this.setState({titleFilter:filter});
 	}
 	
@@ -938,7 +940,9 @@ export default class AppLayout extends Component {
                 
                 <PropsRoute  path="/create" analyticsEvent={this.analyticsEvent} component={CreatePage} fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
                 
-                <PropsRoute exact={true} path='/multiplechoicetopics'  component={MultipleChoiceTopics}  />
+                <PropsRoute exact={true} path='/multiplechoicetopics'  user={this.state.user} component={MultipleChoiceTopics}  />
+                <PropsRoute exact={true} path='/multiplechoicequestions/:topic'  user={this.state.user} component={MultipleChoiceQuestions}  />
+                
                 
                 <PropsRoute  exact={true} path="/search" component={TopicsPage} {...topicsPageOptions}/>
                 <PropsRoute  exact={true} path="/" component={TopicsPage} {...topicsPageOptions}/>

@@ -102,7 +102,7 @@ router.post('/saveuser', function(req, res) {
                   if (req.body.streak) item.streak=req.body.streak;
                   if (req.body.questions) item.questions=req.body.questions;
                   if (req.body.recall) item.recall=req.body.recall;
-                  console.log(['TPPW',req.body.topicPasswords])
+                //  console.log(['TPPW',req.body.topicPasswords])
                   if (req.body.topicPasswords) item.topicPasswords=req.body.topicPasswords;
                   // update avatar only when changed
                  // //console.log(['CHECK AVATORA',item.avatar,req.body.avatar]);

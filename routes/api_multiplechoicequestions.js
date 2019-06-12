@@ -9,20 +9,22 @@ const get = require('simple-get');
 const mustache = require('mustache');
 
 
-let questionExists = {$and:[{question:{$exists:true}},{$where: "this.question.length > 0"} ]};
-let answerExists = {$and:[{answer:{$exists:true}},{$where: "this.answer.length > 0"} ]};
-let multiple_choiceExists = {$and:[{multiple_choice:{$exists:true}},{$where: "this.multiple_choice.length > 0"} ]};
-let topicExists = {$and:[{topic:{$exists:true}},{$where: "this.topic.length > 0"} ]};
-let questionNotExists = {or:[{question:{$exists:false}},{$where: "this.question.length == 0"} ]};
-let answerNotExists = {or:[{answer:{$exists:false}},{$where: "this.answer.length == 0"} ]};
-let multiple_choiceNotExists = {$or:[{multiple_choice:{$exists:false}},{$where: "this.multiple_choice.length == 0"} ]};
-let topicNotExists = {$or:[{topic:{$exists:false}},{$where: "this.topic.length == 0"} ]};
+let questionExists = {$and:[{question:{$exists:true,$ne: ""}} ]};
+let answerExists = {$and:[{answer:{$exists:true,$ne: ""}}]};
+let multiple_choiceExists = {$and:[{multiple_choices:{$exists:true,$ne: ""}} ]};
+let topicExists = {$and:[{topic:{$exists:true,$ne: ""}}]};
+
+let answerNotExists = {or:[{answer:{$exists:false}},{answer:{$in:[null, ""]}} ]};
+
+//let questionNotExists = {or:[{question:{$exists:false}},{$where: "this.question.length == 0"} ]};
+//let multiple_choiceNotExists = {$or:[{multiple_choice:{$exists:false}},{$where: "this.multiple_choice.length == 0"} ]};
+//let topicNotExists = {$or:[{topic:{$exists:false}},{$where: "this.topic.length == 0"} ]};
 
 
 function initRoutes(router,db) {
 	
 	router.post('/savemcquestion', (req, res) => {
-		console.log(['TRY save mc questions',req.body]);
+		//console.log(['TRY save mc questions',req.body]);
 		// stage 1 (ask question) - require question,user,questionId - set ask_date
 		// stage 2 (answer question) - require answer, multiple_choice - set answer_date
 		// stage 3 (publish question) - require topic (admin user) - set publish_date
@@ -45,7 +47,7 @@ function initRoutes(router,db) {
 			} else {
 				data.createDate=new Date().getTime();
 				db().collection('multiplechoicequestions').insertOne(data).then(function() {
-					console.log(['saved asked question',data]);
+					//console.log(['saved asked question',data]);
 					res.send({ok:true})
 				});
 			}
@@ -62,7 +64,7 @@ function initRoutes(router,db) {
 			}  else {
 				data.createDate=new Date().getTime();
 				db().collection('multiplechoicequestions').updateOne({_id:ObjectId(req.body._id)},{$set:data}).then(function() {
-					console.log(['saved answered question',data]);
+					//console.log(['saved answered question',data]);
 					res.send({ok:true})
 				});
 			}
@@ -86,11 +88,11 @@ function initRoutes(router,db) {
 				data.topic = req.body.topic;
 				data.createDate=new Date().getTime();
 				db().collection('multiplechoicequestions').updateOne({_id:ObjectId(req.body._id)},{$set:data}).then(function() {
-					console.log(['saved published question',data]);
+					//console.log(['saved published question',data]);
 					res.send({ok:true})
 				});
 			}
-		} else 
+		} else {
 			res.send({error:'Invalid request missing mode'})
 		}
 	
@@ -103,7 +105,7 @@ function initRoutes(router,db) {
 			let filter = {$and:[{_id:{$eq:ObjectId(req.body._id)}},{user:{$eq:ObjectId(req.body.user)}}]}
 			
 			db().collection('multiplechoicequestions').deleteOne(filter).then(function() {
-				console.log(['deleted multiplechoicequestions',JSON.stringify(filter)]);
+				//console.log(['deleted multiplechoicequestions',JSON.stringify(filter)]);
 					res.send({ok:true})
 				});
 		} else {
@@ -145,7 +147,7 @@ function initRoutes(router,db) {
 	
 	
 	router.get('/mcquestions', (req, res) => {
-		console.log(['FIND mc questions',req.query])
+		//console.log(['FIND mc questions',req.query])
 		let filter = []
 		// filter by question
 		if (req.query.questionId) {
@@ -171,24 +173,24 @@ function initRoutes(router,db) {
 			filter.push({$and:[questionExists,answerExists,multiple_choiceExists,topicExists]});
 		}
 		
-		console.log(['FIND mc questions',JSON.stringify({$and:filter})])
+		//console.log(['FIND mc questions',JSON.stringify({$and:filter})])
 		db().collection('multiplechoicequestions').find({$and:filter}).sort({createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
-			console.log(['FOUND mc questions',err,results])
+		//	console.log(['FOUND mc questions',err,results])
 			res.send(results)
 		});
 
 	});
 	
 	router.get('/mctopics', (req, res) => {
-		console.log(['FIND mc topics',req.query])
+		//console.log(['FIND mc topics',req.query])
 		////console.log(['topics',req.body]);
 		let search = req.query.filter;
 			
 			db().collection('multiplechoicequestions').aggregate([
 				// complete questions only
-				{ $match: {$and:[questionExists,answerExists,multiple_choiceExists,topicExists]}},
+				{ $match: {$and:[questionExists,answerExists,multiple_choiceExists,topicExists]}},// 
 				{ $group: {
-					topic : "$topic",
+					_id : "$topic",
 					tally: { $sum: 1 }
 				}}
 			], function (err, result) {
@@ -197,19 +199,75 @@ function initRoutes(router,db) {
 					return;
 				}
 				result.toArray().then(function(results) {
+					
+					//console.log(results);
 					let final={};
-					results.map(function(key,val) {
+					results.map(function(topic) {
+						let key = topic._id;
 			  //          //console.log([search,key,val]);
-						if (search && search.length > 0 && key.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
-							final[key]=results.length;
-						} 
+						if (search && search.length > 0) {
+							if (key.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+								final[key]={topic:key,tally:topic.tally};
+							}
+						 } else {
+							final[key]={topic:key,tally:topic.tally};
+						}
+						if (req.query.user) {
+							final[key].userTally = 0;
+						}
 					});
-					console.log(['GET TOPICS FINALLY',final]);
-					res.send(final);
+					// add user seen tally
+					if (req.query.user) {
+						let userMatch='seenBy.'+req.query.user
+						let userFilter={}
+						userFilter[userMatch] = {$exists:true}
+						db().collection('multiplechoicequestions').aggregate([
+							// complete questions only
+							{ $match: {$and:[userFilter,questionExists,answerExists,multiple_choiceExists,topicExists]}},// 
+							{ $group: {
+								_id : "$topic",
+								tally: { $sum: 1 }
+							}}
+						], function (err, userResultsa) {
+							if (err) {
+								console.log(err);
+								return;
+							}
+							userResultsa.toArray().then(function(userResults) {
+							//	console.log(['USER RESULTS',userResults])
+								userResults.map(function(userResult) {
+									if (userResult && userResult._id && final.hasOwnProperty(userResult._id)) {
+										final[userResult._id].userTally = userResult.tally;
+									}
+									return;
+								});
+								let sorted = Object.values(final);
+								sorted.sort(function(a,b) {
+									if (a.topic < b.topic) {
+										return -1 
+									} else {
+										return 1;
+									}
+								});
+								res.send(sorted);
+							})
+						})
+					} else {
+						let sorted = Object.values(final);
+						sorted.sort(function(a,b) {
+							if (a.topic < b.topic) {
+								return -1 
+							} else {
+								return 1;
+							}
+						});
+						res.send(sorted);
+					}
+					
+					//console.log(['GET TOPICS FINALLY',final]);
+					
 				})
-			)
-		
-		
+			})
 	});
 	
 
