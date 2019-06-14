@@ -76,7 +76,7 @@ export default class CommentList extends Component {
 					</div>)
 				} else {
 					publicComments.push( <div key={comment._id}>
-						{that.props.user && comment.user === that.props.user._id && <div style={{float:'right'}}>
+						{(that.props.isAdmin() || (that.props.user && comment.user === that.props.user._id)) && <div style={{float:'right'}}>
 							<button   className="btn btn-primary" onClick={(e) => that.props.editComment(comment)} ><EditIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Edit</span></button>
 							<button   className="btn btn-danger" onClick={(e) => that.deleteComment(comment)} ><TrashIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Delete</span></button>
 						</div>}
@@ -92,9 +92,9 @@ export default class CommentList extends Component {
 			return <div style={{marginTop:'1em'}}>
 				{this.props.user && (privateComments.length > 0 ||  publicComments.length > 0) &&  <button style={{float:'right'}} onClick={this.props.newComment} className='btn btn-success'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;New Comment&nbsp;</span></button>}
 				
-				{privateComments.length > 0 && <h3>Notes</h3>}
+				{privateComments.length > 0 && <div><b>Notes</b></div>}
 				{privateComments}
-				{publicComments.length > 0 && <h3>Comments</h3>}
+				{publicComments.length > 0 && <div><b>Comments</b></div>}
 				{publicComments}			
 			</div>
 			

@@ -32,7 +32,7 @@ function initRoutes(router,db) {
 				data.createDate = new Date()
 			}
 			data.user = ObjectId(req.body.user)
-			data.question = ObjectId(req.body.question)
+			data.question = ObjectId(req.body.question);
 			db().collection('comments').save(data).then(function() {
 				//console.log(['save comment',data]);
 				res.send({ok:true})
@@ -77,7 +77,7 @@ function initRoutes(router,db) {
 			});
 		// recent comments
 		} else {
-			let limit = req.query.limit && req.query.limit > 0 ? req.query.limit : 10;
+			let limit = req.query.limit && req.query.limit > 0 ? parseInt(req.query.limit,10) : 10;
 			//console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
 			db().collection('comments').find().sort({createDate:-1}).limit(limit).toArray(function(err,results) {
 				console.log(['FOUND COMMENTS',err,results])

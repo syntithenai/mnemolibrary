@@ -73,26 +73,37 @@ export default class MultipleChoiceTopics extends Component {
     render() { 
 		let that = this;
 		let topics = null;
-		if (this.state.topics) {
-			topics = this.state.topics.map(function(topic,key) {
-				let link='/multiplechoicequestions/'+topic.topic;
-				//
-				let buttons= <span style={{float:'right'}}>{topic.userTally > 0 && <button className='btn btn-success' >{topic.userTally} answered</button>} <button className='btn btn-info' >{topic.tally} questions</button>   </span>
-				if (topic.tally > 0 && topic.tally === topic.userTally) {
-					buttons = <span style={{float:'right'}}><button className='btn btn-danger' >Completed {topic.userTally} questions</button></span>
-				}
-				let theRow = <a key={topic.topic} href={link} style={{paddingLeft:'1em', backgroundColor:(key%2 === 0 ? '#eee' : 'white'), width:'100%', borderTop:'1px solid black' }}><div  style={{}}> {topic.topic}  {buttons} </div></a>
-				if (that.state.filter && that.state.filter.length > 0) {
-					if (topic.topic.toLowerCase().indexOf(that.state.filter.toLowerCase()) !== -1) {
-						return theRow
-					} else {
-						return null;
+		let renderedTopicCollections = null;
+		
+		//if (this.state.filter && this.state.filter.length > 0) {
+			if (this.state.topics) {
+				topics = this.state.topics.map(function(topic,key) {
+					let link='/multiplechoicequestions/'+topic.topic;
+					//
+					let buttons= <span style={{float:'right'}}>{topic.userTally > 0 && <button className='btn btn-success' >{topic.userTally} answered</button>} <button className='btn btn-info' >{topic.tally} questions</button>   </span>
+					if (topic.tally > 0 && topic.tally === topic.userTally) {
+						buttons = <span style={{float:'right'}}><button className='btn btn-danger' >Completed {topic.userTally} questions</button></span>
 					}
-				} else {
-					return theRow;
-				}
-			})
-		}
+					let theRow = <a key={topic.topic} href={link} style={{paddingLeft:'1em', backgroundColor:(key%2 === 0 ? '#eee' : 'white'), width:'100%', borderTop:'1px solid black' }}><div  style={{}}> {topic.topic}  {buttons} </div></a>
+					if (that.state.filter && that.state.filter.length > 0) {
+						if (topic.topic.toLowerCase().indexOf(that.state.filter.toLowerCase()) !== -1) {
+							return theRow
+						} else {
+							return null;
+						}
+					} else {
+						return theRow;
+					}
+				})
+			} else {
+				return null;
+			}
+		//} else {
+			//renderedTopicCollections = this.props.topicCollections.map(function(topicCollection) {
+				//return <b>{JSON.stringify(topicCollection)}</b>;
+			//});
+		//}
+		
 		return (
 		<div>
 			<form className="form-inline" style={{width:'40%'}}>
@@ -100,6 +111,7 @@ export default class MultipleChoiceTopics extends Component {
 			</form>
 			<div className="row">
 				{topics}
+				{renderedTopicCollections}
 			</div>
 		</div>
 		)

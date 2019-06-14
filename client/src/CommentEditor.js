@@ -79,6 +79,9 @@ export default class CommentEditor extends Component {
 			console.log('do save '+this.state.comment);
 			let that = this;
 			toSave.question = this.props.question ? this.props.question._id : null;
+			toSave.questionText = this.props.question ? this.props.question.interrogative + ' ' + this.props.question.question : null;
+			toSave.questionTopic = this.props.question ? this.props.question.quiz : null;
+			
 			toSave.user = this.props.user ? this.props.user._id : null
 			toSave.userAvatar = this.props.user ? this.props.user.avatar : null
 			

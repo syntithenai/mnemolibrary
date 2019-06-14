@@ -57,7 +57,9 @@ export default class MultipleChoiceQuestions extends Component {
     
     componentDidUpdate(props,state) {
 		console.log(['MCQ update',this.props.user,props.user])
-        
+        if ((this.props.question !== props.question) || (this.props.topic !== props.topic)) {
+			this.loadQuestions()
+		}
 		if (this.props.user && !props.user) {
 			this.nextQuestion()
 		}
@@ -69,8 +71,13 @@ export default class MultipleChoiceQuestions extends Component {
     
     loadQuestions() {
 		let that = this;
-		if (this.props.match.params.topic && this.props.match.params.topic.length > 0 ) {
-			fetch('/api/mcquestions?topic='+this.props.match.params.topic)
+		let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
+		if (topic && topic.length > 0 ) {
+			let questionQuery='';
+			if (this.props.question) {
+				questionQuery='&questionId='+this.props.question;
+			}
+			fetch('/api/mcquestions?topic='+topic+questionQuery)
 			.then(function(response) {
 				console.log(['got response'])
 				return response.json()
@@ -85,7 +92,7 @@ export default class MultipleChoiceQuestions extends Component {
 					question.possibleAnswers = possibleAnswers;
 					return question;
 				});
-				
+				if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
 				that.setState({questions:filteredQuestions});
 			
 			}).catch(function(ex) {
@@ -97,11 +104,12 @@ export default class MultipleChoiceQuestions extends Component {
     resetQuiz() {
 		let that = this;
 		console.log('reset  ')
-		if (this.props.match.params.topic && this.props.match.params.topic.length > 0 ) {
+		let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
+		if (topic && topic.length > 0 ) {
 			console.log('really reset  ')
 			var params={
 				'user':this.props.user ? this.props.user._id : null,
-				'topic':this.props.match.params.topic,
+				'topic':topic,
 			};
 			fetch('/api/resetmcquiz', {
 			  method: 'POST',
@@ -145,15 +153,17 @@ export default class MultipleChoiceQuestions extends Component {
 		if (this.state.questions && this.state.questions.length > 0) {
 			console.log(['NEXT QUESTION f',this.state.currentQuestion])
 			let userId = this.props.user ? this.props.user._id : 'unknownuser'
+			let currentQuestion = this.state.currentQuestion != null ? this.state.currentQuestion : -1;
 			let counter = 0;
 			let found = false;
+			
 			for (var questionKey in this.state.questions) {
 				let question = this.state.questions[questionKey]
 				if (question) {
 					console.log(['NEXT QUESTION A',question.seenBy,userId,questionKey])
 					
-					if (counter >= this.state.currentQuestion && (!question.seenBy || !question.seenBy[userId])) {
-						this.setState({currentQuestion:counter})
+					if (questionKey > currentQuestion && (!question.seenBy || !question.seenBy[userId])) {
+						this.setState({currentQuestion:questionKey})
 						found = true;
 						console.log(['NEXT QUESTION A found',counter])
 				
@@ -241,7 +251,9 @@ export default class MultipleChoiceQuestions extends Component {
 		let userCorrectTally = 0;
 		
 		let userId = this.props.user ? this.props.user._id : 'unknownuser';
-		if (this.props.match.params.topic && this.props.match.params.topic.length > 0) {
+		let isQuestionPage = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? false : true;
+		let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
+		if (topic && topic.length > 0) {
 			if (this.state.questions && this.state.questions.length > 0) { 
 				questions = this.state.questions.map(function(question,questionKey) {
 					
@@ -282,9 +294,9 @@ export default class MultipleChoiceQuestions extends Component {
 						
 						{question.image && question.image.length > 0 && <img src={question.image}  style={{float:'right',width:'200px'}} />}
 						
-						<div>
+						{!isQuestionPage && <div>
 							<div style={{float:'right'}}><a href={moreInfoLink} className='btn btn-info'>More Information</a></div> 
-						</div> 
+						</div> }
 						<b style={{paddingTop: '1em'}}>{question.question}</b>
 						
 						<div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> 
@@ -314,17 +326,21 @@ export default class MultipleChoiceQuestions extends Component {
 		let quizLength = this.state.questions ? this.state.questions.length : 0;
 		let successRate = userAnsweredTally > 0 ? parseInt(userCorrectTally/userAnsweredTally*100,10) : 0;
 		let totalMessage=<span><b>Questions Answered</b> {userAnsweredTally}/{this.state.questions ? this.state.questions.length : 0} <b>Success Rate</b> {successRate}%</span>
-
+		
+		let theStyle={ position:'fixed',width:'100%', backgroundColor:'rgb(240, 249, 150)', border :'2px solid black',padding:'0.2em',top:'6.4em'}
+		if (isQuestionPage) theStyle.marginLeft='-1em';
+		//if (isQuestionPage) offset='16.4em'
 
 		return (
-		<div  ref={(section) => { that.scrollTo.top = section; }}  className="row" style={{marginBottom:'5em'}}>
-			  <div style={{ position:'fixed',top:"6.4em",width:'100%', backgroundColor:'rgb(240, 249, 150)', border :'2px solid black',padding:'0.2em'}} >
+		<div  ref={(section) => { that.scrollTo.top = section; }}  className="row card-block" style={{marginBottom:'5em'}}>
+			  {!isQuestionPage && <div style={theStyle} >
 				<span>{totalMessage}</span>
 				<button style={{float:'right'}} onClick={that.clickResetQuiz} className='btn btn-info' >Reset Answers</button>
 				{userAnsweredTally < quizLength && <a style={{color:'white',marginRight:'3em',float:'right'}} onClick={that.nextQuestion} className='btn btn-success' >Next Question</a>}
 				{userAnsweredTally === quizLength && <button style={{marginRight:'3em',float:'right'}} className='btn btn-success' >Quiz Complete</button>}
-			</div>
-			<div style={{width:'100%',marginTop:'2.8em'}}>
+			</div>}
+			{questions.length > 0 && <b style={{display:'block',width:'100%'}}>Quiz Questions</b>}
+			<div style={{border: '1px solid black',width:'100%',marginTop:'2.8em'}}>
 			{questions}
 			</div>
 		</div>

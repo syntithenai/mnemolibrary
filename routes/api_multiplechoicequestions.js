@@ -214,9 +214,9 @@ function initRoutes(router,db) {
 			filter.push({$and:[questionExists,answerExists,multiple_choiceExists,topicExists]});
 		}
 		
-		//console.log(['FIND mc questions',JSON.stringify({$and:filter})])
+		console.log(['FIND mc questions',JSON.stringify({$and:filter})])
 		db().collection('multiplechoicequestions').find({$and:filter}).sort({createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 100).toArray(function(err,results) {
-		//	console.log(['FOUND mc questions',err,results])
+			console.log(['FOUND mc questions',err,results])
 			res.send(results)
 		});
 

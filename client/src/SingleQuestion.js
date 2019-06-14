@@ -40,8 +40,11 @@ import Swipeable from 'react-swipeable'
 import ExclamationTriangle from 'react-icons/lib/fa/exclamation-triangle';
 import "video-react/dist/video-react.css"; // import css
 import { Player } from 'video-react';
-
+import MultipleChoiceQuestions from './MultipleChoiceQuestions';
 import sanitizeHtml from 'sanitize-html';
+
+const QuizIcon = 
+<svg style={{height:'1.5em'}}  role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
 
 export default class SingleQuestion extends Component {
     
@@ -52,7 +55,7 @@ export default class SingleQuestion extends Component {
           this.player = element;
           if (this.player) this.player.subscribeToStateChange(this.handleStateChange.bind(this));
         };
-        this.state = {comments:[],showCommentDialog: false,swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:''}
+        this.state = {mcQuestionsLoaded:0,comments:[],showCommentDialog: false,swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:''}
         this.setVisible = this.setVisible.bind(this);
         this.toggleMedia = this.toggleMedia.bind(this);
         this.isVisible = this.isVisible.bind(this);
@@ -73,6 +76,7 @@ export default class SingleQuestion extends Component {
         this.deleteComment = this.deleteComment.bind(this);
         this.scrollToComments = this.scrollToComments.bind(this);
         this.newComment = this.newComment.bind(this);
+		this.notifyQuestionsLoaded = this.notifyQuestionsLoaded.bind(this);
         
         this.scrollTo={};
         this.questionmessage='';
@@ -80,6 +84,7 @@ export default class SingleQuestion extends Component {
         this.wikiSites = ['https://simple.wikipedia.org','https://en.wikipedia.org','https://wikipedia.org','https://en.wiktionary.org','https://wiktionary.org'] 
 		
     };
+  
   
     
       componentDidMount() {
@@ -520,6 +525,12 @@ export default class SingleQuestion extends Component {
         } else return '';
     };
     
+    
+    
+    notifyQuestionsLoaded(tally) {
+		this.setState({mcQuestionsLoaded:tally});
+	}
+    
     render() {
         let that = this;
         let showRecallButton = this.props.successButton 
@@ -677,7 +688,12 @@ export default class SingleQuestion extends Component {
                              
                              {this.props.user && (!this.state.comments || this.state.comments.length === 0) && <button style={{float:'right'}} onClick={this.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
                              
-                                           
+                             &nbsp;
+                             
+						  {this.state.mcQuestionsLoaded > 0 && <button style={{float:'right'}} className='btn btn-primary' onClick={() => this.setVisible('questions')}> <span class="badge badge-light">{this.state.mcQuestionsLoaded}</span>&nbsp;<span className="d-none d-md-inline-block"> Quiz</span></button>} 
+                            
+								
+							             
                             {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Memory Aid</span></button>
                             }&nbsp;
                             {question.answer && <button className='btn btn-primary' onClick={() => this.setVisible('all')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
@@ -691,6 +707,7 @@ export default class SingleQuestion extends Component {
                             }
                             {(target) && <a  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
                             }&nbsp;
+                            
                             {<button  className='btn btn-primary' onClick={() => this.setVisible('tags')}><Tags size={26}  />&nbsp;<span className="d-none d-md-inline-block">Tags</span></button>
                             }
                     </div>}
@@ -715,10 +732,11 @@ export default class SingleQuestion extends Component {
                          &nbsp;   
                               {this.props.user && this.state.comments && this.state.comments.length > 0 && <button style={{marginTop:'1em',float:'right'}} onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.state.comments.length}&nbsp;Comments&nbsp;</span></button>}
                              
-                             {this.props.user && (!this.state.comments || this.state.comments.length === 0) && <button style={{marginTop:'1em',float:'right'}} onClick={this.newComment} className='btn btn-success'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
+                             {this.props.user && (!this.state.comments || this.state.comments.length === 0) && <button style={{marginTop:'1em',float:'right'}} onClick={this.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
                             
 						&nbsp;
-						
+						  {this.state.mcQuestionsLoaded > 0 && <button style={{marginTop:'1em',float:'right'}} className='btn btn-primary' onClick={() => this.setVisible('questions')}> <span class="badge badge-light">{this.state.mcQuestionsLoaded}</span>&nbsp;<span className="d-none d-md-inline-block"> Quiz</span></button>} 
+                            &nbsp;  
 						    {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
                          }
                         {(target) && <a style={{float:'right',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
@@ -805,9 +823,13 @@ export default class SingleQuestion extends Component {
                     </div>
                     
                     {(!showRecallButton || this.isVisible('comments')) && <div ref={(section) => { this.scrollTo.comments = section; }}  className="card-block">
-						<CommentList  user={this.props.user} question={this.props.question} comments={this.state.comments}   editComment={this.editComment}  deleteComment={this.deleteComment} toggleCommentDialog={this.toggleCommentDialog} newComment={this.newComment}/>
+						<CommentList isAdmin={this.props.isAdmin} user={this.props.user} question={this.props.question} comments={this.state.comments}   editComment={this.editComment}  deleteComment={this.deleteComment} toggleCommentDialog={this.toggleCommentDialog} newComment={this.newComment}/>
 					</div>}
-                    
+						
+					{<div style={((!showRecallButton || this.isVisible('questions'))  ? {display:'block'} : {display:'none'})} ref={(section) => { this.scrollTo.questions = section; }}  className="card-block">
+					<MultipleChoiceQuestions notifyQuestionsLoaded={this.notifyQuestionsLoaded} user={this.props.user} question={this.props.question._id} topic={this.props.question.quiz} />
+					</div>
+					}
                 </div>
                  <div ref={(section) => { this.scrollTo.end = section; }} ></div>
                        

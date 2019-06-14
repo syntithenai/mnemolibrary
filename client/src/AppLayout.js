@@ -28,7 +28,7 @@ import CreateHelp from './CreateHelp';
 import QuizCollection from './QuizCollection';
 import MultipleChoiceTopics from './MultipleChoiceTopics';
 import MultipleChoiceQuestions from './MultipleChoiceQuestions';
-
+import RecentComments from './RecentComments'
 
 import TopicPassword from './TopicPassword';
 import FAQ from './FAQ';
@@ -940,8 +940,10 @@ export default class AppLayout extends Component {
                 
                 <PropsRoute  path="/create" analyticsEvent={this.analyticsEvent} component={CreatePage} fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
                 
-                <PropsRoute exact={true} path='/multiplechoicetopics'  user={this.state.user} component={MultipleChoiceTopics}  />
-                <PropsRoute exact={true} path='/multiplechoicequestions/:topic'  user={this.state.user} component={MultipleChoiceQuestions}  />
+                <PropsRoute exact={true} path='/recentcomments'  component={RecentComments}  />
+                
+                <PropsRoute exact={true} path='/multiplechoicetopics'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}  />
+                <PropsRoute exact={true} path='/multiplechoicequestions/:topic'   user={this.state.user} component={MultipleChoiceQuestions}  />
                 
                 
                 <PropsRoute  exact={true} path="/search" component={TopicsPage} {...topicsPageOptions}/>

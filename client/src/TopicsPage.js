@@ -8,6 +8,8 @@ import FaChild from 'react-icons/lib/fa/child';
 import scrollToComponent from 'react-scroll-to-component';
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 
+import RecentSingleComment from './RecentSingleComment'
+
 export default class TopicsPage extends Component {
     constructor(props) {
         super(props);
@@ -91,18 +93,18 @@ export default class TopicsPage extends Component {
         return (
             <div>
                 <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
-                <span style={{ paddingLeft:'1em',width: '60%',float:'right'}}>Joe says "hi there"</span>
+                <span style={{ paddingLeft:'1em',width: '60%',float:'right'}}><RecentSingleComment /></span>
                 <form className="form-inline" style={{width:'40%'}}>
                   <input className="form-control" type="text" value={this.props.titleFilter} onChange={this.props.setTitleFilter}  placeholder="Search" aria-label="Search" />
 				  
                 </form>
-                {this.props.titleFilter.length>0 && <div><span>Search for &nbsp;
+                {this.props.titleFilter.length>0 &&  <div style={{clear:'both'}}><span>Search for &nbsp;
                     <Link className="btn btn-info" to="/search/tags" >Tags</Link>&nbsp;or&nbsp; 
                   <Link className="btn btn-info" to="/search/questions" >Questions</Link>&nbsp;instead.</span>
                    
-                
                     <QuizList quizzes={this.state.topics} setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics} isLoggedIn={this.props.isLoggedIn} ></QuizList></div>}
-                {this.props.titleFilter.length === 0 && <QuizCollection topicCollections={this.props.topicCollections}  topicTags={this.props.topicTags} tagFilter={this.props.tagFilter}  clearTagFilter={this.props.clearTagFilter} setQuizFromTopic={this.props.setQuizFromTopic} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} setCurrentPage={this.props.setCurrentPage} isLoggedIn={this.props.isLoggedIn} setQuizFromDiscovery={this.props.setQuizFromDiscovery} setQuizFromDifficulty={this.props.setQuizFromDifficulty} setQuizFromTopics={this.props.setQuizFromTopics}  setQuizFromQuestionId={this.props.setQuizFromQuestionId}  user={this.props.user} showCollection={this.props.showCollection} hideCollection={this.props.hideCollection} collectionVisible={this.props.collectionVisible} collection={this.props.collection}  ></QuizCollection>}
+                    
+                {this.props.titleFilter.length === 0 && <div style={{clear:'both'}}><QuizCollection topicCollections={this.props.topicCollections}  topicTags={this.props.topicTags} tagFilter={this.props.tagFilter}  clearTagFilter={this.props.clearTagFilter} setQuizFromTopic={this.props.setQuizFromTopic} setQuiz={this.props.setQuizFromTopic} questionsMissingMnemonics={this.props.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.props.setQuizFromMissingMnemonic} setCurrentPage={this.props.setCurrentPage} isLoggedIn={this.props.isLoggedIn} setQuizFromDiscovery={this.props.setQuizFromDiscovery} setQuizFromDifficulty={this.props.setQuizFromDifficulty} setQuizFromTopics={this.props.setQuizFromTopics}  setQuizFromQuestionId={this.props.setQuizFromQuestionId}  user={this.props.user} showCollection={this.props.showCollection} hideCollection={this.props.hideCollection} collectionVisible={this.props.collectionVisible} collection={this.props.collection}  ></QuizCollection></div>}
             </div>
         )
     }
