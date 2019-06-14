@@ -430,8 +430,41 @@ export default withRouter( class QuizCarousel extends Component {
 	}
 	
 	
-	sendAllQuestionsForReview() {
-		
+	sendAllQuestionsForReview(user,questions) {
+		if (user && questions && questions.length > 0) {
+			let ids=[];
+			questions.map(function(question) {
+				if (question) ids.push(question._id);
+			})
+			console.log(['SEND Q R',ids,questions])
+			fetch('/api/sendallquestionsforreview', {
+			  method: 'POST',
+			   headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+				'user':this.props.user._id,
+				'questions':ids,
+				})
+           
+			}).then(function(response) {
+				return response.json();
+			}).then(function(res) {
+				console.log('done add all to review')
+				confirmAlert({
+				  title: 'Questions Added For Review',
+				  message: 'Added '+ids.length+' questions to your review list',
+				  buttons: [
+					{
+					  label: 'OK',
+					  onClick: () => {}
+					}
+				  ]
+				})
+				
+				
+			})
+		}
 	}
     
     render() {
@@ -464,9 +497,9 @@ export default withRouter( class QuizCarousel extends Component {
                     <ShowAll size={25} /> Load Complete Topic
                     </a>}
                     {!this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-info' onClick={this.showQuestionListDetails}  >Show Details</button>}
-                    {!this.props.isReview && this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-success' onClick={this.sendAllQuestionsForReview} >Send All To My Review List</button>}
+                    {!this.props.isReview && this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-success' onClick={(e) => this.sendAllQuestionsForReview(this.props.user,listQuestions)} >Send All To My Review List</button>}
                     {this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-info' onClick={this.hideQuestionListDetails} >Hide Details</button>}
-                    <QuestionList showQuestionListDetails={this.state.showQuestionListDetails} isReview={this.props.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  onClick={this.onClickListQuestion}></QuestionList>
+                    <QuestionList user={this.props.user} showQuestionListDetails={this.state.showQuestionListDetails} isReview={this.props.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  onClick={this.onClickListQuestion}></QuestionList>
                     </div>);
                 } else {
                     // single question

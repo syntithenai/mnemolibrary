@@ -114,33 +114,74 @@ function initRoutes(router,db) {
 		}
 	});
 	
-	router.post('/submitmcquestion', (req, res) => {
-		if (req.body.user && req.body._id && req.body.answer) {
-			db().collection('multiplechoicequestions').findOne({_id:ObjectId(req.body._id)}).then(function(mcQuestion) {
-				if (mcQuestion.seenBy.hasOwnProperty(req.body.user)) {
-					res.send({error:'You have already answered this question'});
-				} else if (mcQuestion.answer === req.body.answer) {
-					mcQuestion.seen = mcQuestion.seen ? mcQuestion.seen + 1 : 1; 
-					mcQuestion.success = mcQuestion.success ? mcQuestion.success + 1 : 1;
-					let seenBy = mcQuestion.seenBy ? mcQuestion.seenBy : {};
-					seenBy[req.body.user] = req.body.answer;
-					mcQuestion.seenBy = seenBy;
-					db().collection('multiplechoicequestions').updateOne({_id:ObjectId(req.body._id)},{$set:mcQuestion}).then(function() {
-						console.log(['submitted  question',data]);
-						res.send({correct:true,overallPercentCorrect:mcQuestion.success/mcQuestion.seen});
-					});
-				} else {
-					mcQuestion.seen = mcQuestion.seen ? mcQuestion.seen + 1 : 1; 
-					mcQuestion.success = mcQuestion.success ? mcQuestion.success  : 1;
-					let seenBy = mcQuestion.seenBy ? mcQuestion.seenBy : {};
-					seenBy[req.body.user] = req.body.answer;
-					mcQuestion.seenBy = seenBy;
-					db().collection('multiplechoicequestions').updateOne({_id:ObjectId(req.body._id)},{$set:mcQuestion}).then(function() {
-						console.log(['submitted  question',data]);
-						res.send({correct:false,overallPercentCorrect:mcQuestion.success/mcQuestion.seen,seen:mcQuestion.seen});
+	router.post('/resetmcquiz', (req, res) => {
+		//console.log(['myquestions',req.body])
+		if (req.body.user && req.body.user.length > 0 && req.body.topic && req.body.topic.length > 0) {
+			let userMatch='seenBy.'+req.body.user
+			let userFilter={}
+			userFilter[userMatch] = {$exists:true}
+			//let userUpdate = {};
+			//userUpdate['seenBy.'+req.body.user] = null;
+			
+			db().collection('multiplechoicequestions').find({$and:[{topic:{$eq:req.body.topic}}]}).toArray().then(function(myquestions) {
+				if (myquestions) {
+					myquestions.map(function(question) {
+						question.seenBy = question.seenBy ? question.seenBy : {};
+						delete question.seenBy[req.body.user];
+						db().collection('multiplechoicequestions').save(question).then(function() {
+							//console.log('cleared user for question '+question._id);
+						});
 					})
 				}
+				res.send({ok:true})
+				//console.log(['DONER',myquestions])
+			})
+		}
+	})
+	
+	router.post('/submitmcquestion', (req, res) => {
+		if (req.body.user && req.body._id && req.body.answer) {
+			
+			db().collection('multiplechoicequestions').findOne({_id:ObjectId(req.body._id)}).then(function(mcQuestion) {
+				if (mcQuestion && mcQuestion.seenBy && mcQuestion.seenBy.hasOwnProperty(req.body.user)) {
+					res.send({error:'You have already answered this question'});
+				} else if (mcQuestion.answer === req.body.answer) {
+			
+					mcQuestion.seen = mcQuestion.seen ? mcQuestion.seen + 1 : 1; 
+					mcQuestion.success = mcQuestion.success ? mcQuestion.success + 1 : 1;
+					mcQuestion.overallPercentCorrect = (mcQuestion.seen > 0 && mcQuestion.success > 0) ? String(parseInt(mcQuestion.success/mcQuestion.seen*100,10)) : "0"
+					if (req.body.user === 'unknownuser') {
+						res.send({correct:true,overallPercentCorrect:mcQuestion.overallPercentCorrect});
+					} else {
+				
+						let seenBy = mcQuestion.seenBy ? mcQuestion.seenBy : {};
+						seenBy[req.body.user] = req.body.answer;
+						mcQuestion.seenBy = seenBy;
+						console.log(['submitting  question',mcQuestion]);
+							
+						db().collection('multiplechoicequestions').updateOne({_id:ObjectId(req.body._id)},{$set:mcQuestion}).then(function() {
+							console.log(['submitted  question',mcQuestion]);
+							res.send({correct:true,overallPercentCorrect:mcQuestion.overallPercentCorrect});
+						});
+					}
+				} else {
+					mcQuestion.seen = mcQuestion.seen ? mcQuestion.seen + 1 : 1; 
+					mcQuestion.success = mcQuestion.success ? mcQuestion.success  : 0;
+					mcQuestion.overallPercentCorrect = (mcQuestion.seen > 0 && mcQuestion.success > 0) ? String(parseInt(mcQuestion.success/mcQuestion.seen*100,10)) : "0"
+					if (req.body.user === 'unknownuser') {
+						res.send({correct:true,overallPercentCorrect:mcQuestion.overallPercentCorrect});
+					} else {
+						let seenBy = mcQuestion.seenBy ? mcQuestion.seenBy : {};
+						seenBy[req.body.user] = req.body.answer;
+						mcQuestion.seenBy = seenBy;
+						db().collection('multiplechoicequestions').updateOne({_id:ObjectId(req.body._id)},{$set:mcQuestion}).then(function() {
+							console.log(['submitted  question',mcQuestion]);
+							res.send({correct:false,overallPercentCorrect:mcQuestion.overallPercentCorrect,seen:mcQuestion.seen});
+						})
+					}
+				}
 			});
+		
 		}
 	});
 	
@@ -155,7 +196,7 @@ function initRoutes(router,db) {
 		}	
 		// filter by topic
 		if (req.query.topic) {
-			filter.push({topic : {$regex:req.query.topic}});
+			filter.push({topic : {$eq:decodeURI(req.query.topic)}});
 		}
 		
 		
@@ -174,7 +215,7 @@ function initRoutes(router,db) {
 		}
 		
 		//console.log(['FIND mc questions',JSON.stringify({$and:filter})])
-		db().collection('multiplechoicequestions').find({$and:filter}).sort({createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
+		db().collection('multiplechoicequestions').find({$and:filter}).sort({createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 100).toArray(function(err,results) {
 		//	console.log(['FOUND mc questions',err,results])
 			res.send(results)
 		});

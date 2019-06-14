@@ -1161,6 +1161,32 @@ initdb().then(function() {
 		 });
 	}
 
+
+
+
+	
+	router.post('/sendallquestionsforreview', (req, res) => {
+		if (req.body.user && req.body.user.length > 0 && req.body.questions && req.body.questions.length > 0 ) {
+		    console.log(['sendallquestionsforreview',req.body.user,JSON.stringify(req.body.questions)]);
+			let user = req.body.user;
+			let questions = req.body.questions;
+			let ts = new Date().getTime();
+			questions.map(function(question) {
+				console.log('insert seen record for question '+question);
+				db().collection('seen').insert({user:ObjectId(user),question:ObjectId(question),timestamp:ts}).then(function(inserted) {
+			  //      //console.log(['seen inserted']);
+					// collate tally of all seen, calculate success percentage to successScore
+					updateQuestionTallies(user,question);
+					res.send({message:'Sent all questions for review'});
+				}).catch(function(e) {
+					res.send({error:e});
+				});
+			})
+		} else {
+			res.send({error:'Invalid request'});
+		}
+	})
+
 	router.post('/seen', (req, res) => {
 		////console.log(['seen',req.body]);
 		if (req.body.user && req.body.user.length > 0 && req.body.question && String(req.body.question).length > 0 ) {

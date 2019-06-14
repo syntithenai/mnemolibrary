@@ -85,6 +85,27 @@ function initRoutes(router,db) {
 			});
 		}
 	});
+	
+	
+	router.get('/notes', (req, res) => {
+		//console.log(['FIND COMMENTS',req.query])
+			
+		let filter = []
+		// filter by question
+		if (req.query.question && req.query.user) {
+			filter.push({question : {$eq: ObjectId(req.query.question)}});
+			filter.push({$and:[{type:{$eq:'note'}},{user:{$eq:ObjectId(req.query.user)}}]});
+			//console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
+			db().collection('comments').find({$and:filter}).sort({createDate:-1}).toArray(function(err,results) {
+				//console.log(['FOUND COMMENTS',err,results])
+				res.send(results)
+			});
+		// recent comments
+		} else {
+			res.send([])
+		}
+	});
+	
 
 };
 

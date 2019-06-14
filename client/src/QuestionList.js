@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import Utils from './Utils';
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
+import NotesList from './NotesList'
 
 export default class QuestionList extends Component {
     render() {
@@ -25,7 +26,7 @@ export default class QuestionList extends Component {
 							<div style={{marginTop:'0.2em'}}>
 								<b>Answer: </b><span>{question.answer}</span>
 							</div>
-						
+							{this.props.user && <NotesList user={this.props.user._id} question={question._id} />}
 						</div>
 					}
                     

@@ -81,7 +81,7 @@ export default class MultipleChoiceTopics extends Component {
 				if (topic.tally > 0 && topic.tally === topic.userTally) {
 					buttons = <span style={{float:'right'}}><button className='btn btn-danger' >Completed {topic.userTally} questions</button></span>
 				}
-				let theRow = <div key={topic.topic} style={{paddingLeft:'1em', backgroundColor:(key%2 === 0 ? '#eee' : 'white'), width:'100%', borderTop:'1px solid black' }}><a href={link} > {topic.topic}  {buttons}</a> </div>
+				let theRow = <a key={topic.topic} href={link} style={{paddingLeft:'1em', backgroundColor:(key%2 === 0 ? '#eee' : 'white'), width:'100%', borderTop:'1px solid black' }}><div  style={{}}> {topic.topic}  {buttons} </div></a>
 				if (that.state.filter && that.state.filter.length > 0) {
 					if (topic.topic.toLowerCase().indexOf(that.state.filter.toLowerCase()) !== -1) {
 						return theRow

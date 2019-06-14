@@ -451,7 +451,8 @@ function initRoutes(router,db) {
 					let promises=[];
 					for (var a in json.questions) {
 					 //console.log([a]); //,json[collection][a]]);
-						if (json.questions[a]) {
+						// must have topic and question
+						if (json.questions[a] && json.questions[a].question && json.questions[a].question.length > 0 && json.questions[a].quiz && json.questions[a].quiz.length > 0) {
 							let record =  json.questions[a];
 							if (!record.successRate) record.successRate = Math.random()/100; // randomisation to get started
 							if (record.ok_for_alexa && record.ok_for_alexa==="no") {
@@ -507,7 +508,7 @@ function initRoutes(router,db) {
 											&& record.specific_answer && record.specific_answer.length > 0
 											&& record.multiple_choices && record.multiple_choices.length > 0
 										) {
-											let newQuestion ={_id:ObjectId(record.mcQuestionId),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,questionId:ObjectId(record.questionId),feedback:record.feedback,importId:'QQ-'+importId,user:'default'}
+											let newQuestion ={_id:ObjectId(record.mcQuestionId),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,questionId:ObjectId(record._id),feedback:record.feedback,importId:'QQ-'+importId,user:'default'}
 											if (record.autoshow_image==="YES") newQuestion.image = record.image;
 											mcQuestions.push(newQuestion)
 										}
@@ -577,7 +578,8 @@ function initRoutes(router,db) {
 								
 							let ids=[];
 							let final=[];
-							console.log(['TODUMPE v',JSON.stringify(recordIndex)])
+							console.log(['TODUMPE v',Object.keys(recordIndex)])
+							console.log(['TODUMPE mc',JSON.stringify(toDump)])
 									
 							toDump.map(function(val) {
 								if (val) {
@@ -585,8 +587,10 @@ function initRoutes(router,db) {
 									//console.log(['TODUMPE v',val])
 									ids.push(ObjectId(val._id));
 									// update main question with mcQuestionId to allow update
-									if (val.questionId && recordIndex.hasOwnProperty(val._questionId)) {
+									if (val.questionId && recordIndex.hasOwnProperty(val.questionId)) {
 										recordIndex[val.questionId].mcQuestionId = val._id;
+										console.log(['UPDATE REC INDEX',recordIndex[val.questionId]])
+									
 									}
 									//final.push(Object.assign(val,{mcQuestionId:val._id}))
 								}

@@ -97,7 +97,7 @@ export default class SingleQuestion extends Component {
 				//console.log('timeout on sing leod now wiki RELLY')
 				that.fromWikipedia();
 				that.createMedia();
-				that.loadComments(that.props.question._id,that.props.user._id);
+				that.loadComments(that.props.question._id,that.props.user ? that.props.user._id : null);
 			}
 		//},1000);
       } 
@@ -163,6 +163,7 @@ export default class SingleQuestion extends Component {
 	}
 		
 	newComment() {
+		this.setVisible('comments')
 		this.setState({commentId:null,commentText:null,commentType:null,commentCreateDate:null})
 		this.toggleCommentDialog()
 	}
@@ -466,6 +467,7 @@ export default class SingleQuestion extends Component {
     
     scrollToComments() {
 		let that = this;
+		this.setVisible('comments')
 		scrollToComponent(that.scrollTo['comments'],{align:'top',offset:-230});
 	}
 
@@ -673,7 +675,7 @@ export default class SingleQuestion extends Component {
                            
                              {this.props.user && this.state.comments && this.state.comments.length > 0 && <button style={{float:'right'}}   onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.state.comments.length}&nbsp;Comments&nbsp;</span></button>}
                              
-                             {this.props.user && (!this.state.comments || this.state.comments.length === 0) && <button style={{float:'right'}} onClick={this.newComment} className='btn btn-success'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
+                             {this.props.user && (!this.state.comments || this.state.comments.length === 0) && <button style={{float:'right'}} onClick={this.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
                              
                                            
                             {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Memory Aid</span></button>
@@ -802,9 +804,9 @@ export default class SingleQuestion extends Component {
                         </div><div   style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div></div>}
                     </div>
                     
-                    <div ref={(section) => { this.scrollTo.comments = section; }}  className="card-block">
+                    {(!showRecallButton || this.isVisible('comments')) && <div ref={(section) => { this.scrollTo.comments = section; }}  className="card-block">
 						<CommentList  user={this.props.user} question={this.props.question} comments={this.state.comments}   editComment={this.editComment}  deleteComment={this.deleteComment} toggleCommentDialog={this.toggleCommentDialog} newComment={this.newComment}/>
-					</div>
+					</div>}
                     
                 </div>
                  <div ref={(section) => { this.scrollTo.end = section; }} ></div>
