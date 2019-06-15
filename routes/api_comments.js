@@ -79,7 +79,7 @@ function initRoutes(router,db) {
 		} else {
 			let limit = req.query.limit && req.query.limit > 0 ? parseInt(req.query.limit,10) : 10;
 			//console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
-			db().collection('comments').find().sort({createDate:-1}).limit(limit).toArray(function(err,results) {
+			db().collection('comments').find({type:{$eq:'comment'}}).sort({createDate:-1}).limit(limit).toArray(function(err,results) {
 				console.log(['FOUND COMMENTS',err,results])
 				res.send(results)
 			});

@@ -46,7 +46,7 @@ export default class RecentSingleComment extends Component {
 				return  <span key={comment._id}>{comment.userAvatar} says <i>"{shortComment}"</i>&nbsp;&nbsp;&nbsp;<a href='/recentcomments' className='btn btn-info'>...</a></span>
 			});
 			
-			return <div style={{backgroundColor:'#eee'}}>				
+			return <div style={{backgroundColor:'#eee',paddingLeft:'0.8em'}}>				
 				{renderedComments}
 			</div>
 			

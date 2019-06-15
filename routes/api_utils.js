@@ -508,7 +508,7 @@ function initRoutes(router,db) {
 											&& record.specific_answer && record.specific_answer.length > 0
 											&& record.multiple_choices && record.multiple_choices.length > 0
 										) {
-											let newQuestion ={_id:ObjectId(record.mcQuestionId),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,questionId:ObjectId(record._id),feedback:record.feedback,importId:'QQ-'+importId,user:'default'}
+											let newQuestion ={_id:record.mcQuestionId ? ObjectId(record.mcQuestionId) : ObjectId(),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,questionId:ObjectId(record._id),feedback:record.feedback,importId:'QQ-'+importId,user:'default'}
 											if (record.autoshow_image==="YES") newQuestion.image = record.image;
 											mcQuestions.push(newQuestion)
 										}

@@ -6,7 +6,16 @@ import 'whatwg-fetch'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import scrollToComponent from 'react-scroll-to-component';
+import NextIcon from 'react-icons/lib/fa/arrow-right';
+//import ResetIcon from 'react-icons/lib/fa/redo-alt';
+import ShareIcon from 'react-icons/lib/fa/share-alt';
+import CompleteIcon from 'react-icons/lib/fa/check';
+//import MoreInfoIcon from 'react-icons/lib/fa/external-link-alt';
 
+let resetIcon = <svg style={{marginTop:'0.2em',height:'1.1em'}} role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256.455 8c66.269.119 126.437 26.233 170.859 68.685l35.715-35.715C478.149 25.851 504 36.559 504 57.941V192c0 13.255-10.745 24-24 24H345.941c-21.382 0-32.09-25.851-16.971-40.971l41.75-41.75c-30.864-28.899-70.801-44.907-113.23-45.273-92.398-.798-170.283 73.977-169.484 169.442C88.764 348.009 162.184 424 256 424c41.127 0 79.997-14.678 110.629-41.556 4.743-4.161 11.906-3.908 16.368.553l39.662 39.662c4.872 4.872 4.631 12.815-.482 17.433C378.202 479.813 319.926 504 256 504 119.034 504 8.001 392.967 8 256.002 7.999 119.193 119.646 7.755 256.455 8z"></path></svg>
+
+
+let moreInfoIcon = <svg style={{marginTop:'0.2em',height:'1.1em'}} role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M576 24v127.984c0 21.461-25.96 31.98-40.971 16.971l-35.707-35.709-243.523 243.523c-9.373 9.373-24.568 9.373-33.941 0l-22.627-22.627c-9.373-9.373-9.373-24.569 0-33.941L442.756 76.676l-35.703-35.705C391.982 25.9 402.656 0 424.024 0H552c13.255 0 24 10.745 24 24zM407.029 270.794l-16 16A23.999 23.999 0 0 0 384 303.765V448H64V128h264a24.003 24.003 0 0 0 16.97-7.029l16-16C376.089 89.851 365.381 64 344 64H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V287.764c0-21.382-25.852-32.09-40.971-16.97z"></path></svg>
 
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
@@ -64,7 +73,7 @@ export default class MultipleChoiceQuestions extends Component {
 			this.nextQuestion()
 		}
 		if (state.currentQuestion != this.state.currentQuestion) {
-			scrollToComponent(this.scrollTo['question_'+this.state.currentQuestion],{align:'top',offset:-160});
+			scrollToComponent(this.scrollTo['question_'+this.state.currentQuestion],{align:'top',offset:-180});
 		}
 	}
     
@@ -288,14 +297,14 @@ export default class MultipleChoiceQuestions extends Component {
 								return <button key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} className='btn btn-primary' >{sampleAnswer}</button>
 							}
 						})
-						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question._id;
+						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
 						
 						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}  onClick={(e) => that.setCurrentQuestion(questionKey)} key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black'}} > 
 						
 						{question.image && question.image.length > 0 && <img src={question.image}  style={{float:'right',width:'200px'}} />}
 						
-						{!isQuestionPage && <div>
-							<div style={{float:'right'}}><a href={moreInfoLink} className='btn btn-info'>More Information</a></div> 
+						{!isQuestionPage && question.questionId && question.topic && <div>
+							<div style={{float:'right'}}><a target='_new' href={moreInfoLink} className='btn btn-info'>{moreInfoIcon} <span className="d-none d-sm-inline" >More Information</span></a></div> 
 						</div> }
 						<b style={{paddingTop: '1em'}}>{question.question}</b>
 						
@@ -335,12 +344,13 @@ export default class MultipleChoiceQuestions extends Component {
 		<div  ref={(section) => { that.scrollTo.top = section; }}  className="row card-block" style={{marginBottom:'5em'}}>
 			  {!isQuestionPage && <div style={theStyle} >
 				<span>{totalMessage}</span>
-				<button style={{float:'right'}} onClick={that.clickResetQuiz} className='btn btn-info' >Reset Answers</button>
-				{userAnsweredTally < quizLength && <a style={{color:'white',marginRight:'3em',float:'right'}} onClick={that.nextQuestion} className='btn btn-success' >Next Question</a>}
-				{userAnsweredTally === quizLength && <button style={{marginRight:'3em',float:'right'}} className='btn btn-success' >Quiz Complete</button>}
+				<button style={{float:'right'}} onClick={that.shareQuiz} className='btn btn-info' ><ShareIcon size={26} /> <span  className="d-none d-sm-inline" >Share Quiz</span></button>
+				<button style={{float:'right'}} onClick={that.clickResetQuiz} className='btn btn-danger' >{resetIcon} <span className="d-none d-sm-inline" >Reset Answers</span></button>
+				{userAnsweredTally < quizLength && <a style={{color:'white',marginRight:'3em',float:'right'}} onClick={that.nextQuestion} className='btn btn-success' ><NextIcon size={26} /> <span className="d-none d-sm-inline" >Next Question</span></a>}
+				{userAnsweredTally === quizLength && <a href="/multiplechoicetopics" style={{marginRight:'3em',float:'right'}} className='btn btn-success' ><CompleteIcon size={26} /> <span className="d-none d-sm-inline" >Quiz Complete</span></a>}
 			</div>}
 			{questions.length > 0 && <b style={{display:'block',width:'100%'}}>Quiz Questions</b>}
-			<div style={{border: '1px solid black',width:'100%',marginTop:'2.8em'}}>
+			<div style={{border: '1px solid black',width:'100%',marginTop:'3.4em'}}>
 			{questions}
 			</div>
 		</div>
