@@ -102,6 +102,7 @@ router.post('/saveuser', function(req, res) {
                   if (req.body.streak) item.streak=req.body.streak;
                   if (req.body.questions) item.questions=req.body.questions;
                   if (req.body.recall) item.recall=req.body.recall;
+                  if (req.body.email_me) item.email_me=req.body.email_me;
                 //  console.log(['TPPW',req.body.topicPasswords])
                   if (req.body.topicPasswords) item.topicPasswords=req.body.topicPasswords;
                   // update avatar only when changed

@@ -36,6 +36,7 @@ export default withRouter( class QuizCarousel extends Component {
         this.percentageFinished = this.percentageFinished.bind(this);
         this.discoverQuestions = this.discoverQuestions.bind(this);
         this.goto = this.goto.bind(this);
+        this.gotoQuestion = this.gotoQuestion.bind(this);
         this.onClickListQuestion=this.onClickListQuestion.bind(this);
         this.initialiseFromParams = this.initialiseFromParams.bind(this);
         this.showQuestionListDetails = this.showQuestionListDetails.bind(this);
@@ -60,15 +61,15 @@ export default withRouter( class QuizCarousel extends Component {
             // ensure existence old and new match.params    
 			if (this.props.match && props.match && this.props.match.params && props.match.params) {
 				//console.log(['QUIZ CAR DID UPDATE start']);
-				if (this.props.match.topic !== props.match.topic 
-					|| this.props.match.searchtopic !== props.match.searchtopic 
-					|| this.props.match.topicquestion !== props.match.topicquestion 
-					|| this.props.match.tag !== props.match.tag
-					|| this.props.match.difficulty !== props.match.difficulty
-					|| this.props.match.technique !== props.match.technique
-					|| this.props.match.missingtopic !== props.match.missingtopic
-					|| this.props.match.topics !== props.match.topics 
-					|| this.props.match.url != props.match.url
+				if (this.props.match.params.topic !== props.match.params.topic 
+					|| this.props.match.params.searchtopic !== props.match.params.searchtopic 
+					|| this.props.match.params.topicquestion !== props.match.params.topicquestion 
+					|| this.props.match.params.tag !== props.match.params.tag
+					|| this.props.match.params.difficulty !== props.match.params.difficulty
+					|| this.props.match.params.technique !== props.match.params.technique
+					|| this.props.match.params.missingtopic !== props.match.params.missingtopic
+					|| this.props.match.params.topics !== props.match.params.topics 
+					|| this.props.match.params.url != props.match.params.url
 					) {
 						//console.log(['QUIZ CAR DID UPDATE REALLY',props.match,this.props.match]);
 					  this.initialiseFromParams(); 
@@ -212,7 +213,16 @@ export default withRouter( class QuizCarousel extends Component {
             }
           }
   };
-      
+  
+	gotoQuestion(questionKey) {
+		console.log(['GOTO QUESTION',questionKey])
+		let question = parseInt(questionKey,10) != NaN && this.props.questions && this.props.questions[parseInt(questionKey,10)] ? this.props.questions[parseInt(questionKey,10)] : null;
+		if (question) {
+			let url = '/discover/topic/'+question.quiz+'/'+question._id;
+			this.goto(url);
+		}
+	}
+	  
   // handle user click on Remember, Forgot, Skip, Ban
   // update user questions history and remove question from current Quiz
   handleQuestionResponse(question,response) {
@@ -243,6 +253,7 @@ export default withRouter( class QuizCarousel extends Component {
                 ////console.log(['success',this.props.currentQuestion]);
                 this.props.setCurrentQuestion(parseInt(this.props.currentQuestion,10) + 1);
                 this.logStatus('success',id,question.isPreview);
+				//this.gotoQuestion(parseInt(this.props.currentQuestion,10) + 1)
             }
       } else if (response === "previous") {
           //if (!questions.seen.hasOwnProperty(id)) 
@@ -251,6 +262,7 @@ export default withRouter( class QuizCarousel extends Component {
           this.logStatus('seen',id,question.isPreview);
           let currentId =this.props.currentQuestion - 1;
           if (this.props.currentQuestion > 0 && this.props.currentQuiz.length > 0) {
+              //this.gotoQuestion(currentId)
               this.props.setCurrentQuestion(currentId);
           }
           
@@ -263,6 +275,7 @@ export default withRouter( class QuizCarousel extends Component {
             if (this.isQuizFinished()) {
               this.finishQuiz();
             }  else {
+               //this.gotoQuestion(parseInt(this.props.currentQuestion,10) + 1);
                 this.props.setCurrentQuestion(this.props.currentQuestion + 1);
                //this.setState({'currentQuestion':this.state.currentQuestion + 1});
             }
@@ -429,44 +442,7 @@ export default withRouter( class QuizCarousel extends Component {
 		this.setState({showQuestionListDetails:false})
 	}
 	
-	
-	sendAllQuestionsForReview(user,questions) {
-		if (user && questions && questions.length > 0) {
-			let ids=[];
-			questions.map(function(question) {
-				if (question) ids.push(question._id);
-			})
-			console.log(['SEND Q R',ids,questions])
-			fetch('/api/sendallquestionsforreview', {
-			  method: 'POST',
-			   headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-				'user':this.props.user._id,
-				'questions':ids,
-				})
-           
-			}).then(function(response) {
-				return response.json();
-			}).then(function(res) {
-				console.log('done add all to review')
-				confirmAlert({
-				  title: 'Questions Added For Review',
-				  message: 'Added '+ids.length+' questions to your review list',
-				  buttons: [
-					{
-					  label: 'OK',
-					  onClick: () => {}
-					}
-				  ]
-				})
-				
-				
-			})
-		}
-	}
-    
+   
     render() {
         if (this.state.exitRedirect && this.state.exitRedirect.length > 0) {
             return <Redirect to={this.state.exitRedirect} />
@@ -490,20 +466,21 @@ export default withRouter( class QuizCarousel extends Component {
                         label='Continue' ;
                     }
                     content = (<div>
-                    <button className='btn btn-info' onClick={() => this.setQuizQuestion(this.currentQuestion())}   >
+                    <button className='btn btn-success' onClick={() => this.setQuizQuestion(this.currentQuestion())}   >
                     <Play size={25} /> {label}
                     </button>
-                    {this.props.match.params.topic && <a style={{float:'right'}} className='btn btn-info' href={'/discover/searchtopic/'+this.props.match.params.topic} >
+                    {this.props.match.params.topic && <Link style={{float:'right'}} className='btn btn-info' to={'/discover/searchtopic/'+this.props.match.params.topic} >
                     <ShowAll size={25} /> Load Complete Topic
-                    </a>}
+                    </Link>}
                     {!this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-info' onClick={this.showQuestionListDetails}  >Show Details</button>}
-                    {!this.props.isReview && this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-success' onClick={(e) => this.sendAllQuestionsForReview(this.props.user,listQuestions)} >Send All To My Review List</button>}
+                    {!this.props.isReview && this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-success' onClick={(e) => this.props.sendAllQuestionsForReview(listQuestions)} >Send All To My Review List</button>}
                     {this.state.showQuestionListDetails && <button style={{float:'right'}} className='btn btn-info' onClick={this.hideQuestionListDetails} >Hide Details</button>}
+                    <div style={{width:'100%',clear:'both'}}></div>
                     <QuestionList user={this.props.user} showQuestionListDetails={this.state.showQuestionListDetails} isReview={this.props.isReview} questions={listQuestions} setQuiz={this.setQuizQuestion}  onClick={this.onClickListQuestion}></QuestionList>
                     </div>);
                 } else {
                     // single question
-                    content = (<SingleQuestion analyticsEvent={this.props.analyticsEvent}  match={this.props.match} percentageFinished={this.percentageFinished} isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic}   setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} isReview={this.props.isReview} /> )
+                    content = (<SingleQuestion analyticsEvent={this.props.analyticsEvent}  match={this.props.match} percentageFinished={this.percentageFinished} isAdmin={this.props.isAdmin} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} setQuizFromTechnique={this.props.setQuizFromTechnique} setQuizFromTopic={this.props.setQuizFromTopic}   setQuizFromTag={this.props.setQuizFromTag} question={question} user={this.props.user} successButton={this.props.successButton} handleQuestionResponse={this.handleQuestionResponse}  like={this.props.like} isLoggedIn={this.props.isLoggedIn} isReview={this.props.isReview} loadComments={this.props.loadComments} editComment={this.props.editComment} deleteComment={this.props.deleteComment} newComment={this.props.newComment} comments={this.props.comments} saveComment={this.props.saveComment} setComment={this.props.setComment} loadComments={this.props.loadComments} newCommentReply={this.props.newCommentReply} /> )
                 }
             
             //} else {

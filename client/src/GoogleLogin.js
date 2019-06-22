@@ -61,13 +61,13 @@ export default class GoogleLogin extends Component {
         document.body.appendChild(script);
     }
     
-    handleFailure() {
-        //console.log('FAIL LOGIN');
+    handleFailure(e) {
+        console.log(['FAIL LOGIN',e]);
         this.googleSignOut();
     };
     
 	renderSignIn() {
-        ////console.log('redner signin');
+        console.log('redner signin');
 		gapi.signin2.render('google-signin', {
 			'scope': 'profile email',// https://www.googleapis.com/auth/drive.file',
             'width': 200,
@@ -80,7 +80,7 @@ export default class GoogleLogin extends Component {
 	}
 
 	handleAuthClick() {
-		////console.log('handle auth click');
+		console.log('handle auth click');
         this.authApiLoaded = true;
 		this.GoogleAuth = gapi.auth2.getAuthInstance();
 		this.GoogleAuth.isSignedIn.listen(this.updateSigninStatus);
@@ -88,22 +88,22 @@ export default class GoogleLogin extends Component {
 	}
     
     updateSigninStatus() {
-		////console.log('update signin status');
+		console.log('update signin status');
 		var user = this.GoogleAuth.currentUser.get();
 		//$scope.$apply(function() {
 			if (user) {
-			//	//console.log(['update signin status have user reuire scope -',this.requiredScope]);
+			   console.log(['update signin status have user reuire scope -',this.requiredScope]);
 				this.loggedIn = user.hasGrantedScopes(this.requiredScope);
 				if (this.loggedIn) {
-				//	//console.log('update signin status do loging',user);
+					console.log('update signin status do loging',user);
 					this.loginToWebsite().then(function(user) {
 						////$rootScope.$broadcast('sessionId',sessionId);
-                  //      //console.log('LOGGED IN',user);
+                        //console.log('LOGGED IN',user);
                         //this.props.login();
 					});
 				}
 			} else {
-				////console.log(['update signin NOT LOGGED IN']);
+				console.log(['update signin NOT LOGGED IN']);
 				this.loggedIn = false;
 			}
 		//});
@@ -115,7 +115,7 @@ export default class GoogleLogin extends Component {
 	}
 	
 	loginToWebsite(token) {
-        ////console.log(['login to website',token]);
+        console.log(['login to website',token]);
 		let p = new Promise((resolve, reject) => {
             //var now = new Date().getTime();
             // limit refresh to once per minute

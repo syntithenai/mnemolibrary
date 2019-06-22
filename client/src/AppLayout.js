@@ -23,13 +23,19 @@ import ProfilePage from './ProfilePage';
 import SearchPage from './SearchPage';
 import QuizCarousel from './QuizCarousel';
 import Footer from './Footer';
+import SiteMap from './SiteMap';
 import FindQuestions from './FindQuestions';
 import CreateHelp from './CreateHelp';
 import QuizCollection from './QuizCollection';
 import MultipleChoiceTopics from './MultipleChoiceTopics';
 import MultipleChoiceQuestions from './MultipleChoiceQuestions';
 import RecentComments from './RecentComments'
+import CommentEditor from './CommentEditor'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 
+
+import CommentReplyEditor from './CommentReplyEditor'
 import TopicPassword from './TopicPassword';
 import FAQ from './FAQ';
 import ReactGA from 'react-ga';
@@ -99,13 +105,32 @@ export default class AppLayout extends Component {
           mnemonic_techniques :	["homonym","association","alliteration","rhyme","acronym","mnemonic major system","visual"],
           topicCollections:[],
           discoveryBlocks:{tag:[],topic:[],technique:[]},
+          showCommentDialog : false,
+          comments:[],
+          comment: null
       }
 
         this.setCurrentPage = this.setCurrentPage.bind(this);
         this.setCurrentQuestion = this.setCurrentQuestion.bind(this);
         this.setCurrentQuiz = this.setCurrentQuiz.bind(this);
         //this.setQuiz = this.setQuiz.bind(this);
-
+		this.setComment = this.setComment.bind(this);
+		this.loadComments = this.loadComments.bind(this);
+		this.toggleCommentDialog = this.toggleCommentDialog.bind(this);
+		this.editComment = this.editComment.bind(this);
+		this.newComment = this.newComment.bind(this);
+		this.deleteComment = this.deleteComment.bind(this);
+		this.saveComment = this.saveComment.bind(this);
+		this.reallyDeleteComment = this.reallyDeleteComment.bind(this);
+		   
+		this.editCommentReply = this.editCommentReply.bind(this);
+		this.newCommentReply = this.newCommentReply.bind(this);
+		this.cancelCommentReply = this.cancelCommentReply.bind(this);
+		this.deleteCommentReply = this.deleteCommentReply.bind(this);
+		this.saveCommentReply = this.saveCommentReply.bind(this);
+		this.reallyDeleteCommentReply = this.reallyDeleteCommentReply.bind(this);   
+		   
+		 this.sendAllQuestionsForReview = this.sendAllQuestionsForReview.bind(this)  
         //this.setQuizFromDiscovery = this.setQuizFromDiscovery.bind(this);
         //this.discoverQuestions = this.discoverQuestions.bind(this);
         //this.getQuestionsForReview = this.getQuestionsForReview.bind(this);
@@ -192,6 +217,213 @@ export default class AppLayout extends Component {
         //});
   };
   
+  
+  
+  
+  
+  
+	setComment(comment) {
+		this.setState({comment:comment});
+	}
+  
+    loadComments(question,user,limitP) {
+		let that=this;
+		let query='';
+		let currentQuestion = this.getCurrentQuestion()
+		if (question && user && currentQuestion) {
+			query='&question='+question+'&user='+user
+		}
+		let limit = limitP > 0 ? '?limit='+limitP : '?limit=50'; 
+		  fetch('/api/comments'+limit+query)
+		  .then(function(response) {
+			return response.json()
+		  }).then(function(json) {
+			console.log(['loaded comments', json])
+			that.setState({comments:json});
+		  }).catch(function(ex) {
+			console.log(['error loading comments', ex])
+		  })
+		
+	}
+	
+	toggleCommentDialog() {
+		console.log(['TOGGLE COMMENT',this.state.showCommentDialog])
+		//// 
+		//if (this.state.showCommentDialog) {
+			//this.setState({'editingComment':null})
+		//}
+		this.setState({showCommentDialog: !this.state.showCommentDialog})
+	}
+   
+	editComment(comment) {
+		this.setState({comment:comment});	//this.setState({commentId:comment._id,commentText:comment.comment,commentType:comment.type,commentCreateDate:comment.createDate})
+		//this.toggleCommentDialog()
+	}
+		
+	newComment() {
+		//this.setVisible('comments')
+		this.setState({comment:{_id:null,comment:'',type:'',createDate:new Date(),user:this.state.user ? this.state.user._id : null,userAvatar:this.state.user ? this.state.user.avatar : null,question:this.getCurrentQuestion()}})
+	//	this.toggleCommentDialog()
+		
+	}
+	
+	reallyDeleteComment(comment) {
+		console.log(['really delete COMMENT',comment])
+				
+		// refresh single view comments list
+		let that = this;
+		let toSave = {}
+		toSave.question = comment.question ? comment.question : null;
+		toSave.user = comment.user ? comment.user : null
+		toSave.comment = comment ? comment._id : null
+		
+		if (toSave.question && toSave.user && toSave.comment) {
+			console.log(['really really delete COMMENT',toSave])
+		
+			fetch('/api/deletecomment', {
+			  method: 'POST',
+			  headers: {
+				'Content-Type': 'application/json'
+			  },
+			  body: JSON.stringify(toSave)
+			}).then(function() {
+				console.log(['NOW RELOAD COMMENTS'])
+				that.loadComments(toSave.question,toSave.user)
+			});
+		}
+	} 
+  
+  
+      deleteComment(comment) {
+
+            confirmAlert({
+              title: 'Delete Comment',
+              message: 'Are you sure you want to delete this comment?',
+              buttons: [
+                {
+                  label: 'Yes',
+                  onClick: () => {this.reallyDeleteComment(comment)}
+                },
+                {
+                  label: 'No',
+                  onClick: () => {}
+                }
+              ]
+            })
+	} 
+  
+  
+  
+	saveComment(type) {
+			let that = this;
+			let toSave = this.state.comment;
+			if (type && type.type) toSave.type = type.type;
+			if (typeof toSave.question === 'object') {
+				let question = toSave.question;
+				toSave.questionText = question ? question.interrogative + ' ' + question.question : null;
+				toSave.questionTopic = question ? question.quiz : null;
+				toSave.question = question ? question._id : null;
+			}
+			// set user if not already set 
+			console.log(['do save ',toSave.user]);
+			
+			//toSave.user = !toSave.user && this.state.user ? this.state.user._id : null
+			//toSave.userAvatar = !toSave.userAvatar && this.state.user ? this.state.user.avatar : null
+			console.log(['do save ',toSave]);
+						
+			if (toSave.question && toSave.user && toSave.comment && toSave.comment.length > 0) {
+				//if (!this.props.comment._id) {
+				  ////toSave._id= this.props.comment._id;
+				  //toSave.createDate = new Date();
+				//}
+				fetch('/api/savecomment', {
+				  method: 'POST',
+				  headers: {
+					'Content-Type': 'application/json'
+				  },
+				  
+				  body: JSON.stringify(toSave)
+				}).then(function() {
+					console.log('done save '+toSave);
+			
+					that.setComment(null);
+					that.setState({commentReply:null,commentReplyIndex:null,editCommentReply:false})
+					console.log(['NOW RELOAD COMMENTS',that.loadComments])
+					that.loadComments(toSave.question,(that.state.user ? that.state.user._id  : null))
+				});
+			}
+      };
+  
+  // COMMENT REPLY FUNCTIONS
+  
+	editCommentReply(comment,replyIndex) {
+		console.log(['EDIT REPLY',comment,replyIndex])
+		this.setState({comment:comment,commentReplyIndex:replyIndex,editCommentReply:true});	
+	}
+		
+	newCommentReply(comment) {
+		//comment.replies = comment.replies ? comment.replies : [];
+		//comment.replies.push({text:'',createDate:new Date(),user:this.state.user ? this.state.user._id : null,userAvatar:this.state.user ? this.state.user.avatar : null}) 
+		this.setState({comment:comment,editCommentReply:true})
+	}
+	
+	cancelCommentReply() {
+			this.setState({comment:null,commentReplyIndex:null,editCommentReply:true});
+	}
+	
+	reallyDeleteCommentReply(comment,replyIndex) {
+		console.log(['really delete COMMENT reply',comment,replyIndex])
+		if (comment && comment.replies && comment.replies.length > replyIndex) {
+			comment.replies = comment.replies.splice(replyIndex,1);
+			this.setState({comment:comment});
+			this.saveComment()
+		}
+	} 
+  
+    deleteCommentReply(comment,replyIndex) {
+            confirmAlert({
+              title: 'Delete Reply',
+              message: 'Are you sure you want to delete this reply?',
+              buttons: [
+                {
+                  label: 'Yes',
+                  onClick: () => {this.reallyDeleteCommentReply(comment,replyIndex)}
+                },
+                {
+                  label: 'No',
+                  onClick: () => {}
+                }
+              ]
+            })
+	} 
+  
+  
+  
+	saveCommentReply(text) {
+		if (text && text.length > 0 && this.state.comment) {
+			if (this.state.commentReplyIndex != null && this.state.comment && this.state.comment.replies && this.state.comment.replies.length > this.state.commentReplyIndex) {
+				// save edited reply
+				let comment = this.state.comment;
+				comment.replies[this.state.commentReplyIndex].text = text;
+			} else {
+				// new reply
+				let comment = this.state.comment;
+				comment.replies = comment.replies ? comment.replies : [];
+				let reply = {text:text,createDate:new Date(),user:this.state.user ? this.state.user._id : null,userAvatar:this.state.user ? this.state.user.avatar : null}
+				comment.replies.push(reply)
+			}
+			this.setState({comment:comment});
+			this.saveComment()
+			
+		}
+		//let that = this;
+		//console.log(['save  COMMENT reply',comment,replyIndex])
+		//if (comment && comment.replies && comment.replies.length > replyIndex) {
+			//comment.replies = comment.replies.splice(replyIndex,1,);
+			//this.setState({comment:comment});
+		//}
+      };
+  
   getQueryStringValue (key) {  
           return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
   } 
@@ -199,6 +431,7 @@ export default class AppLayout extends Component {
   setCurrentTopic(topic) {
       this.setState({currentTopic:topic});
   };
+  
   getCurrentTopic() {
       return this.state.currentTopic;
   };
@@ -656,6 +889,7 @@ export default class AppLayout extends Component {
   };
   
   logout() {
+	  console.log('LOGOUT')
       var state={};
       state.user = '';
       state.token = '';
@@ -669,7 +903,7 @@ export default class AppLayout extends Component {
       ////console.log(this.state);
       //this.GoogleAuth.disconnect();
       //let GoogleAuth = gapi.auth2.getAuthInstance();
-      this.GoogleAuth.disconnect();
+      if (this.GoogleAuth)  this.GoogleAuth.disconnect();
       window.location='/';
       //gapi.auth2.getAuthInstance().disconnect();
       //var auth2 = gapi.auth2.getAuthInstance();
@@ -890,6 +1124,55 @@ export default class AppLayout extends Component {
 		this.setState({titleFilter:filter});
 	}
 	
+	getCurrentQuestion() {
+       // //console.log(['currentQuestion',this.state]);
+        let question=null;
+        if (this.state.currentQuestion !== null && Array.isArray(this.state.currentQuiz) && this.state.indexedQuestions && this.state.questions) {
+            question = this.state.questions[this.state.indexedQuestions[this.state.currentQuiz[this.state.currentQuestion]]];
+        }
+        return question;
+    };
+    
+    
+    	
+	sendAllQuestionsForReview(questions) {
+		let that = this;
+		if (questions && questions.length > 0) {
+			let ids=[];
+			questions.map(function(question) {
+				if (question) ids.push(question._id);
+			})
+			console.log(['SEND Q R',ids,questions])
+			fetch('/api/sendallquestionsforreview', {
+			  method: 'POST',
+			   headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+				'user':that.state.user._id,
+				'questions':ids,
+				})
+           
+			}).then(function(response) {
+				return response.json();
+			}).then(function(res) {
+				console.log('done add all to review')
+				confirmAlert({
+				  title: 'Questions Added For Review',
+				  message: 'Added '+ids.length+' question'+(ids.length > 1 ? 's' : '') +' to your review list',
+				  buttons: [
+					{
+					  label: 'OK',
+					  onClick: () => {}
+					}
+				  ]
+				})
+				
+				
+			})
+		}
+	}
+ 
     
   render() {
     const progress = this.state.users.default;
@@ -898,9 +1181,10 @@ export default class AppLayout extends Component {
     //const showProfile = this.isCurrentPage('profile') && this.isLoggedIn();
     const showLogin = this.isCurrentPage('login') && !this.isLoggedIn();
     let title=decodeURIComponent(this.state.title);
-    
+   // let question = this.getCurrentQuestion()
+    //console.log(['APPLAYOUT',question])
     if (this.isCurrentPage('disabled')) {
-        return (<div>DIS</div>);
+        return (<div>DISABLED!!</div>);
     } else {
                 
         //let oauth=localStorage.getItem('oauth');
@@ -911,24 +1195,33 @@ export default class AppLayout extends Component {
         
         let searchPage = <div><TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuizFromTopic={this.setQuizFromTopic} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user} showCollection={this.showCollection} hideCollection={this.hideCollection} collectionVisible={this.collectionVisible} collection={this.state.collection} /></div>
         
-        let topicsPageOptions={ analyticsEvent:this.analyticsEvent, titleFilter:this.state.titleFilter,setTitleFilter:this.setTitleFilter,topicCollections:this.state.topicCollections,topics:topics,topicTags:this.state.topicTags,tagFilter:this.state.tagFilter,clearTagFilter:this.clearTagFilter,setQuizFromTopic:this.setQuizFromTopic,setQuiz:this.setQuizFromTopic,questionsMissingMnemonics:this.state.questionsMissingMnemonics,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic,setCurrentPage:this.setCurrentPage,isLoggedIn:this.isLoggedIn,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromQuestionId:this.setQuizFromQuestionId,title:title,user:this.state.user,showCollection:this.showCollection,hideCollection:this.hideCollection,collectionVisible:this.collectionVisible,collection:this.state.collection,setQuizFromQuestionId:this.setQuizFromQuestionId }
+        let topicsPageOptions={ analyticsEvent:this.analyticsEvent, titleFilter:this.state.titleFilter,setTitleFilter:this.setTitleFilter,topicCollections:this.state.topicCollections,topics:topics,topicTags:this.state.topicTags,tagFilter:this.state.tagFilter,clearTagFilter:this.clearTagFilter,setQuizFromTopic:this.setQuizFromTopic,setQuiz:this.setQuizFromTopic,questionsMissingMnemonics:this.state.questionsMissingMnemonics,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic,setCurrentPage:this.setCurrentPage,isLoggedIn:this.isLoggedIn,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromQuestionId:this.setQuizFromQuestionId,title:title,user:this.state.user,showCollection:this.showCollection,hideCollection:this.hideCollection,collectionVisible:this.collectionVisible,collection:this.state.collection,setQuizFromQuestionId:this.setQuizFromQuestionId ,newCommentReply:this.newCommentReply}
         
         let profilePageOptions = {analyticsEvent:this.analyticsEvent,  token:this.state.token,setCurrentPage:this.setCurrentPage,setQuizFromDiscovery:this.setQuizFromDiscovery,reviewBySuccessBand:this.reviewBySuccessBand,setReviewFromTopic:this.setReviewFromTopic,setQuizFromTopic:this.discoverQuizFromTopic,searchQuizFromTopic:this.setQuizFromTopic, isAdmin:this.isAdmin,saveUser:this.saveUser,user:this.state.user,token:this.state.token,logout:this.logout,import:this.import,importMultipleChoice:this.importMultipleChoice,isLoggedIn:this.isLoggedIn}
         
-        let reviewPageOptions = { analyticsEvent:this.analyticsEvent, isAdmin:this.isAdmin,saveSuggestion:this.saveSuggestion,setCurrentQuestion:this.setCurrentQuestion,setCurrentPage:this.setCurrentPage,setCurrentQuiz:this.setCurrentQuiz,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromTopic:this.setQuizFromTopic,setReviewFromTopic:this.setReviewFromTopic,discoverQuizFromTopic:this.discoverQuizFromTopic,setQuizFromTag:this.setQuizFromTag,blocks:this.state.discoveryBlocks,discoverQuestions:this.discoverQuestions,getQuestionsForReview:this.getQuestionsForReview,mnemonic_techniques:this.state.mnemonic_techniques,questions:this.state.questions,currentQuiz:this.state.currentQuiz,currentQuestion:this.state.currentQuestion,indexedQuestions:this.state.indexedQuestions,topicTags:this.state.topicTags,updateProgress:this.updateProgress,finishQuiz:this.finishReview,isReview:true,setMessage:this.setMessage,like:this.like,user:this.state.user,progress:progress,getCurrentTopic:this.getCurrentTopic,isLoggedIn:this.isLoggedIn,getCurrentBand:this.getCurrentBand,reviewBySuccessBand:this.reviewBySuccessBand,setQuizFromDifficulty:this.setQuizFromDifficulty}
+        let reviewPageOptions = { analyticsEvent:this.analyticsEvent, isAdmin:this.isAdmin,saveSuggestion:this.saveSuggestion,setCurrentQuestion:this.setCurrentQuestion,setCurrentPage:this.setCurrentPage,setCurrentQuiz:this.setCurrentQuiz,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromTopic:this.setQuizFromTopic,setReviewFromTopic:this.setReviewFromTopic,discoverQuizFromTopic:this.discoverQuizFromTopic,setQuizFromTag:this.setQuizFromTag,blocks:this.state.discoveryBlocks,discoverQuestions:this.discoverQuestions,getQuestionsForReview:this.getQuestionsForReview,mnemonic_techniques:this.state.mnemonic_techniques,questions:this.state.questions,currentQuiz:this.state.currentQuiz,currentQuestion:this.state.currentQuestion,indexedQuestions:this.state.indexedQuestions,topicTags:this.state.topicTags,updateProgress:this.updateProgress,finishQuiz:this.finishReview,isReview:true,setMessage:this.setMessage,like:this.like,user:this.state.user,progress:progress,getCurrentTopic:this.getCurrentTopic,isLoggedIn:this.isLoggedIn,getCurrentBand:this.getCurrentBand,reviewBySuccessBand:this.reviewBySuccessBand,setQuizFromDifficulty:this.setQuizFromDifficulty,editComment:this.editComment,deleteComment:this.deleteComment,newComment:this.newComment,toggleCommentDialog:this.toggleCommentDialog,comments:this.state.comments,setComment:this.setComment,comment:this.state.comment,saveComment:this.saveComment,loadComments:this.loadComments,newCommentReply:this.newCommentReply,sendAllQuestionsForReview:this.sendAllQuestionsForReview}
         
         
-        let discoverPageOptions ={ analyticsEvent:this.analyticsEvent, isAdmin:this.isAdmin,saveSuggestion:this.saveSuggestion,setCurrentQuestion:this.setCurrentQuestion,setCurrentPage:this.setCurrentPage,setCurrentQuiz:this.setCurrentQuiz,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromTopic:this.setQuizFromTopic,setReviewFromTopic:this.setReviewFromTopic,discoverQuizFromTopic:this.discoverQuizFromTopic,setQuizFromTag:this.setQuizFromTag,discoverQuestions:this.discoverQuestions,getQuestionsForReview:this.getQuestionsForReview,mnemonic_techniques:this.state.mnemonic_techniques,questions:this.state.questions,currentQuiz:this.state.currentQuiz,currentQuestion:this.state.currentQuestion,indexedQuestions:this.state.indexedQuestions,topicTags:this.state.topicTags,updateProgress:this.updateProgress,setMessage:this.setMessage,like:this.like,user:this.state.user,progress:progress,getCurrentTopic:this.getCurrentTopic,isLoggedIn:this.isLoggedIn,getCurrentBand:this.getCurrentBand,reviewBySuccessBand:this.reviewBySuccessBand,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromQuestionId:this.setQuizFromQuestionId ,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic }
+        let discoverPageOptions ={ analyticsEvent:this.analyticsEvent, isAdmin:this.isAdmin,saveSuggestion:this.saveSuggestion,setCurrentQuestion:this.setCurrentQuestion,setCurrentPage:this.setCurrentPage,setCurrentQuiz:this.setCurrentQuiz,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromTopic:this.setQuizFromTopic,setReviewFromTopic:this.setReviewFromTopic,discoverQuizFromTopic:this.discoverQuizFromTopic,setQuizFromTag:this.setQuizFromTag,discoverQuestions:this.discoverQuestions,getQuestionsForReview:this.getQuestionsForReview,mnemonic_techniques:this.state.mnemonic_techniques,questions:this.state.questions,currentQuiz:this.state.currentQuiz,currentQuestion:this.state.currentQuestion,indexedQuestions:this.state.indexedQuestions,topicTags:this.state.topicTags,updateProgress:this.updateProgress,setMessage:this.setMessage,like:this.like,user:this.state.user,progress:progress,getCurrentTopic:this.getCurrentTopic,isLoggedIn:this.isLoggedIn,getCurrentBand:this.getCurrentBand,reviewBySuccessBand:this.reviewBySuccessBand,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromTechnique:this.setQuizFromTechnique,setQuizFromQuestionId:this.setQuizFromQuestionId ,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic ,editComment:this.editComment,deleteComment:this.deleteComment,newComment:this.newComment,toggleCommentDialog:this.toggleCommentDialog,comments:this.state.comments,setComment:this.setComment,comment:this.state.comment,saveComment:this.saveComment,loadComments:this.loadComments,newCommentReply:this.newCommentReply,sendAllQuestionsForReview:this.sendAllQuestionsForReview}
         
          
-        
+         //commentText={this.state.comment.comment} commentType={this.state.comment.type} commentCreateDate={this.state.comment.createDate} question={this.state.comment.question}   user={this.state.user} visible={this.state.showCommentDialog}  loadComments={this.loadComments} toggleVisible={this.toggleCommentDialog}
         return (
         <Router>
-            <div className="mnemo">
+            <div style={{width:'100%'}} className="mnemo">
+                <PropsRoute exact={true} path='/recentcomments/:comment'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} />
                 
+                <PropsRoute exact={true} path='/recentcomments'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} />
+                
+                 {this.state.comment && !this.state.editCommentReply && <CommentEditor comment={this.state.comment} setComment={this.setComment} user={this.props.user} saveComment={this.saveComment}  getCurrentQuestion={this.getCurrentQuestion}/>}
+
+                 {this.state.comment && this.state.editCommentReply && <CommentReplyEditor  comment={this.state.comment} commentReplyIndex={this.state.commentReplyIndex} commentReply={this.state.commentReply} cancelCommentReply={this.cancelCommentReply}  saveCommentReply={this.saveCommentReply} getCurrentQuestion={this.getCurrentQuestion} />}
+             
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
                 
                 <PropsRoute  path="/" component={Navigation}  setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection}  />
+                
+                <PropsRoute  exact={true} path="/sitemap" component={SiteMap} isAdmin={this.isAdmin} isLoggedIn={this.isLoggedIn} logout={this.logout} import={this.import} importMultipleChoice={this.importMultipleChoice}/>
                 
                 <PropsRoute  exact={true} path="/help" component={AboutPage} analyticsEvent={this.analyticsEvent}  />
                 <PropsRoute  path="/help/about" component={AboutPage} analyticsEvent={this.analyticsEvent} />
@@ -940,10 +1233,11 @@ export default class AppLayout extends Component {
                 
                 <PropsRoute  path="/create" analyticsEvent={this.analyticsEvent} component={CreatePage} fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
                 
-                <PropsRoute exact={true} path='/recentcomments'  component={RecentComments}  />
                 
+                <PropsRoute exact={true} path='/multiplechoicetopics/:topicCollection'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}  />
                 <PropsRoute exact={true} path='/multiplechoicetopics'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}  />
-                <PropsRoute exact={true} path='/multiplechoicequestions/:topic'   user={this.state.user} component={MultipleChoiceQuestions}  />
+                
+                <PropsRoute exact={true} path='/multiplechoicequestions/:topic'   user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
                 
                 
                 <PropsRoute  exact={true} path="/search" component={TopicsPage} {...topicsPageOptions}/>

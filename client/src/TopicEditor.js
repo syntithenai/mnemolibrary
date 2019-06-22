@@ -116,10 +116,11 @@ export default class TopicEditor extends Component {
 		let state = this.state;
         if (this.state.restriction === "YES") {
             state.restriction=""
+			state.topicpassword='';
         } else {
             state.restriction="YES"
         }
-		this.setState(state);
+        this.setState(state);
         this.saveTopic();
         return true;
         ////console.log(['topicevent',e.target.value]);
@@ -524,7 +525,7 @@ export default class TopicEditor extends Component {
                         <div className='col-12 col-lg-6'>
                             <button  className='btn btn-info' style={{float:'left'}} onClick={this.showTopics} ><ListAlt size={28}/>&nbsp;<span className="d-none d-sm-inline" >Topics</span></button>
                             {String(this.state._id).length > 0 && <button  className='btn btn-info'  onClick={this.showQuestions} ><List size={28}/>&nbsp;<span className="d-none d-sm-inline" >Questions</span> <span className="badge badge-light">{this.state.questions ? this.state.questions.length : 0}</span></button>}
-                            <a  href='/help/create'  className='btn btn-info ' ><Question size={28}/>&nbsp;<span className="d-none d-sm-inline" >Help</span></a>
+                            <Link  to='/help/create'  className='btn btn-info ' ><Question size={28}/>&nbsp;<span className="d-none d-sm-inline" >Help</span></Link>
                            
                         </div>
                         <div className='col-12  col-lg-6'>
@@ -570,7 +571,7 @@ export default class TopicEditor extends Component {
 											<input onChange={this.setRestrictionEvent}  checked={this.state.restriction?'true':''}  type='checkbox'/> Restrict Access
 										</label>
                                     </div>
-                                  
+									<div style={{width:'100%',clear:'both'}}></div>
                                     <TopicQuestionsList filter={this.state.filter} validationErrors={this.state.validationErrors} editQuestion={this.editQuestion}  questions={this.state.questions} moveQuestion={this.moveQuestion} currentQuestion={this.state.currentQuestion} /></span>
                                 }
                                 {!this.state.showHelp && this.state.currentView==='editor' &&

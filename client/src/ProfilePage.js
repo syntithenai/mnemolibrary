@@ -36,8 +36,11 @@ export default class ProfilePage extends Component {
             recall_award:'',
             streak_award:'',
             distribution_award:'',
+            showTopButtons: false
         }
         this.addAward = this.addAward.bind(this);
+        this.showTopButtons = this.showTopButtons.bind(this);
+        this.hideTopButtons = this.hideTopButtons.bind(this);
        // //console.log(['constr',this.state]);
     };
     
@@ -61,6 +64,14 @@ export default class ProfilePage extends Component {
 				console.log(['ERR',err]);
 			});
 		}
+	}
+	
+	showTopButtons() {
+		this.setState({showTopButtons:true});
+	}
+	
+	hideTopButtons() {
+		this.setState({showTopButtons:false});
 	}
 
     addAward(type,awardData) {
@@ -191,9 +202,9 @@ export default class ProfilePage extends Component {
                 return;
             }
           }
-          //if (this.state.questions) {
-              //data.questions=this.state.questions;
-          //}
+          if (this.state.user.email_me) {
+              data.email_me=this.state.user.email_me;
+          }
           //if (this.state.streak) {
               //data.streak=this.state.streak;
           //}
@@ -203,35 +214,6 @@ export default class ProfilePage extends Component {
           return this.props.saveUser(data,this);  
             
     };
-    
-    clickImport() {
-         confirmAlert({
-          title: 'Import Selection',
-          message: 'Which sheet do you want to import?',
-          buttons: [
-            {
-              label: 'Archive',
-              onClick: () => this.props.import(0)
-            },
-            {
-              label: 'Active',
-              onClick: () => this.props.import(1)
-            },
-            {
-              label: 'Test',
-              onClick: () => this.props.import(2)
-            },
-            {
-			  label: 'Multiple Choice Questions',
-              onClick: () => this.props.importMultipleChoice(0)
-            },
-            {
-              label: 'Cancel',
-              onClick: () => {}
-            }
-          ]
-        })
-    }
     
     change(e) {
         let state = {...this.state.user};
@@ -300,14 +282,12 @@ export default class ProfilePage extends Component {
   }
 //            <a className='btn btn-info' onClick={() => this.allowAlexa.bind(this)(true)} >Yes</a>
     
-    dumpalexa() {
-        fetch('/api/dumpalexa', {});
-    };
     refreshindexes() {
         fetch('/api/indexes?rand='+Math.random(), {});
     };
     
     render() { //req,vars/
+		let that= this;
         let oauth=localStorage.getItem('oauth');
         let authRequest = localStorage.getItem('oauth_request');
         //console.log([authRequest,this.props.token,this.props.user]);
@@ -337,42 +317,36 @@ export default class ProfilePage extends Component {
             );
         } else {
             if (this.props.user && this.props.user._id && this.props.user._id.length > 0) {
-                
-                return (
-                <form method="POST" onSubmit={this.saveUser} className="form-group" autoComplete="false" >
-                        <div style={{position: 'fixed', top: '60', right: '0', zIndex:999}} >
-                                  <a  href='#topics'  className='btn btn-info'>Topics</a>
-                                  <a  href='#progress'  className='btn btn-info'>Progress</a>
-                                  <a  href='#activity'  className='btn btn-info'>Activity</a>
-                                  <a  href='#edit'  className='btn btn-info'>Edit</a>
-                                  <a  href='#leaderboard'  className='btn btn-info'>Leaders</a>
-                                  <a  href='#' onClick={() => this.props.logout()} className='btn btn-info btn-danger' >
-                                   Logout
-                                  </a>
-                                  {this.props.isAdmin() && 
-                                  <span><a  href='#' onClick={() => this.clickImport()} className='btn btn-info btn-warning' >
-                                   Import
-                                  </a>
-                                  <a  href='#' onClick={() => this.dumpalexa.bind(this)()} className='btn btn-info btn-warning' >
-                                   Train
-                                  </a>
-                                  
-                                  </span>
-                                  }
-                                  <span className="dcol-4">
-                                    <Link className="btn btn-success"  to="/create">{createIcon} <span  className="dd-none d-sm-inline">Create</span></Link>
-                                  </span>
-                                
-                                  
-                                 
-                                 
-                                  
-                        </div>
+                let buttonStyle={margin:'0.3em',padding:'1em'}
+                return (<div>
+					    {!this.state.showTopButtons &&  <div style={{position: 'fixed', top: '100', right: '0', zIndex:999}} ><button className='btn btn-info' onClick={this.showTopButtons}>...</button></div>}
+                        {this.state.showTopButtons &&  <div className='modaldialog'  >
+							<div className="modaldialog-content">
+							  <div className="modaldialog-header">
+								<span onClick={this.hideTopButtons} className="modaldialog-close">&times;</span>
+								<h2>Profile Navigation</h2>
+							  </div>
+							  
+							  <div className="modaldialog-body" onClick={this.hideTopButtons} >
+								  <a  href='#topics' style={buttonStyle} className='btn btn-info' onClick={this.hideTopButtons}>Topics</a>
+								  <a  href='#progress'  style={buttonStyle}  className='btn btn-info' onClick={this.hideTopButtons} >Progress</a>
+								  <a  href='#activity'  className='btn btn-info' style={buttonStyle}  onClick={this.hideTopButtons} >Activity</a>
+								  <a  href='#leaderboard'  style={buttonStyle}  className='btn btn-info' onClick={this.hideTopButtons} >Leaders</a>
+								  <div style={{width:'100%',clear:'both'}}></div>
+								  
+								  <a  href='#edit'  style={buttonStyle}  className='btn btn-info' onClick={this.hideTopButtons} >Settings</a>
+								 
+								  
+
+							  </div>
+							  <div className="modaldialog-footer">
+								<hr style={{height:'2px'}}/>
+							  </div>
+							</div>
+						</div>}
                         <div className="row">
                             <div className='col-12 awards'>
-                            <br/><br/>
-                            <br/><br/>
-                                <span>{this.state.streak_award}</span>
+                                  <span>{this.state.streak_award}</span>
                                 <span>{this.state.questions_award}</span>
                                 <span>{this.state.topics_award}</span>
                                 <span>{this.state.recall_award}</span>
@@ -399,24 +373,34 @@ export default class ProfilePage extends Component {
                             </div>
                             
                             <div className="col-12">
-                                  <h3  className="card-title">Profile</h3>
+                             <form method="POST" onSubmit={this.saveUser} className="form-group" autoComplete="false" >
+								<h3 id="settings" className="card-title">Settings</h3>
                                 <div className='col-12 warning-message'>{this.state.warning_message}</div>
                             
                                   <a id="edit"></a>
                                    <label htmlFor="name" className='row'>Name </label><input autoComplete="falsename" id="name" type='text' name='name' onChange={this.change} value={this.state.user.name} />
                                     <label htmlFor="avatar" className='row'>Avatar </label><input autoComplete="falseavatar" id="avatar" type='text' name='avatar' onChange={this.change} value={this.state.user.avatar} />
                                 
-                                    <label htmlFor="username" className='row'>Email </label><input autoComplete="falseusername" id="username" readOnly="true" type='email' name='username' onChange={this.change} value={this.state.user.username}  />
+                                    <label htmlFor="username" className='row'>Email </label><input autoComplete="falseusername" id="username"  type='email' name='username' onChange={this.change} value={this.state.user.username}  />
                                     <label htmlFor="password" className='row'>Password</label> <input  autoComplete="falsepassword" id="password" type='password' name='fake_password' onChange={this.change}  value={this.state.user.password}  />
                                     <label htmlFor="password2" className='row'>Repeat Password</label><input  autoComplete="falsepassword2" id="password2" type='password' name='fake_password2' onChange={this.change} value={this.state.user.password2} />
                                     <input id="id" type='hidden' name='_id' value={this.state.user._id} />
+                                    
+                                    <label htmlFor="avatar" className='row'>Email Me </label><select autoComplete="email_me" id="email_me" type='text' name='email_me' onChange={this.change} value={this.state.user.email_me} >
+										<option value="" >Newsletters AND Replies to my comments</option>
+										<option value="comments" >Replies to my comments</option>
+										<option value="none" >Never</option>
+									</select>
+										
                                     <br/>
                                     <br/>
                                     <button  className='btn btn-info'>Save</button>
+								</form>
                             </div>
                         <br/>
                     </div>
-                    </form>
+                    
+                    </div>
                 )
             } else {
                 return <Redirect to="/login" />

@@ -4,6 +4,7 @@ docker-images
 package-lock.json
 client/public/dev
 client/public/cache
+client/node_modules
 # dependencies
 node_modules
 # testing
@@ -24,3 +25,4 @@ yarn-error.log*
 /old
 /config*
 /docker-compose.yml
+node_modules

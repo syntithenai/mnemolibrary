@@ -464,7 +464,7 @@ initdb().then(function() {
 
 
 	router.post('/discover', (req, res) => {
-	  // console.log(['discover',req.body]);
+	   console.log(['discover',req.body]);
 		let orderBy = req.body.orderBy ? req.body.orderBy : 'successRate';
 		let sortFilter={};
 		let limit = req.body.limit ? req.body.limit : 5;
@@ -484,7 +484,7 @@ initdb().then(function() {
 			}
 			
 			
-		  //  console.log(['disco criteria',JSON.stringify(criteria)]);
+		    console.log(['disco criteria',JSON.stringify(criteria)]);
 			db().collection('questions').find({$and:criteria})
 			//db().collection('questions').aggregate({$match:{$nin:notThese}})
 			.sort(sortFilter).limit(limit).toArray().then(function( questions) {
@@ -509,6 +509,7 @@ initdb().then(function() {
 		};
 		 // block selected question for specific lookup as second query
 		 if (req.body.selectedQuestion && req.body.selectedQuestion.length > 0) {
+			 console.log(['DISCOVER NOT SELECTED QUESTION',req.body.selectedQuestion])
 			 criteria.push({_id:{$ne:ObjectId(req.body.selectedQuestion)}});
 		 }
 		
@@ -648,11 +649,18 @@ initdb().then(function() {
 		 //} else {
 			let oneHourBack = new Date().getTime() - 3600000;
 			let oneDayBack = new Date().getTime() - 86400000;
+			let oneWeekBack = new Date().getTime() - 86400000 * 7;
+			let twoWeeksBack = new Date().getTime() - 86400000 * 14;
+			let oneMonthBack = new Date().getTime() - 86400000 * 31;
+			
 			//criteria.push({seen:{$lt:oneHourBack}});   
 			criteria.push({$or:[
 				 {$and:[{seen:{$lt:oneHourBack}},{successTally:{$eq:1}}]},
 				 {$and:[{seen:{$lt:oneHourBack}},{successTally:{$eq:2}}]},
 				 {$and:[{seen:{$lt:oneDayBack}},{successTally:{$gt:2}}]},
+				 {$and:[{seen:{$lt:oneWeekBack}},{successTally:{$gt:3}}]},
+				 {$and:[{seen:{$lt:twoWeeksBack}},{successTally:{$gt:4}}]},
+				 {$and:[{seen:{$lt:oneMonthBack}},{successTally:{$gt:5}}]},
 				 {successTally:{$not:{$gt:0}}}
 			]});    
 		 //}
@@ -796,7 +804,7 @@ initdb().then(function() {
 	router.get('/questions', (req, res) => {
 		//console.log('search questions');
 		//console.log(req.query);
-		let limit = 10;
+		let limit = 100;
 		let skip = 0;
 		if (req.query.limit && parseInt(req.query.limit,10) != NaN) {
 			limit = parseInt(req.query.limit,10);
@@ -1347,19 +1355,19 @@ initdb().then(function() {
 	})
 
 	router.post('/savewikidata', (req, res) => {
-		//console.log(['SAVEWIKIDATA',req.body]);
+		console.log(['SAVEWIKIDATA',req.body]);
 		let body = req.body; //JSON.parse(req.body)
 	 //   //console.log(['seen',req.body]);
 		if (body._id && body._id.length > 0) {//   && req.body.technique  && req.body.questionText ) {
-		  //  console.log('HAVE ID');
+		    console.log('HAVE ID');
 			if ((body.answer && body.answer.length > 0) || (body.image && body.image.length > 0)) {
-			   // console.log('HAVE DATA');
+			    console.log('HAVE DATA');
 				let toSave={}
 				if (body.answer && body.answer.length > 0) toSave.answer = body.answer;
 				if (body.image && body.image.length > 0) toSave.image = body.image;
-			   // console.log(['SAVEWIKIDATA real',toSave]);
+			    console.log(['SAVEWIKIDATA real',toSave]);
 				db().collection('questions').update({_id:ObjectId(body._id)},{$set:toSave}).then(function(updated) {
-				  //  res.send(['updated',updated]);
+				    res.send(['updated',updated]);
 				}).catch(function(e) {
 					res.send('error on update');
 				});            

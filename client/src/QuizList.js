@@ -108,7 +108,7 @@ export default class QuizList extends Component {
 				  <Link to={linkTo}   >
 					<span>{title}</span>
 				  </Link>
-				  {missingCount > 0 && this.props.isLoggedIn && this.props.isLoggedIn() && <a href={"/missing/"+quiz} className='btn btn-success' style={{float:'right'}}  ><FaChild size="22" /> {missingCount}</a>}
+				  {missingCount > 0 && this.props.isLoggedIn && this.props.isLoggedIn() && <Link to={"/missing/"+quiz} className='btn btn-success' style={{float:'right'}}  ><FaChild size="22" /> {missingCount}</Link>}
               
 				  <div>{this.state.description[quiz]}</div>
               </span>);

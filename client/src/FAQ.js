@@ -57,6 +57,9 @@ export default class FAQ extends Component {
 
 <p><span>No, we are not selling data (see terms of use). We might put some&nbsp;up some ads or&nbsp;charge for some 'premium' features to cover our costs. Otherwise, we have&nbsp;no commercial or ideological agenda other than wanting to&nbsp;make something that is useful to people and that makes knowledge more accessible as the inherently valuable heritage of&nbsp;the world.</span></p>
 
+<p><strong>Who created the website icons? </strong></p>
+<p>We have used the <a target="_new" href='https://fontawesome.com/license' >Creative Commons Licenced</a> Font Awesome library.</p>
+
 <p><strong>Why should I help create mnemonics?</strong></p>
 
 <p><span>There are a few good reasons to join us. Like a mini blog entry, you can curate content that you think is important or valuable and worthy of sharing, including your own work as a journalist, academic, or artist. And extracting key points of encyclopedic, news, or academic articles focuses your reading. You will also find that the challenge of making mnemonic puns and rhymes is fun and addictive. Finally, you earn gratitude and respect on this site, which will be conveyed through badges, rankings, statistics etc.</span></p>

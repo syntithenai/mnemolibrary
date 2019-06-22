@@ -128,39 +128,41 @@ let utilFunctions =  {
         ////console.log(json);
         let questions = [];
         for (var questionKey in json['questions']) {
-            ////console.log('index q '+questionKey);
-            const question = json['questions'][questionKey]
-           // //console.log(question);
-            //question.tags = question.tags ? question.tags.trim().toLowerCase() : '';
-            var id = question._id ? question._id :  new ObjectId();
-            question._id = id;
-            
-            var tagList = [];
-            if (question.tags) {
-                let splitList = question.tags.trim().toLowerCase().split(",");
-                splitList.forEach(function(tag) {
-                    tagList.push(tag.trim());
-                });
-                question.tags = tagList;
-            }
-            // //console.log(question.tags);
-            ////console.log(question.access);
-            // only generate tags for public questions    
-            if (question.access==="public") {
-              //  //console.log('public');
-                for (var tagKey in tagList) {
-            //        //console.log(tagList[tagKey]);
-                  //  //console.log(['taglist each',tagKey,tagList[tagKey]]);
-                    var tag = tagList[tagKey].trim().toLowerCase();
-          //          //console.log(tag);
-                    if (tag.length > 0) {
-                        if (! (Array.isArray(tags[tag]))) {
-                            tags[tag] = 1
-                        }
-                    }
-                }
-            }
-            questions.push(question);
+				////console.log('index q '+questionKey);
+			const question = json['questions'][questionKey]
+			if (question && question.question && question.question.length > 0) {
+			   // //console.log(question);
+				//question.tags = question.tags ? question.tags.trim().toLowerCase() : '';
+				var id = question._id ? question._id :  new ObjectId();
+				question._id = id;
+				
+				var tagList = [];
+				if (question.tags) {
+					let splitList = question.tags.trim().toLowerCase().split(",");
+					splitList.forEach(function(tag) {
+						tagList.push(tag.trim());
+					});
+					question.tags = tagList;
+				}
+				// //console.log(question.tags);
+				////console.log(question.access);
+				// only generate tags for public questions    
+				if (question.access==="public") {
+				  //  //console.log('public');
+					for (var tagKey in tagList) {
+				//        //console.log(tagList[tagKey]);
+					  //  //console.log(['taglist each',tagKey,tagList[tagKey]]);
+						var tag = tagList[tagKey].trim().toLowerCase();
+			  //          //console.log(tag);
+						if (tag.length > 0) {
+							if (! (Array.isArray(tags[tag]))) {
+								tags[tag] = 1
+							}
+						}
+					}
+				}
+				questions.push(question);
+			}
         }
         ////console.log('CREATED IINDEX');
         ////console.log(tags);

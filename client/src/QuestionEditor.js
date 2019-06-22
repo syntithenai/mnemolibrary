@@ -23,6 +23,10 @@ import Google from 'react-icons/lib/fa/google';
 import Camera from 'react-icons/lib/fa/camera';
 import ShareAlt from 'react-icons/lib/fa/share-alt';
 import Toggle from 'react-bootstrap-toggle';
+import ShareDialog from './ShareDialog';
+
+        
+   
 
 export default class QuestionEditor extends Component {
     constructor(props) {
@@ -57,6 +61,7 @@ export default class QuestionEditor extends Component {
         };
        // this.saveQuestion = this.saveQuestion.bind(this);
         this.change = this.change.bind(this);
+        this.setShareDialog = this.setShareDialog.bind(this);
         this.changeInterrogative = this.changeInterrogative.bind(this);
         this.handleDeleteTag = this.handleDeleteTag.bind(this);
         this.handleAddTag = this.handleAddTag.bind(this);
@@ -123,6 +128,10 @@ export default class QuestionEditor extends Component {
             
     }
    
+	
+	setShareDialog(val) {
+		this.setState({showShareDialog:val});
+	}
    
    updateQuestionTag(tags) {
        ////console.log(['updateQuestionTag',tags]);
@@ -408,10 +417,18 @@ export default class QuestionEditor extends Component {
           let techniques = this.props.mnemonic_techniques.map((technique, key) => {
                 return <option  key={key} value={technique}  >{technique}</option>
             })
+            let question = this.props.question;
+            
+             let shareTitle="Mnemo's Library -"+(this.props.question.mnemonic ? this.props.question.mnemonic : '') + " - \n" + question.interrogative+ ' ' +question.question + '?';
+			//let longTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + '?' ;
+			//let twitterTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question  + "?\n" + question.link;
+			let shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+encodeURIComponent(question.quiz)+"/"+question._id;    
+			
             return (
             
             // TAGS https://www.npmjs.com/package/react-tag-autocomplete
                 <div className="questionform card">
+					{this.state.showShareDialog && <ShareDialog setShareDialog={this.setShareDialog} url={shareLink} title={shareTitle} dialogTitle={'Share Question using'} />}
                     <div className="" >
                         <div className='warning-message'>{this.state.warning_message}</div>
                         {<button  className='btn btn-danger' style={{float:'right'}} onClick={() => this.deleteQuestion(this.props.currentQuestion)} ><Trash size={28}/>&nbsp;<span className="d-none d-sm-inline" >Delete</span> </button>}
@@ -419,7 +436,9 @@ export default class QuestionEditor extends Component {
                          <button  className='btn btn-info' style={{float:'right'}}  onClick={()=>this.props.showSearch(this.props.question.question)} > <WikipediaW size={28} /><span className="d-none d-sm-inline" >Wikipedia</span></button>  
                          <a  style={{float:'right'}}  href={'https://www.google.com.au/search?q='+this.props.question.question} target="_new"  className='btn btn-info'   ><Google size={28} /><span className="d-none d-sm-inline" >Google</span></a>
                          { String(this.props._id).length > 0 && this.props.questions.length >0 && <button  className='btn btn-warning'  style={{float:'right'}}  onClick={() => this.props.previewTopic(this.props._id,this.props.currentQuestion)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
-                        {this.props.published===true && this.props.question.isPreview !==true &&  <button style={{float:'right'}}  data-toggle="modal" data-target="#sharetopicdialog" className='btn btn-primary' onClick={(e) => this.props.shareQuestion(this.props.question)}  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>}
+                        
+                        {this.props.published===true && this.props.question.isPreview !==true &&  <button style={{float:'right'}} onClick={(e) => this.setShareDialog(true)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>}
+							
                               
                         <br/><br/><div className='form-inline'>
                             <label htmlFor="interrogative">Interrogative </label>
@@ -473,7 +492,8 @@ export default class QuestionEditor extends Component {
                             <label htmlFor="specific_question" >Specific Question </label><textarea autoComplete="false" id="specific_question" type='text' name='specific_question' onChange={this.change} value={this.props.question.specific_question} className='form-control' ></textarea>
                             <label htmlFor="specific_answer" >Specific Answer </label><textarea autoComplete="false" id="specific_answer" type='text' name='specific_answer' onChange={this.change} value={this.props.question.specific_answer} className='form-control' ></textarea>
                             <label htmlFor="also_accept" >Also Accept </label><textarea autoComplete="false" id="also_accept" type='text' name='also_accept' onChange={this.change} value={this.props.question.also_accept} className='form-control' ></textarea>
-                            <label htmlFor="multiple_choice" >Multiple Choices </label><textarea autoComplete="false" id="multiple_choice" type='text' name='multiple_choice' onChange={this.change} value={this.props.question.multiple_choice} className='form-control' ></textarea>
+                            <label htmlFor="multiple_choices" >Incorrect Multiple Choices (split by |||)</label><textarea autoComplete="false" id="multiple_choices" type='text' name='multiple_choices' onChange={this.change} value={this.props.question.multiple_choices} className='form-control' ></textarea>
+                             <label htmlFor="feedback" >Multiple Choice Feedback </label><textarea autoComplete="false" id="feedback" type='text' name='feedback' onChange={this.change} value={this.props.question.feedback} className='form-control' ></textarea>
                         </div>}
                         
                         

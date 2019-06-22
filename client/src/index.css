@@ -23,6 +23,12 @@ kanji {
   letter-spacing: 0.3em;
   
 }
+.btn {
+box-shadow: 2px 2px 2px grey;
+}
+#recentcomments .commentsubheader {
+  font-size: 1.4em;
+}
 .media-preview label,.media-preview input {
     display: inline;
 }
@@ -399,7 +405,7 @@ h4.graphTitle::before {
 
 /* The Modal (background) */
 .modaldialog {
-  display: none; /* none Hidden by default */
+  display: block; /* none Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 100000; /* Sit on top */
   left: 0;

@@ -26,6 +26,7 @@ export default  class TopicPassword extends Component {
 			that.setState({'exitRedirect':'/discover/topic/'+that.props.match.params.topic+(that.props.match.params.topicquestion ? '/'+that.props.match.params.topicquestion : '')})
 		}
     }
+    
     componentDidUpdate() {
 		let that = this;
 		 console.log(['topic pw DID update',that.props.match.params.topic,that.props.user])
@@ -35,6 +36,7 @@ export default  class TopicPassword extends Component {
 			that.setState({'exitRedirect':'/discover/topic/'+that.props.match.params.topic+(that.props.match.params.topicquestion ? '/'+that.props.match.params.topicquestion : '')})
 		}
     }
+    
     continueToTopic(e) {
 		let that = this;
 		if (e) e.preventDefault();
@@ -119,7 +121,7 @@ console.log(result);
 			</form>
 		   }
 		} else {
-			return <a href="/login" className="btn btn-primary">Please login</a>
+			return <Link to="/login" className="btn btn-primary">Please login</Link>
 		}
     };
 }

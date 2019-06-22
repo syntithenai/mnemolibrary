@@ -424,7 +424,7 @@ function initRoutes(router,db) {
 			res.send('Invalid import sheet '+importId);
 			return;
 		}
-		//console.log(['IMPORT URL',url]);
+		console.log(['IMPORT URL',url]);
 		// load mnemonics and collate tags, topics
 		var request = get(url, function(err,response) {
 			if (err) {
@@ -446,11 +446,11 @@ function initRoutes(router,db) {
 					let json = utils.createIndexes(toImport);
 					let mcQuestions=[];
 					let recordIndex={};
-					//console.log('got indexes');
+					console.log('got indexes',json.questions.length);
 					// iterate questions collecting promises and insert/update as required
 					let promises=[];
 					for (var a in json.questions) {
-					 //console.log([a]); //,json[collection][a]]);
+					 //console.log([a,json.questions[a]]); //,json[collection][a]]);
 						// must have topic and question
 						if (json.questions[a] && json.questions[a].question && json.questions[a].question.length > 0 && json.questions[a].quiz && json.questions[a].quiz.length > 0) {
 							let record =  json.questions[a];
@@ -461,6 +461,19 @@ function initRoutes(router,db) {
 								record.ok_for_alexa=true
 							}
 							record.importId = importId;
+							//console.log(['import ',record]);
+							//// dont' slam (wiki) answer/image with blank answer/image from import
+							if (record.answer && record.answer.length > 0) {
+								
+							} else {
+								record.answer = null;
+							}
+							if (record.image && record.image.length > 0) {
+								
+							} else {
+								record.image = null;
+							}
+							//console.log(['import1 ',record]);
 							
 							//record.answer = record.answer.replace('""','"');
 							//record.answer = record.answer.replace('""','"');
@@ -509,7 +522,9 @@ function initRoutes(router,db) {
 											&& record.multiple_choices && record.multiple_choices.length > 0
 										) {
 											let newQuestion ={_id:record.mcQuestionId ? ObjectId(record.mcQuestionId) : ObjectId(),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,questionId:ObjectId(record._id),feedback:record.feedback,importId:'QQ-'+importId,user:'default'}
-											if (record.autoshow_image==="YES") newQuestion.image = record.image;
+											if (record.autoshow_image==="YES" && record.image) newQuestion.image = record.image;
+											if (record.autoplay_media==="YES" && record.media) newQuestion.media = record.media;
+											
 											mcQuestions.push(newQuestion)
 										}
 										//console.log(['SAVED QUESTION'])
@@ -535,7 +550,8 @@ function initRoutes(router,db) {
 						}
 					}
 					Promise.all(promises).then(function(ids) {
-						
+						console.log(['import  all promises',ids]);
+							
 						
 						let mcPromises = [];
 						// update MC questions
@@ -574,12 +590,12 @@ function initRoutes(router,db) {
 						
 						Promise.all(mcPromises).then(function(toDump) {
 							//cleanup
-							//console.log(['MC TODUMPE',toDump])
+							//nsole.log(['MC TODUMPE',toDump])
 								
 							let ids=[];
 							let final=[];
-							console.log(['TODUMPE v',Object.keys(recordIndex)])
-							console.log(['TODUMPE mc',JSON.stringify(toDump)])
+							//console.log(['TODUMPE v',Object.keys(recordIndex)])
+							console.log(['TODUMPE mc']); //,JSON.stringify(toDump)])
 									
 							toDump.map(function(val) {
 								if (val) {
@@ -612,7 +628,7 @@ function initRoutes(router,db) {
 						
 						
 					
-						//console.log(['IMPORT ALL DONE now MNEMONICS ',ids,mnemonics]);
+						console.log(['IMPORT ALL DONE now MNEMONICS ',ids]); //,mnemonics
 					   // clear default user mnemonics
 						db().collection('mnemonics').remove({$and:[{user:'default'},{importId:importId}]}).then(function(dresults) {
 					   // bulk save mnemonics 
@@ -724,7 +740,8 @@ function initRoutes(router,db) {
 									&& mcQuestion.specific_answer && mcQuestion.specific_answer.length > 0
 									&& mcQuestion.multiple_choices && mcQuestion.multiple_choices.length > 0
 								) {
-									toSave.push({_id:ObjectId(mcQuestion._id),topic:mcQuestion.topic,question:mcQuestion.specific_question,answer:mcQuestion.specific_answer,multiple_choices:mcQuestion.multiple_choices,questionId:ObjectId(mcQuestion.questionId),feedback:mcQuestion.feedback,importId:'MC-'+importId,user:'default',image:mcQuestion.image})
+									toSave.push({_id:ObjectId(mcQuestion._id),topic:mcQuestion.topic,question:mcQuestion.specific_question,answer:mcQuestion.specific_answer,multiple_choices:mcQuestion.multiple_choices,questionId:ObjectId(mcQuestion.questionId),feedback:mcQuestion.feedback,importId:'MC-'+importId,user:'default',image:mcQuestion.image,media:mcQuestion.media})
+										
 								}
 							}
 						});

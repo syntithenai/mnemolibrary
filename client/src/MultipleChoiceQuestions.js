@@ -1,6 +1,6 @@
 /* eslint-disable */ 
 import React, { Component } from 'react';
-//import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
+	import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 
 import 'whatwg-fetch'
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -11,8 +11,13 @@ import NextIcon from 'react-icons/lib/fa/arrow-right';
 import ShareIcon from 'react-icons/lib/fa/share-alt';
 import CompleteIcon from 'react-icons/lib/fa/check';
 //import MoreInfoIcon from 'react-icons/lib/fa/external-link-alt';
+import ShareDialog from './ShareDialog';
 
 let resetIcon = <svg style={{marginTop:'0.2em',height:'1.1em'}} role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256.455 8c66.269.119 126.437 26.233 170.859 68.685l35.715-35.715C478.149 25.851 504 36.559 504 57.941V192c0 13.255-10.745 24-24 24H345.941c-21.382 0-32.09-25.851-16.971-40.971l41.75-41.75c-30.864-28.899-70.801-44.907-113.23-45.273-92.398-.798-170.283 73.977-169.484 169.442C88.764 348.009 162.184 424 256 424c41.127 0 79.997-14.678 110.629-41.556 4.743-4.161 11.906-3.908 16.368.553l39.662 39.662c4.872 4.872 4.631 12.815-.482 17.433C378.202 479.813 319.926 504 256 504 119.034 504 8.001 392.967 8 256.002 7.999 119.193 119.646 7.755 256.455 8z"></path></svg>
+
+
+const reviewIcon = 
+<svg style={{height:'1.2em'}}  role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M336 448H16c-8.84 0-16 7.16-16 16v32c0 8.84 7.16 16 16 16h320c8.84 0 16-7.16 16-16v-32c0-8.84-7.16-16-16-16zm208-320V80c0-8.84-7.16-16-16-16s-16 7.16-16 16v48h-32V80c0-8.84-7.16-16-16-16s-16 7.16-16 16v48h-16c-8.84 0-16 7.16-16 16v32c0 35.76 23.62 65.69 56 75.93v118.49c0 13.95-9.5 26.92-23.26 29.19C431.22 402.5 416 388.99 416 372v-28c0-48.6-39.4-88-88-88h-8V64c0-35.35-28.65-64-64-64H96C60.65 0 32 28.65 32 64v352h288V304h8c22.09 0 40 17.91 40 40v24.61c0 39.67 28.92 75.16 68.41 79.01C481.71 452.05 520 416.41 520 372V251.93c32.38-10.24 56-40.17 56-75.93v-32c0-8.84-7.16-16-16-16h-16zm-283.91 47.76l-93.7 139c-2.2 3.33-6.21 5.24-10.39 5.24-7.67 0-13.47-6.28-11.67-12.92L167.35 224H108c-7.25 0-12.85-5.59-11.89-11.89l16-107C112.9 99.9 117.98 96 124 96h68c7.88 0 13.62 6.54 11.6 13.21L192 160h57.7c9.24 0 15.01 8.78 10.39 15.76z"></path></svg>
 
 
 let moreInfoIcon = <svg style={{marginTop:'0.2em',height:'1.1em'}} role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M576 24v127.984c0 21.461-25.96 31.98-40.971 16.971l-35.707-35.709-243.523 243.523c-9.373 9.373-24.568 9.373-33.941 0l-22.627-22.627c-9.373-9.373-9.373-24.569 0-33.941L442.756 76.676l-35.703-35.705C391.982 25.9 402.656 0 424.024 0H552c13.255 0 24 10.745 24 24zM407.029 270.794l-16 16A23.999 23.999 0 0 0 384 303.765V448H64V128h264a24.003 24.003 0 0 0 16.97-7.029l16-16C376.089 89.851 365.381 64 344 64H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V287.764c0-21.382-25.852-32.09-40.971-16.97z"></path></svg>
@@ -42,7 +47,9 @@ export default class MultipleChoiceQuestions extends Component {
 		super(props);
 		this.state={
 			questions : [],
-			currentQuestion : null
+			currentQuestion : null,
+			showShareDialog : false,
+			showQuizOptionsDialog: false,
 		}
 		this.questionsIndex = {};
 		this.scrollTo={};
@@ -52,8 +59,11 @@ export default class MultipleChoiceQuestions extends Component {
 		this.loadQuestions = this.loadQuestions.bind(this)
 		this.nextQuestion = this.nextQuestion.bind(this)
 		this.setCurrentQuestion = this.setCurrentQuestion.bind(this)
-		
-    };
+		this.setShareDialog = this.setShareDialog.bind(this)
+		this.showQuizOptionsDialog = this.showQuizOptionsDialog.bind(this)
+		this.hideQuizOptionsDialog = this.hideQuizOptionsDialog.bind(this)
+		this.sendAllQuestionsForReview = this.sendAllQuestionsForReview.bind(this)
+	};
     
     componentDidMount() {
       let that=this;
@@ -65,7 +75,7 @@ export default class MultipleChoiceQuestions extends Component {
     };
     
     componentDidUpdate(props,state) {
-		console.log(['MCQ update',this.props.user,props.user])
+		console.log(['MCQ update',this.props.user,props.user,state.currentQuestion ,this.state.currentQuestion])
         if ((this.props.question !== props.question) || (this.props.topic !== props.topic)) {
 			this.loadQuestions()
 		}
@@ -73,10 +83,15 @@ export default class MultipleChoiceQuestions extends Component {
 			this.nextQuestion()
 		}
 		if (state.currentQuestion != this.state.currentQuestion) {
+			console.log(['scroll to','question_'+this.state.currentQuestion,this.scrollTo['question_'+this.state.currentQuestion]])
 			scrollToComponent(this.scrollTo['question_'+this.state.currentQuestion],{align:'top',offset:-180});
 		}
 	}
     
+    setShareDialog(val) {
+		this.setState({showShareDialog:val});
+	}
+	
     
     loadQuestions() {
 		let that = this;
@@ -207,50 +222,65 @@ export default class MultipleChoiceQuestions extends Component {
 		this.setState({currentQuestion : key})
 	}
     
+    showQuizOptionsDialog() {
+		this.setState({showQuizOptionsDialog:true})
+	}
+    
+    hideQuizOptionsDialog() {
+		this.setState({showQuizOptionsDialog:false})
+	}
+    
     clickAnswer(id,answer) {
-		let that = this;
-		console.log('answered '+answer +'||' + id)
-		var params={
-            '_id':id,
-            'user':this.props.user ? this.props.user._id : null,
-            'answer':answer,
-          };
-        fetch('/api/submitmcquestion', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
-        }).then(function(response) {
-            return response.json();
-            
-        }).then(function(res) {
-			console.log(['ANSWERdd RESPONSE',id,that.questionsIndex[id],that.questionsIndex])
-				let questionKey = that.questionsIndex && that.questionsIndex.hasOwnProperty(id) ? that.questionsIndex[id] : null;
-				console.log(['Q KEY',questionKey]);
-				if (questionKey !== null) {
-					let questions = that.state.questions;
-					let question = questions && questions.hasOwnProperty(questionKey) ? questions[questionKey] : null;
-					console.log(['have key',questionKey])
-					if (question) {
-					console.log(['have question',question])
-						// update question with stats
-						if (res.error) {
-							question.error = res.error;
-						} else {
-							question.error = '';
-							question.seenBy = typeof question.seenBy === 'object' ? question.seenBy : {};
-							question.seenBy[that.props.user ? that.props.user._id : 'unknownuser'] = answer;
-							question.seen = res.seen;
-							question.overallPercentCorrect = res.overallPercentCorrect;
-						}
-						
-						questions[questionKey] = question;
-						console.log(['SET MC STATE',question,questions])
-						that.setState({questions: questions});
+		//if (that.props.viewOnly) {
+			let that = this;
+			console.log('answered '+answer +'||' + id)
+			var params={
+				'_id':id,
+				'user':this.props.user ? this.props.user._id : null,
+				'answer':answer,
+			  };
+			fetch('/api/submitmcquestion', {
+			  method: 'POST',
+			  headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+			  },
+			  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+			}).then(function(response) {
+				return response.json();
+				
+			}).then(function(res) {
+				console.log(['ANSWERdd RESPONSE',id,that.questionsIndex[id],that.questionsIndex])
+					let questionKey = that.questionsIndex && that.questionsIndex.hasOwnProperty(id) ? that.questionsIndex[id] : null;
+					console.log(['Q KEY',questionKey]);
+					if (questionKey !== null) {
+						let questions = that.state.questions;
+						let question = questions && questions.hasOwnProperty(questionKey) ? questions[questionKey] : null;
+						console.log(['have key',questionKey])
+						if (question) {
+						console.log(['have question',question])
+							// update question with stats
+							if (res.error) {
+								question.error = res.error;
+							} else {
+								question.error = '';
+								question.seenBy = typeof question.seenBy === 'object' ? question.seenBy : {};
+								question.seenBy[that.props.user ? that.props.user._id : 'unknownuser'] = answer;
+								question.seen = res.seen;
+								question.overallPercentCorrect = res.overallPercentCorrect;
+							}
+							
+							questions[questionKey] = question;
+							console.log(['SET MC STATE',question,questions])
+							that.setState({questions: questions});
+						} 
 					} 
-				} 
-		});
+			});
+		//}
+	}
+	
+	sendAllQuestionsForReview(questions) {
+		this.nextQuestion();
+		this.props.sendAllQuestionsForReview(questions) //[{_id:question.questionId}]
 	}
     
     render() { 
@@ -274,52 +304,83 @@ export default class MultipleChoiceQuestions extends Component {
 							userAnsweredTally++;
 							if (userAnswerCorrect) userCorrectTally++;
 						}
+						let tagsRendered = null;
+						if (question.relatedQuestion && question.relatedQuestion.tags && question.relatedQuestion.tags.length > 0 ) {
+							tagsRendered = question.relatedQuestion.tags.map(function(tag,key) {
+								let linkTo="/discover/tag/"+tag
+								return <Link to={linkTo} className='btn btn-info' key={key} style={{marginRight:'0.8em'}}>{tag}</Link>
+							});
+						}
+
 						
 						let possibleAnswers = question.possibleAnswers;
 						let answerButtons = possibleAnswers.map(function(sampleAnswer,key) {
 							// determine button color from answer status
-							if (answered) {
-								// is this answer the user answer
-								if (sampleAnswer === userAnswer) {
-									if (userAnswerCorrect)  {
-										return <button style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} className='btn btn-success' >{sampleAnswer}</button>
-									} else {
-										return <button key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} className='btn btn-danger' >{sampleAnswer}</button>
-									}
-								// is this button the correct answer
-								} else if (sampleAnswer === question.answer) {
-									return <button style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} className='btn btn-success' >{sampleAnswer}</button>
+							if (that.props.viewOnly) {
+								if (sampleAnswer === question.answer) {
+									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.2em'}} >{sampleAnswer}</div>
 								} else {
-										return <button key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} className='btn btn-primary' >{sampleAnswer}</button>
+									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
 								}
-								
 							} else {
-								return <button key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} className='btn btn-primary' >{sampleAnswer}</button>
+								if (answered) {
+									// is this answer the user answer
+									if (sampleAnswer === userAnswer) {
+										if (userAnswerCorrect)  {
+											return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+										} else {
+											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#dc3545', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+										}
+									// is this button the correct answer
+									} else if (sampleAnswer === question.answer) {
+										return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green', d:'#28a745', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+									} else {
+											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+									}
+									
+								} else {
+									return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)}  style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+								}
 							}
 						})
 						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
 						
-						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}  onClick={(e) => that.setCurrentQuestion(questionKey)} key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black'}} > 
+						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}  donClick={(e) => that.setCurrentQuestion(questionKey)} key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black', marginBottom: '1em'}} > 
 						
-						{question.image && question.image.length > 0 && <img src={question.image}  style={{float:'right',width:'200px'}} />}
+						{!that.props.viewOnly && question.image && question.image.length > 0 && <img src={question.image}  style={{float:'right',width:'200px'}} />}
 						
-						{!isQuestionPage && question.questionId && question.topic && <div>
-							<div style={{float:'right'}}><a target='_new' href={moreInfoLink} className='btn btn-info'>{moreInfoIcon} <span className="d-none d-sm-inline" >More Information</span></a></div> 
-						</div> }
 						<b style={{paddingTop: '1em'}}>{question.question}</b>
 						
 						<div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> 
 
-						{answered && <div>
+						{!that.props.viewOnly && answered && <div>
 							You  {userAnswerCorrect?'' : ' incorrectly '} answered {userAnswer}. {!userAnswerCorrect ? ' The correct answer is '+question.answer+".":''}
 						</div>}
-						{answered  && <i style={{paddingTop: '2em'}}>{question.overallPercentCorrect ? question.overallPercentCorrect : 0} percent of {question.seen > 0 ? question.seen : 1} people answered correctly.</i> }
+						{!that.props.viewOnly && answered  && <i style={{paddingTop: '2em'}}>{question.overallPercentCorrect ? question.overallPercentCorrect : 0} percent of {question.seen > 0 ? question.seen : 1} people answered correctly.</i> }
 	
+						<div className='questionbuttons' style={{width:'100%', minHeight: '2em'}} >
+							{!that.props.viewOnly && !isQuestionPage && question.questionId && question.topic && <div>
+								<div style={{float:'right'}}><Link  to={moreInfoLink} className='btn btn-info'>{moreInfoIcon} <span className="d-none d-sm-inline" >More Information</span></Link></div> 
+							</div> }
+							
+								
+							{that.props.user && question.questionId && <button style={{float:'right'}} className='btn btn-success' onClick={(e) => that.sendAllQuestionsForReview([{_id:question.questionId}])} >{reviewIcon} <span className="d-none d-sm-inline" >Add to Review List</span></button>}
+							{!that.props.user && question.questionId && <Link to="/login" style={{float:'right'}} className='btn btn-success'  >{reviewIcon} <span className="d-none d-sm-inline" >Add to Review List</span></Link>}
+
+							
+							{<a style={{float:'right',color:'white'}} onClick={that.nextQuestion} className='btn btn-success' ><NextIcon size={26} /> <span className="d-none d-sm-inline" >Next Question</span></a>}
+									
+						</div>		
+
+						
 						<div style={{ width:'', marginTop: '1em',padding: '0.5em', border: '1px solid black' , backgroundColor:'#eee',borderRadius:'30px',marginRight:'1em'}}>{answerButtons}</div> 
 						<div id={'question_'+questionKey}></div>
 						
-						{answered && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
-						
+						{(that.props.viewOnly || answered) && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
+
+						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em'}}><b>Memory Aid</b> {question.relatedQuestion.mnemonic}</div>}
+					
+						{!that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.tags && question.relatedQuestion.tags.length > 0 && <div id='relatedtags' style={{marginTop:'1em'}}><b>Tags</b> {tagsRendered}</div>}
 						
 						</div>
 					} else {
@@ -327,30 +388,55 @@ export default class MultipleChoiceQuestions extends Component {
 					}
 				})
 			} else {
-				return <b>No quiz questions for this topic</b>
+				return null; //<b>No quiz questions for this topic</b>
 			}
 		} else {
 			questions=<b>Missing required topic</b>
 		}
 		let quizLength = this.state.questions ? this.state.questions.length : 0;
 		let successRate = userAnsweredTally > 0 ? parseInt(userCorrectTally/userAnsweredTally*100,10) : 0;
-		let totalMessage=<span><b>Questions Answered</b> {userAnsweredTally}/{this.state.questions ? this.state.questions.length : 0} <b>Success Rate</b> {successRate}%</span>
+		let totalMessage=<span style={{float:'left'}}><div><b>Questions Answered</b> {userAnsweredTally}/{this.state.questions ? this.state.questions.length : 0}</div><div> <b>Success Rate</b> {successRate}%</div></span>
 		
 		let theStyle={ position:'fixed',width:'100%', backgroundColor:'rgb(240, 249, 150)', border :'2px solid black',padding:'0.2em',top:'6.4em'}
 		if (isQuestionPage) theStyle.marginLeft='-1em';
 		//if (isQuestionPage) offset='16.4em'
 
+
+
 		return (
-		<div  ref={(section) => { that.scrollTo.top = section; }}  className="row card-block" style={{marginBottom:'5em'}}>
+		<div  ref={(section) => { that.scrollTo.top = section; }}  className="row card-block" style={{width:'100%',marginBottom:'5em'}}>
 			  {!isQuestionPage && <div style={theStyle} >
+				
+				{this.state.showQuizOptionsDialog && <div onClick={that.hideQuizOptionsDialog} style={{marginTop:'8em'}} className='modaldialog'  >
+				<div className="modaldialog-content">
+					  <div className="modaldialog-header">
+						<span onClick={this.hideQuizOptionsDialog} className="modaldialog-close">&times;</span>
+						<h2>Quiz Options</h2>
+					  </div>
+					  
+					  <div className="modaldialog-body">
+							<div>
+								<button  onClick={(e) => that.setShareDialog(!that.state.showShareDialog)} className='btn btn-info' ><ShareIcon size={26} /> <span  className="d-none d-sm-inline" >Share Quiz</span></button>
+								<button style={{}} onClick={that.clickResetQuiz} className='btn btn-danger' >{resetIcon} <span className="d-none d-sm-inline" >Reset Answers</span></button>
+								
+							</div>
+					  </div>
+					  <div className="modaldialog-footer">
+						<hr style={{height:'2px'}}/>
+					  </div>
+					</div>
+				</div>}
+				
 				<span>{totalMessage}</span>
-				<button style={{float:'right'}} onClick={that.shareQuiz} className='btn btn-info' ><ShareIcon size={26} /> <span  className="d-none d-sm-inline" >Share Quiz</span></button>
-				<button style={{float:'right'}} onClick={that.clickResetQuiz} className='btn btn-danger' >{resetIcon} <span className="d-none d-sm-inline" >Reset Answers</span></button>
-				{userAnsweredTally < quizLength && <a style={{color:'white',marginRight:'3em',float:'right'}} onClick={that.nextQuestion} className='btn btn-success' ><NextIcon size={26} /> <span className="d-none d-sm-inline" >Next Question</span></a>}
-				{userAnsweredTally === quizLength && <a href="/multiplechoicetopics" style={{marginRight:'3em',float:'right'}} className='btn btn-success' ><CompleteIcon size={26} /> <span className="d-none d-sm-inline" >Quiz Complete</span></a>}
+				
+				{userAnsweredTally === quizLength && <Link to="/multiplechoicetopics" style={{marginRight:'3em',float:'right'}} className='btn btn-success' ><CompleteIcon size={26} /> <span className="d-none d-sm-inline" >Quiz Complete</span></Link>}
+				
+				<button style={{float:'right'}} onClick={this.showQuizOptionsDialog} className='btn btn-info' >...</button>
 			</div>}
+			
 			{questions.length > 0 && <b style={{display:'block',width:'100%'}}>Quiz Questions</b>}
 			<div style={{border: '1px solid black',width:'100%',marginTop:'3.4em'}}>
+			{this.state.showShareDialog && <ShareDialog setShareDialog={this.setShareDialog} dialogTitle={'Share Quiz using'} />}
 			{questions}
 			</div>
 		</div>

@@ -221,6 +221,11 @@ function initRoutes(router,db) {
 								}).catch(function(e) {
 									//console.log({'erri1':e});
 								});
+								db().collection('multiplechoicequestions').remove({userTopic:{$eq:ObjectId(req.body._id)}}).then(function(delresult) {
+								   //updateTags(tags);
+								}).catch(function(e) {
+									//console.log({'erri1':e});
+								});
 						   } 
 					
 					
@@ -278,6 +283,11 @@ function initRoutes(router,db) {
 									}).catch(function(e) {
 										//console.log({'erri1':e});
 									});
+									db().collection('multiplechoicequestions').remove({userTopic:{$eq:ObjectId(req.body._id)}}).then(function(delresult) {
+									   //updateTags(tags);
+									}).catch(function(e) {
+										//console.log({'erri1':e});
+									});
 							   } 
 					
 					
@@ -306,7 +316,8 @@ function initRoutes(router,db) {
 		////console.log(['pub usrtop',req.body]);
 		let preview=req.body.preview;
 		let tags={}
-		let mnemonics=[];                      
+		let mnemonics=[]; 
+		let mcQuestions=[];                     
 		if (req.body._id && req.body._id.length > 0) {
 			db().collection('userTopics').findOne({$and:[{user:ObjectId(req.body.user)},{_id:ObjectId(req.body._id)}]}).then(function(userTopic) {
 				db().collection('users').findOne({_id:ObjectId(userTopic.user)}).then(function(user) {
@@ -323,7 +334,7 @@ function initRoutes(router,db) {
 						if (userTopic.questions && userTopic.questions.length > 0) {
 							userTopic.questions.map(function(questionR,key) {
 								let question = JSON.parse(JSON.stringify(questionR));
-			  //                  //console.log(['PUBLISH',question,key]);
+			                   console.log(['PUBLISH',question,key]);
 								question.sort=key;
 								question.quiz=user.avatar+'\'s '+userTopic.topic;
 								if (question._id) {
@@ -383,6 +394,19 @@ function initRoutes(router,db) {
 									//if (!errors.hasOwnProperty(key)) errors[key]=[];
 									//errors[key].push('answer');
 								//}
+								// related MC question
+								if (question.quiz && question.quiz.length > 0
+									&& question.specific_question && question.specific_question.length > 0
+									&& question.specific_answer && question.specific_answer.length > 0
+									&& question.multiple_choices && question.multiple_choices.length > 0
+								) {
+									console.log(['NEW MC QUESTION']);
+									let newQuestion ={_id:ObjectId(),topic:question.quiz,question:question.specific_question,answer:question.specific_answer,multiple_choices:question.multiple_choices,questionId:ObjectId(question._id),feedback:question.feedback,importId:'USERTOPIC-'+req.body._id,userTopic:ObjectId(req.body._id)}
+									if (question.autoshow_image==="YES" && question.image) newQuestion.image = question.image;
+									if (question.autoplay_media==="YES" && question.media) newQuestion.media = question.media;
+									
+									mcQuestions.push(newQuestion)
+								}
 								newQuestions.push(question);
 								
 							});
@@ -427,7 +451,24 @@ function initRoutes(router,db) {
 									Promise.all(promises).then(function() {
 										updateTags(tags);
 										updateMnemonics(mnemonics);
+										db().collection('multiplechoicequestions').remove({userTopic:{$eq:ObjectId(req.body._id)}}).then(function(delresult) {
+											console.log(['INSERT MC QUESTIONS',mcQuestions])
+										    if (mcQuestions && mcQuestions.length > 0) {
+												try {
+													db().collection('multiplechoicequestions').insertMany(mcQuestions).then(function(ires) {
+														console.log(['INSERTed MC QUESTIONS',ires])
+												
+													})
+												} catch(e) {
+													console.log(['failed saved mc q',e]);
+												};
+											}
+										}).catch(function(e) {
+											console.log({'erri1':e});
+										});
 									});  
+									
+								
 									// save usertopic
 									db().collection('userTopics').save(userTopic).then(function(result) {
 										////console.log(['saved r',result]);

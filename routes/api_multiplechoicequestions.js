@@ -217,7 +217,38 @@ function initRoutes(router,db) {
 		console.log(['FIND mc questions',JSON.stringify({$and:filter})])
 		db().collection('multiplechoicequestions').find({$and:filter}).sort({createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 100).toArray(function(err,results) {
 			console.log(['FOUND mc questions',err,results])
-			res.send(results)
+			let promises=[];
+			if (results) {
+				console.log([' MC FIND',results])
+				results.map(function(mcQuestion) {
+					console.log([' MC FIND qid',mcQuestion.questionId])
+					if (mcQuestion.questionId) {
+						promises.push(new Promise(function(resolve,reject) {
+							db().collection('questions').findOne({_id:ObjectId(mcQuestion.questionId)}).then(function(question) {
+								if (question) {
+									console.log([' MC FINDhave related',question])
+									mcQuestion.relatedQuestion = question;
+									resolve(mcQuestion)
+								} else {
+									console.log([' MC FIND no find related',question])
+									resolve({})
+								}
+							})
+						}));
+					} else {
+						console.log([' MC FIND no have related',question])
+
+						promises.push(new Promise(function(resolve,reject) {
+							resolve(mcQuestion);
+						}))
+					}
+				});
+			}
+			Promise.all(promises).then(function(final) {
+				console.log(['FINAL ALL MC FIND',final])
+				res.send(final)
+			})
+			
 		});
 
 	});

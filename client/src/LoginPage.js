@@ -93,7 +93,7 @@ export default class LoginPage extends Component {
     }
     googleLogin(user) {
      //   let that=this;
-        ////console.log(['glogin ',user]);
+        console.log(['glogin ',user]);
         fetch('/login/googlesignin', {
           method: 'POST',
           headers: {
@@ -256,7 +256,7 @@ export default class LoginPage extends Component {
                             <h3 className="card-title">Login</h3> 
                             <a className="btn btn-info" style={{float:'right' }} href="#register_form" >I'm a new user</a>
                             <div className="" style={{fontWeight:'bold',fontSize:'large'}} >To track your progress and see graphs and feedback to guide your learning, you need to sign in to the website.</div>
-                            <div className="" style={{fontWeight:'bold',fontSize:'large'}} >By logging into Mnemo's Library, you are agreeing to our <a href="/help/termsofuse" style={{textDecoration:'underline',color: 'blue', paddingLeft:'0.3em'}}  > terms and conditions</a><br/><br/></div>
+                            <div className="" style={{fontWeight:'bold',fontSize:'large'}} >By logging into Mnemo's Library, you are agreeing to our <Link to="/help/termsofuse" style={{textDecoration:'underline',color: 'blue', paddingLeft:'0.3em'}}  > terms and conditions</Link><br/><br/></div>
                            <span style={{float:'right'}}><GoogleLogin 
                                 clientId={config.googleClientId}
                                 onSuccess={this.googleLogin}

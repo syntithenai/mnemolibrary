@@ -26,6 +26,7 @@ import CommentIcon from 'react-icons/lib/fa/comment';
 
 import ShareDialog from './ShareDialog';
 
+
 import scrollToComponent from 'react-scroll-to-component';
 import MnemonicsList from './MnemonicsList';
 import Utils from './Utils';
@@ -55,7 +56,7 @@ export default class SingleQuestion extends Component {
           this.player = element;
           if (this.player) this.player.subscribeToStateChange(this.handleStateChange.bind(this));
         };
-        this.state = {mcQuestionsLoaded:0,comments:[],showCommentDialog: false,swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:''}
+        this.state = {mcQuestionsLoaded:0,comments:[],showCommentDialog: false,swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:'',showShareDialog:false}
         this.setVisible = this.setVisible.bind(this);
         this.toggleMedia = this.toggleMedia.bind(this);
         this.isVisible = this.isVisible.bind(this);
@@ -70,13 +71,15 @@ export default class SingleQuestion extends Component {
         this.createMedia = this.createMedia.bind(this);
         this.isWikiApi = this.isWikiApi.bind(this);
         this.wikiBaseUrl = this.wikiBaseUrl.bind(this);
-        this.toggleCommentDialog = this.toggleCommentDialog.bind(this);
-        this.loadComments = this.loadComments.bind(this);
-        this.editComment = this.editComment.bind(this);
-        this.deleteComment = this.deleteComment.bind(this);
+        //this.toggleCommentDialog = this.toggleCommentDialog.bind(this);
+        //this.loadComments = this.loadComments.bind(this);
+        //this.editComment = this.editComment.bind(this);
+        //this.deleteComment = this.deleteComment.bind(this);
         this.scrollToComments = this.scrollToComments.bind(this);
-        this.newComment = this.newComment.bind(this);
+        //this.newComment = this.newComment.bind(this);
 		this.notifyQuestionsLoaded = this.notifyQuestionsLoaded.bind(this);
+        this.setShareDialog = this.setShareDialog.bind(this);
+        
         
         this.scrollTo={};
         this.questionmessage='';
@@ -102,7 +105,7 @@ export default class SingleQuestion extends Component {
 				//console.log('timeout on sing leod now wiki RELLY')
 				that.fromWikipedia();
 				that.createMedia();
-				that.loadComments(that.props.question._id,that.props.user ? that.props.user._id : null);
+				that.props.loadComments(that.props.question._id,that.props.user ? that.props.user._id : null);
 			}
 		//},1000);
       } 
@@ -119,7 +122,7 @@ export default class SingleQuestion extends Component {
 			//console.log(['SQ UPDATE change question',oldId,newId]);
              this.fromWikipedia();
              this.createMedia();
-             if (that.props.question) that.loadComments(that.props.question._id,that.props.user ? that.props.user._id : null);
+             if (that.props.question) that.props.loadComments(that.props.question._id,that.props.user ? that.props.user._id : null);
           }
       };
     
@@ -137,65 +140,50 @@ export default class SingleQuestion extends Component {
         //this.toggleMedia();
     };
     
-
-    loadComments(question,user) {
-		let that=this;
-		if (question && user) {
-		  fetch('/api/comments?question='+question+'&user='+user)
-		  .then(function(response) {
-			return response.json()
-		  }).then(function(json) {
-			console.log(['loaded comments', json])
-			that.setState({comments:json});
-		  }).catch(function(ex) {
-			console.log(['error loading comments', ex])
-		  })
-		}
-	}
 	
-	toggleCommentDialog() {
-		console.log(['TOGGLE COMMENT',this.state.showCommentDialog])
-		//// 
-		//if (this.state.showCommentDialog) {
-			//this.setState({'editingComment':null})
-		//}
-		this.setState({showCommentDialog: !this.state.showCommentDialog})
-	}
+	//toggleCommentDialog() {
+		//console.log(['TOGGLE COMMENT',this.state.showCommentDialog])
+		////// 
+		////if (this.state.showCommentDialog) {
+			////this.setState({'editingComment':null})
+		////}
+		//this.setState({showCommentDialog: !this.state.showCommentDialog})
+	//}
 
-	editComment(comment) {
-		this.setState({commentId:comment._id,commentText:comment.comment,commentType:comment.type,commentCreateDate:comment.createDate})
-		this.toggleCommentDialog()
-	}
+	//editComment(comment) {
+		//this.setState({commentId:comment._id,commentText:comment.comment,commentType:comment.type,commentCreateDate:comment.createDate})
+		//this.toggleCommentDialog()
+	//}
 		
-	newComment() {
-		this.setVisible('comments')
-		this.setState({commentId:null,commentText:null,commentType:null,commentCreateDate:null})
-		this.toggleCommentDialog()
-	}
-	deleteComment(comment) {
-		// refresh single view comments list
-		let that = this;
-		let toSave = {}
-		toSave.question = this.props.question ? this.props.question._id : null;
-		toSave.user = this.props.user ? this.props.user._id : null
-		toSave.comment = comment ? comment._id : null
+	//newComment() {
+		//this.setVisible('comments')
+		//this.setState({commentId:null,commentText:null,commentType:null,commentCreateDate:null})
+		//this.toggleCommentDialog()
+	//}
+	//deleteComment(comment) {
+		//// refresh single view comments list
+		//let that = this;
+		//let toSave = {}
+		//toSave.question = this.props.question ? this.props.question._id : null;
+		//toSave.user = this.props.user ? this.props.user._id : null
+		//toSave.comment = comment ? comment._id : null
 		
-		if (toSave.question && toSave.user && toSave.comment) {
-			fetch('/api/deletecomment', {
-			  method: 'POST',
-			  headers: {
-				'Content-Type': 'application/json'
-			  },
+		//if (toSave.question && toSave.user && toSave.comment) {
+			//fetch('/api/deletecomment', {
+			  //method: 'POST',
+			  //headers: {
+				//'Content-Type': 'application/json'
+			  //},
 			  
-			  body: JSON.stringify(toSave)
-			}).then(function() {
-				that.setState({'comment':''});                
-				//that.toggleCommentDialog();
-				console.log(['NOW RELOAD COMMENTS'])
-				that.loadComments(that.props.question._id,that.props.user._id)
-			});
-		}
-	} 
+			  //body: JSON.stringify(toSave)
+			//}).then(function() {
+				//that.setState({'comment':''});                
+				////that.toggleCommentDialog();
+				//console.log(['NOW RELOAD COMMENTS'])
+				//that.loadComments(that.props.question._id,that.props.user._id)
+			//});
+		//}
+	//} 
     
     disableSwipe() {
         this.setState({swipeable:false});
@@ -262,7 +250,7 @@ export default class SingleQuestion extends Component {
 					// wikilookup
 					console.log(['FROM WIKIPEDIA LOOKUP ANSWER LINK GOOD',wikiPage,wikiPageParts]);
 					Utils.loadWikipediaIntro(wikiPage,this.wikiBaseUrl(this.props.question.link)).then(function(answer) {
-						//console.log(['FROM WIKIPEDIA got',answer]);
+						console.log(['FROM WIKIPEDIA got',answer]);
 						if (answer && answer.length > 0) {
 							that.setState({answer:answer});
 							fetch("/api/savewikidata", {
@@ -274,10 +262,10 @@ export default class SingleQuestion extends Component {
 							}).then(function(response) {
 								return response.json();
 							}).then(function(token) {
-								//console.log('updated wiki data');
+								console.log('updated wiki data');
 							})
 							.catch(function(err) {
-								console.log(['ERR',err]);
+								console.log(['ERR updating wiki data',err]);
 							});
 						} else {
 							that.setState({answer:''});
@@ -476,6 +464,9 @@ export default class SingleQuestion extends Component {
 		scrollToComponent(that.scrollTo['comments'],{align:'top',offset:-230});
 	}
 
+    setShareDialog(val) {
+		this.setState({showShareDialog:val});
+	}
     
     toggleMedia() {
         ////console.log(['invisible',toHide]);
@@ -661,39 +652,47 @@ export default class SingleQuestion extends Component {
             if (this.props.isReview) cardClassName = "card question container review";
             let shortAnswerStyle={}; //fontSize:'1.1em',fontFamily:'sans_forgeticaregular'};
             if (this.props.isReview)   shortAnswerStyle={}; //fontSize:'1.1em'
+           //<ShareTopicDialog id="sharedialog"  header={header}  question={question}/>
+           //<div style={{height:'11em'}}><br/></div>
+            
+            let shareTitle="Mnemo's Library -"+(this.props.question.mnemonic ? this.props.question.mnemonic : '') + " - \n" + question.interrogative+ ' ' +question.question + '?';
+			//let longTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question + '?' ;
+			//let twitterTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question  + "?\n" + question.link;
+			let shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+encodeURIComponent(question.quiz)+"/"+question._id;     
+            
+            
+            //<button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Back&nbsp;</span></button>
+                    //<span >&nbsp;</span>
+            
            return (
-            <div className="questionwrap" >
-            <ShareDialog id="sharedialog"  header={header}  question={question}/>
-            <CommentEditor commentId={this.state.commentId} commentText={this.state.commentText} commentType={this.state.commentType} commentCreateDate={this.state.commentCreateDate} question={this.props.question} user={this.props.user} visible={this.state.showCommentDialog} user={this.props.user} question={this.props.question}  loadComments={this.loadComments} toggleVisible={this.toggleCommentDialog} />
-                <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
+            <div className="questionwrap"  >
+               <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                 <div className="row buttons justify-content-between" >
                     <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} />&nbsp;</button>
-                    <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Back&nbsp;</span></button>
-                    <span >&nbsp;</span>
+                    
                     {(showRecallButton || !this.props.user) && <button className="col-3 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Needs More Review&nbsp;</span></button>}
 
-                    {!this.props.user && <a href='/login' className="col-2 btn btn-outline btn-success" ><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add to Review&nbsp;</span></a>}
+                    {!this.props.user && <Link to='/login' className="col-4 btn btn-outline btn-success" ><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add to Review List&nbsp;</span></Link>}
 
-                    {!showRecallButton && this.props.user && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add To My Review List&nbsp;</span></button>}
+                    {!showRecallButton && this.props.user && <button className="col-4 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add To My Review List&nbsp;</span></button>}
                     
-                    {showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block"> Enough Review For Now</span></button>}
+                    {showRecallButton && <button className="col-4 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block"> Enough Review For Now</span></button>}
                     <span >&nbsp;</span>
-                    {this.props.user && <button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Not Interested</span></button>}
+                    {this.props.user && <button className="col-3 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Not Interested</span></button>}
                     {showRecallButton && <div className="scrollbuttons col-sm-12" >
-                            <button style={{float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
+                            <button style={{float:'right'}}  onClick={(e) => this.setShareDialog(true)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
                             &nbsp;
                            
-                           
-                             {this.props.user && this.state.comments && this.state.comments.length > 0 && <button style={{float:'right'}}   onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.state.comments.length}&nbsp;Comments&nbsp;</span></button>}
+                                      
+						{this.state.mcQuestionsLoaded > 0 && <button style={{float:'right'}} className='btn btn-primary' onClick={() => this.setVisible('questions')}> <span className="badge badge-light">{this.state.mcQuestionsLoaded}</span>&nbsp;<span className="d-none d-md-inline-block"> Quiz</span></button>} 
+                         
+                        
+                             {this.props.user && this.props.comments && this.props.comments.length > 0 && <button style={{float:'right'}}   onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.props.comments.length}&nbsp;Comments&nbsp;</span></button>}
                              
-                             {this.props.user && (!this.state.comments || this.state.comments.length === 0) && <button style={{float:'right'}} onClick={this.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
+                             {this.props.user && (!this.props.comments || this.props.comments.length === 0) && <button style={{float:'right'}} onClick={this.props.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
                              
                              &nbsp;
-                             
-						  {this.state.mcQuestionsLoaded > 0 && <button style={{float:'right'}} className='btn btn-primary' onClick={() => this.setVisible('questions')}> <span class="badge badge-light">{this.state.mcQuestionsLoaded}</span>&nbsp;<span className="d-none d-md-inline-block"> Quiz</span></button>} 
-                            
-								
-							             
+                                         
                             {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Memory Aid</span></button>
                             }&nbsp;
                             {question.answer && <button className='btn btn-primary' onClick={() => this.setVisible('all')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
@@ -728,14 +727,17 @@ export default class SingleQuestion extends Component {
                          
                        {!showRecallButton && <span> 
 						   
-                            <button style={{marginTop:'1em',float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
-                         &nbsp;   
-                              {this.props.user && this.state.comments && this.state.comments.length > 0 && <button style={{marginTop:'1em',float:'right'}} onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.state.comments.length}&nbsp;Comments&nbsp;</span></button>}
-                             
-                             {this.props.user && (!this.state.comments || this.state.comments.length === 0) && <button style={{marginTop:'1em',float:'right'}} onClick={this.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
-                            
-						&nbsp;
+                            <button style={{marginTop:'1em',float:'right'}} onClick={(e) => this.setShareDialog(true)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
+                       
+                        &nbsp;
 						  {this.state.mcQuestionsLoaded > 0 && <button style={{marginTop:'1em',float:'right'}} className='btn btn-primary' onClick={() => this.setVisible('questions')}> <span className="badge badge-light">{this.state.mcQuestionsLoaded}</span>&nbsp;<span className="d-none d-md-inline-block"> Quiz</span></button>} 
+						  
+                         &nbsp;   
+                              {this.props.user && this.props.comments && this.props.comments.length > 0 && <button style={{marginTop:'1em',float:'right'}} onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.props.comments.length}&nbsp;Comments&nbsp;</span></button>}
+                             
+                             {this.props.user && (!this.props.comments || this.props.comments.length === 0) && <button style={{marginTop:'1em',float:'right'}} onClick={this.props.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
+                            
+						
                             &nbsp;  
 						    {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
                          }
@@ -822,30 +824,35 @@ export default class SingleQuestion extends Component {
                         </div><div   style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div></div>}
                     </div>
                     
-                    {(!showRecallButton || this.isVisible('comments')) && <div ref={(section) => { this.scrollTo.comments = section; }}  className="card-block">
-						<CommentList isAdmin={this.props.isAdmin} user={this.props.user} question={this.props.question} comments={this.state.comments}   editComment={this.editComment}  deleteComment={this.deleteComment} toggleCommentDialog={this.toggleCommentDialog} newComment={this.newComment}/>
+                    {(!showRecallButton || this.isVisible('comments')) && <div ref={(section) => { this.scrollTo.comments = section; }}  className="card-block" id="comments">
+						<CommentList isAdmin={this.props.isAdmin} user={this.props.user} question={this.props.question} comments={this.props.comments}   editComment={this.props.editComment}  deleteComment={this.props.deleteComment} toggleCommentDialog={this.props.toggleCommentDialog} newComment={this.props.newComment} saveComment={this.props.saveComment} setComment={this.props.setComment} newCommentReply={this.props.newCommentReply}/>
 					</div>}
 						
 					{<div style={((!showRecallButton || this.isVisible('questions'))  ? {display:'block'} : {display:'none'})} ref={(section) => { this.scrollTo.questions = section; }}  className="card-block">
-					<MultipleChoiceQuestions notifyQuestionsLoaded={this.notifyQuestionsLoaded} user={this.props.user} question={this.props.question._id} topic={this.props.question.quiz} />
+						<MultipleChoiceQuestions viewOnly={true} notifyQuestionsLoaded={this.notifyQuestionsLoaded} user={this.props.user} question={this.props.question._id} topic={this.props.question.quiz} />
 					</div>
-					}
+					} 
                 </div>
+                
+				{this.state.showShareDialog && <ShareDialog setShareDialog={this.setShareDialog} url={shareLink} title={shareTitle} dialogTitle={'Share Question using'} />}
+			
                  <div ref={(section) => { this.scrollTo.end = section; }} ></div>
                        
             </div>
           
           
             )
-//            
+            
+ 
+             
         } else {
             return <div className="card question container" >
                
                 <div>No new/matching questions</div>
                 <br/>
-                {this.props.match.params.topic && <a style={{float:'right'}} className='btn btn-info lg-2' href={'/discover/searchtopic/'+this.props.match.params.topic} >
+                {this.props.match.params.topic && <Link style={{float:'right'}} className='btn btn-info lg-2' to={'/discover/searchtopic/'+this.props.match.params.topic} >
 				<ShowAll size={25} /> Show All Questions In This Topic
-				</a>}
+				</Link>}
                 
                 
             </div>
@@ -853,125 +860,3 @@ export default class SingleQuestion extends Component {
         
     };
 }
-
-  //{((blockedTags && blockedTags.length > 0) || (blockedTopics && blockedTopics.length > 0) || (blockedTechniques && blockedTechniques.length > 0)) && <div className='blocked-tags' style={{float:'right'}}><b>Filter </b>
-                        //{blockedTags && blockedTags.length>0 && <span>Tags </span>} {blockedTags}
-                        //{blockedTopics && blockedTopics.length>0 && <span>Topics </span>} {blockedTopics}
-                        //{blockedTechniques && blockedTechniques.length>0 && <span>Techniques </span>} {blockedTechniques}
-                       //<hr/> </div>}
-
-//<Ban size={28} className="badge badge-pill badge-info"  onClick={() => this.setDiscoveryBlock('topic',question.quiz)} />
-//{!this.isVisible('moreinfo') && <img className="" src={image} alt={header}  style={{width:"70%"}} /> }
-                    
- //return (
-            //<div className="questionwrap" >
-            //<ShareDialog id="sharedialog"  header={header}  question={question}/>
-            //<ProblemReport user={this.props.user} question={this.props.question} />
-                //<div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
-                //<div className="row buttons justify-content-between" >
-                    //<button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis size={25} />&nbsp;</button>
-                    //<button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Prev&nbsp;</span></button>
-                    //<span >&nbsp;</span>
-                    //<button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block"> Next</span></button>
-                    //{showRecallButton && <button className="col-3 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block"> Recall</span></button>}
-                    //<span >&nbsp;</span>
-                    //{<button className="col-2 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Block</span></button>}
-                    //<div className="scrollbuttons col-sm-12" >
-                             //<button style={{float:'right'}} data-toggle="modal" data-target="#problemdialog" className='btn btn-primary'><ExclamationTriangle size={26} /><span className="d-none d-md-inline-block">&nbsp;Report Problem&nbsp;</span></button>
-                    //&nbsp;
-                            //<button style={{float:'right'}}  data-toggle="modal" data-target="#sharedialog" className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
-                                           
-                            //{<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Mnemonic</span></button>
-                            //}&nbsp;
-                            //{question.answer && <button className='btn btn-primary' onClick={() => this.setVisible('answer')}><Info size={26}  />&nbsp;<span className="d-none d-md-inline-block">Answer</span></button>
-                            //}&nbsp;
-                            //{imageLink && <button  className='btn btn-primary' onClick={() => this.setVisible('image')}><Image size={26} />&nbsp;<span className="d-none d-md-inline-block">Image</span></button>
-                            //}&nbsp;
-                            //{hasMedia && <button  className='btn btn-primary' onClick={() => this.toggleMedia()}><Music size={26} />&nbsp;<span className="d-none d-md-inline-block">Media</span></button>
-                            //}&nbsp;
-                            
-                            //{(!target) && <button  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
-                            //}
-                            //{(target) && <a  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
-                            //}&nbsp;
-                            //{<button  className='btn btn-primary' onClick={() => this.setVisible('tags')}><Tags size={26}  />&nbsp;<span className="d-none d-md-inline-block">Tags</span></button>
-                            //}
-                          //</div>
-                //</div>
-                
-                //<div className="card question container" >
-                 //<div ref={(section) => { this.scrollTo.mnemonic = section; }} ></div>
-                     //<div id="spacerforsmall" className='d-none d-sm-block d-md-none' ><br/><br/> </div>
-                    //<div id="progressbar" style={{backgroundColor: 'blue',width: '100%',height:'0.3em'}} > <div id="innerprogressbar" style={{backgroundColor: 'red',width: this.props.percentageFinished()}} >&nbsp;</div></div>
-                    
-                    //<Swipeable onSwipedLeft={() => this.swipeLeft(question)} onSwipedRight={() => this.swipeRight(question)}   >  
-                        //<h4 className="card-title">{header}?</h4>
-                        //<div className="card-block">
-                            //{(this.isVisible('media') || question.autoplay_media==="YES") && question.mediaattribution && hasMedia  && <div className="card-block mediaattribution">
-                            //<div  className='card-text ' style={{fontSize:'0.85em'}}><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
-                        //</div>}
-                        //<div ref={(section) => { this.scrollTo.media = section; }} ></div>
-                        //{((this.isVisible('media') || question.autoplay_media==="YES") && hasMedia) && <span>
-                            //{media}</span> }
-                        //</div>
-                       //{(this.isVisible('mnemonic')|| !showRecallButton) &&<MnemonicsList isAdmin={this.props.isAdmin} disableSwipe={this.disableSwipe} enableSwipe={this.enableSwipe} saveSuggestion={this.props.saveSuggestion} mnemonic_techniques={this.props.mnemonic_techniques} user={this.props.user} question={question} showRecallButton={showRecallButton} setDiscoveryBlock={this.setDiscoveryBlock} setQuizFromTechnique={this.props.setQuizFromTechnique} isLoggedIn={this.props.isLoggedIn} like={this.props.like}/>}
-                        
-                        //<div ref={(section) => { this.scrollTo.answer = section; }} ></div>
-                        //{(this.isVisible('answer') || !showRecallButton) && question.answer && <div className="card-block answer">
-                            //<div  className='card-text'><b>Answer</b><br/> <span className='shortanswer' style={{fontWeight:'bold',fontSize:'1.1em'}} >{question.shortanswer}</span></div>
-                            //<div  className='card-text'><span><pre>{question.answer}</pre></span></div>
-                        //</div>}
-                        
-                        
-                        //<div  className='card-text' style={{fontSize:'0.85em'}}>
-                        //{(this.isVisible('answer') || !showRecallButton) && question.link && <b >From <a href={question.link} target='_new' >{shortLink}</a></b>}
-                       
-                        //{(this.isVisible('answer') || !showRecallButton) && question.attribution && 
-                            //<div><b >Attribution/Source</b> <span >{attribution}</span></div>
-                        //}
-                        //</div>
-                        //<br/>
-                        
-                        //<div ref={(section) => { this.scrollTo.tags = section; }} ></div>
-                        //{((this.isVisible('tags')  && showRecallButton) && question.quiz) && <div className="card-block topic">
-                            //<b>Topic&nbsp;&nbsp;&nbsp;</b> <span><button className="btn btn-outline btn-primary"   ><span className="hidden-sm-down" >{question.quiz}</span></button></span><br/>
-                        //</div>}
-                        //{((!showRecallButton) && question.quiz) && <div className="card-block topic">
-                            //<b>Topic&nbsp;&nbsp;&nbsp;</b><button className="btn btn-outline btn-primary"   ><Search size={28} className="badge badge-pill badge-info" onClick={() => this.props.setQuizFromTopic(question.quiz)} style={{float:'right'}}/> <span className="hidden-sm-down" >{question.quiz}</span></button><br/>
-                        //</div>}
-                        
-                        //{(!showRecallButton) && <div   className="card-block tags" >
-                          //<b>Tags&nbsp;&nbsp;&nbsp;</b>
-                           //{tags}
-                        //</div>}
-                        //{(showRecallButton && this.isVisible('tags')) && showRecallButton && <div    className="card-block tags" >
-                          //<b>Tags&nbsp;&nbsp;&nbsp;</b>
-                           //{tagsClean}
-                        //</div>}
-                          //{((blockedTags && blockedTags.length > 0) || (blockedTopics && blockedTopics.length > 0) || (blockedTechniques && blockedTechniques.length > 0)) && <div className='blocked-tags' style={{float:'right'}}><b>Filter </b>
-                        //{blockedTags && blockedTags.length>0 && <span>Tags </span>} {blockedTags}
-                        //{blockedTopics && blockedTopics.length>0 && <span>Topics </span>} {blockedTopics}
-                        //{blockedTechniques && blockedTechniques.length>0 && <span>Techniques </span>} {blockedTechniques}
-                       //<hr/> </div>}
-                       
-                    //</Swipeable>
-                    //<br/>
-                     //<div ref={(section) => { this.scrollTo.moreinfo = section; }} ><br/></div>
-                       
-                    //<div className="card-block">
-                         //{(this.isVisible('moreinfo') && !target) && <div className="holds-the-iframe"><iframe className='wikiiframe'  src={link} style={{width:"98%", height: "1200px", border: "0px"}}/></div> }                
-                    //</div>
-                    
-                    //<div className="card-block">
-                        //<div ref={(section) => { this.scrollTo.image = section; }} ></div>
-                        //{((this.isVisible('image') || !showRecallButton || question.autoshow_image==="YES") && imageLink) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={imageLink} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={imageLink} style={{width:"50%",  border: "0px"}}/></a></span> }
-                        //{(this.isVisible('image') || !showRecallButton) && question.imageattribution && <div><div className="card-block imageattribution">
-                            
-                        //</div><div   style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div></div>}
-                    //</div>
-
-                //</div>
-            //</div>
-          
-          
-            //)

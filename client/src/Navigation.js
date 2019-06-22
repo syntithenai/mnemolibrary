@@ -88,7 +88,11 @@ export default class Navigation extends Component {
 			pageTitle = decodeURI(parts[1]) + ' Quiz'
 		} else if (parts[0] === 'recentcomments') {
 			pageTitle = 'Recent Comments'
+		} else if (parts[0] === 'sitemap') {
+			pageTitle = 'Site Map'
 		}
+        
+        
         
         return  (
         <div className="navbar-dark fixed-top bg-dark" >
@@ -118,7 +122,7 @@ export default class Navigation extends Component {
               </span>
            
               <span className="dcol-4">
-                <Link className="btn btn-secondary" to="/help" >{helpIcon} <span  className="d-none d-sm-inline">Help</span></Link>
+                <Link className="btn btn-secondary" to="/sitemap" >...</Link>
                 
               </span>
           </div>
