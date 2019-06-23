@@ -34,7 +34,7 @@ export default class ReviewPage extends Component {
       // this.getQuestionsForReview();
     }
         
-     goto(page) {
+    goto(page) {
        this.setState({exitRedirect:page});
 	};
       
@@ -145,10 +145,12 @@ export default class ReviewPage extends Component {
 					)
 				} else {
 					return (
-					<div><br/><b>You have no questions available for review. <br/>Note that questions that you have seen in the last hour are excluded from review. <br/><br/>Time to discover something new ! </b> <br/><br/><Link className="btn btn-info" to="/discover" >Discover</Link>
-					<Link className="btn btn-info" to="/search" >Topics</Link>
-					<Link className="btn btn-info" to="/search/tags" >Tags</Link>
-					<Link className="btn btn-info" to="/search/questions" >Questions</Link>
+					<div  style={{marginLeft:'1em'}} ><br/><b>You have no questions available for review. <br/>Note that questions that you have seen in the last hour are excluded from review. <br/><br/>Time to discover something new ! </b> <br/><br/>
+					<Link  style={{marginTop:'1em'}} className="btn btn-info" to="/discover" >Discover</Link>
+					<Link  style={{marginTop:'1em'}} className="btn btn-info" to="/search" >Topics</Link>
+					<Link  style={{marginTop:'1em'}} className="btn btn-info" to="/search/tags" >Tags</Link>
+					<Link style={{marginTop:'1em'}}  className="btn btn-info" to="/search/questions" >Questions</Link>
+					<div style={{marginTop:'1em'}} className="btn btn-success" onClick={this.reviewQuestions} >Refresh</div>
 				   </div>
 					)
 				}

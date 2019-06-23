@@ -229,10 +229,15 @@ export default class AppLayout extends Component {
     loadComments(question,user,limitP) {
 		let that=this;
 		let query='';
-		let currentQuestion = this.getCurrentQuestion()
-		if (question && user && currentQuestion) {
-			query='&question='+question+'&user='+user
+		//let currentQuestion = this.getCurrentQuestion()
+		if (question) {
+			query='&question='+question
 		}
+		if (user) {
+			query+='&user='+user
+		}
+		
+		
 		let limit = limitP > 0 ? '?limit='+limitP : '?limit=50'; 
 		  fetch('/api/comments'+limit+query)
 		  .then(function(response) {
@@ -262,7 +267,7 @@ export default class AppLayout extends Component {
 		
 	newComment() {
 		//this.setVisible('comments')
-		this.setState({comment:{_id:null,comment:'',type:'',createDate:new Date(),user:this.state.user ? this.state.user._id : null,userAvatar:this.state.user ? this.state.user.avatar : null,question:this.getCurrentQuestion()}})
+		this.setState({comment:{_id:null,comment:'',type:'',createDate:new Date(),user:this.state.user ? this.state.user._id : null,userEmail:this.state.user ? this.state.user.username : null,userEmailPreference:this.state.user ? this.state.user.email_me : null,userAvatar:this.state.user ? this.state.user.avatar : null,question:this.getCurrentQuestion()}})
 	//	this.toggleCommentDialog()
 		
 	}
@@ -314,7 +319,7 @@ export default class AppLayout extends Component {
   
   
   
-	saveComment(type) {
+	saveComment(type,isReply) {
 			let that = this;
 			let toSave = this.state.comment;
 			if (type && type.type) toSave.type = type.type;
@@ -324,8 +329,9 @@ export default class AppLayout extends Component {
 				toSave.questionTopic = question ? question.quiz : null;
 				toSave.question = question ? question._id : null;
 			}
+			toSave.isReply = isReply;
 			// set user if not already set 
-			console.log(['do save ',toSave.user]);
+			//console.log(['do save ',toSave.user]);
 			
 			//toSave.user = !toSave.user && this.state.user ? this.state.user._id : null
 			//toSave.userAvatar = !toSave.userAvatar && this.state.user ? this.state.user.avatar : null
@@ -363,7 +369,7 @@ export default class AppLayout extends Component {
 		
 	newCommentReply(comment) {
 		//comment.replies = comment.replies ? comment.replies : [];
-		//comment.replies.push({text:'',createDate:new Date(),user:this.state.user ? this.state.user._id : null,userAvatar:this.state.user ? this.state.user.avatar : null}) 
+		//comment.replies.push({text:'',createDate:new Date(),user:this.state.user ? this.state.user._id : null,userAvatar:this.state.user ? this.state.user.avatar : null})
 		this.setState({comment:comment,editCommentReply:true})
 	}
 	
@@ -401,19 +407,19 @@ export default class AppLayout extends Component {
   
 	saveCommentReply(text) {
 		if (text && text.length > 0 && this.state.comment) {
+			let comment = this.state.comment;
+			// send email
 			if (this.state.commentReplyIndex != null && this.state.comment && this.state.comment.replies && this.state.comment.replies.length > this.state.commentReplyIndex) {
 				// save edited reply
-				let comment = this.state.comment;
 				comment.replies[this.state.commentReplyIndex].text = text;
 			} else {
 				// new reply
-				let comment = this.state.comment;
 				comment.replies = comment.replies ? comment.replies : [];
 				let reply = {text:text,createDate:new Date(),user:this.state.user ? this.state.user._id : null,userAvatar:this.state.user ? this.state.user.avatar : null}
 				comment.replies.push(reply)
 			}
 			this.setState({comment:comment});
-			this.saveComment()
+			this.saveComment(null,true)
 			
 		}
 		//let that = this;
@@ -1127,7 +1133,7 @@ export default class AppLayout extends Component {
 	getCurrentQuestion() {
        // //console.log(['currentQuestion',this.state]);
         let question=null;
-        if (this.state.currentQuestion !== null && Array.isArray(this.state.currentQuiz) && this.state.indexedQuestions && this.state.questions) {
+        if (this.state && this.state.currentQuestion !== null && Array.isArray(this.state.currentQuiz) && this.state.indexedQuestions && this.state.questions) {
             question = this.state.questions[this.state.indexedQuestions[this.state.currentQuiz[this.state.currentQuestion]]];
         }
         return question;
@@ -1213,9 +1219,9 @@ export default class AppLayout extends Component {
                 
                 <PropsRoute exact={true} path='/recentcomments'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} />
                 
-                 {this.state.comment && !this.state.editCommentReply && <CommentEditor comment={this.state.comment} setComment={this.setComment} user={this.props.user} saveComment={this.saveComment}  getCurrentQuestion={this.getCurrentQuestion}/>}
+                 {this.state.comment && !this.state.editCommentReply && <CommentEditor comment={this.state.comment} setComment={this.setComment} user={this.state.user} saveComment={this.saveComment}  getCurrentQuestion={this.getCurrentQuestion}/>}
 
-                 {this.state.comment && this.state.editCommentReply && <CommentReplyEditor  comment={this.state.comment} commentReplyIndex={this.state.commentReplyIndex} commentReply={this.state.commentReply} cancelCommentReply={this.cancelCommentReply}  saveCommentReply={this.saveCommentReply} getCurrentQuestion={this.getCurrentQuestion} />}
+                 {this.state.comment && this.state.editCommentReply && <CommentReplyEditor  comment={this.state.comment} commentReplyIndex={this.state.commentReplyIndex} commentReply={this.state.commentReply} cancelCommentReply={this.cancelCommentReply}  saveCommentReply={this.saveCommentReply} getCurrentQuestion={this.getCurrentQuestion} user={this.state.user} />}
              
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
                 
@@ -1238,6 +1244,15 @@ export default class AppLayout extends Component {
                 <PropsRoute exact={true} path='/multiplechoicetopics'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}  />
                 
                 <PropsRoute exact={true} path='/multiplechoicequestions/:topic'   user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
+
+                <PropsRoute exact={true} path='/mymultiplechoicequestions' mode="myquestions"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
+
+                <PropsRoute exact={true} path='/mymultiplechoicequestions/:topic' mode="myquestions"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
+
+                <PropsRoute exact={true} path='/mymultiplechoicetopics' mode="mytopics"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
+
+                <PropsRoute exact={true} path='/mymultiplechoicetopics/:topic' mode="mytopics"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
+                
                 
                 
                 <PropsRoute  exact={true} path="/search" component={TopicsPage} {...topicsPageOptions}/>

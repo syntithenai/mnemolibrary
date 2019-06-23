@@ -177,13 +177,14 @@ export default class MultipleChoiceTopics extends Component {
 		// render topicCollections
 		} else {
 			if (this.state.topicCollections) {
+						
 				let topicCollections = this.state.topicCollections.map(function(topicCollection,key) {
 					//return <div  className="col-lg-4 col-6" style={{}}>{topicCollection.name}
-					let iconStyle={height: '3.6em'}
+					let iconStyle={height: '3.6em', marginTop:'1em'}
+					let blockStyle={float:'left',minHeight:'50px', paddingBottom:'1em',border:'2px solid white',fontSize:'1.1em',paddingTop:'0.2em'}
 					let linkTo='/multiplechoicetopics/'+topicCollection.name;
 					let color = that.colors[key%that.colors.length].color;
 					let backgroundColor = that.colors[key%that.colors.length].backgroundColor;
-					let blockStyle={float:'left',minHeight:'150px',border:'2px solid white',fontSize:'1.1em',paddingTop:'0.2em'}
 					return <Link key={key} style={{display:'block'}}  to={linkTo} ><div  style={{backgroundColor:backgroundColor, color: color ? color : 'black'}} >
 						<div key={key} style={Object.assign({backgroundColor:backgroundColor, color:color},blockStyle)}  className="col-6" >
 							<span style={{backgroundColor:backgroundColor, color: color,sfloat:'right',marginRight:'0.8em'}} >{getIcon(topicCollection.icon,iconStyle)}</span>
@@ -191,7 +192,33 @@ export default class MultipleChoiceTopics extends Component {
 						</div>
 					</div>	</Link>
 				})
-				return <div style={{clear:'both', width: '100%'}} >{searchForm}{topicCollections}<div style={{clear:'both', width: '100%'}} ><br/></div></div>
+					let backgroundColor1 = that.colors[that.colors.length -1].backgroundColor;
+					let color1 = that.colors[that.colors.length -1].color;
+					let backgroundColor2 = that.colors[that.colors.length -2].backgroundColor;
+					let color2 = that.colors[that.colors.length -2].color;
+				let iconStyle={height: '3.6em', marginTop:'1em'}
+				let blockStyle={float:'left',minHeight:'50px', paddingBottom:'1em',border:'2px solid white',fontSize:'1.1em',paddingTop:'0.2em'}
+				
+				return <div style={{clear:'both', width: '100%'}} >
+					{searchForm}
+					
+					<Link key={'mytopics'} style={{display:'block'}}  to={'/mymultiplechoicetopics'} ><div  style={{backgroundColor:backgroundColor1, color: color1 ? color1 : 'black'}} >
+						<div  style={Object.assign({backgroundColor:backgroundColor1, color:color1},blockStyle)}  className="col-6" >
+							<span style={{backgroundColor:backgroundColor1, color: color1,marginRight:'0.8em'}} >{getIcon('mytopics',iconStyle)}</span>
+							<span style={{backgroundColor:backgroundColor1, color: color1,fontSize:'1.4em',fontWeight:'bold'}}>My Topics</span>
+						</div>
+					</div>	</Link>
+					
+					<Link key={'myquestions'} style={{display:'block'}}  to={'/mymultiplechoicequestions'} ><div  style={{backgroundColor:backgroundColor2, color: color2 ? color2 : 'black'}} >
+						<div  style={Object.assign({backgroundColor:backgroundColor2, color:color2},blockStyle)}  className="col-6" >
+							<span style={{backgroundColor:backgroundColor2, color: color2,marginRight:'0.8em'}} >{getIcon('myquestions',iconStyle)}</span>
+							<span style={{backgroundColor:backgroundColor2, color: color2,fontSize:'1.4em',fontWeight:'bold'}}>Review Quiz</span>
+						</div>
+					</div>	</Link>
+					
+					{topicCollections}
+					<div style={{clear:'both', width: '100%'}} ><br/></div>
+				</div>
 			}
 		}
 		

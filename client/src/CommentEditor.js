@@ -59,11 +59,12 @@ export default class CommentEditor extends Component {
 			let that = this;
 			let toSave = {}
 			let question = this.props.getCurrentQuestion();
-			toSave.question = question ? question._id : null;
+			toSave.question = this.props.comment && this.props.comment.question ? this.props.comment.question : null;
 			toSave.user = this.props.user ? this.props.user._id : null;
-			toSave.problem = this.props.problem && this.props.problem.comment ? this.props.problem.comment : '';
+			toSave.userAvatar = this.props.user ? this.props.user.avatar : null;
+			toSave.comment = this.props.comment && this.props.comment ? this.props.comment.comment : '';
 			console.log(['REPORT PROBLEM',toSave])
-			if (toSave.question && toSave.user && toSave.problem && toSave.problem.length > 0) {
+			if (toSave.question && toSave.user && toSave.comment && toSave.comment.length > 0) {
 				fetch('/api/reportproblem', {
 				  method: 'POST',
 				  headers: {
@@ -71,8 +72,10 @@ export default class CommentEditor extends Component {
 				  },
 				  body: JSON.stringify(toSave)
 				}).then(function() {
-					that.setState({'comment':''});                
-					that.props.toggleVisible();
+					console.log(['REPORTed PROBLEM',toSave])
+					//that.setState({'comment':''});                
+					//that.props.toggleVisible();
+					that.props.setComment(null);
 				});
 			}
 		}
@@ -93,11 +96,11 @@ export default class CommentEditor extends Component {
         return true;
     };
     
-    
+    //<button style={{textAlign:'right'}} onClick={this.saveQuestionComment}  className="btn btn-primary" ><QuestionIcon size={26}   />&nbsp;<span className="d-none d-md-inline-block">Ask Question</span></button>
+					
     render() {
 		let buttons=<div style={{paddingLeft:'0',marginLeft:'-1em',paddingBottom:'1em'}} className='commentbuttons'>
 					
-					<button style={{textAlign:'right'}} onClick={this.saveQuestionComment}  className="btn btn-primary" ><QuestionIcon size={26}   />&nbsp;<span className="d-none d-md-inline-block">Ask Question</span></button>
 					
 					<button style={{align:'right'}}  onClick={this.savePublicComment}  className="btn btn-primary"><CommentIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Public Comment</span></button>
 					
@@ -138,7 +141,7 @@ export default class CommentEditor extends Component {
 			  </div>
 			  
 			  <div className="modaldialog-body">
-				<div><b>Question: </b> {Utils.getQuestionTitle(this.props.question)}</div>
+				<div><b>Question: </b> {this.props.comment.questionText}</div>
 				
 				<p style={{paddingTop:'1em'}}>
 					<textarea style={{height: '10em', width:'100%'}} autoComplete="false" id="comment" type='text' name='comment' onChange={this.change} value={this.props.comment ? this.props.comment.comment : ''} className='form-control'></textarea>

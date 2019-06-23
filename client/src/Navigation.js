@@ -86,6 +86,10 @@ export default class Navigation extends Component {
 			pageTitle = 'Quizzes by Topic'
 		} else if (parts[0] === 'multiplechoicequestions') {
 			pageTitle = decodeURI(parts[1]) + ' Quiz'
+		} else if (parts[0] === 'mymultiplechoicequestions') {
+			pageTitle = 'Review Quiz '+ (parts[1] ? ' - '+decodeURI(parts[1]) : '') 
+		} else if (parts[0] === 'mymultiplechoicetopics') {
+			pageTitle = 'My Topics Quiz '+ (parts[1] ? ' - '+decodeURI(parts[1]) : '')
 		} else if (parts[0] === 'recentcomments') {
 			pageTitle = 'Recent Comments'
 		} else if (parts[0] === 'sitemap') {

@@ -64,6 +64,7 @@ export default class ProfilePage extends Component {
 				console.log(['ERR',err]);
 			});
 		}
+		
 	}
 	
 	showTopButtons() {

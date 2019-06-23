@@ -11,18 +11,26 @@ const mustache = require('mustache');
 function initRoutes(router,db) {
 	
 	router.post('/reportproblem', (req, res) => {
-		let content='Reported By ' + req.body.user.username + '<br/><br/>' + req.body.problem + '<br/><br/>Question: ' + JSON.stringify(req.body.question);
+		let content='Reported By ' + req.body.userAvatar + '<br/><br/>' + req.body.comment + '<br/><br/>';
+		if (req.body.question) {
+			let question = req.body.question;
+			content += 'Question: ' + (question.interrogative ? question.interrogative + ' ' : '') + question.question;
+			let  link = config.protocol + "://"  + config.host + '/discover/topic/'+question.quiz+'/'+question._id;
+			content += '\n\n<br/><a href="'+link+'" >View Question</a>'
+		}
+		
+		
 		let data = req.body;
 		data.createDate = new Date()
 				
 		db().collection('reportedProblems').save(data);
 		////console.log(['report',req.body]);
 		utils.sendMail(config.mailFrom,config.mailFrom,"Problem Content Report from Mnemo's Library ",content);
-		res.send('sent email');
+		res.send({ok:'sent email'});
 	});
 
 	router.post('/savecomment', (req, res) => {
-		//console.log(['TRY save comment',req.body]);
+		console.log(['TRY save comment',req.body]);
 			
 		if (req.body.user && (req.body.type === 'note' || req.body.type === 'comment'|| req.body.type === 'question')) {
 			let data = req.body;
@@ -31,8 +39,31 @@ function initRoutes(router,db) {
 			} else {
 				data.createDate = new Date()
 			}
+			
 			data.user = ObjectId(req.body.user)
 			data.question = ObjectId(req.body.question);
+			
+			// send mail when reply is added/updated
+			if (req.body.isReply && req.body.userEmail  && req.body.userEmail.length > 0) {
+				if (req.body.userEmailPreferences && req.body.userEmailPreferences === "none") {
+					console.log('USER PREFERS NO EMAIL')
+					
+				} else { 
+					if (req.body.replies && req.body.replies.length > 0) {
+						let replyText=req.body.replies[req.body.replies.length - 1].text;
+						let replyAvatar=req.body.replies[req.body.replies.length - 1].userAvatar;						
+						let content=replyAvatar + ' replied to your comment <br/><i>"' + req.body.comment + '"</i><br/><br/><br/>'+replyAvatar +' said <i>"' + replyText + '"</i><br/>';
+						if (req.body.questionText) {
+							content += 'Question: ' + req.body.questionText;
+						}
+						let  link = config.protocol + "://"  + config.host + '/discover/topic/'+req.body.questionTopic+'/'+req.body.question;
+						content += '\n\n<br/><a href="'+link+'" >View Discussion</a>'
+						utils.sendMail(config.mailFrom,req.body.userEmail,"New Reply to your comment on Mnemo's Library ",content);
+						console.log('SENT COMMENT REPLY')
+					}
+				}
+			}
+
 			db().collection('comments').save(data).then(function() {
 				//console.log(['save comment',data]);
 				res.send({ok:true})
@@ -50,7 +81,7 @@ function initRoutes(router,db) {
 			let filter = {$and:[{_id:{$eq:ObjectId(req.body.comment)}},{user:{$eq:ObjectId(req.body.user)}},{question:{$eq:ObjectId(req.body.question)}}]}
 			
 			db().collection('comments').deleteOne(filter).then(function() {
-				console.log(['deleted comment',JSON.stringify(filter)]);
+			//	console.log(['deleted comment',JSON.stringify(filter)]);
 					res.send({ok:true})
 				});
 		} else {
@@ -81,7 +112,7 @@ function initRoutes(router,db) {
 			let limit = req.query.limit && req.query.limit > 0 ? parseInt(req.query.limit,10) : 10;
 			//console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
 			db().collection('comments').find({$or:[{type:{$eq:'question'}},{type:{$eq:'comment'}}]}).sort({createDate:-1}).limit(limit).toArray(function(err,results) {
-				console.log(['FOUND COMMENTS',err,results])
+				//console.log(['FOUND COMMENTS',err,results])
 				res.send(results)
 			});
 		}

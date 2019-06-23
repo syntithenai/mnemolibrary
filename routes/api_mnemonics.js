@@ -106,12 +106,12 @@ function initRoutes(router,db) {
 						   // console.log('REMOVED MNEMONIC FOUND Q HAS MNEMONIC ');
 						} else {
 							db().collection('mnemonics').find({question:ObjectId(mnemonic.question)}).toArray().then(function(mnemonics) {
-								console.log('REMOVED MNEMONIC FOUND MNEMONICS ');
+								//console.log('REMOVED MNEMONIC FOUND MNEMONICS ');
 								if (mnemonics && mnemonics.length > 0) {
 									// yes, nothing to do
 								   // console.log('REMOVED MNEMONIC FOUND some mneem '+mnemonics.length);
 								} else {
-									console.log('UPDATE QUESTION WITHOUT MNEMONIC');
+									//console.log('UPDATE QUESTION WITHOUT MNEMONIC');
 									db().collection('questions').update({_id:ObjectId(mnemonic.question)},{$set:{hasMnemonic:false}}).then(function() {
 										//console.log('REMOVED MNEMONIC UPDATED QUESTION AFTER LOOKUP ');
 									});

@@ -464,7 +464,7 @@ initdb().then(function() {
 
 
 	router.post('/discover', (req, res) => {
-	   console.log(['discover',req.body]);
+	   //console.log(['discover',req.body]);
 		let orderBy = req.body.orderBy ? req.body.orderBy : 'successRate';
 		let sortFilter={};
 		let limit = req.body.limit ? req.body.limit : 5;
@@ -484,7 +484,7 @@ initdb().then(function() {
 			}
 			
 			
-		    console.log(['disco criteria',JSON.stringify(criteria)]);
+		   // console.log(['disco criteria',JSON.stringify(criteria)]);
 			db().collection('questions').find({$and:criteria})
 			//db().collection('questions').aggregate({$match:{$nin:notThese}})
 			.sort(sortFilter).limit(limit).toArray().then(function( questions) {
@@ -509,7 +509,7 @@ initdb().then(function() {
 		};
 		 // block selected question for specific lookup as second query
 		 if (req.body.selectedQuestion && req.body.selectedQuestion.length > 0) {
-			 console.log(['DISCOVER NOT SELECTED QUESTION',req.body.selectedQuestion])
+			// console.log(['DISCOVER NOT SELECTED QUESTION',req.body.selectedQuestion])
 			 criteria.push({_id:{$ne:ObjectId(req.body.selectedQuestion)}});
 		 }
 		
@@ -1175,12 +1175,12 @@ initdb().then(function() {
 	
 	router.post('/sendallquestionsforreview', (req, res) => {
 		if (req.body.user && req.body.user.length > 0 && req.body.questions && req.body.questions.length > 0 ) {
-		    console.log(['sendallquestionsforreview',req.body.user,JSON.stringify(req.body.questions)]);
+		  //  console.log(['sendallquestionsforreview',req.body.user,JSON.stringify(req.body.questions)]);
 			let user = req.body.user;
 			let questions = req.body.questions;
 			let ts = new Date().getTime();
 			questions.map(function(question) {
-				console.log('insert seen record for question '+question);
+				//console.log('insert seen record for question '+question);
 				db().collection('seen').insert({user:ObjectId(user),question:ObjectId(question),timestamp:ts}).then(function(inserted) {
 			  //      //console.log(['seen inserted']);
 					// collate tally of all seen, calculate success percentage to successScore
@@ -1355,17 +1355,17 @@ initdb().then(function() {
 	})
 
 	router.post('/savewikidata', (req, res) => {
-		console.log(['SAVEWIKIDATA',req.body]);
+		//console.log(['SAVEWIKIDATA',req.body]);
 		let body = req.body; //JSON.parse(req.body)
 	 //   //console.log(['seen',req.body]);
 		if (body._id && body._id.length > 0) {//   && req.body.technique  && req.body.questionText ) {
-		    console.log('HAVE ID');
+		 //   console.log('HAVE ID');
 			if ((body.answer && body.answer.length > 0) || (body.image && body.image.length > 0)) {
-			    console.log('HAVE DATA');
+			//    console.log('HAVE DATA');
 				let toSave={}
 				if (body.answer && body.answer.length > 0) toSave.answer = body.answer;
 				if (body.image && body.image.length > 0) toSave.image = body.image;
-			    console.log(['SAVEWIKIDATA real',toSave]);
+			//    console.log(['SAVEWIKIDATA real',toSave]);
 				db().collection('questions').update({_id:ObjectId(body._id)},{$set:toSave}).then(function(updated) {
 				    res.send(['updated',updated]);
 				}).catch(function(e) {

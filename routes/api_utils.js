@@ -550,7 +550,7 @@ function initRoutes(router,db) {
 						}
 					}
 					Promise.all(promises).then(function(ids) {
-						console.log(['import  all promises',ids]);
+					//	console.log(['import  all promises',ids]);
 							
 						
 						let mcPromises = [];
@@ -595,11 +595,11 @@ function initRoutes(router,db) {
 							let ids=[];
 							let final=[];
 							//console.log(['TODUMPE v',Object.keys(recordIndex)])
-							console.log(['TODUMPE mc']); //,JSON.stringify(toDump)])
+							//console.log(['TODUMPE mc']); //,JSON.stringify(toDump)])
 									
 							toDump.map(function(val) {
 								if (val) {
-									console.log(['MERGE BACK MC QUESTION IDS',val._id,val.questionId,val.questionId ? recordIndex[val.questionId] : null])
+									//console.log(['MERGE BACK MC QUESTION IDS',val._id,val.questionId,val.questionId ? recordIndex[val.questionId] : null])
 									//console.log(['TODUMPE v',val])
 									ids.push(ObjectId(val._id));
 									// update main question with mcQuestionId to allow update

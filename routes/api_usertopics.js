@@ -334,7 +334,7 @@ function initRoutes(router,db) {
 						if (userTopic.questions && userTopic.questions.length > 0) {
 							userTopic.questions.map(function(questionR,key) {
 								let question = JSON.parse(JSON.stringify(questionR));
-			                   console.log(['PUBLISH',question,key]);
+			                  // console.log(['PUBLISH',question,key]);
 								question.sort=key;
 								question.quiz=user.avatar+'\'s '+userTopic.topic;
 								if (question._id) {
@@ -400,7 +400,7 @@ function initRoutes(router,db) {
 									&& question.specific_answer && question.specific_answer.length > 0
 									&& question.multiple_choices && question.multiple_choices.length > 0
 								) {
-									console.log(['NEW MC QUESTION']);
+									//console.log(['NEW MC QUESTION']);
 									let newQuestion ={_id:ObjectId(),topic:question.quiz,question:question.specific_question,answer:question.specific_answer,multiple_choices:question.multiple_choices,questionId:ObjectId(question._id),feedback:question.feedback,importId:'USERTOPIC-'+req.body._id,userTopic:ObjectId(req.body._id)}
 									if (question.autoshow_image==="YES" && question.image) newQuestion.image = question.image;
 									if (question.autoplay_media==="YES" && question.media) newQuestion.media = question.media;
@@ -452,11 +452,11 @@ function initRoutes(router,db) {
 										updateTags(tags);
 										updateMnemonics(mnemonics);
 										db().collection('multiplechoicequestions').remove({userTopic:{$eq:ObjectId(req.body._id)}}).then(function(delresult) {
-											console.log(['INSERT MC QUESTIONS',mcQuestions])
+											//console.log(['INSERT MC QUESTIONS',mcQuestions])
 										    if (mcQuestions && mcQuestions.length > 0) {
 												try {
 													db().collection('multiplechoicequestions').insertMany(mcQuestions).then(function(ires) {
-														console.log(['INSERTed MC QUESTIONS',ires])
+													//	console.log(['INSERTed MC QUESTIONS',ires])
 												
 													})
 												} catch(e) {

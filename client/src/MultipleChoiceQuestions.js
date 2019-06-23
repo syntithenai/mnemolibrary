@@ -63,6 +63,8 @@ export default class MultipleChoiceQuestions extends Component {
 		this.showQuizOptionsDialog = this.showQuizOptionsDialog.bind(this)
 		this.hideQuizOptionsDialog = this.hideQuizOptionsDialog.bind(this)
 		this.sendAllQuestionsForReview = this.sendAllQuestionsForReview.bind(this)
+		this.loadMyTopics = this.loadMyTopics.bind(this)
+		this.loadMyQuestions = this.loadMyQuestions.bind(this)
 	};
     
     componentDidMount() {
@@ -71,7 +73,7 @@ export default class MultipleChoiceQuestions extends Component {
         this.loadQuestions();
        //	scrollToComponent(this.scrollTo['top'],{align:'top',offset:0});
     	//scrollToComponent(this.scrollTo['top'],{align:'top',offset:-160});
-		
+	
     };
     
     componentDidUpdate(props,state) {
@@ -80,7 +82,8 @@ export default class MultipleChoiceQuestions extends Component {
 			this.loadQuestions()
 		}
 		if (this.props.user && !props.user) {
-			this.nextQuestion()
+			this.loadQuestions();
+        	this.nextQuestion()
 		}
 		if (state.currentQuestion != this.state.currentQuestion) {
 			console.log(['scroll to','question_'+this.state.currentQuestion,this.scrollTo['question_'+this.state.currentQuestion]])
@@ -92,16 +95,18 @@ export default class MultipleChoiceQuestions extends Component {
 		this.setState({showShareDialog:val});
 	}
 	
-    
-    loadQuestions() {
+	loadMyTopics() {
 		let that = this;
-		let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
-		if (topic && topic.length > 0 ) {
-			let questionQuery='';
-			if (this.props.question) {
-				questionQuery='&questionId='+this.props.question;
+		console.log(['load my topics',this.props])
+
+		if (this.props.user) {
+			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
+			let topicQuery='';
+			if (topic && topic.length > 0 ) {
+				topicQuery='&topic='+topic;
 			}
-			fetch('/api/mcquestions?topic='+topic+questionQuery)
+			console.log(['FETCH','/api/mymctopics?user='+this.props.user._id + topicQuery])
+			fetch('/api/mymctopics?user='+this.props.user._id + topicQuery)
 			.then(function(response) {
 				console.log(['got response'])
 				return response.json()
@@ -122,6 +127,79 @@ export default class MultipleChoiceQuestions extends Component {
 			}).catch(function(ex) {
 				console.log(['parsing failed', ex])
 			})
+			
+		}
+    }
+    
+    loadMyQuestions() {
+		let that = this;
+		if (this.props.user) {
+			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
+			let topicQuery='';
+			if (topic && topic.length > 0 ) {
+				topicQuery='&topic='+topic;
+			}
+			fetch('/api/mymcquestions?user='+this.props.user._id + topicQuery)
+			.then(function(response) {
+				console.log(['got response'])
+				return response.json()
+			}).then(function(json) {
+				console.log(['got mount json',json])
+				let filteredQuestions = json.map(function(question,key) {
+					let a = {}
+					that.questionsIndex[question._id] = key;
+					let possibleAnswers = question.multiple_choices.split("|||");
+					possibleAnswers.push(question.answer);
+					possibleAnswers = shuffle(possibleAnswers);
+					question.possibleAnswers = possibleAnswers;
+					return question;
+				});
+				if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
+				that.setState({questions:filteredQuestions});
+			
+			}).catch(function(ex) {
+				console.log(['parsing failed', ex])
+			})
+			
+		}
+    }
+    
+    loadQuestions() {
+		console.log(['LOAD Q',this.props.mode])
+		if (this.props.mode && this.props.mode === "myquestions") {
+			this.loadMyQuestions();
+		} else if (this.props.mode && this.props.mode === "mytopics") {
+			this.loadMyTopics();
+		} else {
+			let that = this;
+			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
+			if (topic && topic.length > 0 ) {
+				let questionQuery='';
+				if (this.props.question) {
+					questionQuery='&questionId='+this.props.question;
+				}
+				fetch('/api/mcquestions?topic='+topic+questionQuery)
+				.then(function(response) {
+					console.log(['got response'])
+					return response.json()
+				}).then(function(json) {
+					console.log(['got mount json',json])
+					let filteredQuestions = json.map(function(question,key) {
+						let a = {}
+						that.questionsIndex[question._id] = key;
+						let possibleAnswers = question.multiple_choices.split("|||");
+						possibleAnswers.push(question.answer);
+						possibleAnswers = shuffle(possibleAnswers);
+						question.possibleAnswers = possibleAnswers;
+						return question;
+					});
+					if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
+					that.setState({questions:filteredQuestions});
+				
+				}).catch(function(ex) {
+					console.log(['parsing failed', ex])
+				})
+			}
 		}
 	}
     
@@ -290,9 +368,10 @@ export default class MultipleChoiceQuestions extends Component {
 		let userCorrectTally = 0;
 		
 		let userId = this.props.user ? this.props.user._id : 'unknownuser';
-		let isQuestionPage = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? false : true;
+		let isQuestionPage = this.props.viewOnly ? true : false; 
+		//this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? false : true;
 		let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
-		if (topic && topic.length > 0) {
+		//if (topic && topic.length > 0) {
 			if (this.state.questions && this.state.questions.length > 0) { 
 				questions = this.state.questions.map(function(question,questionKey) {
 					
@@ -345,20 +424,20 @@ export default class MultipleChoiceQuestions extends Component {
 						})
 						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
 						
-						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}  donClick={(e) => that.setCurrentQuestion(questionKey)} key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black', marginBottom: '1em'}} > 
+						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}   key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black', marginBottom: '1em'}} > 
 						
 						{!that.props.viewOnly && question.image && question.image.length > 0 && <img src={question.image}  style={{float:'right',width:'200px'}} />}
 						
 						<b style={{paddingTop: '1em'}}>{question.question}</b>
 						
-						<div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> 
+						{!that.props.viewOnly && <div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> }
 
 						{!that.props.viewOnly && answered && <div>
 							You  {userAnswerCorrect?'' : ' incorrectly '} answered {userAnswer}. {!userAnswerCorrect ? ' The correct answer is '+question.answer+".":''}
 						</div>}
 						{!that.props.viewOnly && answered  && <i style={{paddingTop: '2em'}}>{question.overallPercentCorrect ? question.overallPercentCorrect : 0} percent of {question.seen > 0 ? question.seen : 1} people answered correctly.</i> }
 	
-						<div className='questionbuttons' style={{width:'100%', minHeight: '2em'}} >
+						{!that.props.viewOnly && <div className='questionbuttons' style={{width:'100%', minHeight: '2em'}} >
 							{!that.props.viewOnly && !isQuestionPage && question.questionId && question.topic && <div>
 								<div style={{float:'right'}}><Link  to={moreInfoLink} className='btn btn-info'>{moreInfoIcon} <span className="d-none d-sm-inline" >More Information</span></Link></div> 
 							</div> }
@@ -370,17 +449,17 @@ export default class MultipleChoiceQuestions extends Component {
 							
 							{<a style={{float:'right',color:'white'}} onClick={that.nextQuestion} className='btn btn-success' ><NextIcon size={26} /> <span className="d-none d-sm-inline" >Next Question</span></a>}
 									
-						</div>		
+						</div>}		
 
 						
 						<div style={{ width:'', marginTop: '1em',padding: '0.5em', border: '1px solid black' , backgroundColor:'#eee',borderRadius:'30px',marginRight:'1em'}}>{answerButtons}</div> 
 						<div id={'question_'+questionKey}></div>
 						
-						{(that.props.viewOnly || answered) && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
+						{!that.props.viewOnly &&  answered && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
 
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em'}}><b>Memory Aid</b> {question.relatedQuestion.mnemonic}</div>}
 					
-						{!that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.tags && question.relatedQuestion.tags.length > 0 && <div id='relatedtags' style={{marginTop:'1em'}}><b>Tags</b> {tagsRendered}</div>}
+						{!that.props.viewOnly && answered && question.relatedQuestion && question.relatedQuestion.tags && question.relatedQuestion.tags.length > 0 && <div id='relatedtags' style={{marginTop:'1em'}}><b>Tags</b> {tagsRendered}</div>}
 						
 						</div>
 					} else {
@@ -388,11 +467,18 @@ export default class MultipleChoiceQuestions extends Component {
 					}
 				})
 			} else {
-				return null; //<b>No quiz questions for this topic</b>
+				let message = null;
+				if (this.props.mode && this.props.mode === "myquestions" ) {
+					message=<b>You have answered all the multiple choice questions that are on your review list.</b>
+				} else if (this.props.mode && this.props.mode === "mytopics" ) {
+					message=<b>You have answered all the multiple choice questions for all the topics you have explored.</b>
+				} 
+				
+				return message ? <div style={{paddingLeft:'1em'}}>{message}<br/><br/><br/><Link className='btn btn-info' to='/' >Discover Something New</Link></div> : null;
 			}
-		} else {
-			questions=<b>Missing required topic</b>
-		}
+		//} else {
+			//questions=<b>Missing required topic</b>
+		//}
 		let quizLength = this.state.questions ? this.state.questions.length : 0;
 		let successRate = userAnsweredTally > 0 ? parseInt(userCorrectTally/userAnsweredTally*100,10) : 0;
 		let totalMessage=<span style={{float:'left'}}><div><b>Questions Answered</b> {userAnsweredTally}/{this.state.questions ? this.state.questions.length : 0}</div><div> <b>Success Rate</b> {successRate}%</div></span>
