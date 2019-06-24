@@ -107,13 +107,15 @@ initdb().then(function() {
 					return;
 				}
 				result.toArray().then(function(final) {
-				   //console.log(['RECENT TOPICS',final]);
+				    console.log(['RECENT TOPICS',final]);
 					let topics = [];
 					let totalQuestions = 0;
 					final.map(function(val,key) {
 						// require topic, skip archived (success > 0.7)
 						if (val.successRate<0.7 && val.topic && String(val.topic).length > 0) {
 							collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
+							console.log(['push TOPICS',val.topic]);
+					
 							topics.push({quiz:{$eq:val.topic}});                        
 						}
 						totalQuestions += val.questions;
@@ -131,7 +133,11 @@ initdb().then(function() {
 					} else {
 						topicCriteria={'magicfield' : {$eq:'neverfound'}};
 					}
-					let criteria={$and:[{access:{$eq:'public'}},topicCriteria]};
+					//{access:{$eq:'public'}},
+					let criteria={$and:[topicCriteria]};
+					
+					
+					
 					// lookup all questions in those topics and set total(questions) for each for each collatedTopic
 					db().collection('questions').aggregate([
 						{ $match: criteria
@@ -462,7 +468,42 @@ initdb().then(function() {
 		//}
 	//})
 
-
+	// if topic exists in user topics and has a topicpassword, check if user has topic and password
+	router.post('/checktopic', (req, res) => {
+		if (req.body.topic && req.body.topic.length > 0) {
+			db().collection('userTopics').findOne({publishedTopic:req.body.topic}).then(function(userTopic) {
+				if (userTopic && userTopic.topicpassword  && userTopic.topicpassword.length > 0) {
+					if (req.body.user && req.body.user.length > 0) {
+						db().collection('users').findOne({_id:ObjectId(req.body.user)}).then(function(user) {
+							if (user && user.topicPasswords && user.topicPasswords.hasOwnProperty(req.body.topic) && userTopic.topicpassword === user.topicPasswords[req.body.topic]) {
+								res.send({ok:true})
+							} else {
+								res.send({ok:false,error:'no matching password'})
+							}
+						})
+					} else {
+						// no matching user topic and no password 
+						res.send({ok:false,error:'invalid parameter missing user'})
+					}
+				} else {
+					// no matching user topic and no password 
+					res.send({ok:true})
+				}
+				//db().collection('progress').findOne({user:req.body.user}).then(function(progress) {
+					//res.send(progress);
+				//}).catch(function(e) {
+					////console.log(e);
+					//res.send({});
+				//});
+			}).catch(function(e) {
+				//console.log(e);
+				res.send({ok:false,error:e});
+			});
+		} else {
+			res.send({ok:false,error:'invalid parameters'})
+		}
+	})
+	
 	router.post('/discover', (req, res) => {
 	   //console.log(['discover',req.body]);
 		let orderBy = req.body.orderBy ? req.body.orderBy : 'successRate';
@@ -491,6 +532,7 @@ initdb().then(function() {
 			  // console.log(['user res',questions ? questions.length : 0]); 
 			   
 			   //console.log(['disco selqiest',req.body.selectedQuestion]);
+				// when a question id is specified, make sure that question is loaded as the first question in the response
 				if (req.body.selectedQuestion && req.body.selectedQuestion.length > 0) {
 				 //   console.log(['disco selqiest',req.body.selectedQuestion]);
 					db().collection('questions').findOne({_id:ObjectId(req.body.selectedQuestion)}).then(function(question) {

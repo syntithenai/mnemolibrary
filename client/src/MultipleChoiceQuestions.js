@@ -178,6 +178,10 @@ export default class MultipleChoiceQuestions extends Component {
 				if (this.props.question) {
 					questionQuery='&questionId='+this.props.question;
 				}
+				// single view page needs all but quiz list page needs not answered
+				if (!this.props.viewOnly) {
+					questionQuery+='&status=asked';
+				}
 				fetch('/api/mcquestions?topic='+topic+questionQuery)
 				.then(function(response) {
 					console.log(['got response'])

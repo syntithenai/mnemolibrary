@@ -31,15 +31,16 @@ export default class QuestionList extends Component {
 					}
                     
                     if (this.props.onClick) {
-                       return <div className='list-group-item' key={question._id} >
-                        <span onClick={(e) => this.props.onClick(question)}  >{title} ? {excerpt}</span>
+                       return <div className='list-group-item' key={question._id} onClick={(e) => this.props.onClick(question)}  >
+                        <span  >{title} ? {excerpt}</span>
                         {details}
                         </div>
                     } else {
-                         return <div className='list-group-item' key={question._id} >
-                        <Link to={"/discover/topic/"+question.quiz+"/"+question._id}  >{title} ? {excerpt}</Link>
+                         return <Link to={"/discover/topic/"+question.quiz+"/"+question._id}  ><div className='list-group-item' key={question._id} >
+                        {title} ? {excerpt}
                         {details}
                         </div>
+                        </Link>
                     }
                   
                   

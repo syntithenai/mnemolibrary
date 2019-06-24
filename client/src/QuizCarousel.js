@@ -24,7 +24,8 @@ export default withRouter( class QuizCarousel extends Component {
           //  'isReview': this.props.isReview,
             'success' : [],
             'logged':{seen:{},success:{}},
-            showQuestionListDetails: false
+            showQuestionListDetails: false,
+            exitRedirect:null
         };
         this.handleQuestionResponse = this.handleQuestionResponse.bind(this);
         this.currentQuestion = this.currentQuestion.bind(this);
@@ -56,7 +57,7 @@ export default withRouter( class QuizCarousel extends Component {
     
     
     componentDidUpdate(props) {
-		//console.log(['QUIZ CAR DID UPDATE',props.match,this.props.match]);
+		console.log(['QUIZ CAR DID UPDATE',props.match,this.props.match]);
         if (this.props.isReview !== true) {
             // ensure existence old and new match.params    
 			if (this.props.match && props.match && this.props.match.params && props.match.params) {
@@ -85,22 +86,56 @@ export default withRouter( class QuizCarousel extends Component {
     hideQuestionList() {
 		this.setState({showList:false})
 	}
-    
+  
+     
     initialiseFromParams() {
 		let that = this;
 			//console.log(['QUIZ CAR DID MOUNT',this.props,this.props.isReview,this.props.match]); //this.state.currentQuiz,this.props.questions
             if (this.props.match && this.props.match.params && this.props.match.params.searchtopic && this.props.match.params.searchtopic.length > 0) {
                 // DISCOVERY
-                setTimeout(function() {
-                     that.props.setQuizFromTopic(that.props.match.params.searchtopic,that.props.match.params.topicquestion);
-                     if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
-                },1000);
+               fetch('/api/checktopic',{ method: "POST",headers: {
+						"Content-Type": "application/json"
+						},
+						body:JSON.stringify({
+							topic:this.props.match.params.searchtopic,
+							user:(this.props.user ? this.props.user._id : ''),
+						})
+					})
+				  .then(function(response) {
+					return response.json()
+				}).then(function(json) {
+					if (json.ok === true) {
+						  
+						setTimeout(function() {
+							 that.props.setQuizFromTopic(that.props.match.params.searchtopic,that.props.match.params.topicquestion);
+							 if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
+						},1000);
+					} else {
+						that.goto('/access/search/'+that.props.match.params.searchtopic);
+					}
+				})
             } else if (this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0) {
                 // DISCOVERY
-                 setTimeout(function() {
-                     that.props.discoverQuizFromTopic(that.props.match.params.topic,that.props.match.params.topicquestion);
-					if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
-                },1000);
+                 fetch('/api/checktopic',{ method: "POST",headers: {
+						"Content-Type": "application/json"
+						},
+						body:JSON.stringify({
+							topic:this.props.match.params.topic,
+							user:(this.props.user ? this.props.user._id : ''),
+						})
+					})
+				  .then(function(response) {
+					return response.json()
+				}).then(function(json) {
+					if (json.ok === true) {
+						setTimeout(function() {
+							 that.props.discoverQuizFromTopic(that.props.match.params.topic,that.props.match.params.topicquestion);
+							if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
+						},1000);
+					} else {
+						that.goto('/access/discover/'+that.props.match.params.topic);
+					}
+				});
             } else if (this.props.match &&  this.props.match.params && this.props.match.params.topics && this.props.match.params.topics.length > 0) {
                 // DISCOVERY
                 setTimeout(function() {
@@ -447,11 +482,14 @@ export default withRouter( class QuizCarousel extends Component {
         if (this.state.exitRedirect && this.state.exitRedirect.length > 0) {
             return <Redirect to={this.state.exitRedirect} />
         } else {
-            //let questions = this.props.currentQuiz;
+            let questions = this.props.currentQuiz;
             ////console.log(['RENDER CAROUS',questions]);
-            //if (Array.isArray(questions) && questions.length > 0) {
+            if (Array.isArray(questions) && questions.length > 0) {
                 
-            //} else if (this.props.discoverQuestions) {
+            } else if (Array.isArray(questions)) {
+				return <div className="fadeMeIn" style={{marginLeft:'1em'}}><h3>No more questions</h3><span>You have seen all the questions in this topic/category</span></div>
+			}
+            // else if (this.props.discoverQuestions) {
                 //questions = this.props.discoverQuestions();
             //}
           //  //console.log(['RENDER CAROUS2',questions]);
@@ -492,7 +530,9 @@ export default withRouter( class QuizCarousel extends Component {
                     
             return (
                 <div className='quiz-carousel'>
-                    {content}
+                   { this.state.exitRedirect && this.state.exitRedirect.length > 0 &&  <Redirect to={this.state.exitRedirect} />}
+            
+					{content}
                 </div>
             )
             

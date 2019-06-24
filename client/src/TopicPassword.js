@@ -23,9 +23,15 @@ export default  class TopicPassword extends Component {
         
         if (that.props.match.params.topic && that.props.user && that.props.user.topicPasswords && that.props.user.topicPasswords.hasOwnProperty(that.props.match.params.topic)  && that.props.user.topicPasswords[that.props.match.params.topic].length > 0) {
 			// already entered password
-			that.setState({'exitRedirect':'/discover/topic/'+that.props.match.params.topic+(that.props.match.params.topicquestion ? '/'+that.props.match.params.topicquestion : '')})
+			that.setState({'exitRedirect':'/discover/'+that.props.mode+'/'+that.props.match.params.topic+(that.props.match.params.topicquestion ? '/'+that.props.match.params.topicquestion : '')})
 		}
     }
+    
+    //componentShouldUpdate(props,state) {
+		//if (state.exitRedirect != this.state.exitRedirect) {
+			//return true;
+		//}
+	//}
     
     componentDidUpdate() {
 		let that = this;
@@ -33,7 +39,7 @@ export default  class TopicPassword extends Component {
         
         if (that.props.match.params.topic && that.props.user && that.props.user.topicPasswords && that.props.user.topicPasswords.hasOwnProperty(that.props.match.params.topic)  && that.props.user.topicPasswords[that.props.match.params.topic].length > 0) {
 			// already entered password
-			that.setState({'exitRedirect':'/discover/topic/'+that.props.match.params.topic+(that.props.match.params.topicquestion ? '/'+that.props.match.params.topicquestion : '')})
+			that.setState({'exitRedirect':'/discover/'+that.props.mode+'/'+that.props.match.params.topic+(that.props.match.params.topicquestion ? '/'+that.props.match.params.topicquestion : '')})
 		}
     }
     
@@ -45,7 +51,7 @@ export default  class TopicPassword extends Component {
 		this.checkPassword(that.props.match.params.topic,this.state.topicpassword).then(function() {
 			that.saveUser().then(function() {
 				// redirect
-				that.setState({'exitRedirect':'/discover/topic/'+that.props.match.params.topic+(that.props.match.params.topicquestion ? '/'+that.props.match.params.topicquestion : '')})
+				that.setState({'exitRedirect':'/discover/'+that.props.mode+'/'+that.props.match.params.topic+(that.props.match.params.topicquestion ? '/'+that.props.match.params.topicquestion : '')})
 			});			
 		}).catch(function(e) {
 			that.setState({'warning_message':"Sorry, that's not the password I'm looking for."})
@@ -103,6 +109,7 @@ console.log(result);
     render() {
 		if (this.props.user) {
 		   if (this.state.exitRedirect && this.state.exitRedirect.length > 0) {
+				//return <b>{this.state.exitRedirect}</b>
 				return <Redirect to={this.state.exitRedirect} />
 			} else {
 				

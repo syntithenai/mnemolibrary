@@ -19,6 +19,7 @@
     "install": "^0.10.4",
     "jquery": "^3.3.1",
     "mongodb": "^3.0.4",
+    "mongodb-backup": "^1.6.9",
     "mongoose": "^5.0.9",
     "morgan": "^1.9.0",
     "mqtt": "^2.18.0",

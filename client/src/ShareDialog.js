@@ -23,8 +23,15 @@ export default class ShareDialog extends Component {
 						
 					  </div>
 					  <div className="modaldialog-body">
-						 
 
+ 
+ <div className="fb-like" 
+    data-href="https://mnemolibrary.com" 
+    data-layout="standard" 
+    data-action="like" 
+    data-show-faces="true">
+  </div>
+  
 						<InlineShareButtons config={{
 							alignment: 'center',  // alignment of buttons (left, center, right)
 							color: 'social',      // set the color of buttons (social, white)
@@ -34,10 +41,11 @@ export default class ShareDialog extends Component {
 							language: 'en',       // which language to use (see LANGUAGES)
 							networks: [           // which networks to include (see SHARING NETWORKS)
 							  'email',
-							  'twitter','facebook','linkedin','pinterest',
+							  'twitter','facebook',
+							  //'linkedin','pinterest',
 							  // 'print','sms',
 							  //'whatsapp','messenger',
-							  'reddit',  'stumbleupon', 'tumblr','flipboard','livejournal',
+							  //'reddit',  'stumbleupon', 'tumblr','flipboard','livejournal',
 							 //   'xing','mailru','vk', 'meneame', 'oknoklassniki', 'wechat', 'weibo'
 								//  'sharethis'
 							  

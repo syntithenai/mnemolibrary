@@ -194,7 +194,7 @@ function initRoutes(router,db) {
 			//  collate all user progress by topic
 			db().collection('userquestionprogress').aggregate([
 				{ $match: {
-						$and:[{'user': {$eq:ObjectId(req.query.user)}}]
+						$and:[{block:{$ne:1}},{'user': {$eq:ObjectId(req.query.user)}}]
 			   }},
 				{ $group: {'_id': "$question",
 					'questions': { $sum: 1 },
@@ -289,7 +289,7 @@ function initRoutes(router,db) {
 			//  collate all user progress by topic
 			db().collection('userquestionprogress').aggregate([
 				{ $match: {
-						$and:[{'user': {$eq:ObjectId(req.query.user)}}]
+						$and:[{block:{$ne:1}},{'user': {$eq:ObjectId(req.query.user)}}]
 			   }},
 				{ $group: {'_id': "$topic",
 					'questions': { $sum: 1 },
@@ -382,7 +382,9 @@ function initRoutes(router,db) {
 		// filter by question
 		if (req.query.questionId) {
 			filter.push({questionId : {$eq: ObjectId(req.query.questionId)}});
-		}	
+		} else {
+		//	filter.push({$and:[questionExists,answerNotExists]});
+		}
 		// filter by topic
 		if (req.query.topic) {
 			filter.push({topic : {$eq:decodeURI(req.query.topic)}});
@@ -397,7 +399,7 @@ function initRoutes(router,db) {
 		} else if (req.query.status === 'answered') {
 			filter.push({$and:[questionExists,answerExists]});
 		} else if (req.query.status === 'asked') {
-			filter.push({$and:[questionExists,answerNotExists]});
+			filter.push({$and:[questionExists,answerExists,multiple_choiceExists,topicExists,answerNotExists]});
 		// default show only complete
 		} else {
 			filter.push({$and:[questionExists,answerExists,multiple_choiceExists,topicExists]});

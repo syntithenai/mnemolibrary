@@ -110,26 +110,44 @@ let mnemoQueries = {
       let that = this;
       let url='/api/discover';
       
-      let rand=Math.random()
-      fetch(url,{ method: "POST",headers: {
-            "Content-Type": "application/json"
-            },
-            body:JSON.stringify({
-                topic:topic,
-                user:(this.state.user ? this.state.user._id : ''),
-                rand:rand,
-                selectedQuestion:selectedQuestion
-            })
-        })
-      .then(function(response) {
-        return response.json()
-      }).then(function(json) {
-        let result = createIdIndex(json['questions'],selectedQuestion);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
-       // console.log(['set state done', that.state])
-      }).catch(function(ex) {
-        console.log(['parsing failed', ex])
-      })
+      // this.goto()
+      //fetch('/api/checktopic',{ method: "POST",headers: {
+            //"Content-Type": "application/json"
+            //},
+            //body:JSON.stringify({
+                //topic:topic,
+                //user:(this.state.user ? this.state.user._id : ''),
+            //})
+        //})
+      //.then(function(response) {
+        //return response.json()
+      //}).then(function(json) {
+		  //if (json.ok === true) {
+			  let rand=Math.random()
+			  fetch(url,{ method: "POST",headers: {
+					"Content-Type": "application/json"
+					},
+					body:JSON.stringify({
+						topic:topic,
+						user:(that.state.user ? that.state.user._id : ''),
+						rand:rand,
+						selectedQuestion:selectedQuestion
+					})
+				})
+			  .then(function(response) {
+				return response.json()
+			  }).then(function(json) {
+				let result = createIdIndex(json['questions'],selectedQuestion);
+				that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+			   // console.log(['set state done', that.state])
+			  }).catch(function(ex) {
+				console.log(['parsing failed', ex])
+			  })
+			//} else {
+				////that.goto('/access/topic/'+topic);
+			//}
+       
+      //})
       
   },
   

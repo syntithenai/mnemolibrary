@@ -87,7 +87,7 @@ export default class AppLayout extends Component {
           currentTopic: "",
           currentPage: "", //splash
           currentQuestion: 0,
-          questions: [],
+          questions: null,
           indexedQuestions: [],
           topics: [],
           tags: [],
@@ -186,6 +186,8 @@ export default class AppLayout extends Component {
         this.hideCollection = this.hideCollection.bind(this);
         this.collectionVisible = this.collectionVisible.bind(this);
         
+
+        
         //this.setDiscoveryBlock = this.setDiscoveryBlock.bind(this);
         //this.clearDiscoveryBlock = this.clearDiscoveryBlock.bind(this);
         //this.clearDiscoveryBlocks = this.clearDiscoveryBlocks.bind(this);
@@ -226,7 +228,7 @@ export default class AppLayout extends Component {
 		this.setState({comment:comment});
 	}
   
-    loadComments(question,user,limitP) {
+    loadComments(question,user,limitP,filter) {
 		let that=this;
 		let query='';
 		//let currentQuestion = this.getCurrentQuestion()
@@ -236,7 +238,10 @@ export default class AppLayout extends Component {
 		if (user) {
 			query+='&user='+user
 		}
-		
+		if (filter) {
+			query+='&filter='+filter
+		}
+				
 		
 		let limit = limitP > 0 ? '?limit='+limitP : '?limit=50'; 
 		  fetch('/api/comments'+limit+query)
@@ -1189,16 +1194,17 @@ export default class AppLayout extends Component {
     let title=decodeURIComponent(this.state.title);
    // let question = this.getCurrentQuestion()
     //console.log(['APPLAYOUT',question])
-    if (this.isCurrentPage('disabled')) {
+    if (this.state.exitRedirect && this.state.exitRedirect.length > 0) {
+		return <Router><Redirect to={this.state.exitRedirect} /></Router>
+    } else if (this.isCurrentPage('disabled')) {
         return (<div>DISABLED!!</div>);
     } else {
-                
         //let oauth=localStorage.getItem('oauth');
         let authRequest = localStorage.getItem('oauth_request');
         //console.log([authRequest,this.props.token,this.props.user]);
         let auth =JSON.parse(authRequest);
         if (!auth) auth={};
-        
+    
         let searchPage = <div><TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuizFromTopic={this.setQuizFromTopic} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user} showCollection={this.showCollection} hideCollection={this.hideCollection} collectionVisible={this.collectionVisible} collection={this.state.collection} /></div>
         
         let topicsPageOptions={ analyticsEvent:this.analyticsEvent, titleFilter:this.state.titleFilter,setTitleFilter:this.setTitleFilter,topicCollections:this.state.topicCollections,topics:topics,topicTags:this.state.topicTags,tagFilter:this.state.tagFilter,clearTagFilter:this.clearTagFilter,setQuizFromTopic:this.setQuizFromTopic,setQuiz:this.setQuizFromTopic,questionsMissingMnemonics:this.state.questionsMissingMnemonics,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic,setCurrentPage:this.setCurrentPage,isLoggedIn:this.isLoggedIn,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromQuestionId:this.setQuizFromQuestionId,title:title,user:this.state.user,showCollection:this.showCollection,hideCollection:this.hideCollection,collectionVisible:this.collectionVisible,collection:this.state.collection,setQuizFromQuestionId:this.setQuizFromQuestionId ,newCommentReply:this.newCommentReply}
@@ -1215,7 +1221,7 @@ export default class AppLayout extends Component {
         return (
         <Router>
             <div style={{width:'100%'}} className="mnemo">
-                <PropsRoute exact={true} path='/recentcomments/:comment'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} />
+			    <PropsRoute exact={true} path='/recentcomments/:comment'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} />
                 
                 <PropsRoute exact={true} path='/recentcomments'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} />
                 
@@ -1286,9 +1292,11 @@ export default class AppLayout extends Component {
                  <PropsRoute  path="/profile" component={ProfilePage} {...profilePageOptions} analyticsEvent={this.analyticsEvent}/>
                  <br/>
                 
-                 <PropsRoute  exact={true} path="/access/topic/:topic" component={TopicPassword}  user={this.state.user} saveUser={this.saveUser} />
-                 <PropsRoute  path="/access/:topic/:topic/:topicquestion" component={TopicPassword} user={this.state.user} saveUser={this.saveUser} />
+                 <PropsRoute  exact={true} path="/access/search/:topic"  mode='searchtopic' component={TopicPassword}  user={this.state.user} saveUser={this.saveUser} />
+                 <PropsRoute  path="/access/search/:topic/:topicquestion"  mode='searchtopic' component={TopicPassword} user={this.state.user} saveUser={this.saveUser} />
                  
+                 <PropsRoute  exact={true} path="/access/discover/:topic"  mode='topic'  component={TopicPassword}  user={this.state.user} saveUser={this.saveUser} />
+                 <PropsRoute  path="/access/discover/:topic/:topicquestion" mode='topic' component={TopicPassword} user={this.state.user} saveUser={this.saveUser} />
                 
                 <Footer/>
                 

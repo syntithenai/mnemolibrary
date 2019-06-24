@@ -36,9 +36,10 @@ function initRoutes(router,db) {
 			let data = req.body;
 			if (data._id) {
 				data._id = ObjectId(data._id)
-			} else {
-				data.createDate = new Date()
 			}
+			 //else {
+				//data.createDate = new Date()
+			//}
 			
 			data.user = ObjectId(req.body.user)
 			data.question = ObjectId(req.body.question);
@@ -52,13 +53,16 @@ function initRoutes(router,db) {
 					if (req.body.replies && req.body.replies.length > 0) {
 						let replyText=req.body.replies[req.body.replies.length - 1].text;
 						let replyAvatar=req.body.replies[req.body.replies.length - 1].userAvatar;						
-						let content=replyAvatar + ' replied to your comment <br/><i>"' + req.body.comment + '"</i><br/><br/><br/>'+replyAvatar +' said <i>"' + replyText + '"</i><br/>';
+						let content=replyAvatar + ' replied to your comment <br/><i>"' + req.body.comment + '"</i><br/><br/>'+replyAvatar +' said <i>"' + replyText + '"</i><br/>';
 						if (req.body.questionText) {
-							content += 'Question: ' + req.body.questionText;
+							content += '\n\n<br/>\n\n<br/>Question: ' + req.body.questionText;
 						}
 						let  link = config.protocol + "://"  + config.host + '/discover/topic/'+req.body.questionTopic+'/'+req.body.question;
+						let  linkProfile = config.protocol + "://"  + config.host + '/profile';
 						content += '\n\n<br/><a href="'+link+'" >View Discussion</a>'
-						utils.sendMail(config.mailFrom,req.body.userEmail,"New Reply to your comment on Mnemo's Library ",content);
+						content += '\n\n<br/><br/><b>You can change your email notification preferences on the <a href="'+linkProfile+'" >Profile Page</a>'
+						
+						utils.sendMail(config.mailFrom,req.body.userEmail,"Reply to your comment on Mnemo's Library ",content);
 						console.log('SENT COMMENT REPLY')
 					}
 				}
@@ -91,9 +95,19 @@ function initRoutes(router,db) {
 	});
 	
 	router.get('/comments', (req, res) => {
-		//console.log(['FIND COMMENTS',req.query])
+		console.log(['FIND COMMENTS',req.query])
 			
 		let filter = []
+		if (req.query.filter && req.query.filter.length > 0) {
+			let filterParts = req.query.filter.trim().split(' ');
+			let innerFilter=[]
+			filterParts.map(function(token) {
+				innerFilter.push({$or:[{comment:{$regex:token}},{userAvatar:{$regex:token}},{questionTopic:{$regex:token}},{questionText:{$regex:token}}]})
+			})
+			filter.push({$and:innerFilter})
+		}
+		console.log(['FIND COMMENTS F',filter])
+		
 		// filter by question
 		if (req.query.question) {
 			filter.push({question : {$eq: ObjectId(req.query.question)}});
@@ -109,9 +123,10 @@ function initRoutes(router,db) {
 			});
 		// recent comments
 		} else {
-			let limit = req.query.limit && req.query.limit > 0 ? parseInt(req.query.limit,10) : 10;
-			//console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
-			db().collection('comments').find({$or:[{type:{$eq:'question'}},{type:{$eq:'comment'}}]}).sort({createDate:-1}).limit(limit).toArray(function(err,results) {
+			let limit = req.query.limit && req.query.limit > 0 ? parseInt(req.query.limit,10) : 30;
+			console.log(['FIND COMMENTS Q',JSON.stringify({$and:filter})])
+			filter.push({$or:[{type:{$eq:'question'}},{type:{$eq:'comment'}}]})
+			db().collection('comments').find({$and:filter}).sort({createDate:-1}).limit(limit).toArray(function(err,results) {
 				//console.log(['FOUND COMMENTS',err,results])
 				res.send(results)
 			});

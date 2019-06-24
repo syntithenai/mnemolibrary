@@ -10,6 +10,7 @@ import scrollToComponent from 'react-scroll-to-component';
 
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+import {debounce} from 'throttle-debounce';
 
 import CommentIcon from 'react-icons/lib/fa/comment';
 import CommentList from './CommentList';
@@ -18,22 +19,32 @@ export default class RecentComments extends Component {
     constructor(props) {
         super(props);
         //let question = this.props.question ? this.props.question : {};
-        
+        this.state={filter:''}
 		this.scrollTo={};
-
-       //this.loadComments = this.loadComments.bind(this)
+		this.setFilter = this.setFilter.bind(this)
+        this.loadComments = this.loadComments.bind(this)
     //   this.scrollToComment = this.scrollToComment.bind(this)
     };
     
     componentDidMount() {
-        this.props.loadComments(null,null,50)
+        this.loadComments(null,null,50,null,1)
         if (this.props.match && this.props.match.param && this.props.match.param.comment) this.scrollToComment(this.props.match.param.comment)
     }
     
-    componentDidUpdate() {
-		
+    componentDidUpdate(props,state) {
+		if (this.state.filter != state.filter) {
+			this.loadComments(null,null,50,this.state.filter,500)
+        }
     }
     
+    loadComments(a,b,c,d,timeout) {
+		let that = this;
+		clearTimeout(this.debounce);
+		setTimeout(function() {
+			that.props.loadComments(a,b,c,d)
+		},timeout)
+		//debounce(5000,this.props.loadComments(a,b,c,d));
+	}
 
     //scrollToComment(id) {
 		//let that = this;
@@ -43,11 +54,17 @@ export default class RecentComments extends Component {
 
 
 
-
+	setFilter(event) {
+		let val = event.target.value;
+		this.setState({filter:val})
+	}
 
 
     render() {
-		return <div id='recentcomments'><CommentList comments={this.props.comments} isAdmin={this.props.isAdmin} newCommentReply={this.props.newCommentReply}   editComment={this.props.editComment}  deleteComment={this.props.deleteComment} /></div>
+		return <div id='recentcomments'>
+		 <input className="form-control" type="text" value={this.state.filter} onChange={this.setFilter}  placeholder="Search" aria-label="Search" />
+				  
+		<CommentList comments={this.props.comments} isAdmin={this.props.isAdmin} newCommentReply={this.props.newCommentReply}   editComment={this.props.editComment}  deleteComment={this.props.deleteComment} /></div>
 		
 		//let that = this;
 		//if (this.props.comments && this.props.comments.length > 0) {

@@ -44,6 +44,51 @@ Other collections include
 The application supports import of questions from a Google spreadsheet. Administrators of the application can click the Import button to update questions from the spreadsheet. When complete a spreadsheet is downloaded that includes ids for any new questions. !!IT IS IMPORTANT TO COPY AND PASTE THE CONTENT OF THIS FILE BACK TO THE GOOGLE SHEET OR THE IDS OF THE NEW QUESTIONS WILL CHANGE AT EVERY IMPORT AFFECTING LINKING.
 
 
+## Access Controlled Quizzes
+
+Access controlled quizzes can be created by users by ticking the restricted box and entering a password in the Create Topic page.
+
+When the (community) topic is published, for each question in the topic
+- the access field is set to restricted
+- the topicpassword field is set from the topic
+
+When a topic is access controlled, visiting the /discover/topic or /discover/searchtopic (Load Complete Topic) paths results in the user being asked for a password before showing the questions.
+!!! this only works for userTopics (can't add topicpassword to questions in spreadsheet)
+
+The entered password is saved in the user record
+as the topicPasswords field
+ie
+```` 
+"topicPasswords": {
+        "TastyKristopher's australian wattles": "acacia"
+    }
+````
+
+Discover and search questions are restricted by default to access=="public".
+Where there is a user, this criteria is expanded to include 
+- questions with access=="<user._id>"  (their own questions)
+- questions with access=="restricted" where user.topicPasswords field includes a key matching the question quiz field.
+
+
+Restricted questions/topics cannot appear in the review or profile page unless the user has access to discover or search for them so no additional filters are applied to review search.
+ 
+
+
+## Filters for common queries
+
+- access?
+- topic/topics
+
+### Discover
+- seen
+
+### Review
+- userquestionprogress
+
+### Search
+
+
+
 
 ## NPM management
 

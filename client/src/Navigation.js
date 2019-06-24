@@ -105,7 +105,7 @@ export default class Navigation extends Component {
        <div className="navbar-brand" >
           <Link  to="/" onClick={this.goHome}><img alt="Mnemos' Library" src="/mnemoicon-100.png"  data-toggle="collapse" data-target="#navbarCollapse" style={{float:'left',clear:'right' ,height:'4em'}}  /></Link>
        
-       <div className='page-title' style={{color:'yellow',fontSize:'0.9em',  zIndex:99, marginTop: '0.1em'}} >&nbsp;&nbsp;{pageTitle}&nbsp;&nbsp;&nbsp;</div>
+       <div className='page-title' style={{textTransform:'capitalize',color:'yellow',fontSize:'0.9em',  zIndex:99, marginTop: '0.1em'}} >&nbsp;&nbsp;{pageTitle}&nbsp;&nbsp;&nbsp;</div>
           
               <span style={{marginLeft:'1em'}} className="dcol-4">
                 <Link className="btn btn-secondary" to="/multiplechoicetopics"  >{quizIcon} <span  className="d-none d-sm-inline">Quizzes</span></Link>

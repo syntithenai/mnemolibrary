@@ -815,6 +815,33 @@ function initRoutes(router,db) {
 		})
 					
 	});
+	
+	
+	
+	router.get('/backup', (req, res) => {
+		//console.log('backup '+config.databaseConnection+'/'+config.database)
+		//var backup = require('mongodb-backup') 
+		 //res.writeHead(200, {
+			//'Content-Type': 'application/x-tar' // force header for tar download
+		  //});
+
+		  //backup({
+			//uri: config.databaseConnection+config.database, // mongodb://<dbuser>:<dbpassword>@<dbdomain>.mongolab.com:<dbport>/<dbdatabase>
+			//collections: [ 'comments' ], // save this collection only
+			//root: '/tmp',
+			//tar: 'mnemolibrary.tar',
+			////stream: res, // send stream into client response
+			//callback: function(err) {
+
+				//if (err) {
+				  //console.error(err);
+				//} else {
+				  //console.log('finish');
+				//}
+			  //},
+			 //// logger:'/tmp/backuplog'
+		  //});
+	})
 
 };
 
