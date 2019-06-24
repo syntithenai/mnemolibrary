@@ -23,15 +23,7 @@ export default class ShareDialog extends Component {
 						
 					  </div>
 					  <div className="modaldialog-body">
-
- 
- <div className="fb-like" 
-    data-href="https://mnemolibrary.com" 
-    data-layout="standard" 
-    data-action="like" 
-    data-show-faces="true">
-  </div>
-  
+				
 						<InlineShareButtons config={{
 							alignment: 'center',  // alignment of buttons (left, center, right)
 							color: 'social',      // set the color of buttons (social, white)

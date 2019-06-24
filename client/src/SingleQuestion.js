@@ -26,6 +26,8 @@ import CommentIcon from 'react-icons/lib/fa/comment';
 
 import ShareDialog from './ShareDialog';
 
+//import ReactFBLike from 'react-fb-like';
+//import { FacebookProvider, Like } from 'react-facebook';
 
 import scrollToComponent from 'react-scroll-to-component';
 import MnemonicsList from './MnemonicsList';
@@ -660,7 +662,8 @@ export default class SingleQuestion extends Component {
 			//let twitterTitle=(this.props.question.mnemonic ? this.props.question.mnemonic : '') + "  \n" + question.interrogative+ ' ' +question.question  + "?\n" + question.link;
 			let shareLink = window.location.protocol+'//'+window.location.host+"/discover/topic/"+encodeURIComponent(question.quiz)+"/"+question._id;     
             
-            
+            let iframeLink = "https://www.facebook.com/plugins/like.php?href="+shareLink+"&width=100&layout=button_count&action=like&size=large&show_faces=false&share=false&height=26&appId=704362873350885"
+
             //<button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Back&nbsp;</span></button>
                     //<span >&nbsp;</span>
             
@@ -738,12 +741,16 @@ export default class SingleQuestion extends Component {
                              {this.props.user && (!this.props.comments || this.props.comments.length === 0) && <button style={{marginTop:'1em',float:'right'}} onClick={this.props.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
                             
 						
+						&nbsp;  
+						
+						  <button className='btn btn-primary'  style={{float:'right',clear:'both' ,marginTop:'1em', padding: '0.4em'}}  ><iframe src={iframeLink} width="100" height="26" style={{border:'none',overflow:'hidden'}} scrolling="no" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe></button>
                             &nbsp;  
 						    {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
                          }
                         {(target) && <a style={{float:'right',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
                         }
                         </span>}
+                        
                         
                         
                         <div  className="card-title questionheader">{this.props.isReview && <br/>}{header}?</div>
