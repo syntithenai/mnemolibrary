@@ -49,6 +49,9 @@ import sanitizeHtml from 'sanitize-html';
 const QuizIcon = 
 <svg style={{height:'1.5em'}}  role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
 
+let fbIcon = 
+<svg style={{height:'1.5em', padding:0,margin:0}} role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"></path></svg>
+
 export default class SingleQuestion extends Component {
     
     constructor(props,context) {
@@ -733,7 +736,7 @@ export default class SingleQuestion extends Component {
                          
  &nbsp;
                            
-			 <button className='btn btn-primary'  style={{float:'right',clear:'both' ,marginTop:'1em', padding: '0.4em'}}  ><iframe src={iframeLink} width="100" height="26" style={{border:'none',overflow:'hidden'}} scrolling="no" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe></button>
+			 <span   style={{border: '1px solid black', paddingTop:'0.1em', paddingBottom:'0.1em',borderRadius:'10px',paddingLeft:'0.1em',paddingRight:'0.1em',float:'right',clear:'both' ,marginTop:'1em'}}  >{fbIcon} <span className="d-none d-md-inline-block">Facebook</span><button style={{padding:'0px',marginLeft: '0.4em'}} className='btn btn-primary' ><iframe src={iframeLink} width="100" height="23" style={{border:'none',overflow:'hidden'}} scrolling="no" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe></button></span>
 			 
 			   
                          
@@ -744,19 +747,21 @@ export default class SingleQuestion extends Component {
                         &nbsp;
 						  {this.state.mcQuestionsLoaded > 0 && <button style={{marginTop:'1em',float:'right'}} className='btn btn-primary' onClick={() => this.setVisible('questions')}> <span className="badge badge-light">{this.state.mcQuestionsLoaded}</span>&nbsp;<span className="d-none d-md-inline-block"> Quiz</span></button>} 
 						  
+						   &nbsp;  
+						    {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
+                         }
+                        {(target) && <a style={{float:'right',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
+                        }
+                        </span>}
+						  
                          &nbsp;   
                               {this.props.user && this.props.comments && this.props.comments.length > 0 && <button style={{marginTop:'1em',float:'right'}} onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.props.comments.length}&nbsp;Comments&nbsp;</span></button>}
                              
                              {this.props.user && (!this.props.comments || this.props.comments.length === 0) && <button style={{marginTop:'1em',float:'right'}} onClick={this.props.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
                             
 						
-                         &nbsp;  
-						    {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
-                         }
-                        {(target) && <a style={{float:'right',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
-                        }
-                        </span>}
                         
+                        <div style={{width:'100%',clear:'both'}}></div>
                         
                         
                         <div  className="card-title questionheader">{this.props.isReview && <br/>}{header}?</div>
