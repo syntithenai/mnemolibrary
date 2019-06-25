@@ -54,7 +54,7 @@ import mnemoQueries from './mnemoQueries'
     
 
 import Utils from './Utils';
-var config = require('../../config')
+var config = require('./config')
 export default class AppLayout extends Component {
 
   constructor(props) {

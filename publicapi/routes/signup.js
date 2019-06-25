@@ -21,8 +21,11 @@ var fetch = require('node-fetch');
 
 const db = require('../../oauth/database');
 const User = db.User;
-db.connect();
-
+try {
+	db.connect();
+} catch (e) {
+	console.log(e)
+}
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 

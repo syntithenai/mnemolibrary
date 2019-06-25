@@ -7,7 +7,7 @@ const axios = require('axios');
 
 var React = require('react'),
     S3Upload = require('./s3upload.js');
-var config = require('../../config')
+var config = require('./config')
 
 /**
  * This class is a react component that renders a file input then uses ffmpeg.js to provide extras including

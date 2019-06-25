@@ -690,8 +690,10 @@ export default class SingleQuestion extends Component {
                     {showRecallButton && <button className="col-4 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block"> Enough Review For Now</span></button>}
                     <span >&nbsp;</span>
                     {this.props.user && <button className="col-3 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Not Interested</span></button>}
+                   
                     {showRecallButton && <div className="scrollbuttons col-sm-12" >
-                            <button style={{float:'right'}}  onClick={(e) => this.setShareDialog(true)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
+                          
+                         <button style={{float:'right'}}  onClick={(e) => this.setShareDialog(true)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
                             &nbsp;
                            
                                       
@@ -701,8 +703,8 @@ export default class SingleQuestion extends Component {
                              {this.props.user && this.props.comments && this.props.comments.length > 0 && <button style={{float:'right'}}   onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.props.comments.length}&nbsp;Comments&nbsp;</span></button>}
                              
                              {this.props.user && (!this.props.comments || this.props.comments.length === 0) && <button style={{float:'right'}} onClick={this.props.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
-                             
-              &nbsp;
+								
+							&nbsp;
                                          
                             {<button className='btn btn-primary' onClick={() => this.setVisible('mnemonic')} ><ConnectDevelop size={26}  />&nbsp;<span className="d-none d-md-inline-block">Memory Aid</span></button>
                             }&nbsp;
@@ -736,29 +738,25 @@ export default class SingleQuestion extends Component {
                          
  &nbsp;
                            
-			 <span   style={{border: '1px solid black', paddingTop:'0.1em', paddingBottom:'0.1em',borderRadius:'10px',paddingLeft:'0.1em',paddingRight:'0.1em',float:'right',clear:'both' ,marginTop:'1em'}}  >{fbIcon} <span className="d-none d-md-inline-block">Facebook</span><button style={{padding:'0px',marginLeft: '0.4em'}} className='btn btn-primary' ><iframe src={iframeLink} width="100" height="23" style={{border:'none',overflow:'hidden'}} scrolling="no" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe></button></span>
-			 
-			   
-                         
-                       {!showRecallButton && <span> 
+	                   {!showRecallButton && <span> 
 						   
                             <button style={{marginTop:'1em',float:'right'}} onClick={(e) => this.setShareDialog(true)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>
                        
                         &nbsp;
 						  {this.state.mcQuestionsLoaded > 0 && <button style={{marginTop:'1em',float:'right'}} className='btn btn-primary' onClick={() => this.setVisible('questions')}> <span className="badge badge-light">{this.state.mcQuestionsLoaded}</span>&nbsp;<span className="d-none d-md-inline-block"> Quiz</span></button>} 
 						  
-						   &nbsp;  
-						    {(!target) && <button style={{float:'right',clear:'both' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
-                         }
-                        {(target) && <a style={{float:'right',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
-                        }
-                        </span>}
-						  
+						
                          &nbsp;   
                               {this.props.user && this.props.comments && this.props.comments.length > 0 && <button style={{marginTop:'1em',float:'right'}} onClick={this.scrollToComments}  className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;{this.props.comments.length}&nbsp;Comments&nbsp;</span></button>}
                              
                              {this.props.user && (!this.props.comments || this.props.comments.length === 0) && <button style={{marginTop:'1em',float:'right'}} onClick={this.props.newComment} className='btn btn-primary'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;Comment&nbsp;</span></button>}
-                            
+                             &nbsp;  
+						    {(!target) && <button style={{float:'right' ,marginTop:'1em'}}  className='btn btn-primary' onClick={() => this.setVisible('moreinfo')}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></button>
+                         }
+                        {(target) && <a style={{float:'right',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
+                        }
+                        </span>}
+						    
 						
                         
                         <div style={{width:'100%',clear:'both'}}></div>

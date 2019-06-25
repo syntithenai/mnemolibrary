@@ -61,17 +61,17 @@ S3Upload.prototype.handleFileSelect = function(files) {
 S3Upload.prototype.createCORSRequest = function(method, url, opts) {
     opts = opts || {};
     var xhr = new XMLHttpRequest();
-
+//console.log(['XDomainRequest',XDomainRequest])
     if (xhr.withCredentials != null) {
         xhr.open(method, url, true);
         if (opts.withCredentials != null) {
             xhr.withCredentials = opts.withCredentials;
         }
     }
-    else if (typeof XDomainRequest !== "undefined") {
-        xhr = new XDomainRequest();
-        xhr.open(method, url);
-    }
+    //else if (typeof XDomainRequest !== undefined) {
+        //xhr = new XDomainRequest();
+        //xhr.open(method, url);
+    //}
     else {
         xhr = null;
     }

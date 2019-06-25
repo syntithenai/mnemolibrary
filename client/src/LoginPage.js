@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import GoogleLogin from './GoogleLogin'
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
 //import mustache  from 'mustache';
-const config=require('../../config');
+const config=require('./config');
 //const utils=require('../../auth_utils');
 var faker = require('faker');
             

@@ -10,8 +10,11 @@ var faker = require('faker');
 const database = require('../oauth/database');
 const User = database.User;
 const OAuthAccessToken = database.OAuthAccessToken;
-database.connect();
-
+try {
+	database.connect();
+} catch (e) {
+	console.log(e)
+}
 const MongoClient = require('mongodb').MongoClient
 let db;
 MongoClient.connect(config.databaseConnection, (err, client) => {
