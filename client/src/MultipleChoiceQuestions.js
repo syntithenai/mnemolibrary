@@ -179,9 +179,9 @@ export default class MultipleChoiceQuestions extends Component {
 					questionQuery='&questionId='+this.props.question;
 				}
 				// single view page needs all but quiz list page needs not answered
-				if (!this.props.viewOnly) {
-					questionQuery+='&status=asked';
-				}
+				//if (!this.props.viewOnly) {
+					//questionQuery+='&status=asked';
+				//}
 				fetch('/api/mcquestions?topic='+topic+questionQuery)
 				.then(function(response) {
 					console.log(['got response'])
@@ -321,42 +321,73 @@ export default class MultipleChoiceQuestions extends Component {
 				'user':this.props.user ? this.props.user._id : null,
 				'answer':answer,
 			  };
-			fetch('/api/submitmcquestion', {
-			  method: 'POST',
-			  headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-			  },
-			  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
-			}).then(function(response) {
-				return response.json();
-				
-			}).then(function(res) {
-				console.log(['ANSWERdd RESPONSE',id,that.questionsIndex[id],that.questionsIndex])
-					let questionKey = that.questionsIndex && that.questionsIndex.hasOwnProperty(id) ? that.questionsIndex[id] : null;
-					console.log(['Q KEY',questionKey]);
-					if (questionKey !== null) {
-						let questions = that.state.questions;
-						let question = questions && questions.hasOwnProperty(questionKey) ? questions[questionKey] : null;
-						console.log(['have key',questionKey])
-						if (question) {
-						console.log(['have question',question])
-							// update question with stats
-							if (res.error) {
-								question.error = res.error;
-							} else {
-								question.error = '';
-								question.seenBy = typeof question.seenBy === 'object' ? question.seenBy : {};
-								question.seenBy[that.props.user ? that.props.user._id : 'unknownuser'] = answer;
-								question.seen = res.seen;
-								question.overallPercentCorrect = res.overallPercentCorrect;
-							}
-							
-							questions[questionKey] = question;
-							console.log(['SET MC STATE',question,questions])
-							that.setState({questions: questions});
-						} 
+			  
+			// view only mode, don't send save request  
+			if (this.props.viewOnly) {
+				let questionKey = that.questionsIndex && that.questionsIndex.hasOwnProperty(id) ? that.questionsIndex[id] : null;
+				console.log(['Q KEY',questionKey]);
+				if (questionKey !== null) {
+					let questions = that.state.questions;
+					let question = questions && questions.hasOwnProperty(questionKey) ? questions[questionKey] : null;
+					console.log(['have key',questionKey])
+					if (question) {
+					console.log(['have question',question])
+						// update question with stats
+						//if (res.error) {
+							//question.error = res.error;
+						//} else {
+							question.error = '';
+							question.seenBy = typeof question.seenBy === 'object' ? question.seenBy : {};
+							question.seenBy[that.props.user ? that.props.user._id : 'unknownuser'] = answer;
+							//question.seen = res.seen;
+							//question.overallPercentCorrect = res.overallPercentCorrect;
+						//}
+						
+						questions[questionKey] = question;
+						console.log(['SET MC STATE',question,questions])
+						that.setState({questions: questions});
 					} 
-			});
+				} 
+			// quiz mode, save first then update question state	
+			} else {
+				
+				fetch('/api/submitmcquestion', {
+				  method: 'POST',
+				  headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				  },
+				  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+				}).then(function(response) {
+					return response.json();
+					
+				}).then(function(res) {
+					console.log(['ANSWERdd RESPONSE',id,that.questionsIndex[id],that.questionsIndex])
+						let questionKey = that.questionsIndex && that.questionsIndex.hasOwnProperty(id) ? that.questionsIndex[id] : null;
+						console.log(['Q KEY',questionKey]);
+						if (questionKey !== null) {
+							let questions = that.state.questions;
+							let question = questions && questions.hasOwnProperty(questionKey) ? questions[questionKey] : null;
+							console.log(['have key',questionKey])
+							if (question) {
+							console.log(['have question',question])
+								// update question with stats
+								if (res.error) {
+									question.error = res.error;
+								} else {
+									question.error = '';
+									question.seenBy = typeof question.seenBy === 'object' ? question.seenBy : {};
+									question.seenBy[that.props.user ? that.props.user._id : 'unknownuser'] = answer;
+									question.seen = res.seen;
+									question.overallPercentCorrect = res.overallPercentCorrect;
+								}
+								
+								questions[questionKey] = question;
+								console.log(['SET MC STATE',question,questions])
+								that.setState({questions: questions});
+							} 
+						} 
+				});
+			}
 		//}
 	}
 	
@@ -399,7 +430,7 @@ export default class MultipleChoiceQuestions extends Component {
 						let possibleAnswers = question.possibleAnswers;
 						let answerButtons = possibleAnswers.map(function(sampleAnswer,key) {
 							// determine button color from answer status
-							if (that.props.viewOnly) {
+							if (false && that.props.viewOnly) {
 								if (sampleAnswer === question.answer) {
 									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.2em'}} >{sampleAnswer}</div>
 								} else {
@@ -436,18 +467,20 @@ export default class MultipleChoiceQuestions extends Component {
 						
 						{!that.props.viewOnly && <div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> }
 
-						{!that.props.viewOnly && answered && <div>
+						{answered && <div>
 							You  {userAnswerCorrect?'' : ' incorrectly '} answered {userAnswer}. {!userAnswerCorrect ? ' The correct answer is '+question.answer+".":''}
 						</div>}
 						{!that.props.viewOnly && answered  && <i style={{paddingTop: '2em'}}>{question.overallPercentCorrect ? question.overallPercentCorrect : 0} percent of {question.seen > 0 ? question.seen : 1} people answered correctly.</i> }
 	
 						{!that.props.viewOnly && <div className='questionbuttons' style={{width:'100%', minHeight: '2em'}} >
+							
 							{!that.props.viewOnly && !isQuestionPage && question.questionId && question.topic && <div>
 								<div style={{float:'right'}}><Link  to={moreInfoLink} className='btn btn-info'>{moreInfoIcon} <span className="d-none d-sm-inline" >More Information</span></Link></div> 
 							</div> }
 							
 								
 							{that.props.user && question.questionId && <button style={{float:'right'}} className='btn btn-success' onClick={(e) => that.sendAllQuestionsForReview([{_id:question.questionId}])} >{reviewIcon} <span className="d-none d-sm-inline" >Add to Review List</span></button>}
+							
 							{!that.props.user && question.questionId && <Link to="/login" style={{float:'right'}} className='btn btn-success'  >{reviewIcon} <span className="d-none d-sm-inline" >Add to Review List</span></Link>}
 
 							
@@ -459,7 +492,7 @@ export default class MultipleChoiceQuestions extends Component {
 						<div style={{ width:'', marginTop: '1em',padding: '0.5em', border: '1px solid black' , backgroundColor:'#eee',borderRadius:'30px',marginRight:'1em'}}>{answerButtons}</div> 
 						<div id={'question_'+questionKey}></div>
 						
-						{!that.props.viewOnly &&  answered && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
+						{answered && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
 
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em'}}><b>Memory Aid</b> {question.relatedQuestion.mnemonic}</div>}
 					
