@@ -1,4 +1,4 @@
- var uuidv4 = require('uuid/v4'),
+ var uuidv4 = require('uuidv4'),
      aws = require('aws-sdk'),
      express = require('express');
 

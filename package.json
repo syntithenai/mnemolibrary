@@ -48,6 +48,7 @@
     "sanitize-html": "^1.20.0",
     "simple-get": "^2.7.0",
     "throttle-debounce": "^1.0.1",
+    "uuidv4": "^4.0.0",
     "video-react": "^0.10.4",
     "xhr2": "^0.1.4",
     "xmlhttprequest": "^1.8.0"
