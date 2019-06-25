@@ -13,15 +13,15 @@ function connect(connectString='') {
   if (connectString.length == 0) {
       connectString = config.databaseConnection + config.database;
   }
-  try {
-	  mongoose.connect(connectString,{useMongoClient: true}).then(() => {
-		console.log('Mongoose Connected');
-	  }).catch((err) => {
-		console.log(err);
-	  });
-	} catch (e) {
-		console.log(e);
-	}
+  //try {
+	  //mongoose.connect(connectString,{useMongoClient: true}).then(() => {
+		//console.log('Mongoose Connected');
+	  //}).catch((err) => {
+		//console.log(err);
+	  //});
+	//} catch (e) {
+		//console.log(e);
+	//}
 }
 
 module.exports = {
