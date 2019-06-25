@@ -201,20 +201,19 @@ export default class MultipleChoiceTopics extends Component {
 				
 				return <div style={{clear:'both', width: '100%'}} >
 					{searchForm}
-					
-					<Link key={'mytopics'} style={{display:'block'}}  to={'/mymultiplechoicetopics'} ><div  style={{backgroundColor:backgroundColor1, color: color1 ? color1 : 'black'}} >
+					{this.props.user && this.props.user._id && <Link key={'mytopics'} style={{display:'block'}}  to={'/mymultiplechoicetopics'} ><div  style={{backgroundColor:backgroundColor1, color: color1 ? color1 : 'black'}} >
 						<div  style={Object.assign({backgroundColor:backgroundColor1, color:color1},blockStyle)}  className="col-6 col-sm-4" >
 							<span style={{backgroundColor:backgroundColor1, color: color1,marginRight:'0.8em'}} >{getIcon('mytopics',iconStyle)}</span>
 							<span style={{backgroundColor:backgroundColor1, color: color1,fontSize:'1.4em',fontWeight:'bold'}}>My Topics</span>
 						</div>
-					</div>	</Link>
+					</div>	</Link>}
 					
-					<Link key={'myquestions'} style={{display:'block'}}  to={'/mymultiplechoicequestions'} ><div  style={{backgroundColor:backgroundColor2, color: color2 ? color2 : 'black'}} >
+					{this.props.user && this.props.user._id && <Link key={'myquestions'} style={{display:'block'}}  to={'/mymultiplechoicequestions'} ><div  style={{backgroundColor:backgroundColor2, color: color2 ? color2 : 'black'}} >
 						<div  style={Object.assign({backgroundColor:backgroundColor2, color:color2},blockStyle)}  className="col-6 col-sm-4" >
 							<span style={{backgroundColor:backgroundColor2, color: color2,marginRight:'0.8em'}} >{getIcon('myquestions',iconStyle)}</span>
 							<span style={{backgroundColor:backgroundColor2, color: color2,fontSize:'1.4em',fontWeight:'bold'}}>Review Quiz</span>
 						</div>
-					</div>	</Link>
+					</div>	</Link>}
 					
 					{topicCollections}
 					<div style={{clear:'both', width: '100%'}} ><br/></div>

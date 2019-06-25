@@ -8,7 +8,11 @@ const usersController = require('../../oauth/controllers/users');
 const clientsController = require('../../oauth/controllers/clients');
 const logger = require('morgan');
 const database = require('../../oauth/database');
-database.connect(config.databaseConnection+config.database);
+try {
+	database.connect(config.databaseConnection+config.database);
+} catch (e) {
+	console.log(e)
+}
 // create client if not exists
     database.OAuthClient.findOne({clientId: config.clientId, clientSecret:config.clientSecret}).then(function(client) {
         if (client!= null) {
