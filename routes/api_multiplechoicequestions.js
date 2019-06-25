@@ -389,7 +389,12 @@ function initRoutes(router,db) {
 		if (req.query.topic) {
 			filter.push({topic : {$eq:decodeURI(req.query.topic)}});
 		}
-		
+		if (req.query.user)  {
+			let userMatch='seenBy.'+req.query.user
+			let userFilter={}
+			userFilter[userMatch] = {$exists:false, $ne:''}
+			filter.push(userFilter)
+		}	
 		
 		// filter incomplete
 		if (req.query.status === 'all') {
@@ -399,7 +404,7 @@ function initRoutes(router,db) {
 		} else if (req.query.status === 'answered') {
 			filter.push({$and:[questionExists,answerExists]});
 		} else if (req.query.status === 'asked') {
-			filter.push({$and:[questionExists,answerExists,multiple_choiceExists,topicExists,answerNotExists]});
+			//filter.push({$and:[questionExists,answerNotExists]});
 		// default show only complete
 		} else {
 			filter.push({$and:[questionExists,answerExists,multiple_choiceExists,topicExists]});

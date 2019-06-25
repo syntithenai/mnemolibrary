@@ -179,9 +179,9 @@ export default class MultipleChoiceQuestions extends Component {
 					questionQuery='&questionId='+this.props.question;
 				}
 				// single view page needs all but quiz list page needs not answered
-				//if (!this.props.viewOnly) {
-					//questionQuery+='&status=asked';
-				//}
+				if (this.props.user) {
+					questionQuery+=this.props.user ? '&user='+this.props.user._id : '';
+				}
 				fetch('/api/mcquestions?topic='+topic+questionQuery)
 				.then(function(response) {
 					console.log(['got response'])
@@ -323,7 +323,7 @@ export default class MultipleChoiceQuestions extends Component {
 			  };
 			  
 			// view only mode, don't send save request  
-			if (this.props.viewOnly) {
+			if (this.props.viewOnly || !this.props.user) {
 				let questionKey = that.questionsIndex && that.questionsIndex.hasOwnProperty(id) ? that.questionsIndex[id] : null;
 				console.log(['Q KEY',questionKey]);
 				if (questionKey !== null) {
@@ -468,7 +468,7 @@ export default class MultipleChoiceQuestions extends Component {
 						{!that.props.viewOnly && <div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> }
 
 						{answered && <div>
-							You  {userAnswerCorrect?'' : ' incorrectly '} answered {userAnswer}. {!userAnswerCorrect ? ' The correct answer is '+question.answer+".":''}
+							You  {userAnswerCorrect? ' correctly ' : ' incorrectly '} answered {userAnswer}. {!userAnswerCorrect ? ' The correct answer is '+question.answer+".":''}
 						</div>}
 						{!that.props.viewOnly && answered  && <i style={{paddingTop: '2em'}}>{question.overallPercentCorrect ? question.overallPercentCorrect : 0} percent of {question.seen > 0 ? question.seen : 1} people answered correctly.</i> }
 	

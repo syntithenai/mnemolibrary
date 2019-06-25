@@ -147,13 +147,14 @@ router.post('/saveuser', function(req, res) {
 
 
 function sendToken(req,res,user) {
+	console.log(['SEND TOKEN'])
      var params={
         username: user.username,
         password: user.password,
         'grant_type':'password',
         'client_id':config.clientId,
         'client_secret':config.clientSecret
-  };
+	};
     fetch("http://localhost:3000/oauth/token", {
       method: 'POST',
       headers: {
@@ -165,23 +166,25 @@ function sendToken(req,res,user) {
     }).then(function(response) {
         return response.json();
     }).then(function(token) {
-      //  //console.log(['got token',token]);
+      console.log(['got token',token]);
        res.send({code:token.access_token});
     }).catch(function(e) {
-       // //console.log(e);
-         res.send({message:'Error logging in'});
+       console.log(e);
+         res.send({error:'Error logging in'});
     });
 }
 
 router.post('/googlesignin',function(req,res) {
-   // //console.log(['/googlesignin']);
+   console.log(['/googlesignin']);
     if (req.body.email && req.body.email.length > 0) {
-     //   //console.log(['/googlesignin have mail',req.body.email]);
+        //console.log(['/googlesignin have mail',req.body.email]);
          db.collection(userModelName).findOne({username:req.body.email}).then(function(user) {
-       //      //console.log(['/googlesignin fnd',user]);
+            console.log(['/googlesignin fnd',user]);
               if (user!=null) {
+				console.log(['/googlesignin send token']);
                  sendToken(req,res,user);
               } else {
+				console.log(['/googlesignin send create user']);
                   var pw = crypto.randomBytes(20).toString('hex');
                   let item={name:req.body.name,username:req.body.email,password:pw};
                   if (!item.avatar) item.avatar = faker.commerce.productAdjective()+faker.name.firstName()+Math.round(Math.random()*10000000)
@@ -190,11 +193,11 @@ router.post('/googlesignin',function(req,res) {
                   })
               }
          }).catch(function(e) {
-             //console.log(e);
-             res.send({message:'Invalid request e'});
+             console.log(e);
+             res.send({error:'Invalid request e'});
          });
     } else {
-        res.send({message:'Invalid request'});
+        res.send({error:'Invalid request'});
     }
     
     

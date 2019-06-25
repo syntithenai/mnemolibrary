@@ -107,7 +107,7 @@ export default class LoginPage extends Component {
         //.then(this.checkStatus)
       .then(this.parseJSON)
       .then(function(data) {
-        //    //console.log(['gsignin request with JSON response', data])
+            console.log(['gsignin request with JSON response', data])
            if (data.code && data.code.length > 0) {
               window.location='/?code='+data.code;
              // that.postToUrl('/',{code:data.code},'POST');
