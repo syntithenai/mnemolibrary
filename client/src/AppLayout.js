@@ -9,6 +9,7 @@ import PropsRoute from './PropsRoute';
 
 import Navigation from './Navigation';
 import SettingsPage from './SettingsPage';
+import LeaderBoardPage from './LeaderBoardPage';
 //import SingleQuestion from './SingleQuestion';
 import HelpVideos from './HelpVideos';
 import AboutPage from './AboutPage';
@@ -1306,6 +1307,7 @@ export default class AppLayout extends Component {
                  <PropsRoute  path="/newslettertool"  component={AdminNewsletterTool} isAdmin={this.isAdmin} user={this.state.user} />
                 
                 <PropsRoute  path="/settings"  component={SettingsPage} saveUser={this.saveUser} user={this.state.user} />
+                <PropsRoute  path="/leaderboard"  component={LeaderBoardPage}  user={this.state.user} />
                 
                 
                 <Footer/>

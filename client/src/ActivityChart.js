@@ -35,7 +35,7 @@ export default class ActivityChart extends React.Component {
                 let key=now.getDate()+"/"+(now.getMonth()+1);
                 seenDateKeys[key]=0;
                 successDateKeys[key]=0;
-                seriesObject[key]={day:key,seenColor:'blue',successColor:"green"};
+                seriesObject[key]={day:String(key),seenColor:'blue',successColor:"green"};
                 now.setDate(now.getDate()-1);
             }
             json.success.map(function(val,key) {
@@ -104,6 +104,9 @@ export default class ActivityChart extends React.Component {
     // make sure parent container have a defined height when using responsive component,
     // otherwise height will be 0 and no chart will be rendered.
     render() {
+				//colors="nivo"
+				//colorBy={({ id, data }) => data[`${id}Color`]}
+		
         if (this.state.series && this.state.series.length > 0) {
         
             return <div style={{height: '600px'}}>
@@ -121,10 +124,9 @@ export default class ActivityChart extends React.Component {
                     "bottom": 50,
                     "left": 61
                 }}
+                colors={['blue','green']}
                 padding={0.3}
-            colors="set1"
-            colorBy={({ id, data }) => data[`${id}Color`]}
-            defs={[
+				defs={[
                 {
                     "id": "dots",
                     "type": "patternDots",
@@ -153,7 +155,7 @@ export default class ActivityChart extends React.Component {
                     "tickPadding": 5,
                     "tickRotation": 90,
                     "legend": "Tally",
-                    "legendPosition": "center",
+                    "legendPosition": "middle",
                     "legendOffset": 46
                 }}
                 axisLeft={{
@@ -162,7 +164,7 @@ export default class ActivityChart extends React.Component {
                     "tickPadding": 5,
                     "tickRotation": 0,
                     "legend": "Date",
-                    "legendPosition": "center",
+                    "legendPosition": "middle",
                     "legendOffset": -40
                 }}
                 labelSkipWidth={12}

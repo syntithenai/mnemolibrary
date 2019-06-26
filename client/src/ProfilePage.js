@@ -273,7 +273,7 @@ export default class ProfilePage extends Component {
             if (this.props.user && this.props.user._id && this.props.user._id.length > 0) {
                 let buttonStyle={margin:'0.3em',padding:'1em'}
                 return (<div>
-					    {!this.state.showTopButtons &&  <div style={{position: 'fixed', top: '100', right: '0', zIndex:999}} ><button className='btn btn-info' onClick={this.showTopButtons}>...</button></div>}
+					    {false && !this.state.showTopButtons &&  <div style={{position: 'fixed', top: '100', right: '0', zIndex:999}} ><button className='btn btn-info' onClick={this.showTopButtons}>...</button></div>}
                         {this.state.showTopButtons &&  <div className='modaldialog'  >
 							<div className="modaldialog-content">
 							  <div className="modaldialog-header">
@@ -285,11 +285,6 @@ export default class ProfilePage extends Component {
 								  <a  href='#topics' style={buttonStyle} className='btn btn-info' onClick={this.hideTopButtons}>Topics</a>
 								  <a  href='#progress'  style={buttonStyle}  className='btn btn-info' onClick={this.hideTopButtons} >Progress</a>
 								  <a  href='#activity'  className='btn btn-info' style={buttonStyle}  onClick={this.hideTopButtons} >Activity</a>
-								  <a  href='#leaderboard'  style={buttonStyle}  className='btn btn-info' onClick={this.hideTopButtons} >Leaders</a>
-								  <div style={{width:'100%',clear:'both'}}></div>
-								  
-								  
-								 
 								  
 
 							  </div>
@@ -306,7 +301,7 @@ export default class ProfilePage extends Component {
                                 <span>{this.state.recall_award}</span>
                                  <span>{this.state.distribution_award}</span>
                             </div>
-                            <div className="col-12" style={{minHeight: '700px'}}>
+                            <div className="col-12" style={{minHeight: '100px'}}>
                                   <TopicsChart addAward={this.addAward} setCurrentPage={this.props.setCurrentPage} setQuizFromDiscovery={this.props.setQuizFromDiscovery} setReviewFromTopic={this.props.setReviewFromTopic} setQuizFromTopic={this.props.setQuizFromTopic} searchQuizFromTopic={this.props.searchQuizFromTopic}  user={this.props.user} />
                             </div>
                             <div className="col-12" style={{height: '500px'}} >
@@ -314,16 +309,6 @@ export default class ProfilePage extends Component {
                             </div>
                             <div className="col-12" style={{height: '700px'}}>
                                   <ActivityChart addAward={this.addAward} user={this.state.user}  />
-                            </div>
-                            <div className="col-12" style={{height: '660px'}} >
-                                <h4 id="leaderboard" className='graphTitle' >Leaderboards</h4>
-                                <LeaderBoard type="streak" user={this.state.user} />
-                            </div>
-                            <div className="col-12" style={{height: '660px'}} >
-                               <LeaderBoard type="questions" user={this.state.user}  />
-                            </div>
-                            <div className="col-12" style={{height: '660px'}} >
-                               <LeaderBoard type="recall" user={this.state.user} />
                             </div>
                             
                             

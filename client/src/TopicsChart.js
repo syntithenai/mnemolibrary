@@ -101,7 +101,7 @@ export default class TopicsChart extends React.Component {
         that.props.addAward('questions',null);
         that.props.addAward('recall',null);
         that.props.addAward('successes',null);
-        
+        let colors = [];
         let url='/api/recenttopics?user='+this.props.user._id;
         if (type==='blocks')  {
             url='/api/blockedtopics?user='+this.props.user._id;
@@ -135,9 +135,10 @@ export default class TopicsChart extends React.Component {
                         //let score=(((val.successRate)*(completion)*3) + (completion))/4
                         let score=(val.successRate + completion)/2
                         let color=getGreenToRed(score*100);
+                        colors.push(color);
                        //console.log(['score',score,color,val.topic,val.questions,val.total,val.successRates]);
                         //+ ' (' + val.questions + '/' + val.total+')'
-                        let point={"topic": val.topic,"id": val.topic ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color,blocks:val.blocks};
+                        let point={"topic": val.topic+" "+score,"id": val.topic+" "+score ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color,blocks:val.blocks};
                         //if (point.score < 0.7) {
                         if (parseFloat(val.questions) > 0) {
                             totalSeen += parseFloat(val.questions)
@@ -169,8 +170,8 @@ export default class TopicsChart extends React.Component {
                    // that.props.addAward('questions',totalSeen);
                     that.props.addAward('recall',totalSuccess/countSuccess + totalSeen/1000) ;
                 }
-                console.log(['SET DATA',series]);
-                that.setState({series:series});
+                console.log(['SET DATA',series,colors]);
+                that.setState({colors:colors,series:series});
                 resolve();
                     
             }).catch(function(ex) {
@@ -334,11 +335,12 @@ export default class TopicsChart extends React.Component {
                     } else {
                         topicsList = (<div className="row" style={{width: '90%', marginLeft: '2em', padding: '0.3em', border: '1px solid black'}} >No progress yet</div>);
                     }
+                    //<a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >{pieChartIcon}&nbsp;<span className="d-none d-md-inline-block">Chart</span></a>
                     return (<div style={{width: '100%',height: '100%'}} >
                        <br/><br/>
                        <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} ><TrashIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Blocks</span></a>
                        <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} ><ArchiveIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Archive</span></a>
-                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >{pieChartIcon}&nbsp;<span className="d-none d-md-inline-block">Chart</span></a>
+                       
                        <h4 className='graphTitle' id="topics" >Active Topics 
                       </h4>
                        <br/>
@@ -364,7 +366,7 @@ export default class TopicsChart extends React.Component {
                        <br/><br/>
                        <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showBlocks.bind(that)} ><TrashIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Blocks</span></a> 
                        <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} ><ListIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Current</span></a>
-                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >{pieChartIcon}&nbsp;<span className="d-none d-md-inline-block">Chart</span></a>
+                       
                        
                        <h4 className='graphTitle' id="topics" >Archived Topics</h4>
                        <br/>
@@ -388,14 +390,15 @@ export default class TopicsChart extends React.Component {
                        <br/><br/>
                        <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showArchive.bind(that)} ><ArchiveIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Archive</span></a>
                        <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showCurrent.bind(that)} ><ListIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Current</span></a>
-                       <a className="btn btn-info" style={{float:'right',color:'white'}}   onClick={that.showChart.bind(that)} >{pieChartIcon}&nbsp;<span className="d-none d-md-inline-block">Chart</span></a>
+                      
                        <h4 className='graphTitle' id="topics" >Blocked Topics</h4>
                        <br/>
                         {topicsList}
                         <br/><br/><br/><br/><br/><br/><br/><br/>
                     </div>);
                 } else {
-                    
+                    // colors={this.state.colors} 
+                       
                     let chart=(<ResponsivePie
                         data={this.state.series}
                         margin={{
@@ -408,7 +411,7 @@ export default class TopicsChart extends React.Component {
                         innerRadius={0.5}
                         padAngle={0.7}
                         cornerRadius={3}
-                        colorBy={function(e){return e.color}}
+                        colorBy="color"              
                         borderColor="inherit:darker(0.6)"
                         radialLabelsSkipAngle={10}
                         radialLabelsTextXOffset={6}

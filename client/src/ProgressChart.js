@@ -30,7 +30,8 @@ export default class ProgressChart extends React.Component {
                 if ((parseInt(val._id,10) > 0)) id=parseInt(val._id,10);
                 else id=0;
                 if (id > max) max=id;
-                let point={y:val.questions,x:id,yColor:'blue'}
+                let point={y:val.questions,x:String(id),yColor:'yellow'}
+                console.log(['POINT',point])
                 tally[id] = parseInt(val.questions,10);
                // val.questionsColor = "lightblue";
                 dataObject[id]=point;
@@ -90,7 +91,8 @@ export default class ProgressChart extends React.Component {
       //this.props.reviewBySuccessBand(a.index);
       this.setState({searchBand:a.index}); 
     };
-         
+         //             colorBy={({ id, data }) => data[`yColor`]}
+  
     // make sure parent container have a defined height when using responsive component,
     // otherwise height will be 0 and no chart will be rendered.
     render() {
@@ -115,8 +117,7 @@ export default class ProgressChart extends React.Component {
                         "left": 61
                     }}
                     padding={0.3}
-                colors="set1"
-                colorBy={({ id, data }) => data[`${id}Color`]}
+                colors={['blue']}
                 defs={[
                     {
                         "id": "dots",
@@ -146,7 +147,7 @@ export default class ProgressChart extends React.Component {
                         "tickPadding": 5,
                         "tickRotation": 0,
                         "legend": "Success Tally",
-                        "legendPosition": "center",
+                        "legendPosition": "middle",
                         "legendOffset": 36
                     }}
                     axisLeft={{
@@ -155,7 +156,7 @@ export default class ProgressChart extends React.Component {
                         "tickPadding": 5,
                         "tickRotation": 0,
                         "legend": "Questions",
-                        "legendPosition": "center",
+                        "legendPosition": "middle",
                         "legendOffset": -40
                     }}
                     labelSkipWidth={12}
