@@ -213,7 +213,7 @@ function initRoutes(router,db) {
 				// collate questions
 				result.toArray().then(function(final) {
 					if (final && final.length > 0) {
-						console.log(['FINAL MY TOPICS',JSON.stringify(final)])
+						//console.log(['FINAL MY TOPICS',JSON.stringify(final)])
 						final.map(function(tc) {
 							//console.log(['PUSH TOPIC',tc,tc.topic])
 							myQuestions.push(ObjectId(tc.question));
@@ -231,9 +231,9 @@ function initRoutes(router,db) {
 						filter.push(userFilter)
 						
 						
-						console.log(['FIND mc questions',JSON.stringify({$and:filter})])
+						//console.log(['FIND mc questions',JSON.stringify({$and:filter})])
 						db().collection('multiplechoicequestions').find({$and:filter}).sort({createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
-							console.log(['FOUND mc questions',err,results])
+						//	console.log(['FOUND mc questions',err,results])
 							let promises=[];
 							if (results) {
 								//console.log([' MC FIND',results])
@@ -325,9 +325,9 @@ function initRoutes(router,db) {
 						filter.push(userFilter)
 						
 						
-						console.log(['FIND mc questions',JSON.stringify({$and:filter})])
+					//	console.log(['FIND mc questions',JSON.stringify({$and:filter})])
 						db().collection('multiplechoicequestions').find({$and:filter}).sort({createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
-							console.log(['FOUND mc questions',err,results])
+						//	console.log(['FOUND mc questions',err,results])
 							let promises=[];
 							if (results) {
 								//console.log([' MC FIND',results])

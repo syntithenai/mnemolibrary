@@ -878,16 +878,16 @@ function initRoutes(router,db) {
 
 	
 	router.post('/publishnewsletter', (req, res) => {
-		console.log(['publish',	req.body])
+		//console.log(['publish',	req.body])
 		if (req.body.user && req.body.user.length > 0 && req.body.publishKey && req.body.publishKey.length > 0) {
-			console.log(['publish a'])
+		//	console.log(['publish a'])
 			db().collection('users').findOne({_id:ObjectId(req.body.user)}).then(function(user) {
-			console.log(['publish u',	user])
+			//console.log(['publish u',	user])
 			if (user && user.publishKey && user.publishKey.length > 0 && user.publishKey === req.body.publishKey) {
-				console.log(['publish matck key',	user])
+				//console.log(['publish matck key',	user])
 				if (req.body.isTest) {
 						if (req.body.content && req.body.content.length > 0) {
-							console.log(['publish is test',	req.body.userEmail])
+						//	console.log(['publish is test',	req.body.userEmail])
 							var params={
 								username: user.username,
 								password: user.password,
@@ -922,12 +922,12 @@ function initRoutes(router,db) {
 						}
 						
 					} else {
-						console.log(['publish for real'])
+						//console.log(['publish for real'])
 						db().collection('users').find({$and:[{email_me:{$ne:'none'}},{email_me:{$ne:'comments'}}]}).toArray(function(err,results) {
-							console.log(['publish for real res',results,req.body.content])
+						//	console.log(['publish for real res',results,req.body.content])
 						let emails=[];
 							if (req.body.content && req.body.content.length > 0) {
-								console.log(['send emails MC',req.body.user,req.body.publishKey,req.body.content,results])
+								//console.log(['send emails MC',req.body.user,req.body.publishKey,req.body.content,results])
 								if (results) {
 									let promises = [];
 									results.map(function(user) {
@@ -952,9 +952,12 @@ function initRoutes(router,db) {
 											}).then(function(token) {
 												// only send newsletter from live site
 												if (config.host === 'mnemolibrary.com') {
-													console.log('really send email to '+user.username)
+													//console.log('really send email to '+user.username)
 													let html = generateNewsletter(req.body.content,user,token.access_token);
 													utils.sendMail(config.mailFrom,user.username,"Mnemo's Library Newsletter",html) 
+												} else {
+													//console.log('no send email not live site to '+user.username)
+													
 												}
 												resolve({email:user.username});
 											}).catch(function(e) {
