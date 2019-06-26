@@ -111,7 +111,7 @@ export default class SiteMap extends Component {
 
 				<div className="row" style={blockStyle}>
 				 <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/"  >Discover</Link></div>
-				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/multiplechoicequestions"  >Quizzes</Link></div>
+				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/multiplechoicetopics"  >Quizzes</Link></div>
 				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/review"  >Review</Link></div>
 			  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/search/tags"  >Search Tags</Link></div>
 				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/search/questions"  >Search Questions</Link></div>
