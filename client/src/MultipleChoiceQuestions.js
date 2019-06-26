@@ -558,7 +558,7 @@ export default class MultipleChoiceQuestions extends Component {
 			</div>}
 			
 			{questions.length > 0 && <b style={{display:'block',width:'100%'}}>Quiz Questions</b>}
-			<div style={{border: '1px solid black',width:'100%',marginTop:'3.4em'}}>
+			<div style={{border: '1px solid black',width:'100%',marginTop:'1.4em'}}>
 			{this.state.showShareDialog && <ShareDialog setShareDialog={this.setShareDialog} dialogTitle={'Share Quiz using'} />}
 			{questions}
 			</div>
