@@ -685,7 +685,7 @@ export default class SingleQuestion extends Component {
                     
 					{!this.props.user && <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Back&nbsp;</span></button>}
 					
-					{(!this.props.user || !showRecallButton) && <button className="col-3 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Next&nbsp;</span></button>}
+					{(!this.props.user) && <button className="col-3 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Next&nbsp;</span></button>}
 
                     {showRecallButton && this.props.user && <button className="col-3 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">More Review Needed</span></button>}
 
