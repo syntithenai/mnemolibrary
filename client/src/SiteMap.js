@@ -101,7 +101,7 @@ export default class SiteMap extends Component {
 				  }
 				  
 				  <div className="row" style={blockStyle}>
-				 {this.props.isLoggedIn() && <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/profile"  >Profile</Link></div>}
+				 {this.props.isLoggedIn() && <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/profile"  >Profile</Link><Link style={buttonStyle} className='btn btn-info'  to="/settings"  >Settings</Link></div>}
 				  {this.props.isLoggedIn() && <div className="col"><div onClick={this.props.logout} style={buttonStyle} className='btn btn-danger'  to="/profile"  >Logout</div></div>}
 				  {!this.props.isLoggedIn() && <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/login"  >Login</Link></div>}
 				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/recentcomments"  >Recent Comments</Link></div>

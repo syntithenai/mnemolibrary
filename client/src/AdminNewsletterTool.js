@@ -18,6 +18,9 @@ export default class AdminNewsletterTool extends Component {
         initialContent += '<br/><br/><a href=":::LINK:::/review/:::CODE:::">Revise questions from your review list</a>'
         initialContent += '<br/><a href=":::LINK:::/multiplechoicetopics/:::CODE:::">Try a multiple choice quiz</a>'
         initialContent += '<br/><a href=":::LINK:::/recentcomments/:::CODE:::">Join the conversation</a>'
+         initialContent += '<br/><br/>If you don\'t want to receive these emails.  <a href=":::LINK:::/settings/:::CODE:::">Update your settings</a>'
+       
+        
         initialContent = '<div>'+initialContent+'</div>'
 
 		this.state = {
