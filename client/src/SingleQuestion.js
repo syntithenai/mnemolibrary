@@ -674,28 +674,28 @@ export default class SingleQuestion extends Component {
 						
             
             //{!this.props.user && <Link to='/login' className="col-4 btn btn-outline btn-success" ><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add to Review List&nbsp;</span></Link>}
-   
+			let buttonStyle={height: '2.6em'}
 
            return (
             <div className="questionwrap"  >
                <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                 <div className="row buttons justify-content-between" >
                   
-                    <button className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis style={{marginLeft:'-0.7em'}} size={25} />&nbsp;</button>
+                    <button style={buttonStyle} className="col-1 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'list')} ><Ellipsis style={{marginLeft:'-0.7em'}} size={25} />&nbsp;</button>
                     
-					{!this.props.user && <button className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Back&nbsp;</span></button>}
+					{!this.props.user && <button style={buttonStyle}  className="col-2 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'previous')} ><ArrowLeft size={25} /><span className="d-none d-md-inline-block" >&nbsp;Back&nbsp;</span></button>}
 					
-					{(!this.props.user) && <button className="col-3 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Next&nbsp;</span></button>}
+					{(!this.props.user) && <button  style={buttonStyle} className="col-3 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Next&nbsp;</span></button>}
 
-                    {showRecallButton && this.props.user && <button className="col-3 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">More Review Needed</span></button>}
+                    {showRecallButton && this.props.user && <button  style={buttonStyle} className="col-3 btn btn-outline btn-info" onClick={() => this.handleQuestionResponse(question,'next')}><ArrowRight size={25} /><span className="d-none d-md-inline-block">More Review Needed</span></button>}
 
-                    {showRecallButton && this.props.user && <button className="col-4 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block">Enough Review For Now</span></button>}
+                    {showRecallButton && this.props.user && <button  style={buttonStyle} className="col-4 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'success')}><Check size={25} /><span className="d-none d-md-inline-block">Enough Review For Now</span></button>}
                    
-                    {!showRecallButton && this.props.user && <button className="col-4 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'next')}><Check size={25} /><span className="d-none d-md-inline-block">Add To My Review List</span></button>}
+                    {!showRecallButton && this.props.user && <button  style={buttonStyle} className="col-4 btn btn-outline btn-success" onClick={() => this.handleQuestionResponse(question,'next')}><Check size={25} /><span className="d-none d-md-inline-block">Add To My Review List</span></button>}
                     
                     
                     <span >&nbsp;</span>
-                    {this.props.user && <button className="col-3 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Not Interested</span></button>}
+                    {this.props.user && <button  style={buttonStyle}  className="col-3 btn btn-outline btn-danger" onClick={() => this.handleQuestionResponse(question,'block')} ><Trash size={25} /><span className="d-none d-md-inline-block"> Not Interested</span></button>}
                    
                     {showRecallButton && <div className="scrollbuttons col-sm-12" >
                           
