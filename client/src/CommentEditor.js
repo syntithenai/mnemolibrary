@@ -132,7 +132,11 @@ export default class CommentEditor extends Component {
 					<button style={{align:'right'}}  className="btn btn-danger" onClick={this.cancelComment} ><CloseIcon size={26}  />&nbsp;<span className="d-none d-md-inline-block">Cancel</span></button>
 				</div>
 		}
-		
+		let questionText = '';
+		if (this.props.comment && this.props.comment.question && this.props.comment.question.interrogative) {
+			questionText+=this.props.comment.question.interrogative + ' ' 
+		}
+		questionText+=this.props.comment.question.question
 		return <div className='modaldialog'  >
 			<div className="modaldialog-content">
 			  <div className="modaldialog-header">
@@ -141,7 +145,7 @@ export default class CommentEditor extends Component {
 			  </div>
 			  
 			  <div className="modaldialog-body">
-				<div><b>Question: </b> {this.props.comment.questionText}</div>
+				<div><b>Question: </b> {questionText} ?</div>
 				
 				<p style={{paddingTop:'1em'}}>
 					<textarea style={{height: '10em', width:'100%'}} autoComplete="false" id="comment" type='text' name='comment' onChange={this.change} value={this.props.comment ? this.props.comment.comment : ''} className='form-control'></textarea>
