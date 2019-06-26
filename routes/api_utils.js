@@ -8,6 +8,7 @@ var ObjectId = require('mongodb').ObjectID;
 const get = require('simple-get');
 const mustache = require('mustache');
 
+var fetch = require('node-fetch');
 
 
 function initRoutes(router,db) {
@@ -858,31 +859,120 @@ function initRoutes(router,db) {
 		}
 	})
 	
+	function generateNewsletter(content,user,token) {
+		let html = ''
+		if (user) {
+			html = content.replace(':::USER:::',user.name ? user.name : user.avatar)
+		}
+		while (html.indexOf(':::CODE:::') != -1) {
+			html = html.replace(':::CODE:::','?code='+token)
+		}
+		var fulllink = config.protocol + "://"  + config.host ;
+        while (html.indexOf(':::LINK:::') != -1) {
+			html = html.replace(':::LINK:::',fulllink)
+		}
+		return '<div>' + html + '</div>';
+
+	}
+//:::LINK:::/recentcomments:::CODE:::
+
+	
 	router.post('/publishnewsletter', (req, res) => {
 		console.log(['publish',	req.body])
 		if (req.body.user && req.body.user.length > 0 && req.body.publishKey && req.body.publishKey.length > 0) {
+			console.log(['publish a'])
 			db().collection('users').findOne({_id:ObjectId(req.body.user)}).then(function(user) {
-				if (user && user.publishKey && user.publishKey.length > 0 && user.publishKey === req.body.publishKey) {
-					if (req.body.isTest) {
-						if (req.body.userEmail && req.body.userEmail.length > 0) {
-							res.send({ok:true,message:'Sent test email to '+req.body.userEmail})
+			console.log(['publish u',	user])
+			if (user && user.publishKey && user.publishKey.length > 0 && user.publishKey === req.body.publishKey) {
+				console.log(['publish matck key',	user])
+				if (req.body.isTest) {
+						if (req.body.content && req.body.content.length > 0) {
+							console.log(['publish is test',	req.body.userEmail])
+							var params={
+								username: user.username,
+								password: user.password,
+								'grant_type':'password',
+								'client_id':config.clientId,
+								'client_secret':config.clientSecret
+							};
+							if (req.body.userEmail && req.body.userEmail.length > 0) {
+								fetch("http://localhost:3000/oauth/token", {
+								  method: 'POST',
+								  headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+									//Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
+								  },
+								  
+								  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+								}).then(function(response) {
+									return response.json();
+								}).then(function(token) {
+									let html = generateNewsletter(req.body.content,user,token.access_token);
+									utils.sendMail(config.mailFrom,req.body.userEmail,"Mnemo's Library Newsletter",html) 
+	 
+									res.send({ok:true,message:'Sent test email to '+req.body.userEmail })
+									
+								}).catch(function(e) {
+								   console.log(e);
+								   res.send({error:e});
+								});
+							}
+						} else {
+							res.send({error:'No message content'});
 						}
 						
 					} else {
+						console.log(['publish for real'])
 						db().collection('users').find({$and:[{email_me:{$ne:'none'}},{email_me:{$ne:'comments'}}]}).toArray(function(err,results) {
-							let emails=[];
-							if (req.body.users && req.body.users.length > 0 && req.body.content && req.body.content.length > 0) {
-								console.log(['send emails MC',req.body.user,req.body.publishKey,req.body.users,req.body.content])
+							console.log(['publish for real res',results,req.body.content])
+						let emails=[];
+							if (req.body.content && req.body.content.length > 0) {
+								console.log(['send emails MC',req.body.user,req.body.publishKey,req.body.content,results])
 								if (results) {
+									let promises = [];
 									results.map(function(user) {
-										emails.push(user.username);
+										var params={
+											username: user.username,
+											password: user.password,
+											'grant_type':'password',
+											'client_id':config.clientId,
+											'client_secret':config.clientSecret
+										};
+										promises.push(new Promise(function(resolve,reject) {
+											fetch("http://localhost:3000/oauth/token", {
+											  method: 'POST',
+											  headers: {
+												'Content-Type': 'application/x-www-form-urlencoded',
+												//Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
+											  },
+											  
+											  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+											}).then(function(response) {
+												return response.json();
+											}).then(function(token) {
+												// only send newsletter from live site
+												if (config.host === 'mnemolibrary.com') {
+													console.log('really send email to '+user.username)
+													let html = generateNewsletter(req.body.content,user,token.access_token);
+													utils.sendMail(config.mailFrom,user.username,"Mnemo's Library Newsletter",html) 
+												}
+												resolve({email:user.username});
+											}).catch(function(e) {
+											   console.log(e);
+											   reject()
+											});
+										}))
 										return null;
 									})
+									Promise.all(promises).then(function(final) {
+										//console.log(['USERS AND TOKENS',final])
+										res.send({ok:true,sentTo:final.length})
+						
+									});
 								}
 								// iterate users building in dynamic elements
 									// send email
 							}
-							res.send({ok:true,sentTo:emails.length})
 						});
 					}
 				} else {

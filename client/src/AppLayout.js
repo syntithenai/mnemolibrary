@@ -221,6 +221,105 @@ export default class AppLayout extends Component {
   
   
   
+    componentDidMount() {
+	  let that = this;
+      ReactGA.initialize(config.analyticsKey);
+        
+        const script = document.createElement("script");
+        script.src = "https://apis.google.com/js/platform.js";
+        script.onload = () => {
+           // //console.log('loaded gapis platform');
+           //gapi.auth2.init({
+                //clientId: this.props.clientId,
+                //scope: 'profile email'
+            //}).then(function() {
+                
+                ////console.log('iNIT loaded gapis client platform');
+            //});
+          gapi.load('client:auth2', () => {
+                //});
+                ////console.log('loaded gapis client platform');
+                gapi.client.init({
+                    clientId: config.clientId,
+                    scope: 'profile email'
+                }).then(function () {
+                  //// Listen for sign-in state changes.
+                  //gapi.auth2.getAuthInstance();
+                //gapi.client.setApiKey(this.props.clientId);
+                ////console.log('loaded gapis client platform set key');
+                //gapi.load('client:auth2', function() {
+                    ////console.log('loaded gapis client platform auth2',gapi.auth2);
+                    let instance=gapi.auth2.getAuthInstance();  
+                    ////console.log(['loaded gapis client platform',instance]);
+                    that.GoogleAuth = instance;
+                });
+              });
+            ////console.log('loaded gapis platform ex1');
+          ////console.log('loaded gapis platform ex2');
+        };
+        ////console.log('loaded gapis platform ex3');
+
+        document.body.appendChild(script);
+
+    if (window.location.search) {
+          let parts = window.location.search.slice(1).split("&");
+          parts.forEach(function(part) {
+              let iParts=part.split("=");
+              // load by token ?
+              if (iParts[0]==="oauth") {
+                  that.openAuth(iParts[1]);
+              } else if (iParts[0]==="confirm") {
+                  that.loginByConfirm(window.location.search.slice(9));
+              } else if (iParts[0]==="recovery") {
+                  that.loginByRecovery(window.location.search.slice(10));
+              } else if (iParts[0]==="code") {
+                  that.loginByToken(window.location.search.slice(6));
+              }
+          });
+    } 
+   // //console.log([this.state.user,this.state.token]);
+    // try login from localstorage
+    let token = JSON.parse(localStorage.getItem('token'));
+      if (token) {
+     //     //console.log('login by local store');
+          that.refreshLogin(token);
+      }
+    
+    //if (window.location.search) {
+        //let parts = window.location.search.slice(1).split("&");
+        //parts.forEach(function(part) {
+              //let iParts=part.split("=");
+
+              //// search on load
+              //if (iParts[0]==="page") {
+                  //that.setCurrentPage(iParts[1]);
+              //} else if (iParts[0]==="question") {
+                  //that.setQuizFromQuestionId(iParts[1]);
+              //} else if (iParts[0]==="tag") {
+                  //that.setQuizFromTag({text:iParts[1]});
+              //} else if (iParts[0]==="topic") {
+                  //that.setQuizFromTopic(iParts[1]);
+              //}
+              
+        //});
+      //}
+      
+     
+      
+      //// load tags and quizzes and indexes
+      //fetch('/api/lookups')
+      //.then(function(response) {
+        //////console.log(['got response', response])
+        //return response.json()
+      //}).then(function(json) {
+        //////console.log(['create indexes', json])
+        //that.setState(json);
+      //}).catch(function(ex) {
+        ////console.log(['parsing failed', ex])
+      //})
+      that.fetchTopicCollections();
+  };
+  
   
   
   
@@ -557,105 +656,6 @@ export default class AppLayout extends Component {
         
     };
     
-    componentDidMount() {
-	  let that = this;
-      ReactGA.initialize(config.analyticsKey);
-        
-        const script = document.createElement("script");
-        script.src = "https://apis.google.com/js/platform.js";
-        script.onload = () => {
-           // //console.log('loaded gapis platform');
-           //gapi.auth2.init({
-                //clientId: this.props.clientId,
-                //scope: 'profile email'
-            //}).then(function() {
-                
-                ////console.log('iNIT loaded gapis client platform');
-            //});
-          gapi.load('client:auth2', () => {
-                //});
-                ////console.log('loaded gapis client platform');
-                gapi.client.init({
-                    clientId: config.clientId,
-                    scope: 'profile email'
-                }).then(function () {
-                  //// Listen for sign-in state changes.
-                  //gapi.auth2.getAuthInstance();
-                //gapi.client.setApiKey(this.props.clientId);
-                ////console.log('loaded gapis client platform set key');
-                //gapi.load('client:auth2', function() {
-                    ////console.log('loaded gapis client platform auth2',gapi.auth2);
-                    let instance=gapi.auth2.getAuthInstance();  
-                    ////console.log(['loaded gapis client platform',instance]);
-                    that.GoogleAuth = instance;
-                });
-              });
-            ////console.log('loaded gapis platform ex1');
-          ////console.log('loaded gapis platform ex2');
-        };
-        ////console.log('loaded gapis platform ex3');
-
-        document.body.appendChild(script);
-
-    if (window.location.search) {
-          let parts = window.location.search.slice(1).split("&");
-          parts.forEach(function(part) {
-              let iParts=part.split("=");
-              // load by token ?
-              if (iParts[0]==="oauth") {
-                  that.openAuth(iParts[1]);
-              } else if (iParts[0]==="confirm") {
-                  that.loginByConfirm(window.location.search.slice(9));
-              } else if (iParts[0]==="recovery") {
-                  that.loginByRecovery(window.location.search.slice(10));
-              } else if (iParts[0]==="code") {
-                  that.loginByToken(window.location.search.slice(6));
-              }
-          });
-    } 
-   // //console.log([this.state.user,this.state.token]);
-    // try login from localstorage
-    let token = JSON.parse(localStorage.getItem('token'));
-      if (token) {
-     //     //console.log('login by local store');
-          that.refreshLogin(token);
-      }
-    
-    //if (window.location.search) {
-        //let parts = window.location.search.slice(1).split("&");
-        //parts.forEach(function(part) {
-              //let iParts=part.split("=");
-
-              //// search on load
-              //if (iParts[0]==="page") {
-                  //that.setCurrentPage(iParts[1]);
-              //} else if (iParts[0]==="question") {
-                  //that.setQuizFromQuestionId(iParts[1]);
-              //} else if (iParts[0]==="tag") {
-                  //that.setQuizFromTag({text:iParts[1]});
-              //} else if (iParts[0]==="topic") {
-                  //that.setQuizFromTopic(iParts[1]);
-              //}
-              
-        //});
-      //}
-      
-     
-      
-      //// load tags and quizzes and indexes
-      //fetch('/api/lookups')
-      //.then(function(response) {
-        //////console.log(['got response', response])
-        //return response.json()
-      //}).then(function(json) {
-        //////console.log(['create indexes', json])
-        //that.setState(json);
-      //}).catch(function(ex) {
-        ////console.log(['parsing failed', ex])
-      //})
-      that.fetchTopicCollections();
-  };
-  
   fetchTopicCollections() {
       let that=this;
       fetch('/api/topiccollections')

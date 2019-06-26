@@ -12,8 +12,16 @@ export default class AdminNewsletterTool extends Component {
 
     constructor(props) {
         super(props);
+        let initialContent = '';
+        initialContent += '<div  ><img style="float:right" src="https://mnemolibrary.com/mnemoicon-100.png"></div>'
+        initialContent += '<div style="color:red" >Dear :::USER::: </div>'
+        initialContent += '<br/><br/><a href=":::LINK:::/review/:::CODE:::">Revise questions from your review list</a>'
+        initialContent += '<br/><a href=":::LINK:::/multiplechoicetopics/:::CODE:::">Try a multiple choice quiz</a>'
+        initialContent += '<br/><a href=":::LINK:::/recentcomments/:::CODE:::">Join the conversation</a>'
+        initialContent = '<div>'+initialContent+'</div>'
+
 		this.state = {
-			value: '',
+			value: initialContent,
 			showPreview:false,
 			isFinished: false,
 			totalSubscribers: 0,
@@ -117,27 +125,54 @@ export default class AdminNewsletterTool extends Component {
 				return response.json()
 		}).then(function(json) {
 			console.log(['newsletter sent',json])
-			if (!isTest && json.ok === true) that.finishNewsletter()
+			if (!isTest && json.ok === true) that.finishNewsletter(json.sentTo)
 		});
 		
 		
 	}
 	
-	finishNewsletter() {
-		this.setState({isFinished:true});
+	finishNewsletter(tally) {
+		this.setState({isFinished:true, sentTo:tally});
 	}
 	
 	render () {
-		let buttonBlockStyle={float:'right', marginLeft: '0.2em'}
-		if (true || this.props.isAdmin()) {
+		let modules = {
+			 // #toolbar: '#toolbar',
+			  //'history': {          // Enable with custom configurations
+				  //'delay': 2500,
+				  //'userOnly': true
+				//},
+				//'syntax': true     
+			  toolbar: [
+			  [{ 'header': [1, 2, false] }],
+			  ['bold', 'italic', 'underline','strike', 'blockquote'],
+			  [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+			  ['link', 'image'],
+			  ['clean']
+			],
+		  }
+
+		let  formats = [
+			'header',
+			'bold', 'italic', 'underline', 'strike', 'blockquote',
+			'list', 'bullet', 'indent',
+			'link', 'image'
+		  ]
+		  let buttonBlockStyle={float:'right', marginLeft: '0.2em'}
+		if (this.props.isAdmin()) {
 			if (this.state.isFinished) {
 				return <div>
 				<h3>Newsletter Sent</h3>
-				<div>Woohoo !!</div>
+				<div>Woohoo !!  Your newsletter was sent to {this.state.sentTo} people.</div>
+				
 				</div>
 			} else if (this.state.showPreview) {
 				
-				let preview = <div dangerouslySetInnerHTML={{__html:this.state.value}} ></div>
+				let replaceString = this.state.value;
+				if (this.props.user) {
+					replaceString = this.state.value.replace(':::USER:::',(this.props.user && this.props.user.name ? this.props.user.name : this.props.user.avatar))
+				}
+				let preview = <div dangerouslySetInnerHTML={{__html:replaceString}} ></div>
 				
 				return (
 					<div>
@@ -147,9 +182,7 @@ export default class AdminNewsletterTool extends Component {
 						</div>
 						<button onClick={this.hidePreview} className='btn btn-info' >Back</button>
 						<h3>Newsletter Preview</h3>
-						<div>{this.state.totalSubscribers} subscribers</div>
 						<hr style={{width:'100%', border: '1px solid black'}}/>
-						{this.props.user && <div>Dear {this.props.user.name ? this.props.user.name : this.props.user.avatar}, </div>}
 						{preview}
 						
 						
@@ -162,9 +195,7 @@ export default class AdminNewsletterTool extends Component {
 							<button onClick={this.showPreview} className='btn btn-info' >Preview</button>
 						</div>
 						<h3>Write Your Newsletter</h3>
-						<div>{this.state.totalSubscribers} subscribers</div>
-						
-						<ReactQuill style={{marginBottom:'3em', border:'1px solid black'}} value={this.state.value}
+						<ReactQuill modules={modules} formats={formats} theme="snow" style={{marginBottom:'3em', border:'1px solid black'}} value={this.state.value}
 						onChange={this.onChange} />
 						
 						
