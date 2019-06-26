@@ -33,7 +33,7 @@ import RecentComments from './RecentComments'
 import CommentEditor from './CommentEditor'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-
+import AdminNewsletterTool from './AdminNewsletterTool'
 
 import CommentReplyEditor from './CommentReplyEditor'
 import TopicPassword from './TopicPassword';
@@ -1301,6 +1301,10 @@ export default class AppLayout extends Component {
                  
                  <PropsRoute  exact={true} path="/access/discover/:topic"  mode='topic'  component={TopicPassword}  user={this.state.user} saveUser={this.saveUser} />
                  <PropsRoute  path="/access/discover/:topic/:topicquestion" mode='topic' component={TopicPassword} user={this.state.user} saveUser={this.saveUser} />
+                
+                 <PropsRoute  path="/newslettertool"  component={AdminNewsletterTool} isAdmin={this.isAdmin} user={this.state.user} />
+                
+                
                 
                 <Footer/>
                 

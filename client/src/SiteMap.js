@@ -68,7 +68,11 @@ export default class SiteMap extends Component {
           ]
         })
     }
-    
+     //<div className="col-3">
+						//<div   style={buttonStyle}  onClick={() => that.backup()} className='btn btn-info' >
+					   //Backup
+					  //</div>
+					//</div>
     render() {
 		let that = this;
 		let buttonStyle = {marginTop:'0.3em',marginBottom:'0.3em',paddingLeft:'1em',paddingRight:'1em'} //padding:'0.3em',fontSize:'1.2em',margin:'0.3em'
@@ -86,12 +90,12 @@ export default class SiteMap extends Component {
 				   Train
 				  </div>
 				  </div>
-				  
-				  <div className="col-3">
-						<div   style={buttonStyle}  onClick={() => that.backup()} className='btn btn-info' >
-					   Backup
-					  </div>
+				   <div className="col-3">
+						<Link to="/newslettertool"   style={buttonStyle}   className='btn btn-info' >
+					   Newsletter
+					  </Link>
 					</div>
+				 
 					
 				</div>
 				  }

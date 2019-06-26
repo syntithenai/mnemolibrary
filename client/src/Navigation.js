@@ -94,6 +94,8 @@ export default class Navigation extends Component {
 			pageTitle = 'Recent Comments'
 		} else if (parts[0] === 'sitemap') {
 			pageTitle = 'Site Map'
+		} else if (parts[0] === 'newslettertool') {
+			pageTitle = 'Newsletter Tool'
 		}
         
         

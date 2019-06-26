@@ -842,7 +842,60 @@ function initRoutes(router,db) {
 			 //// logger:'/tmp/backuplog'
 		  //});
 	})
-
+	
+	router.get('/subscribers', (req, res) => {
+		if (req.query.user && req.query.user.length > 0) {
+			db().collection('users').find({$and:[{email_me:{$ne:'none'}},{email_me:{$ne:'comments'}}]}).toArray(function(err,results) {
+				//console.log(['inserted MC',question])
+				let key = 'key-'+Math.random()
+				db().collection('users').updateOne({_id:ObjectId(req.query.user)},{$set:{publishKey:key}})
+				
+				
+				res.send({publishKey:key ,total:results ? results.length : '0'});
+			});
+		} else {
+			res.send({error:'invalid missing user parameters'})
+		}
+	})
+	
+	router.post('/publishnewsletter', (req, res) => {
+		console.log(['publish',	req.body])
+		if (req.body.user && req.body.user.length > 0 && req.body.publishKey && req.body.publishKey.length > 0) {
+			db().collection('users').findOne({_id:ObjectId(req.body.user)}).then(function(user) {
+				if (user && user.publishKey && user.publishKey.length > 0 && user.publishKey === req.body.publishKey) {
+					if (req.body.isTest) {
+						if (req.body.userEmail && req.body.userEmail.length > 0) {
+							res.send({ok:true,message:'Sent test email to '+req.body.userEmail})
+						}
+						
+					} else {
+						db().collection('users').find({$and:[{email_me:{$ne:'none'}},{email_me:{$ne:'comments'}}]}).toArray(function(err,results) {
+							let emails=[];
+							if (req.body.users && req.body.users.length > 0 && req.body.content && req.body.content.length > 0) {
+								console.log(['send emails MC',req.body.user,req.body.publishKey,req.body.users,req.body.content])
+								if (results) {
+									results.map(function(user) {
+										emails.push(user.username);
+										return null;
+									})
+								}
+								// iterate users building in dynamic elements
+									// send email
+							}
+							res.send({ok:true,sentTo:emails.length})
+						});
+					}
+				} else {
+					res.send({error:'Invalid publish token'})
+				}
+			});
+			
+			
+		} else {
+			res.send({error:'Invalid missing parameters'})
+		}
+	})
+	
 };
 
 
