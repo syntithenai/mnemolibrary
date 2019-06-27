@@ -529,6 +529,7 @@ export default class MultipleChoiceQuestions extends Component {
 								}
 							}
 						})
+						let image = question && question.relatedQuestion && question.relatedQuestion.image_png ? question.relatedQuestion.image_png : (question && question.relatedQuestion && question.relatedQuestion.image ? question.relatedQuestion.image : '') 
 						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
 						let mcByTopicLink = '/multiplechoicequestions/'+encodeURIComponent(question.topic);
 						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}   key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black', marginBottom: '1em'}} > 
@@ -565,10 +566,10 @@ export default class MultipleChoiceQuestions extends Component {
 						<div id={'question_'+questionKey}></div>
 						
 							
-						{!answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.autoshow_image==="YES" && question.relatedQuestion.image_png && question.relatedQuestion.image_png.length > 0 && <img src={question.relatedQuestion.image_png}  style={{width:'200px'}} />}
+						{!answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.autoshow_image==="YES"  && <img src={image}  style={{width:'200px'}} />}
 						
 
-						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.image_png && question.relatedQuestion.image_png.length > 0 && <img src={question.relatedQuestion.image_png}  style={{width:'200px'}} />}
+						{answered && !that.props.viewOnly && image  && <img src={image}  style={{width:'200px'}} />}
 
 
 						{answered && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
