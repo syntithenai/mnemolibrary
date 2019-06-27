@@ -10,6 +10,12 @@ const mustache = require('mustache');
 
 
 
+
+
+
+function initRoutes(router,db) {
+	
+
 	function updateTags(tags) {
 		//console.log(['UPDATETAGS']);
 		////console.log(tags);
@@ -81,12 +87,6 @@ const mustache = require('mustache');
 		});
 
 	}
-
-
-
-
-function initRoutes(router,db) {
-	
 
 	router.post('/saveusertopic', (req, res) => {
 		//let body=JSON.parse(req.body);

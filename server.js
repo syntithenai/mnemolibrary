@@ -3,6 +3,10 @@ const bodyParser= require('body-parser')
 const app = express()
 const path = require('path')
 const fs = require('fs')
+var timeout = express.timeout // express v3 and below
+var timeout = require('connect-timeout'); //express v4
+
+app.use(timeout(120000));
 
 
 app.use(bodyParser.json());
@@ -44,6 +48,11 @@ router.get('/worker', (req, res) => {
 
 app.use('/uploader',router)
 
+server.timeout = 120000;
+app.use(haltOnTimedout);
 
+function haltOnTimedout(req, res, next){
+  if (!req.timedout) next();
+}
 const port = 5000;
 app.listen(port, () => console.log(`Listening on port ${port}`));
