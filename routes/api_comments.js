@@ -43,7 +43,7 @@ function initRoutes(router,db) {
 			
 			data.user = ObjectId(req.body.user)
 			data.question = ObjectId(req.body.question);
-			
+			data.questionComplete = req.body.questionComplete;
 			// send mail when reply is added/updated
 			if (req.body.isReply && req.body.userEmail  && req.body.userEmail.length > 0) {
 				if (req.body.userEmailPreferences && req.body.userEmailPreferences === "none") {

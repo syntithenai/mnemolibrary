@@ -847,7 +847,7 @@ export default class SingleQuestion extends Component {
                     </div>
                     
                     {(!showRecallButton || this.isVisible('comments')) && <div ref={(section) => { this.scrollTo.comments = section; }}  className="card-block" id="comments">
-						<CommentList isAdmin={this.props.isAdmin} user={this.props.user} question={this.props.question} comments={this.props.comments}   editComment={this.props.editComment}  deleteComment={this.props.deleteComment} toggleCommentDialog={this.props.toggleCommentDialog} newComment={this.props.newComment} saveComment={this.props.saveComment} setComment={this.props.setComment} newCommentReply={this.props.newCommentReply}/>
+						<CommentList isAdmin={this.props.isAdmin} user={this.props.user} question={this.props.question} comments={this.props.comments}   editComment={this.props.editComment}  deleteComment={this.props.deleteComment} toggleCommentDialog={this.props.toggleCommentDialog} newComment={this.props.newComment} saveComment={this.props.saveComment} setComment={this.props.setComment} newCommentReply={this.props.newCommentReply} isSingleView={true}/>
 					</div>}
 						
 					{<div style={((!showRecallButton || this.isVisible('questions'))  ? {display:'block'} : {display:'none'})} ref={(section) => { this.scrollTo.questions = section; }}  className="card-block">

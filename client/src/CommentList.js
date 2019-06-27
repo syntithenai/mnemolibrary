@@ -116,12 +116,15 @@ export default class CommentList extends Component {
 			let questionComments = [];
 			
 			this.props.comments.map(function(comment,commentKey) {
-				let buttons = 	(<div style={{float:'right'}}>
-							<button   className="btn btn-success" onClick={(e) => that.props.newCommentReply(comment)} >{replyIcon}&nbsp;<span className="d-none d-md-inline-block">Reply</span></button>
-							<button   className="btn btn-primary" onClick={(e) => that.showButtons(commentKey)} >...</button>
+				console.log(['AB',,that.props.user ,that.props.user ? that.props.user._id : 'noid',that.props.isAdmin(),comment.user,comment])
+				let adminButtons = 	(<div style={{float:'right'}}>{(that.props.isAdmin() || (that.props.user && comment.user === that.props.user._id)) && <button   className="btn btn-primary" onClick={(e) => that.showButtons(commentKey)} >...</button>}
 						</div>)
+				let replyButtons = 	(<div style={{float:'right'}}>
+							{that.props.user && <button   className="btn btn-success" onClick={(e) => that.props.newCommentReply(comment)} >{replyIcon}&nbsp;Reply</button>}
+						</div>)
+								
 				if (that.state.showButtons === commentKey) {
-					buttons=(<div className='modaldialog'  >
+					adminButtons=(<div className='modaldialog'  >
 						<div className="modaldialog-content">
 						  <div className="modaldialog-header">
 							<span onClick={that.hideButtons} className="modaldialog-close">&times;</span>
@@ -175,8 +178,7 @@ export default class CommentList extends Component {
 				if (comment.type === 'note') {
 					
 					privateComments.push( <div key={comment._id} >
-						<div>{buttons}</div>
-						
+						<div>{adminButtons} {replyButtons}</div>
 							<div style={{paddingLeft:'0em'}}> <span >
 								<span className='date' style={{fontWeight:'bold',marginRight:'0em'}} >{formatted_date} </span>
 
@@ -190,6 +192,8 @@ export default class CommentList extends Component {
 					</div>)
 				} else if (comment.type === 'question') {
 					questionComments.push( <div key={comment._id}>
+						<div>{adminButtons} {replyButtons}</div>
+						
 						{(that.props.isAdmin() || (that.props.user && comment.user === that.props.user._id)) && <div>{buttons}</div>}
 								<div style={{ paddingLeft:'0em'}}> <span >
 								<span className='date' style={{fontWeight:'bold',marginRight:'0em'}} >{formatted_date} </span>
@@ -206,7 +210,8 @@ export default class CommentList extends Component {
 				
 				} else {
 					publicComments.push( <div key={comment._id}>
-						{(that.props.isAdmin() || (that.props.user && comment.user === that.props.user._id)) && <div>{buttons}</div>}
+						<div>{adminButtons} {replyButtons}</div>
+						
 								<div style={{ paddingLeft:'0em'}}> <span >
 								<span className='date' style={{fontWeight:'bold',marginRight:'0em'}} >{formatted_date} </span>
 
@@ -223,7 +228,8 @@ export default class CommentList extends Component {
 			});
 			
 			return <div  style={{marginTop:'1em'}}>
-				{this.props.user && (privateComments.length > 0 ||  publicComments.length > 0||  questionComments.length > 0) &&  <button style={{float:'right'}} onClick={this.props.newComment} className='btn btn-success'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;New Comment&nbsp;</span></button>}
+				{this.props.isSingleView && this.props.user && (privateComments.length > 0 ||  publicComments.length > 0||  questionComments.length > 0) &&  <button style={{float:'right'}} onClick={this.props.newComment} className='btn btn-success'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;New Comment&nbsp;</span></button>}
+				
 				<div style={{width:'100%',clear:'both'}}></div>
 				{privateComments.length > 0 && <div><b className='commentsubheader' >Notes</b></div>}
 				{privateComments}

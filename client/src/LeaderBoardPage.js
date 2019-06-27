@@ -14,7 +14,6 @@ export default class LeaderBoardPage extends Component {
     render() {
 
 		return (<div style={{marginLeft:'1em'}} >
-			<h4 id="leaderboard" className='graphTitle' >Leaderboards</h4>
 				<div  style={{height: '660px'}} >
 					<LeaderBoard type="streak" user={this.props.user} />
 				</div>

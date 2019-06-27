@@ -136,7 +136,7 @@ export default class CommentEditor extends Component {
 		if (this.props.comment && this.props.comment.question && this.props.comment.question.interrogative) {
 			questionText+=this.props.comment.question.interrogative + ' ' 
 		}
-		questionText+=this.props.comment.question.question
+		questionText+=this.props.comment && this.props.comment.question ? this.props.comment.question.question : ''
 		return <div className='modaldialog'  >
 			<div className="modaldialog-content">
 			  <div className="modaldialog-header">

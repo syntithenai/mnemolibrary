@@ -9,7 +9,7 @@ import PropsRoute from './PropsRoute';
 
 import Navigation from './Navigation';
 import SettingsPage from './SettingsPage';
-import LeaderBoardPage from './SettingsPage';
+import LeaderBoardPage from './LeaderBoardPage';
 //import SingleQuestion from './SingleQuestion';
 import HelpVideos from './HelpVideos';
 import AboutPage from './AboutPage';
@@ -323,7 +323,11 @@ export default class AppLayout extends Component {
   };
   
   
-  
+  componentDidUpdate(props) {
+	  if (this.props.comment !== props.comment) {
+		  this.setState({editCommentReply:null});
+	  }
+  }
   
 	setComment(comment) {
 		this.setState({comment:comment});
@@ -367,6 +371,7 @@ export default class AppLayout extends Component {
 	}
    
 	editComment(comment) {
+		comment.question = comment.questionComplete;
 		this.setState({comment:comment});	//this.setState({commentId:comment._id,commentText:comment.comment,commentType:comment.type,commentCreateDate:comment.createDate})
 		//this.toggleCommentDialog()
 	}
@@ -437,7 +442,9 @@ export default class AppLayout extends Component {
 				toSave.questionText = question ? question.interrogative + ' ' + question.question : null;
 				toSave.questionTopic = question ? question.quiz : null;
 				toSave.question = question ? question._id : null;
+				toSave.questionComplete = question;
 			}
+			
 			toSave.isReply = isReply;
 			// set user if not already set 
 			//console.log(['do save ',toSave.user]);
@@ -1227,9 +1234,9 @@ export default class AppLayout extends Component {
         <Router>
             <div style={{width:'100%'}} className="mnemo">
 			
-			    <PropsRoute exact={true} path='/recentcomments/:comment'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} />
+			    <PropsRoute exact={true} path='/recentcomments/:comment'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user} />
                 
-                <PropsRoute exact={true} path='/recentcomments'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} />
+                <PropsRoute exact={true} path='/recentcomments'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user}  />
                 
                  {this.state.comment && !this.state.editCommentReply && <CommentEditor comment={this.state.comment} setComment={this.setComment} user={this.state.user} saveComment={this.saveComment}  getCurrentQuestion={this.getCurrentQuestion}/>}
 
