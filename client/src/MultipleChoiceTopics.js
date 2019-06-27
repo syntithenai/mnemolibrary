@@ -182,7 +182,7 @@ export default class MultipleChoiceTopics extends Component {
 				let topicCollections = this.state.topicCollections.map(function(topicCollection,key) {
 					//return <div  className="col-lg-4 col-6" style={{}}>{topicCollection.name}
 					let iconStyle={height: '3.6em', marginTop:'1em'}
-					let blockStyle={float:'left',minHeight:'170px', paddingBottom:'1em',border:'2px solid white',fontSize:'1.1em',paddingTop:'0.2em'}
+					let blockStyle={float:'left',minHeight:'180px', paddingBottom:'1em',border:'2px solid white',fontSize:'1.1em',paddingTop:'0.2em'}
 					let linkTo='/multiplechoicetopics/'+topicCollection.name;
 					let color = that.colors[key%that.colors.length].color;
 					let backgroundColor = that.colors[key%that.colors.length].backgroundColor;
@@ -198,7 +198,7 @@ export default class MultipleChoiceTopics extends Component {
 					let backgroundColor2 = that.colors[that.colors.length -2].backgroundColor;
 					let color2 = that.colors[that.colors.length -2].color;
 				let iconStyle={height: '3.6em', marginTop:'1em'}
-				let blockStyle={float:'left',minHeight:'170px', paddingBottom:'1em',border:'2px solid white',fontSize:'1.1em',paddingTop:'0.2em'}
+				let blockStyle={float:'left',minHeight:'180px', paddingBottom:'1em',border:'2px solid white',fontSize:'1.1em',paddingTop:'0.2em'}
 				
 				return <div style={{clear:'both', width: '100%'}} >
 					{searchForm}
