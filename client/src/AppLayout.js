@@ -9,7 +9,7 @@ import PropsRoute from './PropsRoute';
 
 import Navigation from './Navigation';
 import SettingsPage from './SettingsPage';
-import LeaderBoardPage from './LeaderBoardPage';
+import LeaderBoardPage from './SettingsPage';
 //import SingleQuestion from './SingleQuestion';
 import HelpVideos from './HelpVideos';
 import AboutPage from './AboutPage';
@@ -1252,8 +1252,8 @@ export default class AppLayout extends Component {
                 <PropsRoute  path="/create" analyticsEvent={this.analyticsEvent} component={CreatePage} fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
                 
                 
-                <PropsRoute exact={true} path='/multiplechoicetopics/:topicCollection'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}  />
-                <PropsRoute exact={true} path='/multiplechoicetopics'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}  />
+                <PropsRoute exact={true} path='/multiplechoicetopics/:topicCollection'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics} user={this.state.user} />
+                <PropsRoute exact={true} path='/multiplechoicetopics'  user={this.state.user} topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}  />
                 
                 <PropsRoute exact={true} path='/multiplechoicequestions/:topic'   user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
 

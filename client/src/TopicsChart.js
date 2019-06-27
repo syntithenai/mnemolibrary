@@ -138,7 +138,7 @@ export default class TopicsChart extends React.Component {
                         colors.push(color);
                        //console.log(['score',score,color,val.topic,val.questions,val.total,val.successRates]);
                         //+ ' (' + val.questions + '/' + val.total+')'
-                        let point={"topic": val.topic+" "+score,"id": val.topic+" "+score ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color,blocks:val.blocks};
+                        let point={"topic": val.topic,"id": val.topic ,"value": 1,"total": val.total,"questions": val.questions,"score":score,successRate:val.successRate,color:color,blocks:val.blocks};
                         //if (point.score < 0.7) {
                         if (parseFloat(val.questions) > 0) {
                             totalSeen += parseFloat(val.questions)

@@ -29,7 +29,7 @@ export default class RecentSingleComment extends Component {
     }
     
     shouldComponentUpdate(newProps,newState) {
-		if (this.state.comments != newState.comments) {
+		if (this.state.comments != newState.comments || this.props.user != newProps.user) {
 			return true;
 		} else {	
 			return false;

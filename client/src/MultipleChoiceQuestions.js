@@ -12,6 +12,8 @@ import ShareIcon from 'react-icons/lib/fa/share-alt';
 import CompleteIcon from 'react-icons/lib/fa/check';
 //import MoreInfoIcon from 'react-icons/lib/fa/external-link-alt';
 import ShareDialog from './ShareDialog';
+import "video-react/dist/video-react.css"; // import css
+import { Player } from 'video-react';
 
 let resetIcon = <svg style={{marginTop:'0.2em',height:'1.1em'}} role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256.455 8c66.269.119 126.437 26.233 170.859 68.685l35.715-35.715C478.149 25.851 504 36.559 504 57.941V192c0 13.255-10.745 24-24 24H345.941c-21.382 0-32.09-25.851-16.971-40.971l41.75-41.75c-30.864-28.899-70.801-44.907-113.23-45.273-92.398-.798-170.283 73.977-169.484 169.442C88.764 348.009 162.184 424 256 424c41.127 0 79.997-14.678 110.629-41.556 4.743-4.161 11.906-3.908 16.368.553l39.662 39.662c4.872 4.872 4.631 12.815-.482 17.433C378.202 479.813 319.926 504 256 504 119.034 504 8.001 392.967 8 256.002 7.999 119.193 119.646 7.755 256.455 8z"></path></svg>
 
@@ -228,7 +230,7 @@ export default class MultipleChoiceQuestions extends Component {
 			}).then(function(res) {
 				console.log('done reset quiz')
 				that.loadQuestions();
-				this.setState({currentQuestion:0})
+				that.setState({currentQuestion:0})
 			})
 		}
 	}
@@ -391,6 +393,76 @@ export default class MultipleChoiceQuestions extends Component {
 		//}
 	}
 	
+	createMedia(question) {
+        let sources=[]
+       	let that = this;
+		if (question) {
+			if (question.media && question.media.length > 0) sources.push(<source src={question.media} />)
+			if (question.media_ogg && question.media_ogg.length > 0) sources.push(<source src={question.media_ogg} />)
+			if (question.media_webm && question.media_webm.length > 0) sources.push(<source src={question.media_webm} />)
+			if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source src={question.media_mp4} />)
+				
+			if (question.media_mp3 && question.media_mp3.length > 0) sources.push(<source src={question.media_mp3} />)
+			if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source src={question.media_mp4} />)
+			if (question.media_webmvideo && question.media_webmvideo.length > 0) sources.push(<source src={question.media_webmvideo} />)
+			if (question.media_webmaudio && question.media_webmaudio.length > 0) sources.push(<source src={question.media_webmaudio} />)
+			let dimensions = {x:400,y:50}
+			if (this.isVideo(question)) {
+				dimensions = {x:400,y:400}
+			}
+			//console.log(['SINGLE VIEW CREATE MEDIA from q',this.props.question]);
+				let media=<Player
+				 // ref={this.setPlayerRef}
+				  playsInline
+				  //autoPlay={question.autoplay_media==="YES" ? true : false}
+				   autoPlay={false}
+				   height={dimensions.y}
+				  width={'100%'}
+				  fluid={false}
+				>
+				{sources}
+				</Player>
+				//console.log(['SINGLE VIEW CREATE MEDIA',media]);
+				//setTimeout(function() {
+					////console.log(['SINGLE VIEW UPDATE MEDIA',media,question.media]);
+						//that.setState({media:media});
+						//if (that.player) that.player.load();
+				//},100);
+				return media;
+				//this.setState({media:media});
+		}
+    };
+	
+	   hasMedia(question) {
+         // console.log(['HASMEDIA',question]);
+          if (question.media ||
+            question.media_ogg ||
+            question.media_webm ||
+            question.media_mp4 ||
+            
+            question.media_mp3 ||
+            question.media_mp4 ||
+            question.media_webmvideo ||
+            question.media_webmaudio
+            )  {
+                return true;
+            } else {
+                return false;
+            }
+      };
+      
+       isVideo(question) {
+          //console.log(['isvideo',question]);
+          if (question.media_mp4 ||question.media_webmvideo)  {
+        //  console.log(['isvideo YES']);
+                return true;
+            } else {
+          //console.log(['isvideo NO']);
+                return false;
+            }
+      };
+      
+	
 	sendAllQuestionsForReview(questions) {
 		this.nextQuestion();
 		this.props.sendAllQuestionsForReview(questions) //[{_id:question.questionId}]
@@ -496,7 +568,9 @@ export default class MultipleChoiceQuestions extends Component {
 
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em'}}><b>Memory Aid</b> {question.relatedQuestion.mnemonic}</div>}
 					
-						{!that.props.viewOnly && answered && question.relatedQuestion && question.relatedQuestion.tags && question.relatedQuestion.tags.length > 0 && <div id='relatedtags' style={{marginTop:'1em'}}><b>Tags</b> {tagsRendered}</div>}
+						{!that.props.viewOnly && answered && question.relatedQuestion && question.relatedQuestion.MEDIA && question.relatedQuestion.tags.length > 0 && <div id='relatedtags' style={{marginTop:'1em'}}><b>Tags</b> {tagsRendered}</div>}
+						
+						{question.relatedQuestion && that.hasMedia(question.relatedQuestion) && <div id='media' style={{marginTop:'1em'}}><b>Media</b> {that.createMedia(question.relatedQuestion)}</div>}
 						
 						</div>
 					} else {
