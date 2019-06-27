@@ -380,7 +380,7 @@ export default class AppLayout extends Component {
 		//this.setVisible('comments')
 		console.log(['NEW COMMENT s'])
 		let comment = {_id:null,comment:'',type:'',createDate:new Date(),user:this.state.user ? this.state.user._id : null,userEmail:this.state.user ? this.state.user.username : null,userEmailPreference:this.state.user ? this.state.user.email_me : null,userAvatar:this.state.user ? this.state.user.avatar : null,question:this.getCurrentQuestion()};
-		this.setState({comment:comment})
+		this.setState({comment:comment,editCommentReply:null})
 		console.log(['NEW COMMENT',comment,this.state.comment])
 	//	this.toggleCommentDialog()
 		
