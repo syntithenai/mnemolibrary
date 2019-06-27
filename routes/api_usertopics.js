@@ -401,8 +401,7 @@ function initRoutes(router,db) {
 									&& question.multiple_choices && question.multiple_choices.length > 0
 								) {
 									console.log(['NEW MC QUESTION']);
-									let newQuestion ={_id:ObjectId(),topic:question.quiz,question:question.specific_question,answer:question.specific_answer,multiple_choices:question.multiple_choices,questionId:ObjectId(question._id),feedback:question.feedback,importId:'USERTOPIC-'+req.body._id,userTopic:ObjectId(req.body._id)}
-									if (question.autoshow_image==="YES" && question.image) newQuestion.image = question.image;
+									let newQuestion ={_id:ObjectId(),topic:question.quiz,question:question.specific_question,answer:question.specific_answer,multiple_choices:question.multiple_choices,questionId:ObjectId(question._id),feedback:question.feedback,image:question.image,autoshow_image:question.autoshow_image,importId:'USERTOPIC-'+req.body._id,userTopic:ObjectId(req.body._id)}
 									if (question.autoplay_media==="YES" && question.media) newQuestion.media = question.media;
 									
 									mcQuestions.push(newQuestion)

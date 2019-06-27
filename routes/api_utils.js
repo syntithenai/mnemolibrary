@@ -522,8 +522,7 @@ function initRoutes(router,db) {
 											&& record.specific_answer && record.specific_answer.length > 0
 											&& record.multiple_choices && record.multiple_choices.length > 0
 										) {
-											let newQuestion ={_id:record.mcQuestionId ? ObjectId(record.mcQuestionId) : ObjectId(),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,questionId:ObjectId(record._id),feedback:record.feedback,importId:'QQ-'+importId,user:'default'}
-											if (record.autoshow_image==="YES" && record.image) newQuestion.image = record.image;
+											let newQuestion ={_id:record.mcQuestionId ? ObjectId(record.mcQuestionId) : ObjectId(),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,questionId:ObjectId(record._id),feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image,}
 											if (record.autoplay_media==="YES" && record.media) newQuestion.media = record.media;
 											
 											mcQuestions.push(newQuestion)
@@ -741,7 +740,7 @@ function initRoutes(router,db) {
 									&& mcQuestion.specific_answer && mcQuestion.specific_answer.length > 0
 									&& mcQuestion.multiple_choices && mcQuestion.multiple_choices.length > 0
 								) {
-									toSave.push({_id:ObjectId(mcQuestion._id),topic:mcQuestion.topic,question:mcQuestion.specific_question,answer:mcQuestion.specific_answer,multiple_choices:mcQuestion.multiple_choices,questionId:ObjectId(mcQuestion.questionId),feedback:mcQuestion.feedback,importId:'MC-'+importId,user:'default',image:mcQuestion.image,media:mcQuestion.media})
+									toSave.push({_id:ObjectId(mcQuestion._id),topic:mcQuestion.topic,question:mcQuestion.specific_question,answer:mcQuestion.specific_answer,multiple_choices:mcQuestion.multiple_choices,questionId:ObjectId(mcQuestion.questionId),feedback:mcQuestion.feedback,importId:'MC-'+importId,user:'default',image:mcQuestion.image,autoshow_image:mcQuestion.autoshow_image,media:mcQuestion.media})
 										
 								}
 							}
