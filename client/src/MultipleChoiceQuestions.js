@@ -568,7 +568,7 @@ export default class MultipleChoiceQuestions extends Component {
 
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em'}}><b>Memory Aid</b> {question.relatedQuestion.mnemonic}</div>}
 					
-						{!that.props.viewOnly && answered && question.relatedQuestion && question.relatedQuestion.MEDIA && question.relatedQuestion.tags.length > 0 && <div id='relatedtags' style={{marginTop:'1em'}}><b>Tags</b> {tagsRendered}</div>}
+						{!that.props.viewOnly && answered && question.relatedQuestion && question.relatedQuestion.tags && question.relatedQuestion.tags.length > 0 && <div id='relatedtags' style={{marginTop:'1em'}}><b>Tags</b> {tagsRendered}</div>}
 						
 						{question.relatedQuestion && that.hasMedia(question.relatedQuestion) && <div id='media' style={{marginTop:'1em'}}><b>Media</b> {that.createMedia(question.relatedQuestion)}</div>}
 						
