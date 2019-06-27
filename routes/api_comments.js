@@ -34,7 +34,7 @@ function initRoutes(router,db) {
 			
 		if (req.body.user && (req.body.type === 'note' || req.body.type === 'comment'|| req.body.type === 'question')) {
 			let data = req.body;
-			if (data._id) {
+			if (data._id && data._id !== null && data._id !== 'null') {
 				data._id = ObjectId(data._id)
 			}
 			 //else {
