@@ -48,7 +48,7 @@ router.get('/worker', (req, res) => {
 
 app.use('/uploader',router)
 
-server.timeout = 120000;
+//server.timeout = 120000;
 //app.use(haltOnTimedout);
 
 //function haltOnTimedout(req, res, next){
