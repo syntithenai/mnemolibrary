@@ -36,6 +36,8 @@ function initRoutes(router,db) {
 			let data = req.body;
 			if (data._id && data._id !== null && data._id !== 'null') {
 				data._id = ObjectId(data._id)
+			} else {
+				data._id = ObjectId()
 			}
 			 //else {
 				//data.createDate = new Date()
