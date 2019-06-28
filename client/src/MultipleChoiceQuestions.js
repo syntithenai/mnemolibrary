@@ -92,7 +92,11 @@ export default class MultipleChoiceQuestions extends Component {
 		let that = this;
 		Object.keys(this.playerRefs).map(function(playerKey) {
 			let player = that.playerRefs[playerKey]
-			if (player && questionId !== playerKey) player.pause();
+			try {
+				if (player && player.pause && questionId !== playerKey) player.pause();
+			} catch (e) {
+				
+			}
 		})		
 	}
 	
