@@ -88,7 +88,14 @@ export default class MultipleChoiceTopics extends Component {
 					}
 				})
 			}
-			that.setState({topicCollections: Object.values(collated), topics:json});
+			let finalCollections = Object.values(collated).sort(function(a,b) {
+				if (a.sort && b.sort && a.sort > b.sort) {
+					return 1
+				} else {
+					return -1
+				}
+			})
+			that.setState({topicCollections: finalCollections, topics:json});
 		  }).catch(function(ex) {
 			console.log(['parsing failed', ex])
 		  })

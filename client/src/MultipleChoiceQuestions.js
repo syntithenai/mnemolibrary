@@ -67,7 +67,45 @@ export default class MultipleChoiceQuestions extends Component {
 		this.sendAllQuestionsForReview = this.sendAllQuestionsForReview.bind(this)
 		this.loadMyTopics = this.loadMyTopics.bind(this)
 		this.loadMyQuestions = this.loadMyQuestions.bind(this)
+		this.dumpRefs = this.dumpRefs.bind(this)
+		this.handleStateChange = this.handleStateChange.bind(this)
+		this.stopAllPlayers = this.stopAllPlayersExcept.bind(this)
+		this.stopAllPlayersExcept = this.stopAllPlayersExcept.bind(this)
+		this.playerRefs = {}
+		let that = this;
+		this.setPlayerRef = (key,element) => {
+			if (key && element) {
+				element.subscribeToStateChange((state,prevState) => that.handleStateChange(key,state,prevState));
+				that.playerRefs[key] = element;
+			}
+        };
+       
 	};
+	
+	stopAllPlayers() {
+		Object.values(this.playerRefs).map(function(player) {
+			if (player) player.pause();
+		})
+	}
+		
+	stopAllPlayersExcept(questionId) {
+		let that = this;
+		Object.keys(this.playerRefs).map(function(playerKey) {
+			let player = that.playerRefs[playerKey]
+			if (player && questionId !== playerKey) player.pause();
+		})		
+	}
+	
+	handleStateChange(key,state, prevState) {
+	  // copy player state to this component's state
+		if (state && state.paused !== true) {
+			this.stopAllPlayersExcept(key)
+		}
+	}
+	
+	dumpRefs() {
+		console.log('REFS',this.playerRefs);
+	}
     
     componentDidMount() {
       let that=this;
@@ -100,7 +138,7 @@ export default class MultipleChoiceQuestions extends Component {
 	loadMyTopics() {
 		let that = this;
 		console.log(['load my topics',this.props])
-
+		this.stopAllPlayers();
 		if (this.props.user) {
 			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
 			let topicQuery='';
@@ -135,6 +173,7 @@ export default class MultipleChoiceQuestions extends Component {
     
     loadMyQuestions() {
 		let that = this;
+		this.stopAllPlayers();
 		if (this.props.user) {
 			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
 			let topicQuery='';
@@ -168,6 +207,7 @@ export default class MultipleChoiceQuestions extends Component {
     
     loadQuestions() {
 		console.log(['LOAD Q',this.props.mode])
+		this.stopAllPlayers();
 		if (this.props.mode && this.props.mode === "myquestions") {
 			this.loadMyQuestions();
 		} else if (this.props.mode && this.props.mode === "mytopics") {
@@ -211,6 +251,7 @@ export default class MultipleChoiceQuestions extends Component {
     
     resetQuiz() {
 		let that = this;
+		this.stopAllPlayers();
 		console.log('reset  ')
 		let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
 		if (topic && topic.length > 0 ) {
@@ -236,7 +277,7 @@ export default class MultipleChoiceQuestions extends Component {
 	}
     
     clickResetQuiz() {
-		
+		this.stopAllPlayers();
 		confirmAlert({
 		  title: 'Reset Quiz',
 		  message: 'Are you sure you want to clear all your answers for this quiz ?',
@@ -256,6 +297,7 @@ export default class MultipleChoiceQuestions extends Component {
     
     // scroll to next unanswered question
     nextQuestion() {
+		this.stopAllPlayers();
 		console.log(['NEXT QUESTION',this.state.questions,this.props.user,this.state.currentQuestion])
 		
 		if (this.state.questions && this.state.questions.length > 0) {
@@ -410,12 +452,12 @@ export default class MultipleChoiceQuestions extends Component {
 			if (this.isVideo(question)) {
 				dimensions = {x:400,y:400}
 			}
+			let autoPlay = question && question.relatedQuestion && question.relatedQuestion.autoplay_media==="YES" ? true : false
 			//console.log(['SINGLE VIEW CREATE MEDIA from q',this.props.question]);
 				let media=<Player
-				 // ref={this.setPlayerRef}
+				  ref={(element) => this.setPlayerRef(question._id,element)}
 				  playsInline
-				  //autoPlay={question.autoplay_media==="YES" ? true : false}
-				   autoPlay={false}
+				  autoPlay={autoPlay}
 				   height={dimensions.y}
 				  width={'100%'}
 				  fluid={false}
@@ -481,7 +523,6 @@ export default class MultipleChoiceQuestions extends Component {
 		//if (topic && topic.length > 0) {
 			if (this.state.questions && this.state.questions.length > 0) { 
 				questions = this.state.questions.map(function(question,questionKey) {
-					
 					if (question && question.question && question.question.length > 0 && question.answer && question.answer.length > 0 && question.multiple_choices && question.multiple_choices.length > 0) { 
 						let answered = (question.seenBy && question.seenBy[userId] && question.seenBy[userId].length > 0) ? true : false;
 						let userAnswer = question.seenBy ? question.seenBy[userId] : null;
@@ -591,11 +632,16 @@ export default class MultipleChoiceQuestions extends Component {
 				let message = null;
 				if (this.props.mode && this.props.mode === "myquestions" ) {
 					message=<b>You have answered all the multiple choice questions that are on your review list.</b>
+					return message ? <div style={{paddingLeft:'1em'}}>{message}<br/><br/><br/><Link className='btn btn-info' to='/' >Discover Something New</Link></div> : null;
 				} else if (this.props.mode && this.props.mode === "mytopics" ) {
 					message=<b>You have answered all the multiple choice questions for all the topics you have explored.</b>
-				} 
+					return message ? <div style={{paddingLeft:'1em'}}>{message}<br/><br/><br/><Link className='btn btn-info' to='/' >Discover Something New</Link></div> : null;
+				} else {
+					message=<b>You have answered all the multiple choice questions for this topic.</b>
+					return message ? <div style={{paddingLeft:'1em'}}>{message}<br/><br/><br/><a className='btn btn-danger' onClick={this.resetQuiz} >Reset My Answers</a></div> : null;
+					
+				}
 				
-				return message ? <div style={{paddingLeft:'1em'}}>{message}<br/><br/><br/><Link className='btn btn-info' to='/' >Discover Something New</Link></div> : null;
 			}
 		//} else {
 			//questions=<b>Missing required topic</b>
@@ -622,6 +668,7 @@ export default class MultipleChoiceQuestions extends Component {
 					  </div>
 					  
 					  <div className="modaldialog-body">
+					  <button onClick={this.dumpRefs}>refs</button>
 							<div>
 								<button  onClick={(e) => that.setShareDialog(!that.state.showShareDialog)} className='btn btn-info' ><ShareIcon size={26} /> <span  className="d-none d-sm-inline" >Share Quiz</span></button>
 								<button style={{}} onClick={that.clickResetQuiz} className='btn btn-danger' >{resetIcon} <span className="d-none d-sm-inline" >Reset Answers</span></button>
