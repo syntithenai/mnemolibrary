@@ -1244,7 +1244,7 @@ export default class AppLayout extends Component {
              
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
                 
-                <PropsRoute  path="/" component={Navigation}  setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection}  />
+                <PropsRoute  path="/" component={Navigation}  setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection} newCommentReply={this.newCommentReply}  />
                 
                 <PropsRoute  exact={true} path="/sitemap" component={SiteMap} isAdmin={this.isAdmin} isLoggedIn={this.isLoggedIn} logout={this.logout} import={this.import} importMultipleChoice={this.importMultipleChoice}/>
                 
@@ -1259,8 +1259,8 @@ export default class AppLayout extends Component {
                 <PropsRoute  path="/create" analyticsEvent={this.analyticsEvent} component={CreatePage} fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
                 
                 
-                <PropsRoute exact={true} path='/multiplechoicetopics/:topicCollection'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics} user={this.state.user} />
-                <PropsRoute exact={true} path='/multiplechoicetopics'  user={this.state.user} topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}  />
+                <PropsRoute exact={true} path='/multiplechoicetopics/:topicCollection'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics} user={this.state.user} newCommentReply={this.newCommentReply} />
+                <PropsRoute exact={true} path='/multiplechoicetopics'  user={this.state.user} topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}   newCommentReply={this.newCommentReply}  />
                 
                 <PropsRoute exact={true} path='/multiplechoicequestions/:topic'   user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
 

@@ -149,7 +149,7 @@ export default class MultipleChoiceTopics extends Component {
 			</form>
 			</div>
 			<div className='col-1' ></div>
-			<div className='col-12 col-sm-8' ><RecentSingleComment  user={that.props.user}/></div>
+			<div className='col-12 col-sm-8' ><RecentSingleComment  newCommentReply={this.props.newCommentReply}  user={that.props.user}/></div>
             <div style={{clear:'both',width:'100%'}}></div>
 			</div>
 		if ((this.state.filter && this.state.filter.length > 0) || selectedCollection !== null) {

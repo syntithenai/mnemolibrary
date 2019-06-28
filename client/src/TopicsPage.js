@@ -93,7 +93,7 @@ export default class TopicsPage extends Component {
         return (
             <div>
                 <div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
-                <span style={{ paddingLeft:'1em',width: '60%',float:'right'}}><RecentSingleComment newCommentReply={this.props.newCommentReply} user={this.props.user} /></span>
+                <span style={{ paddingLeft:'1em',width: '60%',float:'right'}}><RecentSingleComment newCommentReply={this.props.newCommentReply} user={this.props.user}  newCommentReply={this.props.newCommentReply}  /></span>
                 <form className="form-inline" style={{width:'40%'}}>
                   <input className="form-control" type="text" value={this.props.titleFilter} onChange={this.props.setTitleFilter}  placeholder="Search" aria-label="Search" />
 				  
