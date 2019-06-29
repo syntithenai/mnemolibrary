@@ -568,34 +568,38 @@ export default class MultipleChoiceQuestions extends Component {
 							});
 						}
 
-						
+						//{answered && <div>
+							//You  {userAnswerCorrect? ' correctly ' : ' incorrectly '} answered {userAnswer}. {!userAnswerCorrect ? ' The correct answer is '+question.answer+".":''}
+						//</div>}
 						let possibleAnswers = question.possibleAnswers;
+						
 						let answerButtons = possibleAnswers.map(function(sampleAnswer,key) {
 							// determine button color from answer status
+							let answerLetter=String.fromCharCode(key+65);
 							if (false && that.props.viewOnly) {
 								if (sampleAnswer === question.answer) {
-									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.2em'}} >{sampleAnswer}</div>
+									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
 								} else {
-									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
 								}
 							} else {
 								if (answered) {
 									// is this answer the user answer
 									if (sampleAnswer === userAnswer) {
 										if (userAnswerCorrect)  {
-											return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+											return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
 										} else {
-											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#dc3545', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#dc3545', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', textDecoration: 'line-through'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
 										}
 									// is this button the correct answer
 									} else if (sampleAnswer === question.answer) {
-										return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green', d:'#28a745', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+										return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green', d:'#28a745', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
 									} else {
-											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
 									}
 									
 								} else {
-									return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)}  style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} >{sampleAnswer}</div>
+									return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)}  style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
 								}
 							}
 						})
@@ -610,9 +614,7 @@ export default class MultipleChoiceQuestions extends Component {
 						
 						{!that.props.viewOnly && <div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> }
 
-						{answered && <div>
-							You  {userAnswerCorrect? ' correctly ' : ' incorrectly '} answered {userAnswer}. {!userAnswerCorrect ? ' The correct answer is '+question.answer+".":''}
-						</div>}
+						
 						{!that.props.viewOnly && answered  && <i style={{paddingTop: '2em'}}>{question.overallPercentCorrect ? question.overallPercentCorrect : 0} percent of {question.seen > 0 ? question.seen : 1} people answered correctly.</i> }
 	
 						{!that.props.viewOnly && <div className='questionbuttons' style={{width:'100%', minHeight: '2em'}} >

@@ -50,7 +50,7 @@ export default class SiteMap extends Component {
               onClick: () => {}
             },
             {
-              label: 'Archive',
+              label: 'Master',
               onClick: () => this.props.import(0)
             },
             {
@@ -58,7 +58,7 @@ export default class SiteMap extends Component {
               onClick: () => this.props.import(1)
             },
             {
-              label: 'Test',
+              label: 'Biology',
               onClick: () => this.props.import(2)
             },
             {

@@ -144,7 +144,7 @@ export default class MultipleChoiceTopics extends Component {
 		let renderedTopicCollections = null;
 		let searchForm = <div className='row'>
 			<div className='col-12 col-sm-3' >
-                <form className="form-inline" >
+                <form className="form-inline" onSubmit={(e) => {e.preventDefault(); return false;}}>
 				<input className="form-cmctopicsontrol" type="text" value={this.state.filter} onChange={this.setFilter}  placeholder="Search" aria-label="Search" />
 			</form>
 			</div>
