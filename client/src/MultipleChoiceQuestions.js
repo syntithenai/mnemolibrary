@@ -189,15 +189,15 @@ export default class MultipleChoiceQuestions extends Component {
 		let that = this;
 		console.log(['load my topics',this.props])
 		this.stopAllPlayers();
-		if (this.props.user) {
-			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
-			let topicQuery='';
-			if (topic && topic.length > 0 ) {
-				topicQuery='&topic='+topic;
-			}
-			console.log(['FETCH','/api/mymctopics?user='+this.props.user._id + topicQuery])
-			return new Promise(function(resolve,reject) {
-				fetch('/api/mymctopics?user='+this.props.user._id + topicQuery)
+		return new Promise(function(resolve,reject) {
+			if (that.props.user) {
+				let topic = that.props.match && that.props.match.params && that.props.match.params.topic && that.props.match.params.topic.length > 0 ? that.props.match.params.topic : that.props.topic;
+				let topicQuery='';
+				if (topic && topic.length > 0 ) {
+					topicQuery='&topic='+topic;
+				}
+				console.log(['FETCH','/api/mymctopics?user='+that.props.user._id + topicQuery])
+				fetch('/api/mymctopics?user='+that.props.user._id + topicQuery)
 				.then(function(response) {
 					console.log(['got response'])
 					return response.json()
@@ -220,22 +220,21 @@ export default class MultipleChoiceQuestions extends Component {
 					reject()
 				})
 				
-			})
-			
-		}
+			}
+		})
     }
     
     loadMyQuestions() {
 		let that = this;
 		this.stopAllPlayers();
-		if (this.props.user) {
-			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
-			let topicQuery='';
-			if (topic && topic.length > 0 ) {
-				topicQuery='&topic='+topic;
-			}
-			return new Promise(function(resolve,reject) {
-				fetch('/api/mymcquestions?user='+this.props.user._id + topicQuery)
+		return new Promise(function(resolve,reject) {
+			if (that.props.user) {
+				let topic = that.props.match && that.props.match.params && that.props.match.params.topic && that.props.match.params.topic.length > 0 ? that.props.match.params.topic : that.props.topic;
+				let topicQuery='';
+				if (topic && topic.length > 0 ) {
+					topicQuery='&topic='+topic;
+				}
+				fetch('/api/mymcquestions?user='+that.props.user._id + topicQuery)
 				.then(function(response) {
 					console.log(['got response'])
 					return response.json()
@@ -257,9 +256,9 @@ export default class MultipleChoiceQuestions extends Component {
 					console.log(['parsing failed', ex])
 					reject()
 				})
-			})
+			}
 			
-		}
+		})
     }
     
     loadQuestions() {
@@ -271,17 +270,17 @@ export default class MultipleChoiceQuestions extends Component {
 			return this.loadMyTopics();
 		} else {
 			let that = this;
-			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
-			if (topic && topic.length > 0 ) {
-				let questionQuery='';
-				if (this.props.question) {
-					questionQuery='&questionId='+this.props.question;
-				}
-				// single view page needs all but quiz list page needs not answered
-				if (this.props.user) {
-					questionQuery+=this.props.user ? '&user='+this.props.user._id : '';
-				}
-				return new Promise(function(resolve,reject) {
+			return new Promise(function(resolve,reject) {
+				let topic = that.props.match && that.props.match.params && that.props.match.params.topic && that.props.match.params.topic.length > 0 ? that.props.match.params.topic : that.props.topic;
+				if (topic && topic.length > 0 ) {
+					let questionQuery='';
+					if (that.props.question) {
+						questionQuery='&questionId='+that.props.question;
+					}
+					// single view page needs all but quiz list page needs not answered
+					if (that.props.user) {
+						questionQuery+=that.props.user ? '&user='+that.props.user._id : '';
+					}
 					fetch('/api/mcquestions?topic='+topic+questionQuery)
 					.then(function(response) {
 						console.log(['got response'])
@@ -304,8 +303,9 @@ export default class MultipleChoiceQuestions extends Component {
 						console.log(['parsing failed', ex])
 						reject();
 					})
-				})
-			}
+					
+				}
+			})
 		}
 	}
     
