@@ -648,7 +648,7 @@ export default class MultipleChoiceQuestions extends Component {
 						
 						<div style={{fontWeight:'bold',paddingTop: '1em'}}>{question.question}</div>
 						
-						{!answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.autoshow_image==="YES"  && <img src={image}  style={{ float:'left',height:'200px'}} />}
+						{!answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.autoshow_image==="YES"  && <img src={image}  style={{ height:'200px'}} />}
 						
 
 						{!that.props.viewOnly && <div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> }
@@ -657,7 +657,7 @@ export default class MultipleChoiceQuestions extends Component {
 						{!that.props.viewOnly && answered  && <i style={{paddingTop: '2em'}}>{question.overallPercentCorrect ? question.overallPercentCorrect : 0} percent of {question.seen > 0 ? question.seen : 1} people answered correctly.</i> }
 	
 							
-						{!that.props.viewOnly && <div className='questionbuttons' style={{minWidth:'50%', minHeight: '190px'}} >
+						{!that.props.viewOnly && <div className='questionbuttons' style={{minWidth:'50%', minHeight: '2em'}} >
 							
 							{!that.props.viewOnly && !isQuestionPage && question.questionId && question.topic && <div>
 								<div style={{float:'right'}}><Link  to={moreInfoLink} className='btn btn-info'>{moreInfoIcon} <span className="d-none d-sm-inline" >More Information</span></Link></div> 
