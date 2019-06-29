@@ -68,6 +68,7 @@ export default class MultipleChoiceQuestions extends Component {
 		this.loadMyTopics = this.loadMyTopics.bind(this)
 		this.loadMyQuestions = this.loadMyQuestions.bind(this)
 		this.dumpRefs = this.dumpRefs.bind(this)
+		this.createMedia = this.createMedia.bind(this)
 		this.startPlayer = this.startPlayer.bind(this)
 		this.handleStateChange = this.handleStateChange.bind(this)
 		this.stopAllPlayers = this.stopAllPlayersExcept.bind(this)
@@ -75,6 +76,7 @@ export default class MultipleChoiceQuestions extends Component {
 		this.playerRefs = {}
 		let that = this;
 		this.setPlayerRef = (key,element) => {
+			console.log(['SET PLAYER REF',key,element])
 			if (key && element) {
 				element.subscribeToStateChange((state,prevState) => that.handleStateChange(key,state,prevState));
 				that.playerRefs[key] = element;
@@ -82,18 +84,64 @@ export default class MultipleChoiceQuestions extends Component {
         };
        
 	};
+
+    componentDidMount() {
+      let that=this;
+        console.log(['MCQ dmount'])
+        this.loadQuestions();
+       	this.nextQuestion()
+		//	scrollToComponent(this.scrollTo['top'],{align:'top',offset:0});
+    	//scrollToComponent(this.scrollTo['top'],{align:'top',offset:-160});
+	
+    };
+    
+    componentDidUpdate(props,state) {
+		let that = this;
+		console.log(['MCQ update',this.props.user,props.user,state.currentQuestion ,this.state.currentQuestion])
+        if (this.props.user && !props.user) {
+			console.log(['MCQ have user CHANGE'])
+			this.loadQuestions().then(function() {
+				console.log(['MCQ have loaded'])
+				that.nextQuestion()
+			})
+		} else if (this.props.question !== props.question) {
+			// single question view
+			console.log(['MCQ have soingel view'])
+			this.loadQuestions.then(function() {
+				
+			})
+		} else if (this.props.topic !== props.topic) {
+			console.log(['MCQ have TOPIC CANNGE'])
+			this.loadQuestions().then(function() {
+				console.log(['MCQ have TOPIC LOADED'])
+				that.nextQuestion();
+				if (state.currentQuestion != that.state.currentQuestion) {
+					console.log(['scroll to','question_'+that.state.currentQuestion,that.scrollTo['question_'+that.state.currentQuestion]])
+					scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
+					let thisQuestion = that.state.questions && that.state.questions.length > that.state.currentQuestion ? that.state.questions[that.state.currentQuestion] : {};
+					that.startPlayer(thisQuestion._id)
+				}
+			})
+			
+		}
+		if (state.currentQuestion != that.state.currentQuestion || this.props.questions != props.questions) {
+			console.log(['scroll to','question_'+that.state.currentQuestion,that.scrollTo['question_'+that.state.currentQuestion]])
+			scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
+			let thisQuestion = that.state.questions && that.state.questions.length > that.state.currentQuestion ? that.state.questions[that.state.currentQuestion] : {};
+			that.startPlayer(thisQuestion._id)
+		}
+	}
 	
 	startPlayer(questionId) {
 		let that = this;
 		console.log(['START PLAYER',questionId,that.playerRefs])
-				
 		Object.keys(this.playerRefs).map(function(playerKey) {
 			let player = that.playerRefs[playerKey]
 			console.log(['test PLAYER',questionId,playerKey])
 			if (player && player.pause && questionId == playerKey) {
 				console.log(['PLAY',player])
 				setTimeout(function() {
-					console.log(['PLAY real',e])
+					console.log(['PLAY real'])
 					try {
 						 player.play();
 					} catch (e) {
@@ -132,32 +180,7 @@ export default class MultipleChoiceQuestions extends Component {
 	dumpRefs() {
 		console.log('REFS',this.playerRefs);
 	}
-    
-    componentDidMount() {
-      let that=this;
-        console.log(['MCQ dmount'])
-        this.loadQuestions();
-       	this.nextQuestion()
-		//	scrollToComponent(this.scrollTo['top'],{align:'top',offset:0});
-    	//scrollToComponent(this.scrollTo['top'],{align:'top',offset:-160});
-	
-    };
-    
-    componentDidUpdate(props,state) {
-		console.log(['MCQ update',this.props.user,props.user,state.currentQuestion ,this.state.currentQuestion])
-        if ((this.props.question !== props.question) || (this.props.topic !== props.topic)) {
-			this.loadQuestions()
-		}
-		if (this.props.user && !props.user) {
-			this.loadQuestions();
-        	this.nextQuestion()
-		}
-		if (state.currentQuestion != this.state.currentQuestion) {
-			console.log(['scroll to','question_'+this.state.currentQuestion,this.scrollTo['question_'+this.state.currentQuestion]])
-			scrollToComponent(this.scrollTo['question_'+this.state.currentQuestion],{align:'top',offset:-180});
-		}
-	}
-    
+        
     setShareDialog(val) {
 		this.setState({showShareDialog:val});
 	}
@@ -173,85 +196,8 @@ export default class MultipleChoiceQuestions extends Component {
 				topicQuery='&topic='+topic;
 			}
 			console.log(['FETCH','/api/mymctopics?user='+this.props.user._id + topicQuery])
-			fetch('/api/mymctopics?user='+this.props.user._id + topicQuery)
-			.then(function(response) {
-				console.log(['got response'])
-				return response.json()
-			}).then(function(json) {
-				console.log(['got mount json',json])
-				let filteredQuestions = json.map(function(question,key) {
-					let a = {}
-					that.questionsIndex[question._id] = key;
-					let possibleAnswers = question.multiple_choices.split("|||");
-					possibleAnswers.push(question.answer);
-					possibleAnswers = shuffle(possibleAnswers);
-					question.possibleAnswers = possibleAnswers;
-					return question;
-				});
-				if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
-				that.setState({questions:filteredQuestions});
-			
-			}).catch(function(ex) {
-				console.log(['parsing failed', ex])
-			})
-			
-		}
-    }
-    
-    loadMyQuestions() {
-		let that = this;
-		this.stopAllPlayers();
-		if (this.props.user) {
-			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
-			let topicQuery='';
-			if (topic && topic.length > 0 ) {
-				topicQuery='&topic='+topic;
-			}
-			fetch('/api/mymcquestions?user='+this.props.user._id + topicQuery)
-			.then(function(response) {
-				console.log(['got response'])
-				return response.json()
-			}).then(function(json) {
-				console.log(['got mount json',json])
-				let filteredQuestions = json.map(function(question,key) {
-					let a = {}
-					that.questionsIndex[question._id] = key;
-					let possibleAnswers = question.multiple_choices.split("|||");
-					possibleAnswers.push(question.answer);
-					possibleAnswers = shuffle(possibleAnswers);
-					question.possibleAnswers = possibleAnswers;
-					return question;
-				});
-				if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
-				that.setState({questions:filteredQuestions});
-			
-			}).catch(function(ex) {
-				console.log(['parsing failed', ex])
-			})
-			
-		}
-    }
-    
-    loadQuestions() {
-		console.log(['LOAD Q',this.props.mode])
-		this.stopAllPlayers();
-		if (this.props.mode && this.props.mode === "myquestions") {
-			this.loadMyQuestions();
-		} else if (this.props.mode && this.props.mode === "mytopics") {
-			this.loadMyTopics();
-		} else {
-			let that = this;
-			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
-			if (topic && topic.length > 0 ) {
-				let questionQuery='';
-				if (this.props.question) {
-					questionQuery='&questionId='+this.props.question;
-				}
-				// single view page needs all but quiz list page needs not answered
-				if (this.props.user) {
-					questionQuery+=this.props.user ? '&user='+this.props.user._id : '';
-				}
-				fetch('/api/mcquestions?topic='+topic+questionQuery)
+			return new Promise(function(resolve,reject) {
+				fetch('/api/mymctopics?user='+this.props.user._id + topicQuery)
 				.then(function(response) {
 					console.log(['got response'])
 					return response.json()
@@ -268,9 +214,96 @@ export default class MultipleChoiceQuestions extends Component {
 					});
 					if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
 					that.setState({questions:filteredQuestions});
-				
+					resolve()
 				}).catch(function(ex) {
 					console.log(['parsing failed', ex])
+					reject()
+				})
+				
+			})
+			
+		}
+    }
+    
+    loadMyQuestions() {
+		let that = this;
+		this.stopAllPlayers();
+		if (this.props.user) {
+			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
+			let topicQuery='';
+			if (topic && topic.length > 0 ) {
+				topicQuery='&topic='+topic;
+			}
+			return new Promise(function(resolve,reject) {
+				fetch('/api/mymcquestions?user='+this.props.user._id + topicQuery)
+				.then(function(response) {
+					console.log(['got response'])
+					return response.json()
+				}).then(function(json) {
+					console.log(['got mount json',json])
+					let filteredQuestions = json.map(function(question,key) {
+						let a = {}
+						that.questionsIndex[question._id] = key;
+						let possibleAnswers = question.multiple_choices.split("|||");
+						possibleAnswers.push(question.answer);
+						possibleAnswers = shuffle(possibleAnswers);
+						question.possibleAnswers = possibleAnswers;
+						return question;
+					});
+					if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
+					that.setState({questions:filteredQuestions});
+					resolve()
+				}).catch(function(ex) {
+					console.log(['parsing failed', ex])
+					reject()
+				})
+			})
+			
+		}
+    }
+    
+    loadQuestions() {
+		console.log(['LOAD Q',this.props.mode])
+		this.stopAllPlayers();
+		if (this.props.mode && this.props.mode === "myquestions") {
+			return this.loadMyQuestions();
+		} else if (this.props.mode && this.props.mode === "mytopics") {
+			return this.loadMyTopics();
+		} else {
+			let that = this;
+			let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
+			if (topic && topic.length > 0 ) {
+				let questionQuery='';
+				if (this.props.question) {
+					questionQuery='&questionId='+this.props.question;
+				}
+				// single view page needs all but quiz list page needs not answered
+				if (this.props.user) {
+					questionQuery+=this.props.user ? '&user='+this.props.user._id : '';
+				}
+				return new Promise(function(resolve,reject) {
+					fetch('/api/mcquestions?topic='+topic+questionQuery)
+					.then(function(response) {
+						console.log(['got response'])
+						return response.json()
+					}).then(function(json) {
+						console.log(['got mount json',json])
+						let filteredQuestions = json.map(function(question,key) {
+							let a = {}
+							that.questionsIndex[question._id] = key;
+							let possibleAnswers = question.multiple_choices.split("|||");
+							possibleAnswers.push(question.answer);
+							possibleAnswers = shuffle(possibleAnswers);
+							question.possibleAnswers = possibleAnswers;
+							return question;
+						});
+						if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
+						that.setState({questions:filteredQuestions});
+						resolve();
+					}).catch(function(ex) {
+						console.log(['parsing failed', ex])
+						reject();
+					})
 				})
 			}
 		}
@@ -386,6 +419,7 @@ export default class MultipleChoiceQuestions extends Component {
 	}
     
     clickAnswer(id,answer) {
+		this.stopAllPlayers();
 		//if (that.props.viewOnly) {
 			let that = this;
 			console.log('answered '+answer +'||' + id)
@@ -464,9 +498,10 @@ export default class MultipleChoiceQuestions extends Component {
 		//}
 	}
 	
-	createMedia(question) {
+	createMedia(mcquestion) {
         let sources=[]
        	let that = this;
+       	let question = mcquestion.relatedQuestion;
 		if (question) {
 			if (question.media && question.media.length > 0) sources.push(<source key={1} src={question.media} />)
 			if (question.media_ogg && question.media_ogg.length > 0) sources.push(<source key={2} src={question.media_ogg} />)
@@ -484,7 +519,7 @@ export default class MultipleChoiceQuestions extends Component {
 			let autoPlay = question && question.relatedQuestion && question.relatedQuestion.autoplay_media==="YES" ? true : false
 			//console.log(['SINGLE VIEW CREATE MEDIA from q',this.props.question]);
 				let media=<Player
-				  ref={(element) => this.setPlayerRef(question._id,element)}
+				  ref={(element) => this.setPlayerRef(mcquestion._id,element)}
 				  playsInline
 				  autoPlay={autoPlay}
 				   height={dimensions.y}
@@ -578,28 +613,28 @@ export default class MultipleChoiceQuestions extends Component {
 							let answerLetter=String.fromCharCode(key+65);
 							if (false && that.props.viewOnly) {
 								if (sampleAnswer === question.answer) {
-									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
+									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
 								} else {
-									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
+									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
 								}
 							} else {
 								if (answered) {
 									// is this answer the user answer
 									if (sampleAnswer === userAnswer) {
 										if (userAnswerCorrect)  {
-											return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
+											return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
 										} else {
-											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#dc3545', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', textDecoration: 'line-through'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
+											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#dc3545', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', textDecoration: 'line-through'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
 										}
 									// is this button the correct answer
 									} else if (sampleAnswer === question.answer) {
-										return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green', d:'#28a745', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
+										return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green', d:'#28a745', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
 									} else {
-											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
+											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
 									}
 									
 								} else {
-									return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)}  style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}. </span>{sampleAnswer}</div>
+									return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)}  style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
 								}
 							}
 						})
@@ -652,7 +687,7 @@ export default class MultipleChoiceQuestions extends Component {
 					
 						{!that.props.viewOnly && answered && question.relatedQuestion && question.relatedQuestion.tags && question.relatedQuestion.tags.length > 0 && <div id='relatedtags' style={{marginTop:'1em'}}><b>Tags</b> {tagsRendered}</div>}
 						
-						{question.relatedQuestion && that.hasMedia(question.relatedQuestion) && <div id='media' style={{marginTop:'1em'}}><b>Media</b> {that.createMedia(question.relatedQuestion)}</div>}
+						{question.relatedQuestion && that.hasMedia(question.relatedQuestion) && <div id='media' style={{marginTop:'1em'}}><b>Media</b> {that.createMedia(question)}</div>}
 						
 						</div>
 					} else {
