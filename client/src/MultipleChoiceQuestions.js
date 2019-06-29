@@ -68,6 +68,7 @@ export default class MultipleChoiceQuestions extends Component {
 		this.loadMyTopics = this.loadMyTopics.bind(this)
 		this.loadMyQuestions = this.loadMyQuestions.bind(this)
 		this.dumpRefs = this.dumpRefs.bind(this)
+		this.startPlayer = this.startPlayer.bind(this)
 		this.handleStateChange = this.handleStateChange.bind(this)
 		this.stopAllPlayers = this.stopAllPlayersExcept.bind(this)
 		this.stopAllPlayersExcept = this.stopAllPlayersExcept.bind(this)
@@ -81,6 +82,27 @@ export default class MultipleChoiceQuestions extends Component {
         };
        
 	};
+	
+	startPlayer(questionId) {
+		let that = this;
+		console.log(['START PLAYER',questionId,that.playerRefs])
+				
+		Object.keys(this.playerRefs).map(function(playerKey) {
+			let player = that.playerRefs[playerKey]
+			console.log(['test PLAYER',questionId,playerKey])
+			if (player && player.pause && questionId == playerKey) {
+				console.log(['PLAY',player])
+				setTimeout(function() {
+					console.log(['PLAY real',e])
+					try {
+						 player.play();
+					} catch (e) {
+						console.log(['FAILED TO PLAY',e])
+					}
+				},500)
+			}
+		})
+	}
 	
 	stopAllPlayers() {
 		Object.values(this.playerRefs).map(function(player) {
@@ -115,7 +137,8 @@ export default class MultipleChoiceQuestions extends Component {
       let that=this;
         console.log(['MCQ dmount'])
         this.loadQuestions();
-       //	scrollToComponent(this.scrollTo['top'],{align:'top',offset:0});
+       	this.nextQuestion()
+		//	scrollToComponent(this.scrollTo['top'],{align:'top',offset:0});
     	//scrollToComponent(this.scrollTo['top'],{align:'top',offset:-160});
 	
     };
@@ -318,6 +341,7 @@ export default class MultipleChoiceQuestions extends Component {
 					
 					if (questionKey > currentQuestion && (!question.seenBy || !question.seenBy[userId])) {
 						this.setState({currentQuestion:questionKey})
+						this.startPlayer(question._id);
 						found = true;
 						console.log(['NEXT QUESTION A found',counter])
 				
@@ -336,6 +360,7 @@ export default class MultipleChoiceQuestions extends Component {
 						console.log(['NEXT QUESTION B',question.seenBy])
 						if ((!question.seenBy || !question.seenBy[userId])) {
 							this.setState({currentQuestion:counter})
+							this.startPlayer(question._id);
 							console.log(['NEXT QUESTION B found',counter])
 							break;
 						}
@@ -443,15 +468,15 @@ export default class MultipleChoiceQuestions extends Component {
         let sources=[]
        	let that = this;
 		if (question) {
-			if (question.media && question.media.length > 0) sources.push(<source src={question.media} />)
-			if (question.media_ogg && question.media_ogg.length > 0) sources.push(<source src={question.media_ogg} />)
-			if (question.media_webm && question.media_webm.length > 0) sources.push(<source src={question.media_webm} />)
-			if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source src={question.media_mp4} />)
+			if (question.media && question.media.length > 0) sources.push(<source key={1} src={question.media} />)
+			if (question.media_ogg && question.media_ogg.length > 0) sources.push(<source key={2} src={question.media_ogg} />)
+			if (question.media_webm && question.media_webm.length > 0) sources.push(<source  key={3} src={question.media_webm} />)
+			if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source  key={4} src={question.media_mp4} />)
 				
-			if (question.media_mp3 && question.media_mp3.length > 0) sources.push(<source src={question.media_mp3} />)
-			if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source src={question.media_mp4} />)
-			if (question.media_webmvideo && question.media_webmvideo.length > 0) sources.push(<source src={question.media_webmvideo} />)
-			if (question.media_webmaudio && question.media_webmaudio.length > 0) sources.push(<source src={question.media_webmaudio} />)
+			if (question.media_mp3 && question.media_mp3.length > 0) sources.push(<source  key={5} src={question.media_mp3} />)
+			if (question.media_mp4 && question.media_mp4.length > 0) sources.push(<source  key={6} src={question.media_mp4} />)
+			if (question.media_webmvideo && question.media_webmvideo.length > 0) sources.push(<source  key={7} src={question.media_webmvideo} />)
+			if (question.media_webmaudio && question.media_webmaudio.length > 0) sources.push(<source  key={8} src={question.media_webmaudio} />)
 			let dimensions = {x:400,y:50}
 			if (this.isVideo(question)) {
 				dimensions = {x:400,y:400}
@@ -672,7 +697,6 @@ export default class MultipleChoiceQuestions extends Component {
 					  </div>
 					  
 					  <div className="modaldialog-body">
-					  <button onClick={this.dumpRefs}>refs</button>
 							<div>
 								<button  onClick={(e) => that.setShareDialog(!that.state.showShareDialog)} className='btn btn-info' ><ShareIcon size={26} /> <span  className="d-none d-sm-inline" >Share Quiz</span></button>
 								<button style={{}} onClick={that.clickResetQuiz} className='btn btn-danger' >{resetIcon} <span className="d-none d-sm-inline" >Reset Answers</span></button>

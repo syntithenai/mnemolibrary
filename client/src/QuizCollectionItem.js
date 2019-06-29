@@ -19,27 +19,35 @@ export default class QuizCollectionItem extends Component {
         if (!this.props.hideSingleQuestionInCollectionView) {
             if (this.props.loadQuestionByDifficulty) {
                 this.props.loadQuestionByDifficulty.bind(this)(this.props.difficulty).then(function(question) {
-					that.setState({question:Utils.getQuestionTitle(question),id:question._id,topic:question.quiz});
+					if (question) {
+						that.setState({question:Utils.getQuestionTitle(question),id:question._id,topic:question.quiz});
+					}
                 });
             } else if (this.props.loadQuestionByTopics) {
                 this.props.loadQuestionByTopics.bind(this)(this.props.topics).then(function(question) {
-                    let state = {};
-                    // hack
-                    if (question.question === "You've seen all these questions") {
-						state.nolink = true;
-						state.question = question.question;
-                    } else {
-						state = {question:Utils.getQuestionTitle(question),id:question._id,topic:question.quiz}
-                    }
-                    that.setState(state);
+                    if (question) {
+						let state = {};
+						// hack
+						if (question && question.question === "You've seen all these questions") {
+							state.nolink = true;
+							state.question = question.question;
+						} else {
+							state = {question:Utils.getQuestionTitle(question),id:question._id,topic:question.quiz}
+						}
+						that.setState(state);
+					}
                 });
             }  else if (this.props.loadQuestionByCommunity) {
                 this.props.loadQuestionByCommunity.bind(this)(this.props.topics).then(function(question) {
-                    that.setState({question:Utils.getQuestionTitle(question),id:question._id,topic:question.quiz});
+                    if (question) {
+						that.setState({question:Utils.getQuestionTitle(question),id:question._id,topic:question.quiz});
+					}
                 });
             }  else if (this.props.loadQuestionByAll) {
                 this.props.loadQuestionByAll.bind(this)(this.props.topics).then(function(question) {
-                    that.setState({question:Utils.getQuestionTitle(question),id:question._id,topic:question.quiz});
+                    if (question) {
+						that.setState({question:Utils.getQuestionTitle(question),id:question._id,topic:question.quiz});
+					}
                 });
             }             
         }
