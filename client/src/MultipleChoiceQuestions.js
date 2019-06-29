@@ -126,7 +126,7 @@ export default class MultipleChoiceQuestions extends Component {
 		}
 		if (state.currentQuestion != that.state.currentQuestion || this.props.questions != props.questions) {
 			console.log(['scroll to','question_'+that.state.currentQuestion,that.scrollTo['question_'+that.state.currentQuestion]])
-			scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
+			scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-140});
 			let thisQuestion = that.state.questions && that.state.questions.length > that.state.currentQuestion ? that.state.questions[that.state.currentQuestion] : {};
 			that.startPlayer(thisQuestion._id)
 		}
@@ -715,7 +715,7 @@ export default class MultipleChoiceQuestions extends Component {
 		//}
 		let quizLength = this.state.questions ? this.state.questions.length : 0;
 		let successRate = userAnsweredTally > 0 ? parseInt(userCorrectTally/userAnsweredTally*100,10) : 0;
-		let totalMessage=<span style={{float:'left'}}><div><b>Questions Answered</b> {userAnsweredTally}/{this.state.questions ? this.state.questions.length : 0}</div><div> <b>Success Rate</b> {successRate}%</div></span>
+		let totalMessage=<span style={{float:'left'}}><div><b>Answered</b> {userAnsweredTally}/{this.state.questions ? this.state.questions.length : 0}  <b>Success</b> {successRate}%</div></span>
 		
 		let theStyle={ position:'fixed',width:'100%', backgroundColor:'rgb(240, 249, 150)', border :'2px solid black',padding:'0.2em',top:'6.4em'}
 		if (isQuestionPage) theStyle.marginLeft='-1em';
@@ -751,7 +751,7 @@ export default class MultipleChoiceQuestions extends Component {
 				
 				{userAnsweredTally === quizLength && <Link to="/multiplechoicetopics" style={{marginRight:'3em',float:'right'}} className='btn btn-success' ><CompleteIcon size={26} /> <span className="d-none d-sm-inline" >Quiz Complete</span></Link>}
 				
-				<button style={{float:'right'}} onClick={this.showQuizOptionsDialog} className='btn btn-info' >...</button>
+				<button style={{paddingTop: '0',height:'1.4em',float:'right'}} onClick={this.showQuizOptionsDialog} className='btn btn-info' >...</button>
 			</div>}
 			
 			{questions.length > 0 && <b style={{display:'block',width:'100%'}}>Quiz Questions</b>}
