@@ -643,16 +643,21 @@ export default class MultipleChoiceQuestions extends Component {
 						let mcByTopicLink = '/multiplechoicequestions/'+encodeURIComponent(question.topic);
 						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}   key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black', marginBottom: '1em'}} > 
 						
-					
+
 						
-						<b style={{paddingTop: '1em'}}>{question.question}</b>
 						
+						<div style={{fontWeight:'bold',paddingTop: '1em'}}>{question.question}</div>
+						
+						{!answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.autoshow_image==="YES"  && <img src={image}  style={{ height:'200px'}} />}
+						
+
 						{!that.props.viewOnly && <div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> }
 
 						
 						{!that.props.viewOnly && answered  && <i style={{paddingTop: '2em'}}>{question.overallPercentCorrect ? question.overallPercentCorrect : 0} percent of {question.seen > 0 ? question.seen : 1} people answered correctly.</i> }
 	
-						{!that.props.viewOnly && <div className='questionbuttons' style={{width:'100%', minHeight: '2em'}} >
+							
+						{!that.props.viewOnly && <div className='questionbuttons' style={{minWidth:'50%', minHeight: '2em'}} >
 							
 							{!that.props.viewOnly && !isQuestionPage && question.questionId && question.topic && <div>
 								<div style={{float:'right'}}><Link  to={moreInfoLink} className='btn btn-info'>{moreInfoIcon} <span className="d-none d-sm-inline" >More Information</span></Link></div> 
@@ -666,17 +671,13 @@ export default class MultipleChoiceQuestions extends Component {
 							
 							{<a style={{float:'right',color:'white'}} onClick={that.nextQuestion} className='btn btn-success' ><NextIcon size={26} /> <span className="d-none d-sm-inline" >Next Question</span></a>}
 									
-						</div>}		
-
+						</div>}	
 						
 						<div style={{ width:'', marginTop: '1em',padding: '0.5em', border: '1px solid black' , backgroundColor:'#eee',borderRadius:'30px',marginRight:'1em'}}>{answerButtons}</div> 
 						<div id={'question_'+questionKey}></div>
 						
 							
-						{!answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.autoshow_image==="YES"  && <img src={image}  style={{width:'200px'}} />}
-						
-
-						{answered && !that.props.viewOnly && image  && <img src={image}  style={{width:'200px'}} />}
+						{answered && !that.props.viewOnly && image  && <img src={image}  style={{width:'90%'}} />}
 
 
 						{answered && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
