@@ -241,12 +241,12 @@ initdb().then(function() {
 							let finalTopics={};
 							// filter fully blocked topics
 							
-							Object.keys(collatedTopics).map(function(key) {
-								let val = collatedTopics[key];
-								if (val.blocks < val.total && val.total <= val.questions) {
-									finalTopics[key]=val;
-								}
-							});
+							//Object.keys(collatedTopics).map(function(key) {
+								//let val = collatedTopics[key];
+								//if (val.blocks < val.total && val.total <= val.questions) {
+									//finalTopics[key]=val;
+								//}
+							//});
 							////console.log(['aggq',finalTopics]);
 							res.send(Object.values(finalTopics));
 						});

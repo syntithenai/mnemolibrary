@@ -676,13 +676,14 @@ export default class MultipleChoiceQuestions extends Component {
 						<div style={{ width:'', marginTop: '1em',padding: '0.5em', border: '1px solid black' , backgroundColor:'#eee',borderRadius:'30px',marginRight:'1em'}}>{answerButtons}</div> 
 						<div id={'question_'+questionKey}></div>
 						
-							
-						{answered && !that.props.viewOnly && image  && <img src={image}  style={{width:'90%'}} />}
-
+						
 
 						{answered && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
 
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em'}}><b>Memory Aid</b> {question.relatedQuestion.mnemonic}</div>}
+
+							
+						{answered && !that.props.viewOnly && image  && <img src={image}  style={{width:'90%'}} />}
 
 						{(that.props.mode==='myquestions' ||that.props.mode==='mytopics') && answered && question.relatedQuestion && question.relatedQuestion.quiz && question.relatedQuestion.quiz.length > 0 && <div id='relatedtopic' style={{marginTop:'1em'}}><b>Topic</b> <Link className='btn btn-info' to={mcByTopicLink} > {question.relatedQuestion.quiz}</Link></div>}
 					
