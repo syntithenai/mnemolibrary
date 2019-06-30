@@ -726,26 +726,39 @@ function initRoutes(router,db) {
 				
 				'complete': function(data) {
 				//	const toImport = {'questions':data.data};
-					//console.log(['IMPORTED',data.data]);
+					console.log(['IMPORTED',data.data]);
 					console.log(['IMPORTED','Errors ->',data.errors]);
 					let toSave=[];
 					let toDump=[];
 					let promises=[];
 					if (data && data.data) {
 						data.data.map(function(mcQuestion) {
-							//console.log(mcQuestion);
+							//console.log([mcQuestion.specific_question,mcQuestion.specific_answer,mcQuestion.topic,mcQuestion.multiple_choices]);
 							if (mcQuestion) {
 								if (mcQuestion.topic && mcQuestion.topic.length > 0
 									&& mcQuestion.specific_question && mcQuestion.specific_question.length > 0
 									&& mcQuestion.specific_answer && mcQuestion.specific_answer.length > 0
 									&& mcQuestion.multiple_choices && mcQuestion.multiple_choices.length > 0
 								) {
-									toSave.push({_id:ObjectId(mcQuestion._id),topic:mcQuestion.topic,question:mcQuestion.specific_question,answer:mcQuestion.specific_answer,multiple_choices:mcQuestion.multiple_choices,questionId:ObjectId(mcQuestion.questionId),feedback:mcQuestion.feedback,importId:'MC-'+importId,user:'default',image:mcQuestion.image,autoshow_image:mcQuestion.autoshow_image,media:mcQuestion.media})
-										
+									let newQ = {}
+									newQ._id = mcQuestion._id && mcQuestion._id.length > 0 ? ObjectId(mcQuestion._id): ObjectId()
+									newQ.topic = mcQuestion.topic
+									newQ.question = mcQuestion.specific_question
+									newQ.answer = mcQuestion.specific_answer
+									newQ.multiple_choices = mcQuestion.multiple_choices
+									newQ.questionId = (mcQuestion.questionId && mcQuestion.questionId.length > 0 ? ObjectId(mcQuestion.
+									newQ.questionId) : null)
+									newQ.feedback=mcQuestion.feedback
+									newQ.importId='MC-'+importId
+									newQ.user='default'
+									newQ.image=mcQuestion.image
+									newQ.autoshow_image=mcQuestion.autoshow_image
+									newQ.media=mcQuestion.media
+									toSave.push(newQ)
 								}
 							}
 						});
-						//console.log(['TOSAVE',toSave,toSave.length])
+						console.log(['TOSAVE',toSave,toSave.length])
 						toSave.map(function(question,key) {
 							let p = new Promise(function(resolve,reject) {
 								if (question._id) {
@@ -754,7 +767,7 @@ function initRoutes(router,db) {
 										//console.log(['done find det ins/upd',existingQuestion])
 										if (existingQuestion) {
 											db().collection('multiplechoicequestions').updateOne({_id:existingQuestion._id},{$set:question}).then(function() {
-												//console.log(['UPDATED MC',Object.extend(existingQuestion,question)])
+												console.log(['UPDATED MC',Object.extend(existingQuestion,question)])
 												resolve(Object.assign(existingQuestion,question));
 											});
 											
@@ -762,7 +775,7 @@ function initRoutes(router,db) {
 										} else {
 											question.createDate = new Date().getTime();
 											db().collection('multiplechoicequestions').insertOne(question).then(function() {
-												//console.log(['inserted MC',question])
+												console.log(['inserted MC',question])
 												resolve(question);
 											});
 										}
@@ -770,7 +783,7 @@ function initRoutes(router,db) {
 								} else {
 									// insert
 									db().collection('multiplechoicequestions').insertOne(question).then(function() {
-										//console.log(['inserted MC',question])
+										console.log(['inserted MC',question])
 										resolve(question);
 									});
 								}
@@ -801,9 +814,9 @@ function initRoutes(router,db) {
 									createDate:val.createDate
 								});
 							});
-							//console.log(['NOW DELETE',JSON.stringify({$and:[{$id: {$nin:ids}},{user:'default'},{importId:importId}]})])
-							db().collection('multiplechoicequestions').remove({$and:[{$id: {$nin:ids}},{user:'default'},{importId:'MC-'+importId}]}).then(function(dresults) {
-								console.log('cleanup done'); 
+							console.log(['NOW DELETE',JSON.stringify({$and:[{_id: {$nin:ids}},{user:'default'},{importId:importId}]})])
+							db().collection('multiplechoicequestions').remove({$and:[{_id: {$nin:ids}},{user:{$eq:'default'}},{importId:{$eq:'MC-'+importId}}]}).then(function(dresults) {
+								console.log(['cleanup done',dresults]); 
 							});
 							// download with ids to bring back into google sheet
 							let unparsed = Papa.unparse(final,{quotes: true});

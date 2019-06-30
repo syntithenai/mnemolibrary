@@ -288,10 +288,12 @@ export default class MultipleChoiceQuestions extends Component {
 					}).then(function(json) {
 						console.log(['got mount json',json])
 						let filteredQuestions = json.map(function(question,key) {
-							let a = {}
+							//let a = {}
 							that.questionsIndex[question._id] = key;
 							let possibleAnswers = question.multiple_choices.split("|||");
 							possibleAnswers.push(question.answer);
+							// uniquify
+							possibleAnswers = [...new Set(possibleAnswers)];
 							possibleAnswers = shuffle(possibleAnswers);
 							question.possibleAnswers = possibleAnswers;
 							return question;
@@ -639,6 +641,7 @@ export default class MultipleChoiceQuestions extends Component {
 							}
 						})
 						let image = question && question.relatedQuestion && question.relatedQuestion.image_png ? question.relatedQuestion.image_png : (question && question.relatedQuestion && question.relatedQuestion.image ? question.relatedQuestion.image : '') 
+						if (!image) image = question  && question.image_png ? question.image_png : (question  && question.image ? question.image : '')  
 						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
 						let mcByTopicLink = '/multiplechoicequestions/'+encodeURIComponent(question.topic);
 						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}   key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black', marginBottom: '1em'}} > 
@@ -648,7 +651,7 @@ export default class MultipleChoiceQuestions extends Component {
 						
 						<div style={{fontWeight:'bold',paddingTop: '1em'}}>{question.question}</div>
 						
-						{!answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.autoshow_image==="YES"  && <img src={image}  style={{ height:'200px'}} />}
+						{!answered && !that.props.viewOnly && question.relatedQuestion && (question.relatedQuestion.autoshow_image==="YES" || question.autoshow_image==="YES")  && <img src={image}  style={{ height:'200px'}} />}
 						
 
 						{!that.props.viewOnly && <div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> }
@@ -682,8 +685,7 @@ export default class MultipleChoiceQuestions extends Component {
 
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em'}}><b>Memory Aid</b> {question.relatedQuestion.mnemonic}</div>}
 
-							
-						{answered && !that.props.viewOnly && image  && <img src={image}  style={{height:'400px'}} />}
+						{answered && !that.props.viewOnly && image && <img src={image}  style={{height:'400px'}} />}
 
 						{(that.props.mode==='myquestions' ||that.props.mode==='mytopics') && answered && question.relatedQuestion && question.relatedQuestion.quiz && question.relatedQuestion.quiz.length > 0 && <div id='relatedtopic' style={{marginTop:'1em'}}><b>Topic</b> <Link className='btn btn-info' to={mcByTopicLink} > {question.relatedQuestion.quiz}</Link></div>}
 					
