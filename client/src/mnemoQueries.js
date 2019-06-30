@@ -360,7 +360,7 @@ let mnemoQueries = {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions'],selectedQuestion);
-      //  that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })
