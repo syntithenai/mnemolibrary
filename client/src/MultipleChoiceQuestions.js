@@ -660,7 +660,7 @@ export default class MultipleChoiceQuestions extends Component {
 						{!that.props.viewOnly && <div className='questionbuttons' style={{minWidth:'50%', minHeight: '2em'}} >
 							
 							{!that.props.viewOnly && !isQuestionPage && question.questionId && question.topic && <div>
-								<div style={{float:'right'}}><Link  to={moreInfoLink} className='btn btn-info'>{moreInfoIcon} <span className="d-none d-sm-inline" >More Information</span></Link></div> 
+								<div style={{float:'right'}}><a target="_new" href={moreInfoLink} className='btn btn-info'>{moreInfoIcon} <span className="d-none d-sm-inline" >More Information</span></a></div> 
 							</div> }
 							
 								
@@ -683,7 +683,7 @@ export default class MultipleChoiceQuestions extends Component {
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em'}}><b>Memory Aid</b> {question.relatedQuestion.mnemonic}</div>}
 
 							
-						{answered && !that.props.viewOnly && image  && <img src={image}  style={{width:'90%'}} />}
+						{answered && !that.props.viewOnly && image  && <img src={image}  style={{height:'400px'}} />}
 
 						{(that.props.mode==='myquestions' ||that.props.mode==='mytopics') && answered && question.relatedQuestion && question.relatedQuestion.quiz && question.relatedQuestion.quiz.length > 0 && <div id='relatedtopic' style={{marginTop:'1em'}}><b>Topic</b> <Link className='btn btn-info' to={mcByTopicLink} > {question.relatedQuestion.quiz}</Link></div>}
 					
