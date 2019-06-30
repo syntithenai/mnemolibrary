@@ -706,7 +706,7 @@ export default class MultipleChoiceQuestions extends Component {
 				} else if (this.props.mode && this.props.mode === "mytopics" ) {
 					message=<b>You have answered all the multiple choice questions for all the topics you have explored.</b>
 					return message ? <div style={{paddingLeft:'1em'}}>{message}<br/><br/><br/><Link className='btn btn-info' to='/' >Discover Something New</Link></div> : null;
-				} else  {
+				} else if (!this.props.carousel) {
 					message=<b>You have answered all the multiple choice questions for this topic.</b>
 					return message ? <div style={{paddingLeft:'1em'}}>{message}<br/><br/><br/><a className='btn btn-danger' onClick={this.resetQuiz} >Reset My Answers</a></div> : null;
 					
