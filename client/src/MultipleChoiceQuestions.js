@@ -757,7 +757,7 @@ export default class MultipleChoiceQuestions extends Component {
 				<button style={{paddingTop: '0',height:'1.4em',float:'right'}} onClick={this.showQuizOptionsDialog} className='btn btn-info' >...</button>
 			</div>}
 			
-			{questions.length > 0 && <b style={{display:'block',width:'100%'}}>Quiz Questions</b>}
+			{questions && questions.length > 0 && <b style={{display:'block',width:'100%'}}>Quiz Questions</b>}
 			<div style={{border: '1px solid black',width:'100%',marginTop:'1.4em'}}>
 			{this.state.showShareDialog && <ShareDialog setShareDialog={this.setShareDialog} dialogTitle={'Share Quiz using'} />}
 			{questions}

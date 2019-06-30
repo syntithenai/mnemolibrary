@@ -140,8 +140,7 @@ let mnemoQueries = {
 			    console.log(['set state',JSON.stringify(json.questions)]); 
 			    let result = createIdIndex(json['questions'],selectedQuestion);
 				console.log(['set state', json,topic,result.currentQuiz,result.currentQuestion,json.questions ,result.indexedQuestions])
-				if (result && topic && result.currentQuiz  && json && json.questions && result.indexedQuestions
-				) {
+				if (result && topic && result.currentQuiz  && json && json.questions && result.indexedQuestions) {
 					that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json.questions,'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
 					console.log(['set state done', that.state])
 			    }

@@ -108,7 +108,7 @@ export default withRouter( class QuizCarousel extends Component {
 						  console.log(['loaded searcg topic',json])
 						setTimeout(function() {
 							 that.props.setQuizFromTopic(that.props.match.params.searchtopic,that.props.match.params.topicquestion);
-							 if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
+							 if (that.props.match && that.props.match.params && that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
 						},1000);
 					} else {
 						that.goto('/access/search/'+that.props.match.params.searchtopic);
@@ -131,7 +131,7 @@ export default withRouter( class QuizCarousel extends Component {
 					if (json.ok === true) {
 						//setTimeout(function() {
 							 that.props.discoverQuizFromTopic(that.props.match.params.topic,that.props.match.params.topicquestion);
-							if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
+							if (that.props.match && that.props.match.params && that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
 						//},1000);
 					} else {
 						that.goto('/access/discover/'+that.props.match.params.topic);
@@ -141,14 +141,14 @@ export default withRouter( class QuizCarousel extends Component {
                 // DISCOVERY
                 setTimeout(function() {
                      that.props.setQuizFromTopics(that.props.match.params.topics.split(","));
-                     if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
+                     if (that.props.match && that.props.match.params && that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
                 },1000);
             } else if (this.props.match &&  this.props.match.params && this.props.match.params.tag && this.props.match.params.tag.length > 0) {
                 // SEARCH
                 console.log(['QUIZ CAR FROMTAG',that.props.match.params.tag]);
                 setTimeout(function() {
                      that.props.setQuizFromTag(that.props.match.params.tag);
-                     if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
+                     if (that.props.match && that.props.match.params && that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
                 },1000);
             } else if (this.props.match &&  this.props.match.params && this.props.match.params.difficulty && this.props.match.params.difficulty.length > 0) {
                 // DISCOVERY
