@@ -90,7 +90,7 @@ export default withRouter( class QuizCarousel extends Component {
      
     initialiseFromParams() {
 		let that = this;
-			//console.log(['QUIZ CAR DID MOUNT',this.props,this.props.isReview,this.props.match]); //this.state.currentQuiz,this.props.questions
+			console.log(['QUIZ CAR DID MOUNT',this.props,this.props.isReview,this.props.match]); //this.state.currentQuiz,this.props.questions
             if (this.props.match && this.props.match.params && this.props.match.params.searchtopic && this.props.match.params.searchtopic.length > 0) {
                 // DISCOVERY
                fetch('/api/checktopic',{ method: "POST",headers: {
@@ -105,7 +105,7 @@ export default withRouter( class QuizCarousel extends Component {
 					return response.json()
 				}).then(function(json) {
 					if (json.ok === true) {
-						  
+						  console.log(['loaded searcg topic',json])
 						setTimeout(function() {
 							 that.props.setQuizFromTopic(that.props.match.params.searchtopic,that.props.match.params.topicquestion);
 							 if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
@@ -127,11 +127,12 @@ export default withRouter( class QuizCarousel extends Component {
 				  .then(function(response) {
 					return response.json()
 				}).then(function(json) {
+						  console.log(['loaded topic',json])
 					if (json.ok === true) {
-						setTimeout(function() {
+						//setTimeout(function() {
 							 that.props.discoverQuizFromTopic(that.props.match.params.topic,that.props.match.params.topicquestion);
 							if (that.props.match.params.topicquestion && that.props.match.params.topicquestion.length > 0) that.hideQuestionList();
-						},1000);
+						//},1000);
 					} else {
 						that.goto('/access/discover/'+that.props.match.params.topic);
 					}
@@ -487,7 +488,13 @@ export default withRouter( class QuizCarousel extends Component {
             if (Array.isArray(questions) && questions.length > 0) {
                 
             } else if (Array.isArray(questions)) {
-				return <div className="fadeMeIn" style={{marginLeft:'1em'}}><h3>No more questions</h3><span>You have seen all the questions in this topic/category</span></div>
+				let searchLink=this.props.match && this.props.match.params && this.props.match.params.topic  ? '/discover/searchtopic/'+this.props.match.params.topic : null;
+				return <div className="fadeMeIn" style={{marginLeft:'1em'}}><h3>No more questions</h3><span>You have seen all the questions in this topic/category</span>
+				<br/><br/>
+				{searchLink && <Link to={searchLink} className='btn btn-info' >Show All Questions For This Topic</Link>}
+				<br/>
+				<br/>
+				</div>
 			}
             // else if (this.props.discoverQuestions) {
                 //questions = this.props.discoverQuestions();

@@ -106,7 +106,7 @@ let mnemoQueries = {
   }, 
     
   discoverQuizFromTopic : function(topic,selectedQuestion) {
-    //  console.log(['dissc quiz from topic',topic,selectedQuestion,this.state.user]);
+      console.log(['dissc quiz from topic',topic,selectedQuestion,this.state.user]);
       let that = this;
       let url='/api/discover';
       
@@ -137,9 +137,14 @@ let mnemoQueries = {
 			  .then(function(response) {
 				return response.json()
 			  }).then(function(json) {
-				let result = createIdIndex(json['questions'],selectedQuestion);
-				that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
-			   // console.log(['set state done', that.state])
+			    console.log(['set state',JSON.stringify(json.questions)]); 
+			    let result = createIdIndex(json['questions'],selectedQuestion);
+				console.log(['set state', json,topic,result.currentQuiz,result.currentQuestion,json.questions ,result.indexedQuestions])
+				if (result && topic && result.currentQuiz  && json && json.questions && result.indexedQuestions
+				) {
+					that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json.questions,'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+					console.log(['set state done', that.state])
+			    }
 			  }).catch(function(ex) {
 				console.log(['parsing failed', ex])
 			  })
@@ -355,7 +360,7 @@ let mnemoQueries = {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions'],selectedQuestion);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+      //  that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })
@@ -377,7 +382,9 @@ let mnemoQueries = {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions']);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+        if (result && topic && result.currentQuiz && json && json.questions && result.indexedQuestions) {
+			that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+		}
       }).catch(function(ex) {
         console.log(['parsing failed', ex])
       })
