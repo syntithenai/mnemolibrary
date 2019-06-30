@@ -112,7 +112,7 @@ initdb().then(function() {
 					let totalQuestions = 0;
 					final.map(function(val,key) {
 						// require topic, skip archived (success > 0.7)
-						if (val.successRate<0.7 && val.topic && String(val.topic).length > 0) {
+						if (val.successRate<0.8 && val.topic && String(val.topic).length > 0) {
 							collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
 							//console.log(['push TOPICS',val.topic]);
 					
@@ -209,7 +209,7 @@ initdb().then(function() {
 					
 					
 					final.map(function(val,key) {
-						if (val.successRate>=0.7 && val.topic && String(val.topic).length > 0) {
+						if (val.successRate>=0.8 && val.topic && String(val.topic).length > 0) {
 							collatedTopics[val.topic]={_id:val.topic,topic:val.topic,questions:val.questions,successRate:val.successRate,blocks:val.blocks}
 							topics.push({quiz:{$eq:val.topic}});
 						}
