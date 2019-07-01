@@ -1180,16 +1180,16 @@ export default class AppLayout extends Component {
 				return response.json();
 			}).then(function(res) {
 				console.log('done add all to review')
-				confirmAlert({
-				  title: 'Questions Added For Review',
-				  message: 'Added '+ids.length+' question'+(ids.length > 1 ? 's' : '') +' to your review list',
-				  buttons: [
-					{
-					  label: 'OK',
-					  onClick: () => {}
-					}
-				  ]
-				})
+				//confirmAlert({
+				  //title: 'Questions Added For Review',
+				  //message: 'Added '+ids.length+' question'+(ids.length > 1 ? 's' : '') +' to your review list',
+				  //buttons: [
+					//{
+					  //label: 'OK',
+					  //onClick: () => {}
+					//}
+				  //]
+				//})
 				
 				
 			})
