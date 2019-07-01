@@ -1171,7 +1171,7 @@ initdb().then(function() {
 				 //user.successRate = user.seen > 0 ? userSuccess/user.seen : 0;
 				 // total unique questions seen
 				 //let lastSeen = 0;
-				 db().collection('userquestionprogress').find({$and:[{user: {$eq:ObjectId(userId)}}]}).sort({seen:-1}).toArray().then(function(uniqueQuestionResults) {
+				 db().collection('userquestionprogress').find({$and:[{user: {$eq:ObjectId(userId)}}, {block:{ $not: { $gt: 0 }}}]}).sort({seen:-1}).toArray().then(function(uniqueQuestionResults) {
 					user.questions = uniqueQuestionResults ? uniqueQuestionResults.length : 0;
 				//	console.log('UPDATING USER STATS '+(uniqueQuestionResults ? uniqueQuestionResults.length: 0));
 					let seen = 0;

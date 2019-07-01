@@ -271,8 +271,16 @@ export default class ProfilePage extends Component {
             );
         } else {
             if (this.props.user && this.props.user._id && this.props.user._id.length > 0) {
-                let buttonStyle={margin:'0.3em',padding:'1em'}
+                let buttonStyle={margin:'0.1em',padding:'0.1em'}
                 return (<div>
+							<div style={{position:'fixed', right:'10px', top:'7em',zIndex:9999999, padding:'0.1em', backgroundColor:'lightgrey' }} ><a  href='#topics' style={buttonStyle} className='btn btn-info' onClick={this.hideTopButtons}>Topics</a>
+							<a  href='#progress'  style={buttonStyle}  className='btn btn-info' onClick={this.hideTopButtons} >Progress</a>
+							<a  href='#activity'  className='btn btn-info' style={buttonStyle}  onClick={this.hideTopButtons} >Activity</a>
+							<Link to='/leaderboard'    className='btn btn-info' style={buttonStyle}  onClick={this.hideTopButtons} >Leaderboard</Link>
+							<Link to='/settings'    className='btn btn-info' style={buttonStyle}  onClick={this.hideTopButtons} >Settings</Link>
+
+						  </div>
+						  <br/><br/>
 					    {false && !this.state.showTopButtons &&  <div style={{position: 'fixed', top: '100', right: '0', zIndex:999}} ><button className='btn btn-info' onClick={this.showTopButtons}>...</button></div>}
                         {this.state.showTopButtons &&  <div className='modaldialog'  >
 							<div className="modaldialog-content">
