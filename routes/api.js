@@ -699,15 +699,16 @@ initdb().then(function() {
 			let oneWeekBack = new Date().getTime() - 86400000 * 7;
 			let twoWeeksBack = new Date().getTime() - 86400000 * 14;
 			let oneMonthBack = new Date().getTime() - 86400000 * 31;
-			
+			let twoMonthBack = oneMonthBack * 2;
 			//criteria.push({seen:{$lt:oneHourBack}});   
 			criteria.push({$or:[
 				 {$and:[{seen:{$lt:oneHourBack}},{successTally:{$eq:1}}]},
 				 {$and:[{seen:{$lt:oneHourBack}},{successTally:{$eq:2}}]},
-				 {$and:[{seen:{$lt:oneDayBack}},{successTally:{$gt:2}}]},
-				 {$and:[{seen:{$lt:oneWeekBack}},{successTally:{$gt:3}}]},
-				 {$and:[{seen:{$lt:twoWeeksBack}},{successTally:{$gt:4}}]},
-				 {$and:[{seen:{$lt:oneMonthBack}},{successTally:{$gt:5}}]},
+				 {$and:[{seen:{$lt:oneDayBack}},{successTally:{$eq:3}}]},
+				 {$and:[{seen:{$lt:oneWeekBack}},{successTally:{$eq:4}}]},
+				 {$and:[{seen:{$lt:twoWeeksBack}},{successTally:{$eq:5}}]},
+				 {$and:[{seen:{$lt:oneMonthBack}},{successTally:{$eq:6}}]},
+				 {$and:[{seen:{$lt:twoMonthBack}},{successTally:{$eq:7}}]},
 				 {successTally:{$not:{$gt:0}}}
 			]});    
 		 //}
@@ -722,7 +723,7 @@ initdb().then(function() {
 		 ////console.log({seen:{$lt:oneHourBack}});
 		 if (req.query.user && req.query.user.length > 0) {
 			 // sort by successTally and then most recently seen first
-			//console.log(JSON.stringify(criteria));
+				console.log(JSON.stringify(criteria));
 			db().collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(limit).toArray().then(function(questions,error) {
 				////console.log('llll');
 				////console.log(questions);

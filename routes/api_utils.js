@@ -578,6 +578,8 @@ function initRoutes(router,db) {
 									});
 								} else {
 									// insert
+									question.createDate = new Date().getTime();
+											
 									db().collection('multiplechoicequestions').insertOne(question).then(function() {
 										//console.log(['inserted MC',question])
 										resolve(question);
@@ -782,6 +784,7 @@ function initRoutes(router,db) {
 									});
 								} else {
 									// insert
+									question.createDate = new Date().getTime();
 									db().collection('multiplechoicequestions').insertOne(question).then(function() {
 										console.log(['inserted MC',question])
 										resolve(question);
