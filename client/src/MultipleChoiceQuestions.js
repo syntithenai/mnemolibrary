@@ -17,6 +17,8 @@ import { Player } from 'video-react';
 
 let resetIcon = <svg style={{marginTop:'0.2em',height:'1.1em'}} role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256.455 8c66.269.119 126.437 26.233 170.859 68.685l35.715-35.715C478.149 25.851 504 36.559 504 57.941V192c0 13.255-10.745 24-24 24H345.941c-21.382 0-32.09-25.851-16.971-40.971l41.75-41.75c-30.864-28.899-70.801-44.907-113.23-45.273-92.398-.798-170.283 73.977-169.484 169.442C88.764 348.009 162.184 424 256 424c41.127 0 79.997-14.678 110.629-41.556 4.743-4.161 11.906-3.908 16.368.553l39.662 39.662c4.872 4.872 4.631 12.815-.482 17.433C378.202 479.813 319.926 504 256 504 119.034 504 8.001 392.967 8 256.002 7.999 119.193 119.646 7.755 256.455 8z"></path></svg>
 
+let upIcon = <svg style={{marginTop:'0.2em',height:'1.1em'}} role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M313.553 119.669L209.587 7.666c-9.485-10.214-25.676-10.229-35.174 0L70.438 119.669C56.232 134.969 67.062 160 88.025 160H152v272H68.024a11.996 11.996 0 0 0-8.485 3.515l-56 56C-4.021 499.074 1.333 512 12.024 512H208c13.255 0 24-10.745 24-24V160h63.966c20.878 0 31.851-24.969 17.587-40.331z"></path></svg>
+
 
 const reviewIcon = 
 <svg style={{height:'1.2em'}}  role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M336 448H16c-8.84 0-16 7.16-16 16v32c0 8.84 7.16 16 16 16h320c8.84 0 16-7.16 16-16v-32c0-8.84-7.16-16-16-16zm208-320V80c0-8.84-7.16-16-16-16s-16 7.16-16 16v48h-32V80c0-8.84-7.16-16-16-16s-16 7.16-16 16v48h-16c-8.84 0-16 7.16-16 16v32c0 35.76 23.62 65.69 56 75.93v118.49c0 13.95-9.5 26.92-23.26 29.19C431.22 402.5 416 388.99 416 372v-28c0-48.6-39.4-88-88-88h-8V64c0-35.35-28.65-64-64-64H96C60.65 0 32 28.65 32 64v352h288V304h8c22.09 0 40 17.91 40 40v24.61c0 39.67 28.92 75.16 68.41 79.01C481.71 452.05 520 416.41 520 372V251.93c32.38-10.24 56-40.17 56-75.93v-32c0-8.84-7.16-16-16-16h-16zm-283.91 47.76l-93.7 139c-2.2 3.33-6.21 5.24-10.39 5.24-7.67 0-13.47-6.28-11.67-12.92L167.35 224H108c-7.25 0-12.85-5.59-11.89-11.89l16-107C112.9 99.9 117.98 96 124 96h68c7.88 0 13.62 6.54 11.6 13.21L192 160h57.7c9.24 0 15.01 8.78 10.39 15.76z"></path></svg>
@@ -59,6 +61,7 @@ export default class MultipleChoiceQuestions extends Component {
 		this.clickResetQuiz = this.clickResetQuiz.bind(this)
 		this.resetQuiz = this.resetQuiz.bind(this)
 		this.loadQuestions = this.loadQuestions.bind(this)
+		this.refreshQuestions = this.refreshQuestions.bind(this)
 		this.nextQuestion = this.nextQuestion.bind(this)
 		this.setCurrentQuestion = this.setCurrentQuestion.bind(this)
 		this.setShareDialog = this.setShareDialog.bind(this)
@@ -260,6 +263,12 @@ export default class MultipleChoiceQuestions extends Component {
 			
 		})
     }
+    
+    refreshQuestions() {
+		this.loadQuestions().then(function() {
+			scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
+		})		
+	}
     
     loadQuestions() {
 		console.log(['LOAD Q',this.props.mode])
@@ -644,6 +653,7 @@ export default class MultipleChoiceQuestions extends Component {
 						if (!image) image = question  && question.image_png ? question.image_png : (question  && question.image ? question.image : '')  
 						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
 						let mcByTopicLink = '/multiplechoicequestions/'+encodeURIComponent(question.topic);
+						let questionKeyId ='question_'+questionKey;
 						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}   key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black', marginBottom: '1em'}} > 
 						
 
@@ -677,11 +687,12 @@ export default class MultipleChoiceQuestions extends Component {
 						</div>}	
 						
 						<div style={{ width:'', marginTop: '1em',padding: '0.5em', border: '1px solid black' , backgroundColor:'#eee',borderRadius:'30px',marginRight:'1em'}}>{answerButtons}</div> 
-						<div id={'question_'+questionKey}></div>
+						
+						<div id={questionKeyId}></div>
 						
 						
 
-						{answered && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
+						{answered && !that.props.carousel && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
 
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em'}}><b>Memory Aid</b> {question.relatedQuestion.mnemonic}</div>}
 
@@ -752,9 +763,18 @@ export default class MultipleChoiceQuestions extends Component {
 				
 				<span>{totalMessage}</span>
 				
-				{userAnsweredTally === quizLength && <Link to="/multiplechoicetopics" style={{marginRight:'3em',float:'right'}} className='btn btn-success' ><CompleteIcon size={26} /> <span className="d-none d-sm-inline" >Quiz Complete</span></Link>}
 				
-				<button style={{paddingTop: '0',height:'1.4em',float:'right'}} onClick={this.showQuizOptionsDialog} className='btn btn-info' >...</button>
+
+				<button style={{paddingTop: '0',height:'1.4em',float:'right'}} onClick={this.showQuizOptionsDialog} className='btn btn-info' > ...</button>
+				
+				{(userAnsweredTally === quizLength) && <div style={{marginRight:'3em',float:'right'}}>
+					 
+					<Link to="/multiplechoicetopics" style={{marginRight:'1em',float:'right'}} className='btn btn-success' >{upIcon}</Link>
+					<div onClick={this.loadQuestions}   className='btn btn-success' style={{marginRight:'1em',float:'right'}} ><CompleteIcon size={26} /> 
+					<span className="d-none d-sm-inline" > Quiz Complete - Load More Questions</span></div>&nbsp;
+					
+					</div>}
+				
 			</div>}
 			
 			{questions && questions.length > 0 && <b style={{display:'block',width:'100%'}}>Quiz Questions</b>}

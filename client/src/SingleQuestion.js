@@ -769,12 +769,11 @@ export default class SingleQuestion extends Component {
                         
                         
                         <div  className="card-title questionheader">{this.props.isReview && <br/>}{header}?</div>
-                        <div className="card-block">
-                            {(this.isVisible('media') || question.autoplay_media==="YES") && question.mediaattribution && hasMedia  && <div className="card-block mediaattribution">
-                            <div  className='card-text ' style={{fontSize:'0.85em'}}><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
-                        </div>}
-                        
-                        </div>
+							<div className="card-block">
+								{(this.isVisible('media') || question.autoplay_media==="YES") && question.mediaattribution && hasMedia  && <div className="card-block mediaattribution">
+								<div  className='card-text ' style={{fontSize:'0.85em'}}><b>Media Attribution/Source</b> <span><pre>{mediaAttribution}</pre></span></div>
+							</div>}
+						</div>
                           
                         <div className="card-block answer">
                         {((this.isVisible('image') || question.autoshow_image==="YES" || !showRecallButton) && imageLink  ) && 
