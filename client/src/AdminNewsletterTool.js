@@ -181,7 +181,7 @@ export default class AdminNewsletterTool extends Component {
 					<div>
 						<div style={buttonBlockStyle}>
 							<button onClick={(e) => this.sendNewsletter(true)} className='btn btn-warning' >Test</button>
-							{this.state.isTested && <button onClick={(e) => this.sendNewsletter(false)} className='btn btn-success' >Send</button>}
+							{this.state.isTested && <span><button onClick={(e) => this.sendNewsletter(false)} className='btn btn-success' >Send to {this.state.totalSubscribers} Subscribers </button></span>}
 						</div>
 						<button onClick={this.hidePreview} className='btn btn-info' >Back</button>
 						<h3>Newsletter Preview</h3>

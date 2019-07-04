@@ -522,7 +522,7 @@ function initRoutes(router,db) {
 											&& record.specific_answer && record.specific_answer.length > 0
 											&& record.multiple_choices && record.multiple_choices.length > 0
 										) {
-											let newQuestion ={_id:record.mcQuestionId ? ObjectId(record.mcQuestionId) : ObjectId(),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,questionId:ObjectId(record._id),feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image}
+											let newQuestion ={_id:((record.mcQuestionId && record.mcQuestionId.length > 0 ? ObjectId(record.mcQuestionId) : ObjectId()),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,(questionId:record._id && record._id.length > 0 ? ObjectId(record._id) : ObjectId()) ,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image}
 											if (record.autoplay_media==="YES" && record.media) newQuestion.media = record.media;
 											
 											mcQuestions.push(newQuestion)
@@ -890,113 +890,133 @@ function initRoutes(router,db) {
 
 	}
 //:::LINK:::/recentcomments:::CODE:::
-
+	router.get('/newsletterpublishstatus', (req, res) => {
+	
+	})
+	
+	router.get('/resetnewsletterstatus', (req, res) => {
+	
+	})
 	
 	router.post('/publishnewsletter', (req, res) => {
 		//console.log(['publish',	req.body])
 		if (req.body.user && req.body.user.length > 0 && req.body.publishKey && req.body.publishKey.length > 0) {
-		//	console.log(['publish a'])
-			db().collection('users').findOne({_id:ObjectId(req.body.user)}).then(function(user) {
-			//console.log(['publish u',	user])
-			if (user && user.publishKey && user.publishKey.length > 0 && user.publishKey === req.body.publishKey) {
-				//console.log(['publish matck key',	user])
-				if (req.body.isTest) {
-						if (req.body.content && req.body.content.length > 0) {
-						//	console.log(['publish is test',	req.body.userEmail])
-							var params={
-								username: user.username,
-								password: user.password,
-								'grant_type':'password',
-								'client_id':config.clientId,
-								'client_secret':config.clientSecret
-							};
-							if (req.body.userEmail && req.body.userEmail.length > 0) {
-								fetch("http://localhost:3000/oauth/token", {
-								  method: 'POST',
-								  headers: {
-									'Content-Type': 'application/x-www-form-urlencoded',
-									//Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
-								  },
-								  
-								  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
-								}).then(function(response) {
-									return response.json();
-								}).then(function(token) {
-									let html = generateNewsletter(req.body.content,user,token.access_token);
-									utils.sendMail(config.mailFrom,req.body.userEmail,"Mnemo's Library Newsletter",html) 
-	 
-									res.send({ok:true,message:'Sent test email to '+req.body.userEmail })
-									
-								}).catch(function(e) {
-								   console.log(e);
-								   res.send({error:e});
+			db().collection('newsletters').deleteMany({}).then(function() {
+				let id= new ObjectId()
+				db().collection('newsletters').insert({_id:id,key:req.body.publishKey,status:'started'}).then(function() {
+					//	console.log(['publish a'])
+					db().collection('users').findOne({_id:ObjectId(req.body.user)}).then(function(user) {
+					//console.log(['publish u',	user])
+					if (user && user.publishKey && user.publishKey.length > 0 && user.publishKey === req.body.publishKey) {
+						//console.log(['publish matck key',	user])
+						if (req.body.isTest) {
+								if (req.body.content && req.body.content.length > 0) {
+								//	console.log(['publish is test',	req.body.userEmail])
+									var params={
+										username: user.username,
+										password: user.password,
+										'grant_type':'password',
+										'client_id':config.clientId,
+										'client_secret':config.clientSecret
+									};
+									if (req.body.userEmail && req.body.userEmail.length > 0) {
+										fetch("http://localhost:3000/oauth/token", {
+										  method: 'POST',
+										  headers: {
+											'Content-Type': 'application/x-www-form-urlencoded',
+											//Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
+										  },
+										  
+										  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+										}).then(function(response) {
+											return response.json();
+										}).then(function(token) {
+											let html = generateNewsletter(req.body.content,user,token.access_token);
+											utils.sendMail(config.mailFrom,req.body.userEmail,"Mnemo's Library Newsletter",html).then(function() {
+												res.send({ok:true,message:'Sent test email to '+req.body.userEmail })
+											}).catch(function(e) {
+												res.send({error:e})
+											})
+				
+										}).catch(function(e) {
+										   console.log(e);
+										   res.send({error:e});
+										});
+									}
+								} else {
+									res.send({error:'No message content'});
+								}
+								
+							} else {
+								//console.log(['publish for real'])
+								db().collection('users').find({$and:[{email_me:{$ne:'none'}},{email_me:{$ne:'comments'}}]}).toArray(function(err,results) {
+								//	console.log(['publish for real res',results,req.body.content])
+								let emails=[];
+									if (req.body.content && req.body.content.length > 0) {
+										//console.log(['send emails MC',req.body.user,req.body.publishKey,req.body.content,results])
+										if (results) {
+											let promises = [];
+											results.map(function(user) {
+												var params={
+													username: user.username,
+													password: user.password,
+													'grant_type':'password',
+													'client_id':config.clientId,
+													'client_secret':config.clientSecret
+												};
+												promises.push(new Promise(function(resolve,reject) {
+													fetch("http://localhost:3000/oauth/token", {
+													  method: 'POST',
+													  headers: {
+														'Content-Type': 'application/x-www-form-urlencoded',
+														//Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
+													  },
+													  
+													  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+													}).then(function(response) {
+														return response.json();
+													}).then(function(token) {
+														// only send newsletter from live site
+														//if (config.host === 'mnemolibrary.com') {
+															//console.log('really send email to '+user.username)
+														let interval = 3000;
+														setTimeout(function() {
+															let html = generateNewsletter(req.body.content,user,token.access_token);
+															utils.sendMail(config.mailFrom,user.username,"Mnemo's Library Newsletter",html).then(function() {
+																resolve({email:user.username});
+															});
+														,interval}
+														//} else {
+															////console.log('no send email not live site to '+user.username)
+															
+														//}
+													}).catch(function(e) {
+													   console.log(e);
+													   reject()
+													});
+												}))
+												return null;
+											})
+											Promise.all(promises).then(function(final) {
+												//console.log(['USERS AND TOKENS',final])
+												res.send({ok:true,sentTo:final.length})
+								
+											});
+										}
+										// iterate users building in dynamic elements
+											// send email
+									}
 								});
 							}
 						} else {
-							res.send({error:'No message content'});
+							res.send({error:'Invalid publish token'})
 						}
-						
-					} else {
-						//console.log(['publish for real'])
-						db().collection('users').find({$and:[{email_me:{$ne:'none'}},{email_me:{$ne:'comments'}}]}).toArray(function(err,results) {
-						//	console.log(['publish for real res',results,req.body.content])
-						let emails=[];
-							if (req.body.content && req.body.content.length > 0) {
-								//console.log(['send emails MC',req.body.user,req.body.publishKey,req.body.content,results])
-								if (results) {
-									let promises = [];
-									results.map(function(user) {
-										var params={
-											username: user.username,
-											password: user.password,
-											'grant_type':'password',
-											'client_id':config.clientId,
-											'client_secret':config.clientSecret
-										};
-										promises.push(new Promise(function(resolve,reject) {
-											fetch("http://localhost:3000/oauth/token", {
-											  method: 'POST',
-											  headers: {
-												'Content-Type': 'application/x-www-form-urlencoded',
-												//Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
-											  },
-											  
-											  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
-											}).then(function(response) {
-												return response.json();
-											}).then(function(token) {
-												// only send newsletter from live site
-												if (config.host === 'mnemolibrary.com') {
-													//console.log('really send email to '+user.username)
-													let html = generateNewsletter(req.body.content,user,token.access_token);
-													utils.sendMail(config.mailFrom,user.username,"Mnemo's Library Newsletter",html) 
-												} else {
-													//console.log('no send email not live site to '+user.username)
-													
-												}
-												resolve({email:user.username});
-											}).catch(function(e) {
-											   console.log(e);
-											   reject()
-											});
-										}))
-										return null;
-									})
-									Promise.all(promises).then(function(final) {
-										//console.log(['USERS AND TOKENS',final])
-										res.send({ok:true,sentTo:final.length})
-						
-									});
-								}
-								// iterate users building in dynamic elements
-									// send email
-							}
-						});
-					}
-				} else {
-					res.send({error:'Invalid publish token'})
-				}
-			});
+					});
+					
+					
+				})
+			})
+
 			
 			
 		} else {
