@@ -248,7 +248,7 @@ function initRoutes(router,db) {
 													resolve(mcQuestion)
 												} else {
 													//console.log([' MC FIND no find related',question])
-													resolve({})
+													resolve(mcQuestion)
 												}
 											})
 										}));
@@ -342,7 +342,7 @@ function initRoutes(router,db) {
 													resolve(mcQuestion)
 												} else {
 													//console.log([' MC FIND no find related',question])
-													resolve({})
+													resolve(mcQuestion)
 												}
 											})
 										}));
@@ -427,7 +427,7 @@ function initRoutes(router,db) {
 									resolve(mcQuestion)
 								} else {
 									//console.log([' MC FIND no find related',question])
-									resolve({})
+									resolve(mcQuestion)
 								}
 							})
 						}));

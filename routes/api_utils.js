@@ -13,8 +13,6 @@ var fetch = require('node-fetch');
 
 function initRoutes(router,db) {
 
-
-
 	function updateTags(tags) {
 		//console.log(['UPDATETAGS']);
 		////console.log(tags);
@@ -448,10 +446,12 @@ function initRoutes(router,db) {
 					let mcQuestions=[];
 					let recordIndex={};
 					console.log('got indexes',json.questions.length);
+					
 					// iterate questions collecting promises and insert/update as required
 					let promises=[];
 					for (var a in json.questions) {
 					 //console.log([a,json.questions[a]]); //,json[collection][a]]);
+						
 						// must have topic and question
 						if (json.questions[a] && json.questions[a].question && json.questions[a].question.length > 0 && json.questions[a].quiz && json.questions[a].quiz.length > 0) {
 							let record =  json.questions[a];
@@ -463,17 +463,18 @@ function initRoutes(router,db) {
 							}
 							record.importId = importId;
 							//console.log(['import ',record]);
-							//// dont' slam (wiki) answer/image with blank answer/image from import
-							if (record.answer && record.answer.length > 0) {
+							
+							////// dont' slam (wiki) answer/image with blank answer/image from import
+							//if (record.answer && record.answer.length > 0) {
 								
-							} else {
-								record.answer = null;
-							}
-							if (record.image && record.image.length > 0) {
+							//} else {
+								//record.answer = null;
+							//}
+							//if (record.image && record.image.length > 0) {
 								
-							} else {
-								record.image = null;
-							}
+							//} else {
+								//record.image = null;
+							//}
 							//console.log(['import1 ',record]);
 							
 							//record.answer = record.answer.replace('""','"');
@@ -491,6 +492,7 @@ function initRoutes(router,db) {
 						   //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
 						   //record.answer = record.answer.replace(/^"(.*)"$/, '$1');
 							// remove and restore id to allow update
+							
 							let thePromise = null;
 							let recordExists = false;
 							// convert to ObjectId or create new 
@@ -507,6 +509,7 @@ function initRoutes(router,db) {
 							} else {
 								record.hasMnemonic = false;
 							}
+							
 							function saveQuestion() {
 								//console.log('SAVE QUESTION')
 								thePromise = new Promise(function(resolve,reject) {
@@ -522,12 +525,18 @@ function initRoutes(router,db) {
 											&& record.specific_answer && record.specific_answer.length > 0
 											&& record.multiple_choices && record.multiple_choices.length > 0
 										) {
-											let newQuestion ={_id:((record.mcQuestionId && record.mcQuestionId.length > 0 ? ObjectId(record.mcQuestionId) : ObjectId()),topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,(questionId:record._id && record._id.length > 0 ? ObjectId(record._id) : ObjectId()) ,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image}
+											let newQuestion ={topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image}
+											
+											try {
+												newQuestion._id=(record.mcQuestionId && record.mcQuestionId.length > 0 ? ObjectId(record.mcQuestionId) : ObjectId())
+											} catch (e) {}
+											newQuestion.questionId = record._id; //(record._id && record._id.length > 0 ? ObjectId(record._id) : ObjectId())
+											
 											if (record.autoplay_media==="YES" && record.media) newQuestion.media = record.media;
 											
 											mcQuestions.push(newQuestion)
 										}
-										//console.log(['SAVED QUESTION'])
+										//console.log(['SAVED QUESTION',record._id,record])
 										recordIndex[record._id] = record;
 							
 										resolve(record._id);
@@ -596,7 +605,7 @@ function initRoutes(router,db) {
 								
 							let ids=[];
 							let final=[];
-							//console.log(['TODUMPE v',Object.keys(recordIndex)])
+							//console.log(['TODUMPE v',JSON.stringify(recordIndex)])
 							//console.log(['TODUMPE mc']); //,JSON.stringify(toDump)])
 									
 							toDump.map(function(val) {
@@ -605,10 +614,9 @@ function initRoutes(router,db) {
 									//console.log(['TODUMPE v',val])
 									ids.push(ObjectId(val._id));
 									// update main question with mcQuestionId to allow update
-									if (val.questionId && recordIndex.hasOwnProperty(val.questionId)) {
-										recordIndex[val.questionId].mcQuestionId = val._id;
-										console.log(['UPDATE REC INDEX',recordIndex[val.questionId]])
-									
+									if (val.questionId && recordIndex.hasOwnProperty(ObjectId(val.questionId))) {
+										recordIndex[val.questionId].mcQuestionId = ObjectId(val._id);
+										//console.log(['UPDATE REC INDEX',recordIndex[val.questionId]])
 									}
 									//final.push(Object.assign(val,{mcQuestionId:val._id}))
 								}
@@ -634,7 +642,9 @@ function initRoutes(router,db) {
 					   // clear default user mnemonics
 						db().collection('mnemonics').remove({$and:[{user:'default'},{importId:importId}]}).then(function(dresults) {
 					   // bulk save mnemonics 
-							db().collection('mnemonics').insertMany(mnemonics);
+							if (mnemonics && mnemonics.length > 0) {
+								db().collection('mnemonics').insertMany(mnemonics);
+							}
 						});
 						
 					   // console.log(['del ids',ids]);
@@ -980,12 +990,12 @@ function initRoutes(router,db) {
 														//if (config.host === 'mnemolibrary.com') {
 															//console.log('really send email to '+user.username)
 														let interval = 3000;
-														setTimeout(function() {
+														//setTimeout(function() {
 															let html = generateNewsletter(req.body.content,user,token.access_token);
 															utils.sendMail(config.mailFrom,user.username,"Mnemo's Library Newsletter",html).then(function() {
 																resolve({email:user.username});
 															});
-														,interval}
+														//,interval}
 														//} else {
 															////console.log('no send email not live site to '+user.username)
 															

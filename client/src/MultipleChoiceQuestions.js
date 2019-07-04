@@ -209,7 +209,7 @@ export default class MultipleChoiceQuestions extends Component {
 					let filteredQuestions = json.map(function(question,key) {
 						let a = {}
 						that.questionsIndex[question._id] = key;
-						let possibleAnswers = question.multiple_choices.split("|||");
+						let possibleAnswers = question.multiple_choices ? question.multiple_choices.split("|||") : [];
 						possibleAnswers.push(question.answer);
 						possibleAnswers = shuffle(possibleAnswers);
 						question.possibleAnswers = possibleAnswers;
@@ -246,7 +246,7 @@ export default class MultipleChoiceQuestions extends Component {
 					let filteredQuestions = json.map(function(question,key) {
 						let a = {}
 						that.questionsIndex[question._id] = key;
-						let possibleAnswers = question.multiple_choices.split("|||");
+						let possibleAnswers = question.multiple_choices ? question.multiple_choices.split("|||") : [];
 						possibleAnswers.push(question.answer);
 						possibleAnswers = shuffle(possibleAnswers);
 						question.possibleAnswers = possibleAnswers;
@@ -299,12 +299,17 @@ export default class MultipleChoiceQuestions extends Component {
 						let filteredQuestions = json.map(function(question,key) {
 							//let a = {}
 							that.questionsIndex[question._id] = key;
-							let possibleAnswers = question.multiple_choices.split("|||");
+							let possibleAnswers = question.multiple_choices ? question.multiple_choices.split("|||") : [];
 							possibleAnswers.push(question.answer);
 							// uniquify
 							possibleAnswers = [...new Set(possibleAnswers)];
 							possibleAnswers = shuffle(possibleAnswers);
-							question.possibleAnswers = possibleAnswers;
+							let finalPossible = [];
+							possibleAnswers.map(function(answer) {
+								if (answer && answer.trim().length > 0) finalPossible.push(answer); 
+								return null; 
+							});
+							question.possibleAnswers = finalPossible;
 							return question;
 						});
 						if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
@@ -740,7 +745,6 @@ export default class MultipleChoiceQuestions extends Component {
 		return (
 		<div  ref={(section) => { that.scrollTo.top = section; }}  className="row card-block" style={{width:'100%',marginBottom:'5em'}}>
 			  {!isQuestionPage && <div style={theStyle} >
-				
 				{this.state.showQuizOptionsDialog && <div onClick={that.hideQuizOptionsDialog} style={{marginTop:'8em'}} className='modaldialog'  >
 				<div className="modaldialog-content">
 					  <div className="modaldialog-header">

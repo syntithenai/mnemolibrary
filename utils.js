@@ -86,7 +86,7 @@ let utilFunctions =  {
     //return Object.keys(set);
   //},
   sendMail : function(from,to,subject,html) {
-        return new Promise(resolve,reject) {
+        return new Promise(function(resolve,reject) {
 			var transporter = nodemailer.createTransport(config.transport);
 
 			var mailOptions = {
