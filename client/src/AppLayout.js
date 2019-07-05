@@ -1217,7 +1217,7 @@ export default class AppLayout extends Component {
         let auth =JSON.parse(authRequest);
         if (!auth) auth={};
     
-        let searchPage = <div><TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuizFromTopic={this.setQuizFromTopic} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user} showCollection={this.showCollection} hideCollection={this.hideCollection} collectionVisible={this.collectionVisible} collection={this.state.collection} /></div>
+        let searchPage = <div><TopicsPage topicCollections={this.state.topicCollections} topics={topics}  topicTags={this.state.topicTags} tagFilter={this.state.tagFilter}  clearTagFilter={this.clearTagFilter} setQuizFromTopic={this.setQuizFromTopic} setQuiz={this.setQuizFromTopic} questionsMissingMnemonics={this.state.questionsMissingMnemonics} setQuizFromMissingMnemonic={this.setQuizFromMissingMnemonic} setCurrentPage={this.setCurrentPage} isLoggedIn={this.isLoggedIn} setQuizFromDiscovery={this.setQuizFromDiscovery} setQuizFromDifficulty={this.setQuizFromDifficulty} setQuizFromTopics={this.setQuizFromTopics}  setQuizFromQuestionId={this.setQuizFromQuestionId} title={title} user={this.state.user} showCollection={this.showCollection} hideCollection={this.hideCollection} collectionVisible={this.collectionVisible} collection={this.state.collection} analyticsEvent={this.analyticsEvent}  /></div>
         
         let topicsPageOptions={ analyticsEvent:this.analyticsEvent, titleFilter:this.state.titleFilter,setTitleFilter:this.setTitleFilter,topicCollections:this.state.topicCollections,topics:topics,topicTags:this.state.topicTags,tagFilter:this.state.tagFilter,clearTagFilter:this.clearTagFilter,setQuizFromTopic:this.setQuizFromTopic,setQuiz:this.setQuizFromTopic,questionsMissingMnemonics:this.state.questionsMissingMnemonics,setQuizFromMissingMnemonic:this.setQuizFromMissingMnemonic,setCurrentPage:this.setCurrentPage,isLoggedIn:this.isLoggedIn,setQuizFromDiscovery:this.setQuizFromDiscovery,setQuizFromDifficulty:this.setQuizFromDifficulty,setQuizFromTopics:this.setQuizFromTopics,setQuizFromQuestionId:this.setQuizFromQuestionId,title:title,user:this.state.user,showCollection:this.showCollection,hideCollection:this.hideCollection,collectionVisible:this.collectionVisible,collection:this.state.collection,setQuizFromQuestionId:this.setQuizFromQuestionId ,newCommentReply:this.newCommentReply}
         
@@ -1234,19 +1234,19 @@ export default class AppLayout extends Component {
         <Router>
             <div style={{width:'100%'}} className="mnemo">
 			
-			    <PropsRoute exact={true} path='/recentcomments/:comment'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user} />
+			    <PropsRoute exact={true} path='/recentcomments/:comment'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user} analyticsEvent={this.analyticsEvent} />
                 
-                <PropsRoute exact={true} path='/recentcomments'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user}  />
+                <PropsRoute exact={true} path='/recentcomments'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user}  	analyticsEvent={this.analyticsEvent} />
                 
-                 {this.state.comment && !this.state.editCommentReply && <CommentEditor comment={this.state.comment} setComment={this.setComment} user={this.state.user} saveComment={this.saveComment}  getCurrentQuestion={this.getCurrentQuestion}/>}
+                 {this.state.comment && !this.state.editCommentReply && <CommentEditor comment={this.state.comment} setComment={this.setComment} user={this.state.user} saveComment={this.saveComment}  getCurrentQuestion={this.getCurrentQuestion} 	analyticsEvent={this.analyticsEvent} />}
 
-                 {this.state.comment && this.state.editCommentReply && <CommentReplyEditor  comment={this.state.comment} commentReplyIndex={this.state.commentReplyIndex} commentReply={this.state.commentReply} cancelCommentReply={this.cancelCommentReply}  saveCommentReply={this.saveCommentReply} getCurrentQuestion={this.getCurrentQuestion} user={this.state.user} />}
+                 {this.state.comment && this.state.editCommentReply && <CommentReplyEditor  comment={this.state.comment} commentReplyIndex={this.state.commentReplyIndex} commentReply={this.state.commentReply} cancelCommentReply={this.cancelCommentReply}  saveCommentReply={this.saveCommentReply} getCurrentQuestion={this.getCurrentQuestion} user={this.state.user} 	analyticsEvent={this.analyticsEvent} />}
              
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
                 
-                <PropsRoute  path="/" component={Navigation}  setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection} newCommentReply={this.newCommentReply}  />
+                <PropsRoute  path="/" component={Navigation}  setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection} newCommentReply={this.newCommentReply} 	analyticsEvent={this.analyticsEvent}  />
                 
-                <PropsRoute  exact={true} path="/sitemap" component={SiteMap} isAdmin={this.isAdmin} isLoggedIn={this.isLoggedIn} logout={this.logout} import={this.import} importMultipleChoice={this.importMultipleChoice}/>
+                <PropsRoute  exact={true} path="/sitemap" component={SiteMap} isAdmin={this.isAdmin} isLoggedIn={this.isLoggedIn} logout={this.logout} import={this.import} importMultipleChoice={this.importMultipleChoice} 	analyticsEvent={this.analyticsEvent}  />
                 
                 <PropsRoute  exact={true} path="/help" component={AboutPage} analyticsEvent={this.analyticsEvent}  />
                 <PropsRoute  path="/help/about" component={AboutPage} analyticsEvent={this.analyticsEvent} />
@@ -1256,30 +1256,30 @@ export default class AppLayout extends Component {
                 <PropsRoute  path="/help/create" isLoggedIn={this.isLoggedIn} component={CreateHelp} analyticsEvent={this.analyticsEvent}/>
                 <PropsRoute  path="/help/videos" component={HelpVideos} analyticsEvent={this.analyticsEvent} />
                 
-                <PropsRoute  path="/create" analyticsEvent={this.analyticsEvent} component={CreatePage} fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} />
+                <PropsRoute  path="/create" analyticsEvent={this.analyticsEvent} component={CreatePage} fetchTopicCollections={this.fetchTopicCollections} user={this.state.user} isAdmin={this.isAdmin}  mnemonic_techniques={this.state.mnemonic_techniques} saveQuestion={this.saveQuestion} setQuizFromTopic={this.setQuizFromTopic} setCurrentPage={this.setCurrentPage} analyticsEvent={this.analyticsEvent}  />
                 
                 
                 <PropsRoute exact={true} path='/multiplechoicetopics/:topicCollection'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics} user={this.state.user} newCommentReply={this.newCommentReply} />
-                <PropsRoute exact={true} path='/multiplechoicetopics'  user={this.state.user} topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}   newCommentReply={this.newCommentReply}  />
+                <PropsRoute exact={true} path='/multiplechoicetopics'  user={this.state.user} topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}   newCommentReply={this.newCommentReply} 	analyticsEvent={this.analyticsEvent}  />
                 
-                <PropsRoute exact={true} path='/multiplechoicequestions/:topic'   user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
+                <PropsRoute exact={true} path='/multiplechoicequestions/:topic'   user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
 
-                <PropsRoute exact={true} path='/mymultiplechoicequestions' mode="myquestions"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
+                <PropsRoute exact={true} path='/mymultiplechoicequestions' mode="myquestions"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
 
-                <PropsRoute exact={true} path='/mymultiplechoicequestions/:topic' mode="myquestions"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
+                <PropsRoute exact={true} path='/mymultiplechoicequestions/:topic' mode="myquestions"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
 
-                <PropsRoute exact={true} path='/mymultiplechoicetopics' mode="mytopics"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
+                <PropsRoute exact={true} path='/mymultiplechoicetopics' mode="mytopics"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
 
-                <PropsRoute exact={true} path='/mymultiplechoicetopics/:topic' mode="mytopics"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} />
+                <PropsRoute exact={true} path='/mymultiplechoicetopics/:topic' mode="mytopics"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
                 
                 
                 
-                <PropsRoute  exact={true} path="/search" component={TopicsPage} {...topicsPageOptions}/>
-                <PropsRoute  exact={true} path="/" component={TopicsPage} {...topicsPageOptions}/>
+                <PropsRoute  exact={true} path="/search" component={TopicsPage} {...topicsPageOptions} analyticsEvent={this.analyticsEvent}  />
+                <PropsRoute  exact={true} path="/" component={TopicsPage} {...topicsPageOptions} analyticsEvent={this.analyticsEvent} />
                 
-                <PropsRoute  path="/search/tags" analyticsEvent={this.analyticsEvent} component={TagsPage}   titleFilter={this.state.titleFilter} setTitleFilter={this.setTitleFilter}  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} />
+                <PropsRoute  path="/search/tags" analyticsEvent={this.analyticsEvent} component={TagsPage}   titleFilter={this.state.titleFilter} setTitleFilter={this.setTitleFilter}  setCurrentPage={this.setCurrentPage} tags={tags} relatedTags={this.state.relatedTags} setQuiz={this.setQuizFromTag} analyticsEvent={this.analyticsEvent}  />
                 
-                <PropsRoute  path="/search/questions" analyticsEvent={this.analyticsEvent} component={SearchPage}  titleFilter={this.state.titleFilter} setTitleFilter={this.setTitleFilter} mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} />
+                <PropsRoute  path="/search/questions" analyticsEvent={this.analyticsEvent} component={SearchPage}  titleFilter={this.state.titleFilter} setTitleFilter={this.setTitleFilter} mnemonic_techniques={this.state.mnemonic_techniques} setCurrentPage={this.setCurrentPage} questions={this.state.questions} setQuiz={this.setQuizFromQuestion} analyticsEvent={this.analyticsEvent}  />
                 
                 <PropsRoute  path="/missing/:missingtopic" component={QuizCarousel} {...discoverPageOptions}  />
                 <PropsRoute  exact={true} path="/discover" component={QuizCarousel} {...discoverPageOptions}  />
@@ -1305,16 +1305,16 @@ export default class AppLayout extends Component {
                  <PropsRoute  path="/profile" component={ProfilePage} {...profilePageOptions} analyticsEvent={this.analyticsEvent}/>
                  <br/>
                 
-                 <PropsRoute  exact={true} path="/access/search/:topic"  mode='searchtopic' component={TopicPassword}  user={this.state.user} saveUser={this.saveUser} />
-                 <PropsRoute  path="/access/search/:topic/:topicquestion"  mode='searchtopic' component={TopicPassword} user={this.state.user} saveUser={this.saveUser} />
+                 <PropsRoute  exact={true} path="/access/search/:topic"  mode='searchtopic' component={TopicPassword}  user={this.state.user} saveUser={this.saveUser} analyticsEvent={this.analyticsEvent}  />
+                 <PropsRoute  path="/access/search/:topic/:topicquestion"  mode='searchtopic' component={TopicPassword} user={this.state.user} saveUser={this.saveUser} analyticsEvent={this.analyticsEvent}  />
                  
-                 <PropsRoute  exact={true} path="/access/discover/:topic"  mode='topic'  component={TopicPassword}  user={this.state.user} saveUser={this.saveUser} />
-                 <PropsRoute  path="/access/discover/:topic/:topicquestion" mode='topic' component={TopicPassword} user={this.state.user} saveUser={this.saveUser} />
+                 <PropsRoute  exact={true} path="/access/discover/:topic"  mode='topic'  component={TopicPassword}  user={this.state.user} saveUser={this.saveUser} analyticsEvent={this.analyticsEvent} />
+                 <PropsRoute  path="/access/discover/:topic/:topicquestion" mode='topic' component={TopicPassword} user={this.state.user} saveUser={this.saveUser} analyticsEvent={this.analyticsEvent} />
                 
-                 <PropsRoute  path="/newslettertool"  component={AdminNewsletterTool} isAdmin={this.isAdmin} user={this.state.user} />
+                 <PropsRoute  path="/newslettertool"  component={AdminNewsletterTool} isAdmin={this.isAdmin} user={this.state.user} analyticsEvent={this.analyticsEvent} />
                 
-                <PropsRoute  path="/settings"  component={SettingsPage} saveUser={this.saveUser} user={this.state.user} />
-                <PropsRoute  path="/leaderboard"  component={LeaderBoardPage}  user={this.state.user} />
+                <PropsRoute  path="/settings"  component={SettingsPage} saveUser={this.saveUser} user={this.state.user} analyticsEvent={this.analyticsEvent} />
+                <PropsRoute  path="/leaderboard"  component={LeaderBoardPage}  user={this.state.user} analyticsEvent={this.analyticsEvent}  />
                 
                 
                 <Footer/>

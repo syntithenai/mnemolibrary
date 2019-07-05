@@ -58,11 +58,15 @@ export default class SiteMap extends Component {
               onClick: () => this.props.import(1)
             },
             {
-              label: 'Biology',
+			  label: 'MC only',
+              onClick: () => this.props.importMultipleChoice(1)
+            },
+            {
+              label: 'Steve',
               onClick: () => this.props.import(2)
             },
             {
-			  label: 'Multiple Choice Questions',
+			  label: 'MC Steve',
               onClick: () => this.props.importMultipleChoice(0)
             }
           ]

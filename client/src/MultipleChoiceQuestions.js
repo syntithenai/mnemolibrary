@@ -265,6 +265,7 @@ export default class MultipleChoiceQuestions extends Component {
     }
     
     refreshQuestions() {
+		let that = this;
 		this.loadQuestions().then(function() {
 			scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
 		})		
@@ -677,11 +678,7 @@ export default class MultipleChoiceQuestions extends Component {
 							
 						{!that.props.viewOnly && <div className='questionbuttons' style={{minWidth:'50%', minHeight: '2em'}} >
 							
-							{!that.props.viewOnly && !isQuestionPage && question.questionId && question.topic && <div>
-								<div style={{float:'right'}}><a target="_new" href={moreInfoLink} className='btn btn-info'>{moreInfoIcon} <span className="d-none d-sm-inline" >More Information</span></a></div> 
-							</div> }
 							
-								
 							{that.props.user && question.questionId && <button style={{float:'right'}} className='btn btn-success' onClick={(e) => that.sendAllQuestionsForReview([{_id:question.questionId}])} >{reviewIcon} <span className="d-none d-sm-inline" >Add to Review List</span></button>}
 							
 							{!that.props.user && question.questionId && <Link to="/login" style={{float:'right'}} className='btn btn-success'  >{reviewIcon} <span className="d-none d-sm-inline" >Add to Review List</span></Link>}
@@ -696,12 +693,16 @@ export default class MultipleChoiceQuestions extends Component {
 						<div id={questionKeyId}></div>
 						
 						
-
+ 
 						{answered && !that.props.carousel && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
 
-						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em'}}><b>Memory Aid</b> {question.relatedQuestion.mnemonic}</div>}
+						{!that.props.viewOnly && !isQuestionPage && question.relatedQuestion&& question.relatedQuestion.interrogative && question.relatedQuestion.question && answered && <div>
+								<div style={{marginTop:'1em',marginBottom:'1em'}} ><b>Root Question</b> <a target="_new" href={moreInfoLink} >{moreInfoIcon} <span className="d-none d-sm-inline" >{question.relatedQuestion.interrogative} {question.relatedQuestion.question}</span></a></div> 
+							</div> }
 
-						{answered && !that.props.viewOnly && image && <img src={image}  style={{height:'400px'}} />}
+						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em',marginBottom:'1em'}} ><b>Memory Aid</b><pre> {question.relatedQuestion.mnemonic}</pre></div>}
+
+						{answered && !that.props.viewOnly && image && <img src={image}  style={{maxHeight:'400px',marginTop:'1em',marginBottom:'1em'}} />}
 
 						{(that.props.mode==='myquestions' ||that.props.mode==='mytopics') && answered && question.relatedQuestion && question.relatedQuestion.quiz && question.relatedQuestion.quiz.length > 0 && <div id='relatedtopic' style={{marginTop:'1em'}}><b>Topic</b> <Link className='btn btn-info' to={mcByTopicLink} > {question.relatedQuestion.quiz}</Link></div>}
 					
@@ -774,7 +775,7 @@ export default class MultipleChoiceQuestions extends Component {
 				{(userAnsweredTally === quizLength) && <div style={{marginRight:'3em',float:'right'}}>
 					 
 					<Link to="/multiplechoicetopics" style={{marginRight:'1em',float:'right'}} className='btn btn-success' >{upIcon}</Link>
-					<div onClick={this.loadQuestions}   className='btn btn-success' style={{marginRight:'1em',float:'right'}} ><CompleteIcon size={26} /> 
+					<div onClick={this.refreshQuestions}   className='btn btn-success' style={{marginRight:'1em',float:'right'}} ><CompleteIcon size={26} /> 
 					<span className="d-none d-sm-inline" > Quiz Complete - Load More Questions</span></div>&nbsp;
 					
 					</div>}

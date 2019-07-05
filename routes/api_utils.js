@@ -526,6 +526,8 @@ function initRoutes(router,db) {
 											&& record.multiple_choices && record.multiple_choices.length > 0
 										) {
 											let newQuestion ={topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image}
+											newQuestion.sort=record.sort
+									
 											
 											try {
 												newQuestion._id=(record.mcQuestionId && record.mcQuestionId.length > 0 ? ObjectId(record.mcQuestionId) : ObjectId())
@@ -745,32 +747,39 @@ function initRoutes(router,db) {
 					let promises=[];
 					if (data && data.data) {
 						data.data.map(function(mcQuestion) {
-							//console.log([mcQuestion.specific_question,mcQuestion.specific_answer,mcQuestion.topic,mcQuestion.multiple_choices]);
 							if (mcQuestion) {
+								console.log([mcQuestion.specific_question,mcQuestion.specific_answer,mcQuestion.topic,mcQuestion.multiple_choices]);
 								if (mcQuestion.topic && mcQuestion.topic.length > 0
 									&& mcQuestion.specific_question && mcQuestion.specific_question.length > 0
 									&& mcQuestion.specific_answer && mcQuestion.specific_answer.length > 0
 									&& mcQuestion.multiple_choices && mcQuestion.multiple_choices.length > 0
 								) {
 									let newQ = {}
-									newQ._id = mcQuestion._id && mcQuestion._id.length > 0 ? ObjectId(mcQuestion._id): ObjectId()
+									try {
+										newQ._id = mcQuestion._id && mcQuestion._id.length > 0 ? ObjectId(mcQuestion._id): ObjectId()
+									} catch (e) {
+										newQ._id = ObjectId()
+									}
+									console.log(['NEWQ id'])
 									newQ.topic = mcQuestion.topic
 									newQ.question = mcQuestion.specific_question
 									newQ.answer = mcQuestion.specific_answer
 									newQ.multiple_choices = mcQuestion.multiple_choices
-									newQ.questionId = (mcQuestion.questionId && mcQuestion.questionId.length > 0 ? ObjectId(mcQuestion.
-									newQ.questionId) : null)
+									newQ.questionId = (mcQuestion.questionId && mcQuestion.questionId.length > 0 ? ObjectId(mcQuestion.questionId) : null)
+									console.log(['NEWQ qid'])
 									newQ.feedback=mcQuestion.feedback
 									newQ.importId='MC-'+importId
+									newQ.sort=mcQuestion.sort
 									newQ.user='default'
 									newQ.image=mcQuestion.image
 									newQ.autoshow_image=mcQuestion.autoshow_image
 									newQ.media=mcQuestion.media
+									console.log(['NEWQ',newQ])
 									toSave.push(newQ)
 								}
 							}
 						});
-						console.log(['TOSAVE',toSave,toSave.length])
+						console.log(['TOSAVE',toSave.length])
 						toSave.map(function(question,key) {
 							let p = new Promise(function(resolve,reject) {
 								if (question._id) {

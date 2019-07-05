@@ -168,7 +168,7 @@ export default class CommentList extends Component {
 							return <div key={replyKey} style={{paddingLeft:'0em'}}> <span >
 									<span className='date' style={{fontWeight:'bold',marginRight:'0em'}} > {reply_formatted_date} </span>
 
-									<b>{reply.userAvatar}</b> replied <i>"{reply.text}"</i></span>
+									<i>{reply.userAvatar} replied </i><span>"{reply.text}"</span></span>
 								</div>
 						});
 					} else {
@@ -182,7 +182,7 @@ export default class CommentList extends Component {
 							<div style={{paddingLeft:'0em'}}> <span >
 								<span className='date' style={{fontWeight:'bold',marginRight:'0em'}} >{formatted_date} </span>
 
-								<b>{comment.userAvatar}</b> {joinWord} <i>"{comment.comment}"</i></span>
+								<i>{comment.userAvatar} {joinWord}</i> <span>"{comment.comment}"</span></span>
 							</div>
 								
 							{comment.questionText && <div><div><b>Topic: </b> {comment.questionTopic}</div>
@@ -215,7 +215,7 @@ export default class CommentList extends Component {
 								<div style={{ paddingLeft:'0em'}}> <span >
 								<span className='date' style={{fontWeight:'bold',marginRight:'0em'}} >{formatted_date} </span>
 
-								<b>{comment.userAvatar}</b> {joinWord} <i>"{comment.comment}"</i></span>
+								<i>{comment.userAvatar} {joinWord}</i> <span>"{comment.comment}"</span></span>
 							</div>
 								
 							{comment.questionText && <div><div><b>Topic: </b> {comment.questionTopic}</div>
@@ -227,7 +227,7 @@ export default class CommentList extends Component {
 				return;
 			});
 			
-			return <div  style={{marginTop:'1em'}}>
+			return <div  style={{marginTop:'1em',fontSize:'1.07em'}}>
 				{this.props.isSingleView && this.props.user && (privateComments.length > 0 ||  publicComments.length > 0||  questionComments.length > 0) &&  <button style={{float:'right'}} onClick={this.props.newComment} className='btn btn-success'><CommentIcon size={26} /><span className="d-none d-md-inline-block">&nbsp;New Comment&nbsp;</span></button>}
 				
 				<div style={{width:'100%',clear:'both'}}></div>
