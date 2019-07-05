@@ -525,9 +525,8 @@ function initRoutes(router,db) {
 											&& record.specific_answer && record.specific_answer.length > 0
 											&& record.multiple_choices && record.multiple_choices.length > 0
 										) {
-											let newQuestion ={topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image}
-											newQuestion.sort=record.sort
-									
+											let newQuestion ={topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image,sort:record.sort}
+											console.log('NEWQ',JSON.stringify(newQuestion))
 											
 											try {
 												newQuestion._id=(record.mcQuestionId && record.mcQuestionId.length > 0 ? ObjectId(record.mcQuestionId) : ObjectId())
@@ -760,7 +759,7 @@ function initRoutes(router,db) {
 									} catch (e) {
 										newQ._id = ObjectId()
 									}
-									console.log(['NEWQ id'])
+									console.log(['NEWQ id',mcQuestion.sort,JSON.stringify(mcQuestion)])
 									newQ.topic = mcQuestion.topic
 									newQ.question = mcQuestion.specific_question
 									newQ.answer = mcQuestion.specific_answer
@@ -831,6 +830,7 @@ function initRoutes(router,db) {
 									specific_answer:val.answer,
 									multiple_choices:val.multiple_choices,
 									feedback:val.feedback,
+									sort:val.sort,
 									image:val.image,
 									importId: val.importId,
 									createDate:val.createDate
