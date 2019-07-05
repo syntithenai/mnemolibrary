@@ -525,7 +525,7 @@ function initRoutes(router,db) {
 											&& record.specific_answer && record.specific_answer.length > 0
 											&& record.multiple_choices && record.multiple_choices.length > 0
 										) {
-											let newQuestion ={topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image,sort:record.sort}
+											let newQuestion ={topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image,sort:record.sort,difficulty:record.difficulty}
 											console.log('NEWQ',JSON.stringify(newQuestion))
 											
 											try {
@@ -769,6 +769,7 @@ function initRoutes(router,db) {
 									newQ.feedback=mcQuestion.feedback
 									newQ.importId='MC-'+importId
 									newQ.sort=mcQuestion.sort
+									newQ.difficulty = mcQuestion.difficulty
 									newQ.user='default'
 									newQ.image=mcQuestion.image
 									newQ.autoshow_image=mcQuestion.autoshow_image

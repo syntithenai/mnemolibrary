@@ -212,7 +212,13 @@ export default class MultipleChoiceQuestions extends Component {
 						let possibleAnswers = question.multiple_choices ? question.multiple_choices.split("|||") : [];
 						possibleAnswers.push(question.answer);
 						possibleAnswers = shuffle(possibleAnswers);
-						question.possibleAnswers = possibleAnswers;
+						let finalPossible = [];
+						possibleAnswers.map(function(answer) {
+							if (answer && answer.trim().length > 0) finalPossible.push(answer); 
+							return null; 
+						});
+						question.possibleAnswers = finalPossible;
+						
 						return question;
 					});
 					if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
@@ -249,7 +255,12 @@ export default class MultipleChoiceQuestions extends Component {
 						let possibleAnswers = question.multiple_choices ? question.multiple_choices.split("|||") : [];
 						possibleAnswers.push(question.answer);
 						possibleAnswers = shuffle(possibleAnswers);
-						question.possibleAnswers = possibleAnswers;
+						let finalPossible = [];
+							possibleAnswers.map(function(answer) {
+								if (answer && answer.trim().length > 0) finalPossible.push(answer); 
+								return null; 
+							});
+						question.possibleAnswers = finalPossible;
 						return question;
 					});
 					if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
@@ -697,7 +708,7 @@ export default class MultipleChoiceQuestions extends Component {
 						{answered && !that.props.carousel && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
 
 						{!that.props.viewOnly && !isQuestionPage && question.relatedQuestion&& question.relatedQuestion.interrogative && question.relatedQuestion.question && answered && <div>
-								<div style={{marginTop:'1em',marginBottom:'1em'}} ><b>Root Question</b> <a target="_new" href={moreInfoLink} >{moreInfoIcon} <span className="d-none d-sm-inline" >{question.relatedQuestion.interrogative} {question.relatedQuestion.question}</span></a></div> 
+								<div style={{marginTop:'1em',marginBottom:'1em'}} ><b>Root Question</b> <a target="_blank" href={moreInfoLink} >{moreInfoIcon} <span className="d-none d-sm-inline" >{question.relatedQuestion.interrogative} {question.relatedQuestion.question} ?</span></a></div> 
 							</div> }
 
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em',marginBottom:'1em'}} ><b>Memory Aid</b><pre> {question.relatedQuestion.mnemonic}</pre></div>}
