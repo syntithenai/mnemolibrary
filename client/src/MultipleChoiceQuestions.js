@@ -765,8 +765,6 @@ export default class MultipleChoiceQuestions extends Component {
 							</div> }
 
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em',marginBottom:'1em'}} ><b>Memory Aid</b>
-							<MnemonicsList isAdmin={that.props.isAdmin} disableSwipe={that.ignore} enableSwipe={that.ignore} saveSuggestion={that.ignore} mnemonic_techniques={that.props.mnemonic_techniques} user={that.props.user} question={question} showRecallButton={false}  setQuizFromTechnique={that.ignore} isLoggedIn={that.ignore} like={that.ignore} viewOnly={true} />
-                        
 							
 							<pre> {question.relatedQuestion.mnemonic}</pre></div>}
 
@@ -858,3 +856,6 @@ export default class MultipleChoiceQuestions extends Component {
 
 
 }
+	//<MnemonicsList isAdmin={that.props.isAdmin} disableSwipe={that.ignore} enableSwipe={that.ignore} saveSuggestion={that.ignore} mnemonic_techniques={that.props.mnemonic_techniques} user={that.props.user} question={question} showRecallButton={false}  setQuizFromTechnique={that.ignore} isLoggedIn={that.ignore} like={that.ignore} viewOnly={true} />
+                        
+						
