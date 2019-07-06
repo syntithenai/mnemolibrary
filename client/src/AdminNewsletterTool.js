@@ -166,7 +166,7 @@ export default class AdminNewsletterTool extends Component {
 				console.log(['newsletter send request complete ',json])
 			})
 		  
-		  },5000);
+		  },1000);
 		  this.setState({sending:true})		  
 	  }
 	  
