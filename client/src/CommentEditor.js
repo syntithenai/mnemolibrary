@@ -73,6 +73,8 @@ export default class CommentEditor extends Component {
 				  body: JSON.stringify(toSave)
 				}).then(function() {
 					console.log(['REPORTed PROBLEM',toSave])
+					that.props.analyticsEvent('report problem');
+        
 					//that.setState({'comment':''});                
 					//that.props.toggleVisible();
 					that.props.setComment(null);

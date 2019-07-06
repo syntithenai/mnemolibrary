@@ -137,6 +137,8 @@ export default class MultipleChoiceTopics extends Component {
     render() { 
 		let that = this;
 		let topics = null;
+		that.props.analyticsEvent('multiple choice topics');
+
 		let selectedCollectionId = this.props.match && this.props.match.params && this.props.match.params.topicCollection ? this.props.match.params.topicCollection : null;
 		let selectedCollection = selectedCollectionId ? this.findTopicCollection(selectedCollectionId) : null
 		let allowedTopics = selectedCollection  ? selectedCollection.topics : null;

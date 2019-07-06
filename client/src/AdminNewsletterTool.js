@@ -391,6 +391,7 @@ export default class AdminNewsletterTool extends Component {
 						<td>{newsletter.subscribers ? newsletter.subscribers.length : 0}</td>
 						<td>{newsletter.toSend ? newsletter.toSend.length : 0}</td>
 						<td>{newsletter.sentTo ? newsletter.sentTo.length : 0}</td>
+						<td>{newsletter.pingedBy ? newsletter.pingedBy.length : 0}</td>
 						
 						<td>{newsletter.status === "new" && <Link to={editLink} className='btn btn-info' >Edit</Link>}</td>
 						<td>{newsletter.status !== "active" && <button onClick={(e) => that.deleteNewsletter(newsletter)} className='btn btn-danger' >Delete</button>}</td>
@@ -403,7 +404,7 @@ export default class AdminNewsletterTool extends Component {
 				let startStopButtons = <span style={{float:'right'}}>{!this.state.sending && <button onClick={this.startSending} className="btn btn-success"   >Start</button>}{this.state.sending && <button onClick={this.stopSending} className="btn btn-danger"   >Stop</button>}{this.state.waiting && <img src='/loading.gif' style={{height: '3em'}}/>}
 								</span>
 				
-				return <div><h3>Recent Newsletters</h3><button onClick={this.newNewsletter} className="btn btn-success"   >New</button>{startStopButtons}<table><tbody>{this.state.newsletters.length > 0 && <tr key='headerrow' ><th>Created</th><th>Updated</th><th>Sent Date</th><th>Status</th><th>Subscribers</th><th>Pending</th><th>Sent</th><th></th></tr>}{rendered}</tbody></table></div>
+				return <div><h3>Recent Newsletters</h3><button onClick={this.newNewsletter} className="btn btn-success"   >New</button>{startStopButtons}<table><tbody>{this.state.newsletters.length > 0 && <tr key='headerrow' ><th>Created</th><th>Updated</th><th>Sent Date</th><th>Status</th><th>Subscribers</th><th>Pending</th><th>Sent</th><th>Sent</th><th></th></tr>}{rendered}</tbody></table></div>
 			}
 			
 			

@@ -76,6 +76,10 @@ export default class MultipleChoiceQuestions extends Component {
 		this.handleStateChange = this.handleStateChange.bind(this)
 		this.stopAllPlayers = this.stopAllPlayersExcept.bind(this)
 		this.stopAllPlayersExcept = this.stopAllPlayersExcept.bind(this)
+		this.finishQuiz = this.finishQuiz.bind(this)
+		this.goto = this.goto.bind(this)
+		this.skipQuestion = this.skipQuestion.bind(this)
+		
 		this.playerRefs = {}
 		let that = this;
 		this.setPlayerRef = (key,element) => {
@@ -189,6 +193,8 @@ export default class MultipleChoiceQuestions extends Component {
 	}
 	
 	loadMyTopics() {
+		this.props.analyticsEvent('multiple choice - my topics');
+			
 		let that = this;
 		console.log(['load my topics',this.props])
 		this.stopAllPlayers();
@@ -234,6 +240,7 @@ export default class MultipleChoiceQuestions extends Component {
     }
     
     loadMyQuestions() {
+		this.props.analyticsEvent('multiple choice - my questions');
 		let that = this;
 		this.stopAllPlayers();
 		return new Promise(function(resolve,reject) {
@@ -283,6 +290,7 @@ export default class MultipleChoiceQuestions extends Component {
 	}
     
     loadQuestions() {
+		let that = this;
 		console.log(['LOAD Q',this.props.mode])
 		this.stopAllPlayers();
 		if (this.props.mode && this.props.mode === "myquestions") {
@@ -290,10 +298,10 @@ export default class MultipleChoiceQuestions extends Component {
 		} else if (this.props.mode && this.props.mode === "mytopics") {
 			return this.loadMyTopics();
 		} else {
-			let that = this;
 			return new Promise(function(resolve,reject) {
 				let topic = that.props.match && that.props.match.params && that.props.match.params.topic && that.props.match.params.topic.length > 0 ? that.props.match.params.topic : that.props.topic;
 				if (topic && topic.length > 0 ) {
+					that.props.analyticsEvent('multiple choice - topic -'+topic);
 					let questionQuery='';
 					if (that.props.question) {
 						questionQuery='&questionId='+that.props.question;
@@ -325,7 +333,7 @@ export default class MultipleChoiceQuestions extends Component {
 							return question;
 						});
 						if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
-						that.setState({questions:filteredQuestions});
+						that.setState({questions:filteredQuestions,currentQuestion:0});
 						resolve();
 					}).catch(function(ex) {
 						console.log(['parsing failed', ex])
@@ -339,10 +347,12 @@ export default class MultipleChoiceQuestions extends Component {
     
     resetQuiz() {
 		let that = this;
+					
 		this.stopAllPlayers();
 		console.log('reset  ')
 		let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
 		if (topic && topic.length > 0 ) {
+		that.props.analyticsEvent('reset multiple choice answers - '+topic);
 			console.log('really reset  ')
 			var params={
 				'user':this.props.user ? this.props.user._id : null,
@@ -381,6 +391,34 @@ export default class MultipleChoiceQuestions extends Component {
 		  ]
 		})
 	
+	}
+	
+	goto(page) {
+      this.setState({goto:page});
+	};
+ 
+    
+    finishQuiz() {
+		this.stopAllPlayers();
+		confirmAlert({
+		  title: 'Quiz Complete',
+		  message: 'What next ?',
+		  buttons: [
+			{
+			  label: 'Try a different quiz',
+			  onClick: () => this.goto('/multiplechoicetopics')
+			},
+			{
+			  label: 'Load more questions',
+			  onClick: () => this.loadQuestions()
+			},
+			{
+			  label: 'Cancel',
+			  onClick: () => {}
+			}
+		  ]
+		})
+
 	}
     
     // scroll to next unanswered question
@@ -429,6 +467,9 @@ export default class MultipleChoiceQuestions extends Component {
 					}
 				}
 			}
+			if (!found) {
+				this.finishQuiz()
+			}
 		}
         
 	}
@@ -444,6 +485,15 @@ export default class MultipleChoiceQuestions extends Component {
     
     hideQuizOptionsDialog() {
 		this.setState({showQuizOptionsDialog:false})
+	}
+	
+	skipQuestion(id,answer) {
+		let that = this;
+		this.clickAnswer(id,' ');
+		setTimeout(function() {
+			that.nextQuestion();
+		
+		},500);
 	}
     
     clickAnswer(id,answer) {
@@ -607,7 +657,7 @@ export default class MultipleChoiceQuestions extends Component {
 		let questions = null;
 		let userAnsweredTally = 0;
 		let userCorrectTally = 0;
-		
+		if (this.state.goto) return <Redirect to={this.state.goto} /> 
 		let userId = this.props.user ? this.props.user._id : 'unknownuser';
 		let isQuestionPage = this.props.viewOnly ? true : false; 
 		//this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? false : true;
@@ -689,7 +739,7 @@ export default class MultipleChoiceQuestions extends Component {
 							
 						{!that.props.viewOnly && <div className='questionbuttons' style={{minWidth:'50%', minHeight: '2em'}} >
 							
-							
+							<button className='btn btn-danger' style={{float:'right'}} onClick={() => that.skipQuestion(question._id,' ')}>Skip</button>
 							{that.props.user && question.questionId && <button style={{float:'right'}} className='btn btn-success' onClick={(e) => that.sendAllQuestionsForReview([{_id:question.questionId}])} >{reviewIcon} <span className="d-none d-sm-inline" >Add to Review List</span></button>}
 							
 							{!that.props.user && question.questionId && <Link to="/login" style={{float:'right'}} className='btn btn-success'  >{reviewIcon} <span className="d-none d-sm-inline" >Add to Review List</span></Link>}
@@ -785,17 +835,14 @@ export default class MultipleChoiceQuestions extends Component {
 				
 				{(userAnsweredTally === quizLength) && <div style={{marginRight:'3em',float:'right'}}>
 					 
-					<Link to="/multiplechoicetopics" style={{marginRight:'1em',float:'right'}} className='btn btn-success' >{upIcon}</Link>
-					<div onClick={this.refreshQuestions}   className='btn btn-success' style={{marginRight:'1em',float:'right'}} ><CompleteIcon size={26} /> 
-					<span className="d-none d-sm-inline" > Quiz Complete - Load More Questions</span></div>&nbsp;
-					
+					<div onClick={this.finishQuiz}   className='btn btn-success' style={{marginRight:'1em',float:'right'}} ><CompleteIcon size={26} /><span className="d-none d-sm-inline" > Quiz Complete</span></div>
+
 					</div>}
 				
 			</div>}
 			
-			{questions && questions.length > 0 && <b style={{display:'block',width:'100%'}}>Quiz Questions</b>}
 			<div style={{border: '1px solid black',width:'100%',marginTop:'1.4em'}}>
-			{this.state.showShareDialog && <ShareDialog setShareDialog={this.setShareDialog} dialogTitle={'Share Quiz using'} />}
+			{this.state.showShareDialog && <ShareDialog analyticsEvent={this.props.analyticsEvent} setShareDialog={this.setShareDialog} dialogTitle={'Share Quiz using'} />}
 			{questions}
 			</div>
 		</div>

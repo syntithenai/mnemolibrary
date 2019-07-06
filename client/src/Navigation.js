@@ -65,6 +65,7 @@ export default class Navigation extends Component {
     };
   
     render() {
+
 		//console.log(['RENDER NAV',window.locationpathname])
 		let pathName = window.location.pathname ? window.location.pathname.replace('/',' ').trim() : '';
 		let parts = pathName.split('/').slice(0,3);

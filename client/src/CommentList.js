@@ -110,6 +110,8 @@ export default class CommentList extends Component {
     
     render() {
 		let that = this;
+		this.props.analyticsEvent('recent comments');
+			
 		if (this.props.comments && this.props.comments.length > 0) {
 			let publicComments = [];
 			let privateComments = [];

@@ -213,6 +213,8 @@ export default class LoginPage extends Component {
     };
     
     render() { //req,vars/
+		this.props.analyticsEvent('login');
+			
         if (this.state.justSignedUp) {
              return (
                 <div className="row">

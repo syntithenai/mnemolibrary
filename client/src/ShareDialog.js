@@ -10,6 +10,8 @@ import {InlineShareButtons} from 'sharethis-reactjs';
 export default class ShareDialog extends Component {
     
     render() {
+		this.props.analyticsEvent('share');
+
 	    return  (
             <div id="sharedialog" onClick={() => this.props.setShareDialog(false)} className="modaldialog" tabIndex="-1" role="dialog">
               

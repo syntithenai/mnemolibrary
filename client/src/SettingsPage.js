@@ -75,6 +75,8 @@ export default class SettingsPage extends Component {
   
   
 	render() {
+		this.props.analyticsEvent('user settings');
+
 		return (
 			<div className="col-12">
 			 <form method="POST" onSubmit={this.saveUser} className="form-group" autoComplete="false" >

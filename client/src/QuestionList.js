@@ -6,6 +6,7 @@ import NotesList from './NotesList'
 
 export default class QuestionList extends Component {
     render() {
+		
        // //console.log(['QL',this.props.questions]);
         if (Array.isArray(this.props.questions)) {
             let questions = this.props.questions.map((question, key) => {

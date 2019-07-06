@@ -78,6 +78,8 @@ export default class SiteMap extends Component {
 					  //</div>
 					//</div>
     render() {
+		this.props.analyticsEvent('site map');
+
 		let that = this;
 		let buttonStyle = {marginTop:'0.3em',marginBottom:'0.3em',paddingLeft:'1em',paddingRight:'1em'} //padding:'0.3em',fontSize:'1.2em',margin:'0.3em'
 		let blockStyle={marginBottom:'1em', backgroundColor:'#eee', padding:'0.1em', border: '1px solid black', borderRadius:'10px'}

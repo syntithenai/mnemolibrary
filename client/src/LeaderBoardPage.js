@@ -12,7 +12,8 @@ export default class LeaderBoardPage extends Component {
      };
     
     render() {
-
+		this.props.analyticsEvent('leaderboard');
+			
 		return (<div style={{marginLeft:'1em'}} >
 				<div  style={{height: '660px'}} >
 					<LeaderBoard type="streak" user={this.props.user} />

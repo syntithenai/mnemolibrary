@@ -846,16 +846,16 @@ export default class SingleQuestion extends Component {
                     </div>
                     
                     {(!showRecallButton || this.isVisible('comments')) && <div ref={(section) => { this.scrollTo.comments = section; }}  className="card-block" id="comments">
-						<CommentList isAdmin={this.props.isAdmin} user={this.props.user} question={this.props.question} comments={this.props.comments}   editComment={this.props.editComment}  deleteComment={this.props.deleteComment} toggleCommentDialog={this.props.toggleCommentDialog} newComment={this.props.newComment} saveComment={this.props.saveComment} setComment={this.props.setComment} newCommentReply={this.props.newCommentReply} isSingleView={true}/>
+						<CommentList  analyticsEvent={this.props.analyticsEvent}  isAdmin={this.props.isAdmin} user={this.props.user} question={this.props.question} comments={this.props.comments}   editComment={this.props.editComment}  deleteComment={this.props.deleteComment} toggleCommentDialog={this.props.toggleCommentDialog} newComment={this.props.newComment} saveComment={this.props.saveComment} setComment={this.props.setComment} newCommentReply={this.props.newCommentReply} isSingleView={true}/>
 					</div>}
 						
 					{<div style={((!showRecallButton || this.isVisible('questions'))  ? {display:'block'} : {display:'none'})} ref={(section) => { this.scrollTo.questions = section; }}  className="card-block">
-						<MultipleChoiceQuestions viewOnly={true} notifyQuestionsLoaded={this.notifyQuestionsLoaded}  question={this.props.question ? this.props.question._id : null} topic={this.props.question ? this.props.question.quiz : null} carousel={true} />
+						<MultipleChoiceQuestions viewOnly={true} notifyQuestionsLoaded={this.notifyQuestionsLoaded}  question={this.props.question ? this.props.question._id : null} topic={this.props.question ? this.props.question.quiz : null} carousel={true}  analyticsEvent={this.props.analyticsEvent} />
 					</div>
 					} 
                 </div>
                 
-				{this.state.showShareDialog && <ShareDialog setShareDialog={this.setShareDialog} url={shareLink} title={shareTitle} dialogTitle={'Share Question using'} />}
+				{this.state.showShareDialog && <ShareDialog   analyticsEvent={this.props.analyticsEvent} setShareDialog={this.setShareDialog} url={shareLink} title={shareTitle} dialogTitle={'Share Question using'} />}
 			
                  <div ref={(section) => { this.scrollTo.end = section; }} ></div>
                        
