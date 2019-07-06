@@ -1,4 +1,4 @@
-FROM node:carbon
+FROM node
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -7,12 +7,13 @@ WORKDIR /usr/src/app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
 COPY package*.json ./
-
+RUN npm install -g npm@latest
 RUN npm install
 # If you are building your code for production
 # RUN npm install --only=production
 
 RUN npm install --unsafe-perm -g ask-cli 
+
 
 # Bundle app source
 #COPY . .
