@@ -12,6 +12,7 @@ import ShareIcon from 'react-icons/lib/fa/share-alt';
 import CompleteIcon from 'react-icons/lib/fa/check';
 //import MoreInfoIcon from 'react-icons/lib/fa/external-link-alt';
 import ShareDialog from './ShareDialog';
+import MnemonicsList from './MnemonicsList';
 import "video-react/dist/video-react.css"; // import css
 import { Player } from 'video-react';
 
