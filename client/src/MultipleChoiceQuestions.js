@@ -651,6 +651,8 @@ export default class MultipleChoiceQuestions extends Component {
 		this.nextQuestion();
 		this.props.sendAllQuestionsForReview(questions) //[{_id:question.questionId}]
 	}
+	
+	ignore() {}
     
     render() { 
 		let that = this;
@@ -758,10 +760,14 @@ export default class MultipleChoiceQuestions extends Component {
 						{answered && !that.props.carousel && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
 
 						{!that.props.viewOnly && !isQuestionPage && question.relatedQuestion && question.relatedQuestion.question && answered && <div>
-								<div style={{marginTop:'1em',marginBottom:'1em'}} ><b>Root Question</b> <a target="_blank" href={moreInfoLink} >{moreInfoIcon} <span className="d-none d-sm-inline" >{question.relatedQuestion.interrogative} {question.relatedQuestion.question} ?</span></a></div> 
+								<div style={{marginTop:'1em',marginBottom:'1em'}} ><b>Root Question</b> <a target="_blank" href={moreInfoLink} >{moreInfoIcon} <span >{question.relatedQuestion.interrogative} {question.relatedQuestion.question} ?</span></a></div> 
 							</div> }
 
-						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em',marginBottom:'1em'}} ><b>Memory Aid</b><pre> {question.relatedQuestion.mnemonic}</pre></div>}
+						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em',marginBottom:'1em'}} ><b>Memory Aid</b>
+							<MnemonicsList isAdmin={this.props.isAdmin} disableSwipe={this.ignore} enableSwipe={this.ignore} saveSuggestion={this.ignore} mnemonic_techniques={this.props.mnemonic_techniques} user={this.props.user} question={question} showRecallButton={false}  setQuizFromTechnique={this.ignore} isLoggedIn={this.ignore} like={this.ignore} viewOnly={true} />
+                        
+							
+							<pre> {question.relatedQuestion.mnemonic}</pre></div>}
 
 						{answered && !that.props.viewOnly && image && <img src={image}  style={{maxHeight:'400px',marginTop:'1em',marginBottom:'1em'}} />}
 

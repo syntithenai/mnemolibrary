@@ -328,10 +328,10 @@ export default class MnemonicsList extends Component {
 
 
                     <div className='row' style={{width:'100%',clear:'both'}}>
-                        <div style={{float:'right'}} className='dcol-12 dcol-lg-4 lg-4' >&nbsp;{mainLikeButton}</div>
+                        {!this.props.viewOnly && <div style={{float:'right'}} className='dcol-12 dcol-lg-4 lg-4' >&nbsp;{mainLikeButton}</div>}
                         <pre  className='mnemonic dcol-12 dcol-lg-8' >
                           {this.state.mnemonics.hasOwnProperty(this.state.defaultMnemonic) && this.state.mnemonics[this.state.defaultMnemonic].mnemonic}</pre>
-                          {this.state.mnemonics.hasOwnProperty(this.state.defaultMnemonic) && this.props.user && this.state.mnemonics[this.state.defaultMnemonic].user !=="default" && (this.props.isAdmin() || this.props.user._id === selectedMnemonic.user) && selectedMnemonic && selectedMnemonic._id && selectedMnemonic._id.length > 0 && <span style={{marginLeft:'1em'}} >
+                          {!this.props.viewOnly &&  this.state.mnemonics.hasOwnProperty(this.state.defaultMnemonic) && this.props.user && this.state.mnemonics[this.state.defaultMnemonic].user !=="default" && (this.props.isAdmin() || this.props.user._id === selectedMnemonic.user) && selectedMnemonic && selectedMnemonic._id && selectedMnemonic._id.length > 0 && <span style={{marginLeft:'1em'}} >
 
                                 <button style={{float:'right'}}   onClick={() => this.askDeleteSuggestion(selectedMnemonic)} className='btn btn-danger'><Trash size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Delete&nbsp;</span></button>
                                 <button style={{float:'right'}} data-toggle="modal" data-target="#suggestdialog" onClick={() => this.editSuggestion(selectedMnemonic)} className='btn btn-primary'><Edit size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Edit&nbsp;</span></button>

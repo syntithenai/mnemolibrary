@@ -15,7 +15,6 @@
     "body-parser": "^1.18.2",
     "connect-timeout": "^1.9.0",
     "dns": "^0.2.2",
-    "eslint": "^6.0.1",
     "express": "^4.16.2",
     "faker": "^4.1.0",
     "install": "^0.10.4",
