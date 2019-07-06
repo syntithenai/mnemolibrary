@@ -8,11 +8,14 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY package*.json ./
 RUN npm install -g npm@latest
-RUN npm install
+RUN npm install --unsafe-perm -g ask-cli 
+RUN npm install -g react-scripts
+
+#RUN npm install
+#RUN cd client; npm i
 # If you are building your code for production
 # RUN npm install --only=production
 
-RUN npm install --unsafe-perm -g ask-cli 
 
 
 # Bundle app source
