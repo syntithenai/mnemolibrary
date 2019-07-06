@@ -1311,7 +1311,8 @@ export default class AppLayout extends Component {
                  <PropsRoute  exact={true} path="/access/discover/:topic"  mode='topic'  component={TopicPassword}  user={this.state.user} saveUser={this.saveUser} analyticsEvent={this.analyticsEvent} />
                  <PropsRoute  path="/access/discover/:topic/:topicquestion" mode='topic' component={TopicPassword} user={this.state.user} saveUser={this.saveUser} analyticsEvent={this.analyticsEvent} />
                 
-                 <PropsRoute  path="/newslettertool"  component={AdminNewsletterTool} isAdmin={this.isAdmin} user={this.state.user} analyticsEvent={this.analyticsEvent} />
+                 <PropsRoute  path="/newslettertool"  exact={true} component={AdminNewsletterTool} isAdmin={this.isAdmin} user={this.state.user} analyticsEvent={this.analyticsEvent} />
+                <PropsRoute  path="/newslettertool/:id" exact={true}   component={AdminNewsletterTool} isAdmin={this.isAdmin} user={this.state.user} analyticsEvent={this.analyticsEvent} />
                 
                 <PropsRoute  path="/settings"  component={SettingsPage} saveUser={this.saveUser} user={this.state.user} analyticsEvent={this.analyticsEvent} />
                 <PropsRoute  path="/leaderboard"  component={LeaderBoardPage}  user={this.state.user} analyticsEvent={this.analyticsEvent}  />

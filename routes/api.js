@@ -16,6 +16,7 @@ var initCommentsRoutes = require('./api_comments')
 var initMnemonicsRoutes = require('./api_mnemonics')
 var initUserTopicsRoutes = require('./api_usertopics')
 var initMultipleChoiceQuestionsRoutes = require('./api_multiplechoicequestions')
+var initNewsletterRoutes = require('./api_newsletter')
 
 function initdb() {
 	return new Promise(function(resolve,reject) {
@@ -44,6 +45,7 @@ initdb().then(function() {
 	initMnemonicsRoutes (router,db);
 	initUserTopicsRoutes(router,db);
 	initMultipleChoiceQuestionsRoutes(router,db);
+	initNewsletterRoutes(router,db);
 	
 	router.get('/blocktopic', (req, res) => {
 		if (req.query.user && req.query.user.length > 0 && req.query.topic && req.query.topic.length > 0) {
