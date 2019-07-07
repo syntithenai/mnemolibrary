@@ -35,10 +35,10 @@ export default class AdminNewsletterTool extends Component {
         let initialContent = '';
         initialContent += '<div  ><img style="float:right" src="https://mnemolibrary.com/mnemoicon-100.png"></div>'
         initialContent += '<div style="color:red" >Dear :::USER::: </div>'
-        initialContent += '<br/><br/><a href=":::LINK:::/review/:::CODE:::">Revise questions from your review list</a>'
-        initialContent += '<br/><a href=":::LINK:::/multiplechoicetopics/:::CODE:::">Try a multiple choice quiz</a>'
-        initialContent += '<br/><a href=":::LINK:::/recentcomments/:::CODE:::">Join the conversation</a>'
-         initialContent += '<br/><br/>If you don\'t want to receive these emails.  <a href=":::LINK:::/settings/:::CODE:::">Update your settings</a>'
+        initialContent += '<br/><br/><a href="https://:::LINK:::/review/:::CODE:::">Revise questions from your review list</a>'
+        initialContent += '<br/><a href="https://:::LINK:::/multiplechoicetopics/:::CODE:::">Try a multiple choice quiz</a>'
+        initialContent += '<br/><a href="https://:::LINK:::/recentcomments/:::CODE:::">Join the conversation</a>'
+         initialContent += '<br/><br/>If you don\'t want to receive these emails.  <a href="https://:::LINK:::/settings/:::CODE:::">Update your settings</a>'
        
         this.saveTimer = null;
         this.initialContent = '<div>'+initialContent+'</div>'
