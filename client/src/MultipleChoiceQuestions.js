@@ -128,7 +128,7 @@ export default class MultipleChoiceQuestions extends Component {
 				that.nextQuestion();
 				if (state.currentQuestion != that.state.currentQuestion) {
 					console.log(['scroll to topichange','question_'+that.state.currentQuestion,that.scrollTo['question_'+that.state.currentQuestion]])
-					let thisQuestion = scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
+					if (!that.props.viewOnly) scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
 					let thisQuestion = that.state.questions && that.state.questions.length > that.state.currentQuestion ? that.state.questions[that.state.currentQuestion] : {};
 					that.startPlayer(thisQuestion._id)
 				}
@@ -137,7 +137,7 @@ export default class MultipleChoiceQuestions extends Component {
 		}
 		if (state.currentQuestion != that.state.currentQuestion || this.props.questions != props.questions) {
 			console.log(['scroll to currentqchange','question_'+that.state.currentQuestion,that.scrollTo['question_'+that.state.currentQuestion]])
-			scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-140});
+			if (!that.props.viewOnly) scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-140});
 			let thisQuestion = that.state.questions && that.state.questions.length > that.state.currentQuestion ? that.state.questions[that.state.currentQuestion] : {};
 			if (thisQuestion && thisQuestion._id) that.startPlayer(thisQuestion._id)
 		}
