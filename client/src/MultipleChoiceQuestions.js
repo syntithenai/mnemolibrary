@@ -128,7 +128,7 @@ export default class MultipleChoiceQuestions extends Component {
 				that.nextQuestion();
 				if (state.currentQuestion != that.state.currentQuestion) {
 					console.log(['scroll to topichange','question_'+that.state.currentQuestion,that.scrollTo['question_'+that.state.currentQuestion]])
-					scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
+					let thisQuestion = scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
 					let thisQuestion = that.state.questions && that.state.questions.length > that.state.currentQuestion ? that.state.questions[that.state.currentQuestion] : {};
 					that.startPlayer(thisQuestion._id)
 				}
