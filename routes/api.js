@@ -676,7 +676,7 @@ initdb().then(function() {
 
 	router.get('/review', (req, res) => {
 		//console.log('review');
-		let limit=10;
+		let limit=5;
 		 let orderBy = (req.query.orderBy == 'successRate') ? 'successRate' : 'timeScore'
 		 let orderMeBy = {};
 		 orderMeBy[orderBy] = 1;          

@@ -21,10 +21,13 @@ function initRoutes(router,db) {
 			html = html.replace(':::CODE:::','?code='+token)
 		}
 		var fulllink = config.protocol + "://"  + config.host ;
-        while (html.indexOf(':::LINK:::') != -1) {
-			html = html.replace(':::LINK:::',fulllink)
+        while (html.indexOf('http://:::LINK:::') != -1) {
+			html = html.replace('http://:::LINK:::',fulllink)
 		}
-		return '<div>' + html + '</div>';
+		while (html.indexOf('https://:::LINK:::') != -1) {
+			html = html.replace('https://:::LINK:::',fulllink)
+		}
+		return '<div style="margin-left:1em">' + html + '</div>';
 
 	}
 	

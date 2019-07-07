@@ -96,8 +96,11 @@ export default class MultipleChoiceQuestions extends Component {
     componentDidMount() {
       let that=this;
         console.log(['MCQ dmount'])
-        this.loadQuestions();
-       	this.nextQuestion()
+        this.loadQuestions().then(function() {
+			console.log(['MCQ have loaded'])
+			that.nextQuestion()
+		})
+       //	this.nextQuestion()
 		//	scrollToComponent(this.scrollTo['top'],{align:'top',offset:0});
     	//scrollToComponent(this.scrollTo['top'],{align:'top',offset:-160});
 	
@@ -124,7 +127,7 @@ export default class MultipleChoiceQuestions extends Component {
 				console.log(['MCQ have TOPIC LOADED'])
 				that.nextQuestion();
 				if (state.currentQuestion != that.state.currentQuestion) {
-					console.log(['scroll to','question_'+that.state.currentQuestion,that.scrollTo['question_'+that.state.currentQuestion]])
+					console.log(['scroll to topichange','question_'+that.state.currentQuestion,that.scrollTo['question_'+that.state.currentQuestion]])
 					scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
 					let thisQuestion = that.state.questions && that.state.questions.length > that.state.currentQuestion ? that.state.questions[that.state.currentQuestion] : {};
 					that.startPlayer(thisQuestion._id)
@@ -133,10 +136,10 @@ export default class MultipleChoiceQuestions extends Component {
 			
 		}
 		if (state.currentQuestion != that.state.currentQuestion || this.props.questions != props.questions) {
-			console.log(['scroll to','question_'+that.state.currentQuestion,that.scrollTo['question_'+that.state.currentQuestion]])
+			console.log(['scroll to currentqchange','question_'+that.state.currentQuestion,that.scrollTo['question_'+that.state.currentQuestion]])
 			scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-140});
 			let thisQuestion = that.state.questions && that.state.questions.length > that.state.currentQuestion ? that.state.questions[that.state.currentQuestion] : {};
-			that.startPlayer(thisQuestion._id)
+			if (thisQuestion && thisQuestion._id) that.startPlayer(thisQuestion._id)
 		}
 	}
 	
@@ -286,7 +289,8 @@ export default class MultipleChoiceQuestions extends Component {
     refreshQuestions() {
 		let that = this;
 		this.loadQuestions().then(function() {
-			scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
+			that.nextQuestion()
+			//scrollToComponent(that.scrollTo['question_'+that.state.currentQuestion],{align:'top',offset:-180});
 		})		
 	}
     
@@ -334,7 +338,7 @@ export default class MultipleChoiceQuestions extends Component {
 							return question;
 						});
 						if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
-						that.setState({questions:filteredQuestions,currentQuestion:0});
+						that.setState({questions:filteredQuestions,currentQuestion:null});
 						resolve();
 					}).catch(function(ex) {
 						console.log(['parsing failed', ex])
@@ -400,6 +404,7 @@ export default class MultipleChoiceQuestions extends Component {
  
     
     finishQuiz() {
+		let that = this
 		this.stopAllPlayers();
 		confirmAlert({
 		  title: 'Quiz Complete',
@@ -411,7 +416,9 @@ export default class MultipleChoiceQuestions extends Component {
 			},
 			{
 			  label: 'Load more questions',
-			  onClick: () => this.loadQuestions()
+			  onClick: () => this.loadQuestions().then(function() {
+					that.nextQuestion()
+				})
 			},
 			{
 			  label: 'Cancel',
@@ -430,7 +437,13 @@ export default class MultipleChoiceQuestions extends Component {
 		if (this.state.questions && this.state.questions.length > 0) {
 			console.log(['NEXT QUESTION f',this.state.currentQuestion])
 			let userId = this.props.user ? this.props.user._id : 'unknownuser'
-			let currentQuestion = this.state.currentQuestion != null ? this.state.currentQuestion : -1;
+			let currentQuestion = this.state.currentQuestion ;
+			// newly loaded, scroll to top
+			if (currentQuestion === null) {
+				this.setState({currentQuestion:0})
+				this.startPlayer(this.state.questions[0]._id);
+				return;
+			} 
 			let counter = 0;
 			let found = false;
 			
@@ -725,8 +738,6 @@ export default class MultipleChoiceQuestions extends Component {
 						let mcByTopicLink = '/multiplechoicequestions/'+encodeURIComponent(question.topic);
 						let questionKeyId ='question_'+questionKey;
 						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}   key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black', marginBottom: '1em'}} > 
-						
-
 						
 						
 						<div style={{fontWeight:'bold',paddingTop: '1em'}}>{question.question}</div>

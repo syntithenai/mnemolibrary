@@ -16,7 +16,7 @@ RUN npm install -g react-scripts
 # If you are building your code for production
 # RUN npm install --only=production
 
-
+#RUN apt-get update; apt-get install nano
 
 # Bundle app source
 #COPY . .

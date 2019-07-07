@@ -342,7 +342,7 @@ export default class AdminNewsletterTool extends Component {
 					if (this.props.user) {
 						replaceString = this.state.currentNewsletter.content.replace(':::USER:::',(this.props.user && this.props.user.name ? this.props.user.name : this.props.user.avatar))
 					}
-					let preview = <div dangerouslySetInnerHTML={{__html:replaceString}} ></div>
+					let preview = <div style={{marginLeft:'1em'}} dangerouslySetInnerHTML={{__html:replaceString}} ></div>
 					
 					return (
 						<div>
@@ -361,7 +361,7 @@ export default class AdminNewsletterTool extends Component {
 						)
 				} else {
 					return (
-						<div>
+						<div style={{marginLeft:'1em'}} >
 							<div style={buttonBlockStyle}>
 								<button onClick={this.showPreview} className='btn btn-info' >Preview</button>
 							</div>

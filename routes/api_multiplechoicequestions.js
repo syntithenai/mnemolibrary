@@ -411,7 +411,7 @@ function initRoutes(router,db) {
 		}
 		
 		//console.log(['FIND mc questions',JSON.stringify({$and:filter})])
-		db().collection('multiplechoicequestions').find({$and:filter}).sort({difficulty:1,sort:1,createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
+		db().collection('multiplechoicequestions').find({$and:filter}).sort({difficulty:1,sort:1,createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 3).toArray(function(err,results) {
 			//console.log(['FOUND mc questions',err,results])
 			let promises=[];
 			if (results) {
