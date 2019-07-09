@@ -47,6 +47,47 @@ initdb().then(function() {
 	initMultipleChoiceQuestionsRoutes(router,db);
 	initNewsletterRoutes(router,db);
 	
+	router.post('/importquestion', (req, res) => {
+		
+		// min requirements
+		if (req.body.question && req.body.question.length > 0)
+		console.log('import question')
+		console.log(JSON.stringify(req.body));
+		let user = req.body.user;
+		function saveToReviewFeed(user,question) {
+			let ts = new Date().getTime()
+			db().collection('seen').insertOne({user:ObjectId(user),question:ObjectId(question._id),timestamp:ts}).then(function(inserted) {
+		       //console.log(['seen inserted']);
+				// collate tally of all seen, calculate success percentage to successScore
+				updateQuestionTallies(req.body.user,question._id);
+				res.send({message:'Sent question to review'});
+			}).catch(function(e) {
+				res.send({error:e});
+			});
+		}
+		
+		// try find the question by species id
+		db().collection('questions').findOne({question:{$eq:req.body.question}}).then(function (question) {
+			if (question) {
+				console.log('use existing question')
+				saveToReviewFeed(req.body.user,question);
+			} else {
+				console.log('use new question')
+				// otherwise create the question
+				let question = req.body;
+				question._id = new ObjectId()
+				question.importId = "userimport"
+				db().collection('questions').insertOne(question).then(function (question) {
+					saveToReviewFeed(req.body.user,question);
+				});
+			}
+		})
+		
+		
+		
+		
+	})
+	
 	router.get('/blocktopic', (req, res) => {
 		if (req.query.user && req.query.user.length > 0 && req.query.topic && req.query.topic.length > 0) {
 			let criteria=[];
@@ -1107,7 +1148,7 @@ initdb().then(function() {
 
 	// update question stats into the questions collection
 	function updateQuestionTallies(user,question,tallySuccess=false) {
-		//console.log(['update question tallies']);
+		console.log(['update question tallies']);
 		db().collection('questions').findOne({_id:ObjectId(question)}).then(function(result) {
 				if (result && result._id) {
 					let data={};
@@ -1133,7 +1174,7 @@ initdb().then(function() {
 
 	// update per user progress stats into the userquestionprogress collection
 	function updateUserQuestionProgress(user,question,quiz,tags,ok_for_alexa,tallySuccess) {
-		//console.log(['update progress',user,question,quiz,tags,ok_for_alexa,tallySuccess]);
+		console.log(['update progress',user,question,quiz,tags,ok_for_alexa,tallySuccess]);
 		db().collection('userquestionprogress').findOne({$and:[{'user': {$eq:ObjectId(user)}},{question:ObjectId(question)} , {block:{ $not: { $gt: 0 } }}]}).then(function(progress) {
 			if (!progress) progress = {user:ObjectId(user),question:ObjectId(question)};
 			progress.topic=quiz;
@@ -1157,7 +1198,7 @@ initdb().then(function() {
 	}
 
 	function updateUserStats(userId,question,tallySuccess) {
-		//console.log(['update stats',userId,question,tallySuccess]);
+		console.log(['update stats',userId,question,tallySuccess]);
 		let criteria = {_id: new ObjectId(userId)};
 		//console.log(['update stats have criteria ',criteria]);
 		 db().collection('users').findOne(criteria).then(function(user) {

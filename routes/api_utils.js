@@ -879,7 +879,7 @@ function initRoutes(router,db) {
 		  //});
 	})
 
-	
+
 };
 
 

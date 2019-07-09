@@ -97,6 +97,8 @@ export default class Navigation extends Component {
 			pageTitle = 'Site Map'
 		} else if (parts[0] === 'newslettertool') {
 			pageTitle = 'Newsletter Tool'
+		} else if (parts[0] === 'ala') {
+			pageTitle = 'Atlas of Living Australia'
 		}
         
         
