@@ -77,7 +77,7 @@ initdb().then(function() {
 				let question = req.body;
 				question._id = new ObjectId()
 				question.importId = "userimport"
-				db().collection('questions').insertOne(question).then(function (question) {
+				db().collection('questions').insertOne(question).then(function (result) {
 					saveToReviewFeed(req.body.user,question);
 				});
 			}
@@ -1148,7 +1148,7 @@ initdb().then(function() {
 
 	// update question stats into the questions collection
 	function updateQuestionTallies(user,question,tallySuccess=false) {
-		console.log(['update question tallies']);
+		console.log(['update question tallies',user,question]);
 		db().collection('questions').findOne({_id:ObjectId(question)}).then(function(result) {
 				if (result && result._id) {
 					let data={};
