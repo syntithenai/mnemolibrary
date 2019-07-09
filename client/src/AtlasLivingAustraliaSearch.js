@@ -366,7 +366,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		let rowClass='';
 		let rowStyle = {}
 		if (isRow) {
-			rowClass='col-6'
+			rowClass='col-12 col-lg-6'
 		} else {
 			rowStyle={width:'100%'}
 		}
