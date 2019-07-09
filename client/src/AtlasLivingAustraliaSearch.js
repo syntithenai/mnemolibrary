@@ -43,9 +43,9 @@ export default class AtlasLivingAustraliaSearch extends Component {
 			'All':{subtitle:'',searchLabel:"Search Australian Life",filter:null},
 			'Iconic Species':{subtitle:'',searchLabel:"Search Australian Iconic Species",filter:["favourite:iconic"]},
 			'Animals':{subtitle:'Animalia',searchLabel:"Search Australian Animals",filter:["rk_kingdom:ANIMALIA"]},
-			'Birds':{subtitle:'',searchLabel:"Search Australian Reptiles",filter:["rk_class:AVES"]},
+			'Birds':{subtitle:'',searchLabel:"Search Australian Birds",filter:["rk_class:AVES"]},
 			'Reptiles':{subtitle:'',searchLabel:"Search Australian Reptiles",filter:["rk_class:REPTILIA"]},
-			'Insects':{subtitle:'',searchLabel:"Search Australian Reptiles",filter:["rk_class:INSECTA"]},
+			'Insects':{subtitle:'',searchLabel:"Search Australian Insects",filter:["rk_class:INSECTA"]},
 			'Plants':{subtitle:'Plantae',searchLabel:"Search Australian Plants",filter:["rk_kingdom:Plantae"]},
 			'Fungi':{subtitle:'',searchLabel:"Search Australian Fungi",filter:["rk_kingdom:Fungi"]},
 		}
