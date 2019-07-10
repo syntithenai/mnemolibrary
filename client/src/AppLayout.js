@@ -436,7 +436,7 @@ export default class AppLayout extends Component {
   
 	saveComment(type,isReply) {
 			let that = this;
-			this.props.analyticsEvent('comment - save');
+			this.analyticsEvent('comment - save');
         
 			let toSave = this.state.comment;
 			if (type && type.type) toSave.type = type.type;
@@ -526,7 +526,7 @@ export default class AppLayout extends Component {
   
 	saveCommentReply(text) {
 		if (text && text.length > 0 && this.state.comment) {
-			this.props.analyticsEvent('comment - reply');
+			this.analyticsEvent('comment - reply');
 			let comment = this.state.comment;
 			// send email
 			if (this.state.commentReplyIndex != null && this.state.comment && this.state.comment.replies && this.state.comment.replies.length > this.state.commentReplyIndex) {
@@ -1241,6 +1241,7 @@ export default class AppLayout extends Component {
 				<PropsRoute exact={true} user={this.state.user} path='/ala/:searchFor'  component={AtlasLivingAustraliaSearch}  />
 				<PropsRoute exact={true} user={this.state.user}  path='/ala/:searchFor/mode/:searchMode'  component={AtlasLivingAustraliaSearch}  />
 				<PropsRoute exact={true} user={this.state.user}  path='/ala/mode/:searchMode'  component={AtlasLivingAustraliaSearch}  />
+				<PropsRoute exact={true} user={this.state.user}  path='/ala/single/:speciesGUID'  component={AtlasLivingAustraliaSearch}  />
 
 				
 			
