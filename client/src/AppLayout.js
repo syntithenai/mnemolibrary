@@ -37,7 +37,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import AdminNewsletterTool from './AdminNewsletterTool'
 import AtlasLivingAustraliaSearch from './AtlasLivingAustraliaSearch'
-import AtlasLivingAustraliaSingle from './AtlasLivingAustraliaSingle'
+//import AtlasLivingAustraliaSingle from './AtlasLivingAustraliaSingle'
 
 import CommentReplyEditor from './CommentReplyEditor'
 import TopicPassword from './TopicPassword';
