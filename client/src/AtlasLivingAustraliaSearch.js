@@ -431,23 +431,26 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		let quiz = 'Australian Biota'
 		let interrogative = 'Do you recall the Australian species '
 		
+		let tags = ['australia','biota','scientific names']
 		// split into a few specific topics
 		if (result.kingdom && result.kingdom.toLowerCase() === 'plantae') {
 			quiz = 'Australian Plants'
+			tags.push('plants');
 			interrogative = 'Do you recall the Australian plant '
 		} else if (result.kingdom && result.kingdom.toLowerCase() === 'animalia') {
 			quiz = 'Australian Animals'
+			tags.push('animals');
 			interrogative = 'Do you recall the Australian animal '
 			
 		} else if (result.kingdom && result.kingdom.toLowerCase() === 'fungi') {
 			quiz = 'Australian Fungi'
+			tags.push('fungi');
 			interrogative = 'Do you recall the Australian fungi '
 			 
 		}
 
 		
 		
-		let tags = ['australia','biota','scientific names']
 		let link = this.getLink(result)
 		fetch('/api/importquestion', {
 			  method: 'POST',

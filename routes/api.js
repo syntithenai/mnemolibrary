@@ -70,7 +70,7 @@ initdb().then(function() {
 		db().collection('questions').findOne({question:{$eq:req.body.question}}).then(function (question) {
 			if (question) {
 				console.log('use existing question')
-				db().collection('questions').updateOne({question._id},{$set:Object.assign(question,req.body)}).then(function() {
+				db().collection('questions').updateOne({_id:question._id},{$set:Object.assign(question,req.body)}).then(function() {
 					saveToReviewFeed(req.body.user,question);
 				});
 			} else {
