@@ -556,7 +556,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 	 * Set this item as expanded
 	 */
 	expandItem(key) {
-		scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-130});
+		//scrollToComponent(this.scrollTo['topofpage'],{align:'top',offset:-130});
 
 		let expanded= {};
 		expanded[key] = true
@@ -720,15 +720,15 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		let that = this;
 		let expandedKeys = Object.keys(this.state.expanded);
 		let rendered = null;
-		if (expandedKeys.length > 0) {
-			let resultKey = expandedKeys[0];
-			let result = this.state.results[resultKey]
-			rendered = that.renderResult(result,resultKey)
-		} else {
+		//if (expandedKeys.length > 0) {
+			//let resultKey = expandedKeys[0];
+			//let result = this.state.results[resultKey]
+			//rendered = that.renderResult(result,resultKey)
+		//} else {
 			rendered = this.state.results && this.state.results.length > 0 ? this.state.results.map(function(result,resultKey) {
 				return that.renderResult(result,resultKey,true)
 			}) : null;
-		}
+		//}
 		//	{JSON.stringify(result)}
 		//{isExpanded &&  result.imageUrl && <img  style={{width:'100%', clear:'both'}} src={result.imageUrl} />}   
 		let selectedMode = that.searchModes.hasOwnProperty(this.getSearchMode()) ? this.getSearchMode() : 'All' 
