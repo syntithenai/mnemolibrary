@@ -570,9 +570,9 @@ export default class AtlasLivingAustraliaSearch extends Component {
 				{!isExpanded &&  result.imageUrl && <img crossOrigin="anonymous" ref={(section) => { this.images[resultKey] = section; }}  onClick={(e) => this.getBase64Image(resultKey)} style={{maxHeight:'300px' }}  src={result.smallImageUrl} />}   
 				{isExpanded &&  result.imageUrl && <img  crossOrigin="anonymous" ref={(section) => { this.images[resultKey] = section; }}    onClick={(e) => this.getBase64Image(resultKey)} src={result.smallImageUrl} />}   
 			<br/><br/>
-				<h3>Distribution Map</h3>
+				{ isExpanded && <div><h3>Distribution Map</h3>
 				<AlaDistributionMap species={scientificName} setMapRef={this.setMapRef} />
-			
+				</div>}
 				<hr/>
 			</div>
 		} else {
