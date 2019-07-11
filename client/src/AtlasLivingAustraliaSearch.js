@@ -426,23 +426,46 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		if (question && this.getScientificName(question).length > 0) {
              var url="https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles="+this.getScientificName(question)
 	 
-				console.log(['expand',url])
+			console.log(['expand wiki data',url])
 		
-		            fetch(url).then(function(response) {
+		     fetch(url).then(function(response) {
                 return response.json();
             }).then(function(json) {
 				let questions = that.state.results;
 				
 				let pages = json.query && json.query.pages ? json.query.pages : null;
-				let questionsLoaded = pages ? Object.values(pages) : null;
+				let questionsLoaded = pages && Object.values(pages).length > 0 ? Object.values(pages) : null;
 				console.log(['expand results',questionsLoaded,json])
-				if (questionsLoaded) {
+				if (questionsLoaded && questionsLoaded[0] && questionsLoaded[0].pageid > 0) {
 					let questionLoaded = questionsLoaded[0];
 					questions[questionKey].description = questionLoaded.extract;
 					questions[questionKey].wikipediaPageId = questionLoaded.pageid;
 					let expanded = {};
 					expanded[questionKey] = true;
 					that.setState({results:questions,expanded:expanded});
+				// try again with common name
+				} else if (that.getName(question).length > 0)  {
+					var url="https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles="+that.getName(question)
+	 
+					console.log(['expand wikidata by common name',url])
+		
+		            fetch(url).then(function(response) {
+						return response.json();
+					}).then(function(json) {
+						let questions = that.state.results;
+						
+						let pages = json.query && json.query.pages ? json.query.pages : null;
+						let questionsLoaded = pages && Object.values(pages).length > 0 ? Object.values(pages)  : null;
+						console.log(['expand results',questionsLoaded,json])
+						if (questionsLoaded && questionsLoaded[0] && questionsLoaded[0].pageid > 0) {
+							let questionLoaded = questionsLoaded[0];
+							questions[questionKey].description = questionLoaded.extract;
+							questions[questionKey].wikipediaPageId = questionLoaded.pageid;
+							let expanded = {};
+							expanded[questionKey] = true;
+							that.setState({results:questions,expanded:expanded});
+						}
+					})
 				}
             })
             .catch(function(err) {
