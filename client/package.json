@@ -23,6 +23,7 @@
     "react": "^16.8.6",
     "react-adsense": "0.0.5",
     "react-app-polyfill": "^1.0.1",
+    "react-autocomplete": "^1.8.1",
     "react-bootstrap-toggle": "^2.3.1",
     "react-cropper": "^1.0.1",
     "react-d3-basic": "^1.6.11",

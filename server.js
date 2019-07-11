@@ -9,8 +9,10 @@ const fs = require('fs')
 //app.use(timeout(120000));
 
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({limit: '50mb', extended: true}))
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
 
 app.use('/api',require('./routes/api'));
 app.use('/login',require('./routes/signup'));

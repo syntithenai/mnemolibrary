@@ -37,6 +37,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import AdminNewsletterTool from './AdminNewsletterTool'
 import AtlasLivingAustraliaSearch from './AtlasLivingAustraliaSearch'
+import AtlasLivingAustraliaSingle from './AtlasLivingAustraliaSingle'
 
 import CommentReplyEditor from './CommentReplyEditor'
 import TopicPassword from './TopicPassword';
@@ -70,7 +71,7 @@ export default class AppLayout extends Component {
           'tags':{},
         //  'review':[]
         }};
-        let users = null;
+      let users = null;
       this.GoogleAuth = null; // Google Auth object.
       this.mqttClient = null;
       this.mqttClientId = null;
@@ -1237,12 +1238,16 @@ export default class AppLayout extends Component {
         return (
         <Router>
             <div style={{width:'100%'}} className="mnemo">
-				<PropsRoute exact={true} user={this.state.user} path='/ala'  component={AtlasLivingAustraliaSearch}  />
-				<PropsRoute exact={true} user={this.state.user} path='/ala/:searchFor'  component={AtlasLivingAustraliaSearch}  />
-				<PropsRoute exact={true} user={this.state.user}  path='/ala/:searchFor/mode/:searchMode'  component={AtlasLivingAustraliaSearch}  />
-				<PropsRoute exact={true} user={this.state.user}  path='/ala/mode/:searchMode'  component={AtlasLivingAustraliaSearch}  />
-				<PropsRoute exact={true} user={this.state.user}  path='/ala/single/:speciesGUID'  component={AtlasLivingAustraliaSearch}  />
-
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/ala'  component={AtlasLivingAustraliaSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/ala/:searchFor'  component={AtlasLivingAustraliaSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user}  path='/ala/:searchFor/mode/:searchMode'  component={AtlasLivingAustraliaSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user}   path='/ala/mode/:searchMode'  component={AtlasLivingAustraliaSearch}  />
+				
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/ala/search/:searchFor'  component={AtlasLivingAustraliaSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/ala/search/:searchFor/mode/:searchMode'  component={AtlasLivingAustraliaSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/ala/search/:searchFor/:index'  component={AtlasLivingAustraliaSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/ala/search/:searchFor/mode/:searchMode/:index'  component={AtlasLivingAustraliaSearch}  />
+				
 				
 			
 			    <PropsRoute exact={true} path='/recentcomments/:comment'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user} analyticsEvent={this.analyticsEvent} />

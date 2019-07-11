@@ -23,6 +23,9 @@ kanji {
   letter-spacing: 0.3em;
   
 }
+.alasearch input {
+  width: 300px;
+}
 .answerletter {
   font-weight: bold;
   font-size: 1.2em;

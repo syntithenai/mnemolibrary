@@ -325,7 +325,7 @@ export default class MultipleChoiceQuestions extends Component {
 							//let a = {}
 							that.questionsIndex[question._id] = key;
 							let possibleAnswers = question.multiple_choices ? question.multiple_choices.split("|||") : [];
-							possibleAnswers.push(question.answer);
+							if (question.answer && question.answer.trim().length > 0) possibleAnswers.push(question.answer.trim());
 							// uniquify
 							possibleAnswers = [...new Set(possibleAnswers)];
 							possibleAnswers = shuffle(possibleAnswers);

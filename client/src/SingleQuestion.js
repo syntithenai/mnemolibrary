@@ -61,7 +61,7 @@ export default class SingleQuestion extends Component {
           this.player = element;
           if (this.player) this.player.subscribeToStateChange(this.handleStateChange.bind(this));
         };
-        this.state = {mcQuestionsLoaded:0,comments:[],showCommentDialog: false,swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:'',showShareDialog:false}
+        this.state = {mcQuestionsLoaded:0,comments:[],showCommentDialog: false,swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:'',showShareDialog:false,imagesLoaded:{}}
         this.setVisible = this.setVisible.bind(this);
         this.toggleMedia = this.toggleMedia.bind(this);
         this.isVisible = this.isVisible.bind(this);
@@ -84,6 +84,8 @@ export default class SingleQuestion extends Component {
         //this.newComment = this.newComment.bind(this);
 		this.notifyQuestionsLoaded = this.notifyQuestionsLoaded.bind(this);
         this.setShareDialog = this.setShareDialog.bind(this);
+        this.imageLoaded = this.imageLoaded.bind(this);
+        this.imageLoadError = this.imageLoadError.bind(this);
         
         
         this.scrollTo={};
@@ -145,6 +147,18 @@ export default class SingleQuestion extends Component {
         //this.toggleMedia();
     };
     
+	imageLoaded(id) {
+		let imagesLoaded = this.state.imagesLoaded
+		imagesLoaded[id] = 'LOADED'
+		this.setState({imagesLoaded:imagesLoaded})
+	}
+	
+	imageLoadError(id) {
+		let imagesLoaded = this.state.imagesLoaded
+		imagesLoaded[id] = 'ERROR'
+		this.setState({imagesLoaded:imagesLoaded})		
+	}
+	
 	
 	//toggleCommentDialog() {
 		//console.log(['TOGGLE COMMENT',this.state.showCommentDialog])
@@ -619,6 +633,19 @@ export default class SingleQuestion extends Component {
             }
             let imageAttribution=question.imageattribution;
             let imageLink= this.state.image; //question.image_png ? question.image_png : question.image;
+            let imageHeight = '5px'
+            if (this.state.imagesLoaded.hasOwnProperty(question._id)) {
+				if (this.state.imagesLoaded[question._id] === "LOADED") { 
+					imageHeight = '150px'	
+				} else if (this.state.imagesLoaded[question._id] === "ERROR") { 
+					imageHeight = '150px'
+				//	imageLink='/error.gif'
+				} else {
+					
+				}
+			} else {
+				
+			}
             //imageLink="/s3/uploads/imagefiles/image_5b6ac06107ddb0007afc848b.png"
             //imageLink =  imageLink ? imageLink +"?rand="+Math.random() : '';
             if (imageAttribution && imageAttribution.indexOf('http')===0) {
@@ -777,8 +804,10 @@ export default class SingleQuestion extends Component {
                           
                         <div className="card-block answer">
                         {((this.isVisible('image') || question.autoshow_image==="YES" || !showRecallButton) && imageLink  ) && 
-                            <img   alt={question.question} onClick={() => this.setVisible('image')} style={{ float:'left', maxHeight:'150px', maxWidth:'150px',border: "0px",clear:'both', paddingRight: '1em'}} src={imageLink} />
-                            }
+                            <span><img  onError={(e) => this.imageLoadError(question._id)} onLoad={(e) => this.imageLoaded(question._id)} alt={question.question} onClick={() => this.setVisible('image')} style={{ float:'left', maxHeight:imageHeight, maxWidth:'150px',border: "0px",clear:'both', paddingRight: '1em'}} src={imageLink} />
+                            
+                            { !this.state.imagesLoaded.hasOwnProperty(question._id) && <img style={{height:'2em'}} src='/loading.gif' />}
+                            </span>}
                         
                         {(this.isVisible('answer') || !showRecallButton)  && shortanswer.length > 0  && 
                             <div  className='card-text'><b>Answer</b><br/> 
@@ -839,7 +868,7 @@ export default class SingleQuestion extends Component {
                     
                     <div className="card-block">
                         <div ref={(section) => { this.scrollTo.image = section; }} ></div>
-                        {((this.isVisible('image') || !showRecallButton || question.autoshow_image==="YES") && imageLink) && <span><a href={imageLink} target='_new'><img  className="d-lg-none"   alt={question.question} src={imageLink} style={{width:"98%",  border: "0px"}}/><img  className="d-none d-lg-block"   alt={question.question} src={imageLink} style={{width:"50%",  border: "0px"}}/></a></span> }
+                        {((this.isVisible('image') || !showRecallButton || question.autoshow_image==="YES") && imageLink) && <span><a href={imageLink} target='_new'><img   onError={(e) => this.imageLoadError(question._id)} onLoad={(e) => this.imageLoaded(question._id)} className="d-lg-none"   alt={question.question} src={imageLink} style={{width:"98%",  border: "0px"}}/><img   onError={(e) => this.imageLoadError(question._id)} onLoad={(e) => this.imageLoaded(question._id)} className="d-none d-lg-block"   alt={question.question} src={imageLink} style={{width:"50%",  border: "0px"}}/></a></span> }
                         {(this.isVisible('image') || !showRecallButton) && question.imageattribution && <div><div className="card-block imageattribution">
                             
                         </div><div   style={{fontSize:'0.85em'}}><b>Image Attribution/Source</b> <span>{imageAttribution}</span></div></div>}
