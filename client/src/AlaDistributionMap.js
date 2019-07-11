@@ -1,16 +1,11 @@
 /* global google */ 
-
-/* eslint-disable */ 
 import React, { Component } from 'react';
-//import HelpNavigation from './HelpNavigation';
-
 
 export default class AlaDistributionMap extends Component {
     
     constructor(props) {
 		super(props)
 		this.mapRef = null;
-		
 	}
     
     componentDidMount() {
@@ -99,7 +94,7 @@ export default class AlaDistributionMap extends Component {
 	}
     
     render() {
-		  return <div ref={(ref) => this.mapRef = ref} id="map_canvas" style={{width:'100%',height:'100%'}} ></div>
+		  return <div ref={(ref) => this.mapRef = ref} id="map_canvas" style={{width:'100%',height:'400px'}} ></div>
 
     }
 }
