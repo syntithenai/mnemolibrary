@@ -5,7 +5,6 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 //import RichTextEditor from 'react-rte';
 import {debounce} from 'throttle-debounce';
-
 import ReactQuill from 'react-quill'; // ES6
 import 'react-quill/dist/quill.snow.css'; // ES6
 
