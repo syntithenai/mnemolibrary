@@ -1,5 +1,6 @@
 /* global google */ 
 import React, { Component } from 'react';
+//import html2canvas from 'html2canvas';
 
 export default class AlaDistributionMap extends Component {
     
@@ -86,10 +87,15 @@ export default class AlaDistributionMap extends Component {
 			map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 			//add WMS layer
 			map.overlayMapTypes.push(SLPLayer);
+			//google.maps.event.addDomListener(that.mapRef, 'click', function() {
+			  //window.alert('Map was clicked!');
+			//});
+			
 		   
 		}
 		if (this.props.species && this.props.species.length > 0) {
 			initialize()
+			that.props.setMapRef(this.mapRef)
 		}
 	}
     

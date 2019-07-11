@@ -18,7 +18,7 @@ Each entry in the list can be expanded. When the item is expanded,
  * 
  * Copyright: Steve Ryan <stever@syntithenai.com>  MIT Licence
  */
-
+//import html2canvas from 'html2canvas';
 import React, { Component } from 'react';
 import HelpNavigation from './HelpNavigation';
 import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-dom'
@@ -42,7 +42,8 @@ export default class AtlasLivingAustraliaSearch extends Component {
 			moreIndex:0,
 			hasMore: true,
 			results:[],
-			suggestions: []
+			suggestions: [],
+			mapRef: null
 		}
 		this.scrollTo={}
 		this.sugestTimeout = null;;
@@ -59,12 +60,13 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		this.getSearchFor = this.getSearchFor.bind(this)
 		this.getLink = this.getLink.bind(this)
 		this.getBase64Image = this.getBase64Image.bind(this)
-		
+		this.setMapRef= this.setMapRef.bind(this)
 		this.setAlaSearch = this.setAlaSearch.bind(this)
 		this.loadMore = this.loadMore.bind(this)
 		this.alaFirstSearch = this.alaFirstSearch.bind(this)
 		this.loadSuggestions = this.loadSuggestions.bind(this)
 		this.submitForm = this.submitForm.bind(this)
+		this.addToReview = this.addToReview.bind(this)
 		
 		this.images = {}
 		this.searchTimout = null
@@ -108,6 +110,12 @@ export default class AtlasLivingAustraliaSearch extends Component {
 			this.alaFirstSearch()
 		} 
 		
+	}
+	
+	setMapRef(ref) {
+		console.log(['set map ref',ref])
+		this.setState({mapRef:ref});
+			
 	}
 	
 	/**
@@ -365,17 +373,26 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		}
 
 		
+		console.log(['CANVAS RENDER',that.props.mapRef]);
+		//if (that.state.mapRef ) {
+			//html2canvas(that.state.mapRef, {
+				//useCORS: true,
+			//}).then(function(canvas) {
+				let mapImage = null //(canvas ? canvas.toDataURL('image/png'):null);
+				let link = that.getLink(result)
+				
+				fetch('/api/importquestion', {
+					  method: 'POST',
+					  headers: {
+						'Content-Type': 'application/json'
+					  },
+					  body: JSON.stringify(Object.assign({user:user,tags:tags,quiz:quiz,access:'public',interrogative:interrogative,question:that.getScientificName(result),difficulty:3,autoshow_image:"YES",image:that.getBase64Image(resultKey),image2:mapImage,answer:result.description,facts:result,link:link},{}))
+					}).then(function() {
+						that.showMessage('Saved for review')
+					});
+			//})
+		//}
 		
-		let link = this.getLink(result)
-		fetch('/api/importquestion', {
-			  method: 'POST',
-			  headers: {
-				'Content-Type': 'application/json'
-			  },
-			  body: JSON.stringify(Object.assign({user:user,tags:tags,quiz:quiz,access:'public',interrogative:interrogative,question:that.getScientificName(result),difficulty:3,autoshow_image:"YES",image:this.getBase64Image(resultKey),answer:result.description,facts:result,link:link},{}))
-			}).then(function() {
-				that.showMessage('Saved for review')
-			});
 	}
 	
 	/**
@@ -554,7 +571,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 				{isExpanded &&  result.imageUrl && <img  crossOrigin="anonymous" ref={(section) => { this.images[resultKey] = section; }}    onClick={(e) => this.getBase64Image(resultKey)} src={result.smallImageUrl} />}   
 			<br/><br/>
 				<h3>Distribution Map</h3>
-				<AlaDistributionMap species={scientificName} />
+				<AlaDistributionMap species={scientificName} setMapRef={this.setMapRef} />
 			
 				<hr/>
 			</div>
