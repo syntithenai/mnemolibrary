@@ -573,7 +573,7 @@ function initRoutes(router,db) {
 										//console.log(['done find det ins/upd',existingQuestion])
 										if (existingQuestion) {
 											db().collection('multiplechoicequestions').updateOne({_id:existingQuestion._id},{$set:question}).then(function() {
-												//console.log(['UPDATED MC',Object.extend(existingQuestion,question)])
+												//console.log(['UPDATED MC',Object.assign(existingQuestion,question)])
 												resolve(Object.assign(existingQuestion,question));
 											});
 											
@@ -788,7 +788,7 @@ function initRoutes(router,db) {
 										//console.log(['done find det ins/upd',existingQuestion])
 										if (existingQuestion) {
 											db().collection('multiplechoicequestions').updateOne({_id:existingQuestion._id},{$set:question}).then(function() {
-												console.log(['UPDATED MC',Object.extend(existingQuestion,question)])
+												console.log(['UPDATED MC',Object.assign(existingQuestion,question)])
 												resolve(Object.assign(existingQuestion,question));
 											});
 											

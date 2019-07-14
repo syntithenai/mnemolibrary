@@ -718,6 +718,7 @@ initdb().then(function() {
 	})
 
 	router.get('/review', (req, res) => {
+		let startTime = new Date().getTime();
 		//console.log('review');
 		let limit=5;
 		 let orderBy = (req.query.orderBy == 'successRate') ? 'successRate' : 'timeScore'
@@ -880,6 +881,8 @@ initdb().then(function() {
 						});
 			   //       //console.log(['q',err,orderedResults]);
 						//res.send({'currentQuestion':'0','currentQuiz':questionIds,'questions':results,indexedQuestions:indexedQuestions});
+						let endTime = new Date().getTime();
+						console.log(['REVIEW SEARCH IN ',endTime - startTime])
 						res.send({'questions':orderedResults});
 						//res.send({'questions':results});
 					}) 
