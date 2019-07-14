@@ -38,12 +38,14 @@ let mnemoQueries = {
     //console.log('getQuestionsForReview');
       let that = this;
       if (this.state.user) {
+		that.setState({'waiting':true});
         fetch('/api/review?user='+this.state.user._id).then(function(response) {
             return response.json()
           }).then(function(json) {
               let result = createIdIndex(json['questions']);
-              that.setState({currentQuiz:result.currentQuiz,'currentQuestion':0, 'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Review'});
+              that.setState({currentQuiz:result.currentQuiz,'currentQuestion':0, 'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Review', waiting:false});
           }).catch(function(ex) {
+            that.setState({'waiting':false});
             console.log(['parsing failed', ex])
           })
       }
@@ -57,12 +59,14 @@ let mnemoQueries = {
           url=url+'&user='+this.state.user._id;
       }
       url=url+'&rand'+Math.random();
+      that.setState({'waiting':true});
       fetch(url).then(function(response) {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions']);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Review Success Band  '+  band});
+        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Review Success Band  '+  band,waiting:false});
       }).catch(function(ex) {
+        that.setState({'waiting':false});
         console.log(['parsing failed', ex])
       })
   },
@@ -75,12 +79,14 @@ let mnemoQueries = {
           url=url+'&user='+this.state.user._id;
       }
       url=url+'&rand='+Math.random();
+      that.setState({'waiting':true});
       fetch(url).then(function(response) {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions']);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Review Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Review Topic '+  decodeURI(Utils.snakeToCamel(topic)),waiting:false});
       }).catch(function(ex) {
+		that.setState({'waiting':false});
         console.log(['parsing failed', ex])
       })
       
@@ -93,14 +99,16 @@ let mnemoQueries = {
       // //console.log(['discover da questions']);
       let that = this;
       let rand=Math.random()
+      that.setState({'waiting':true});
       fetch('/api/discover',{ method: "POST",headers: {
     "Content-Type": "application/json"},body:JSON.stringify({user:(this.state.user ? this.state.user._id : ''),rand:rand,topic:topic})})
       .then(function(response) {
         return response.json()
       }).then(function(json) {
       let result = createIdIndex(json['questions']);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,'title': 'Discover'});
+        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,'title': 'Discover',waiting:false});
       }).catch(function(ex) {
+		that.setState({'waiting':false});
         console.log(['parsing failed', ex])
       })
   }, 
@@ -124,6 +132,7 @@ let mnemoQueries = {
       //}).then(function(json) {
 		  //if (json.ok === true) {
 			  let rand=Math.random()
+			  that.setState({'waiting':true});
 			  fetch(url,{ method: "POST",headers: {
 					"Content-Type": "application/json"
 					},
@@ -141,10 +150,12 @@ let mnemoQueries = {
 			    let result = createIdIndex(json['questions'],selectedQuestion);
 				console.log(['set state', json,topic,result.currentQuiz,result.currentQuestion,json.questions ,result.indexedQuestions])
 				if (result && topic && result.currentQuiz  && json && json.questions && result.indexedQuestions) {
-					that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json.questions,'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+					that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json.questions,'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic)),waiting:false});
 					console.log(['set state done', that.state])
-			    }
+			    } 
+			    that.setState({'waiting':false});
 			  }).catch(function(ex) {
+				that.setState({'waiting':false});
 				console.log(['parsing failed', ex])
 			  })
 			//} else {
@@ -160,6 +171,7 @@ let mnemoQueries = {
       let that = this;
       let url='/api/discover';
       let rand=Math.random()
+      that.setState({'waiting':true});
       fetch(url,{ method: "POST",headers: {
             "Content-Type": "application/json"
             },
@@ -173,8 +185,9 @@ let mnemoQueries = {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions']);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Difficulty Level '+  difficulty});
+        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Difficulty Level '+  difficulty,waiting:false});
       }).catch(function(ex) {
+		that.setState({'waiting':false});
         console.log(['parsing failed', ex])
       })
       
@@ -184,6 +197,7 @@ let mnemoQueries = {
       let that = this;
       let url='/api/discover';
       let rand=Math.random()
+      that.setState({'waiting':true});
       fetch(url,{ method: "POST",headers: {
             "Content-Type": "application/json"
             },
@@ -197,8 +211,9 @@ let mnemoQueries = {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions']);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover'});
+        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover',waiting: false});
       }).catch(function(ex) {
+		that.setState({'waiting':false});
         console.log(['parsing failed', ex])
       })
       
@@ -355,12 +370,14 @@ let mnemoQueries = {
       if (selectedQuestion && selectedQuestion.length > 0) {
           url=url+'&selectedQuestion='+selectedQuestion;
       }
+      that.setState({'waiting':true});
       fetch(url).then(function(response) {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions'],selectedQuestion);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic)),waiting:false});
       }).catch(function(ex) {
+		that.setState({'waiting':false});
         console.log(['parsing failed', ex])
       })
       
@@ -377,14 +394,18 @@ let mnemoQueries = {
           url = url + '&topic='+topic ;
       }
       url=url + '&rand='+Math.random()
+      that.setState({'waiting':true});
       fetch(url).then(function(response) {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions']);
         if (result && topic && result.currentQuiz && json && json.questions && result.indexedQuestions) {
-			that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic))});
+			that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,title: 'Discover Topic '+  decodeURI(Utils.snakeToCamel(topic)),waiting:false});
+		} else {
+			that.setState({'waiting':false});
 		}
       }).catch(function(ex) {
+		that.setState({'waiting':false});
         console.log(['parsing failed', ex])
       })
       
@@ -393,15 +414,17 @@ let mnemoQueries = {
   
   setQuizFromTag : function(tag) {
       let that = this;
+      that.setState({'waiting':true});
       fetch('/api/discover',{ method: "POST",headers: {"Content-Type": "application/json"},body:JSON.stringify({tag:tag}) })
       .then(function(response) {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions']);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,'title': 'Discover Tag '+ decodeURI(tag)});
+        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,'title': 'Discover Tag '+ decodeURI(tag),waiting:false});
         ////console.log(['set state done', that.state])
          //that.setState({});
       }).catch(function(ex) {
+		that.setState({'waiting':false});
         //console.log(['parsing failed', ex])
       })
   },
@@ -409,13 +432,15 @@ let mnemoQueries = {
   setQuizFromTechnique : function(tag) {
      let that=this;
      //console.log(['set quiz form technique',tag]);
+       that.setState({'waiting':true});
        fetch('/api/discover',{ method: "POST",headers: {"Content-Type": "application/json"},body:JSON.stringify({technique:tag})})
       .then(function(response) {
         return response.json()
       }).then(function(json) {
         let result = createIdIndex(json['questions']);
-        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,'title': 'Discover Technique '+ decodeURI(tag)});
+        that.setState({currentQuiz:result.currentQuiz,'currentQuestion':result.currentQuestion,'questions':json['questions'],'indexedQuestions':result.indexedQuestions,'title': 'Discover Technique '+ decodeURI(tag),waiting:false});
       }).catch(function(ex) {
+		that.setState({'waiting':false});
         console.log(['parsing failed', ex])
       })
   },

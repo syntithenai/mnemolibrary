@@ -37,6 +37,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import AdminNewsletterTool from './AdminNewsletterTool'
 import AtlasLivingAustraliaSearch from './AtlasLivingAustraliaSearch'
+import MusicBrainzSearch from './MusicBrainzSearch'
 //import AtlasLivingAustraliaSingle from './AtlasLivingAustraliaSingle'
 
 import CommentReplyEditor from './CommentReplyEditor'
@@ -126,6 +127,8 @@ export default class AppLayout extends Component {
 		this.deleteComment = this.deleteComment.bind(this);
 		this.saveComment = this.saveComment.bind(this);
 		this.reallyDeleteComment = this.reallyDeleteComment.bind(this);
+		this.stopWaiting = this.stopWaiting.bind(this);
+		
 		   
 		this.editCommentReply = this.editCommentReply.bind(this);
 		this.newCommentReply = this.newCommentReply.bind(this);
@@ -361,6 +364,10 @@ export default class AppLayout extends Component {
 			console.log(['error loading comments', ex])
 		  })
 		
+	}
+	
+	stopWaiting() {
+		this.setState({waiting: false})
 	}
 	
 	toggleCommentDialog() {
@@ -1237,8 +1244,11 @@ export default class AppLayout extends Component {
          //commentText={this.state.comment.comment} commentType={this.state.comment.type} commentCreateDate={this.state.comment.createDate} question={this.state.comment.question}   user={this.state.user} visible={this.state.showCommentDialog}  loadComments={this.loadComments} toggleVisible={this.toggleCommentDialog}
         return (
         <Router>
-            <div style={{width:'100%'}} className="mnemo">
-				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/ala'  component={AtlasLivingAustraliaSearch}  />
+			<div style={{width:'100%'}} className="mnemo">
+				
+				{(this.state.waiting) && <div onClick={this.stopWaiting} style ={{position: 'fixed', top: 0, left: 0, width:'100%',height:'100%',backgroundColor:'grey',zIndex:9999999,opacity:0.3}}  ><img style={{height:'7em' }} src='/loading.gif' /></div>}
+            	
+            	<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/ala'  component={AtlasLivingAustraliaSearch}  />
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/ala/:searchFor'  component={AtlasLivingAustraliaSearch}  />
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user}  path='/ala/:searchFor/mode/:searchMode'  component={AtlasLivingAustraliaSearch}  />
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user}   path='/ala/mode/:searchMode'  component={AtlasLivingAustraliaSearch}  />
@@ -1249,6 +1259,18 @@ export default class AppLayout extends Component {
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/ala/search/:searchFor/mode/:searchMode/:index'  component={AtlasLivingAustraliaSearch}  />
 				
 				
+				{false && <PropsRoute exact={true} routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} path='/musicbrainz'  component={MusicBrainzSearch}  />
+				<PropsRoute exact={true} routerBaseUrl="/musicbrainz"  analyticsEvent={this.analyticsEvent} user={this.state.user} path='/musicbrainz/:searchFor'  component={MusicBrainzSearch}  />
+				<PropsRoute exact={true} routerBaseUrl="/musicbrainz"  analyticsEvent={this.analyticsEvent} user={this.state.user}  path='/musicbrainz/:searchFor/mode/:searchMode'  component={MusicBrainzSearch}  />
+				<PropsRoute exact={true}  routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user}   path='/musicbrainz/mode/:searchMode'  component={MusicBrainzSearch}  />
+				
+				<PropsRoute exact={true}  routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/musicbrainz/search/:searchFor'  component={MusicBrainzSearch}  />
+				<PropsRoute exact={true}  routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/musicbrainz/search/:searchFor/mode/:searchMode'  component={MusicBrainzSearch}  />
+				<PropsRoute exact={true}  routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/musicbrainz/search/:searchFor/:index'  component={MusicBrainzSearch}  />
+				<PropsRoute exact={true}  routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/musicbrainz/search/:searchFor/mode/:searchMode/:index'  component={MusicBrainzSearch}  />
+
+			}
+			
 			
 			    <PropsRoute exact={true} path='/recentcomments/:comment'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user} analyticsEvent={this.analyticsEvent} />
                 

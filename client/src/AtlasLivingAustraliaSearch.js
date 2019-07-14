@@ -324,24 +324,26 @@ export default class AtlasLivingAustraliaSearch extends Component {
 	
 	// Code taken from MatthewCrumley (https://stackoverflow.com/a/934925/298479)
 	getBase64Image(imageRef) {
-		let img = this.images[imageRef]  
-		// Create an empty canvas element
-		var canvas = document.createElement("canvas");
-		canvas.width = img.width;
-		canvas.height = img.height;
+		if (imageRef && this.images.hasOwnProperty(imageRef)) {
+			let img = this.images[imageRef]  
+			// Create an empty canvas element
+			var canvas = document.createElement("canvas");
+			canvas.width = img.width;
+			canvas.height = img.height;
 
-		// Copy the image contents to the canvas
-		var ctx = canvas.getContext("2d");
-		ctx.drawImage(img, 0, 0);
+			// Copy the image contents to the canvas
+			var ctx = canvas.getContext("2d");
+			ctx.drawImage(img, 0, 0);
 
-		// Get the data-URL formatted image
-		// Firefox supports PNG and JPEG. You could check img.src to guess the
-		// original format, but be aware the using "image/jpg" will re-encode the image.
-		var dataURL = canvas.toDataURL("image/png");
+			// Get the data-URL formatted image
+			// Firefox supports PNG and JPEG. You could check img.src to guess the
+			// original format, but be aware the using "image/jpg" will re-encode the image.
+			var dataURL = canvas.toDataURL("image/png");
 
-		//let a = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-		console.log(dataURL);
-		return dataURL;
+			//let a = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+			console.log(dataURL);
+			return dataURL;
+		}
 	}
 		
 		
@@ -519,7 +521,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 				let final = json && json.searchResults ? json.searchResults.results : [];
 				that.setState({suggestions:final});
 				that.loading = false;
-				final.unshift({name:' ',commonName:[]});
+				//final.unshift({name:' ',commonName:[]});
 				resolve(final)
 			  }).catch(function(ex) {
 				console.log(['error loading results', ex])
@@ -572,6 +574,10 @@ export default class AtlasLivingAustraliaSearch extends Component {
 						<i>{scientificName}</i>   
 					
 				</div>
+
+
+
+
 				
 				{ isExpanded && <div style={{width:'100%', clear:'both'}}>
 					<div>{result.scientificNameAuthorship && <i>by {result.scientificNameAuthorship}</i>}</div>
@@ -594,7 +600,6 @@ export default class AtlasLivingAustraliaSearch extends Component {
 				{isExpanded &&  result.imageUrl && <img  crossOrigin="anonymous" ref={(section) => { this.images[resultKey] = section; }}    onClick={(e) => this.getBase64Image(resultKey)} src={result.smallImageUrl} />}   
 			<br/><br/>
 				{ isExpanded && <div><h3>Distribution Map</h3>
-				<AlaDistributionMap species={scientificName} setMapRef={this.setMapRef} />
 				</div>}
 				<hr/>
 			</div>
@@ -602,6 +607,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 			return null;
 		}
 	}
+//				<AlaDistributionMap species={scientificName} setMapRef={this.setMapRef} />
 	
     
     
@@ -632,7 +638,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 			<div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                
 			<h3>{searchLabel}</h3>
-			{this.state.message && <b style={{color:'red'}}>{this.state.message}</b>}
+			{this.state.message && <b style={{position:'fixed',top:'7em',left:'50%',backgroundColor:'pink',border:'1px solid black',color:'black',padding:'0.8em'}}>{this.state.message}</b>}
 
 	  
 			<div style={{padding:'0.5em',backgroundColor:'grey',border:'1px solid black',marginBottom:'1em'}}>
