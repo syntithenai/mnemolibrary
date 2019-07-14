@@ -1259,7 +1259,7 @@ export default class AppLayout extends Component {
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/ala/search/:searchFor/mode/:searchMode/:index'  component={AtlasLivingAustraliaSearch}  />
 				
 				
-				{false && <PropsRoute exact={true} routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} path='/musicbrainz'  component={MusicBrainzSearch}  />
+				{false && <div><PropsRoute exact={true} routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} path='/musicbrainz'  component={MusicBrainzSearch}  />
 				<PropsRoute exact={true} routerBaseUrl="/musicbrainz"  analyticsEvent={this.analyticsEvent} user={this.state.user} path='/musicbrainz/:searchFor'  component={MusicBrainzSearch}  />
 				<PropsRoute exact={true} routerBaseUrl="/musicbrainz"  analyticsEvent={this.analyticsEvent} user={this.state.user}  path='/musicbrainz/:searchFor/mode/:searchMode'  component={MusicBrainzSearch}  />
 				<PropsRoute exact={true}  routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user}   path='/musicbrainz/mode/:searchMode'  component={MusicBrainzSearch}  />
@@ -1268,7 +1268,7 @@ export default class AppLayout extends Component {
 				<PropsRoute exact={true}  routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/musicbrainz/search/:searchFor/mode/:searchMode'  component={MusicBrainzSearch}  />
 				<PropsRoute exact={true}  routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/musicbrainz/search/:searchFor/:index'  component={MusicBrainzSearch}  />
 				<PropsRoute exact={true}  routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/musicbrainz/search/:searchFor/mode/:searchMode/:index'  component={MusicBrainzSearch}  />
-
+</div>
 			}
 			
 			
