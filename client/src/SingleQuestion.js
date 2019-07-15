@@ -702,6 +702,12 @@ export default class SingleQuestion extends Component {
             
             //{!this.props.user && <Link to='/login' className="col-4 btn btn-outline btn-success" ><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add to Review List&nbsp;</span></Link>}
 			let buttonStyle={height: '2.6em'}
+console.log([question.headlineFacts])
+			let headlineFacts = question.headlineFacts && Object.keys(question.headlineFacts).length > 0 ?  Object.keys(question.headlineFacts).map(function(factKey) {
+				let fact = question.headlineFacts[factKey];
+				console.log([factKey,fact])
+				return <div className='fact '><b>{factKey}</b> <i>{fact}</i></div>
+			}) : null;
 
            return (
             <div className="questionwrap"  >
@@ -827,7 +833,7 @@ export default class SingleQuestion extends Component {
                     <div className="card-block">
                         <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
                         
-                        {(this.isVisible('answer') || !showRecallButton) && showLongAnswer && <div  className='card-text'><span style={{fontSize:'1.4em'}}><pre>{this.state.answer}</pre></span></div>}
+                        {(this.isVisible('answer') || !showRecallButton) && showLongAnswer && <div  className='card-text'><div style={{marginBottom:'1em', border: '1px solid black',paddingLeft:'0.7em'}}>{headlineFacts}</div><span style={{fontSize:'1.4em'}}><pre>{this.state.answer}</pre></span></div>}
                          
                         <div  className='card-text' style={{fontSize:'0.85em'}}>
                         {(this.isVisible('answer') || !showRecallButton) && question.link && <b >From <a href={question.link} target='_new' >{shortLink}</a></b>}

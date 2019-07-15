@@ -43,7 +43,8 @@ export default class AtlasLivingAustraliaSearch extends Component {
 			hasMore: true,
 			results:[],
 			suggestions: [],
-			mapRef: null
+			mapRef: null,
+			showDistMap:false
 		}
 		this.scrollTo={}
 		this.sugestTimeout = null;;
@@ -67,6 +68,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		this.loadSuggestions = this.loadSuggestions.bind(this)
 		this.submitForm = this.submitForm.bind(this)
 		this.addToReview = this.addToReview.bind(this)
+		this.showDistMap = this.showDistMap.bind(this)
 		
 		this.images = {}
 		this.searchTimout = null
@@ -141,10 +143,17 @@ export default class AtlasLivingAustraliaSearch extends Component {
 	}
 	
 	/**
+	 * Reset search criteria, results and suggestions
+	 */
+    showDistMap() {
+		this.setState({showDistMap:true})
+	}
+	
+	/**
 	 * Catch keypress return on search form and trigger search
 	 */
 	submitForm(e) {
-		this.setState({rawSearch:true,searchFor:this.state.searchForValue,suggestions:[]});
+		this.setState({rawSearch:true,searchFor:this.state.searchForValue,suggestions:[],showDistMap:false});
 		if (this.searchTimeout) clearTimeout(this.searchTimeout)
 		this.searchTimeout = setTimeout(this.setAlaSearch,500)
 		if (e) {
@@ -158,7 +167,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 	 * Catch select event in autoselect on search form and trigger search
 	 */
 	submitFormOnSelect(e) {
-		this.setState({rawSearch:false});
+		this.setState({rawSearch:false,showDistMap:false});
 		if (this.searchTimeout) clearTimeout(this.searchTimeout)
 		this.searchTimeout = setTimeout(this.setAlaSearch,500)
 		if (e) e.preventDefault()
@@ -382,13 +391,14 @@ export default class AtlasLivingAustraliaSearch extends Component {
 			//}).then(function(canvas) {
 				let mapImage = null //(canvas ? canvas.toDataURL('image/png'):null);
 				let link = that.getLink(result)
+				let headlineFacts = {Author: result.author, Kingdom: result.kingdom, Phylum: result.phylum,"Class": result["class"], Subclass: result.subclass, Superorder: result.superorder, Order:result.order, Family: result.family, Genus: result.genus, Species: result.species};
 				
 				fetch('/api/importquestion', {
 					  method: 'POST',
 					  headers: {
 						'Content-Type': 'application/json'
 					  },
-					  body: JSON.stringify(Object.assign({user:user,tags:tags,quiz:quiz,access:'public',interrogative:interrogative,question:that.getScientificName(result),difficulty:3,autoshow_image:"YES",image:that.getBase64Image(resultKey),image2:mapImage,answer:result.description,facts:result,link:link},{}))
+					  body: JSON.stringify(Object.assign({user:user,tags:tags,quiz:quiz,access:'public',interrogative:interrogative,question:that.getScientificName(result),difficulty:3,autoshow_image:"YES",image:that.getBase64Image(resultKey),image2:mapImage,answer:result.description,headlineFacts: headlineFacts,link:link},{}))
 					}).then(function() {
 						that.showMessage('Saved for review')
 					});
@@ -598,8 +608,10 @@ export default class AtlasLivingAustraliaSearch extends Component {
                
 				{!isExpanded &&  result.imageUrl && <img crossOrigin="anonymous" ref={(section) => { this.images[resultKey] = section; }}  onClick={(e) => this.getBase64Image(resultKey)} style={{maxHeight:'300px' }}  src={result.smallImageUrl} />}   
 				{isExpanded &&  result.imageUrl && <img  crossOrigin="anonymous" ref={(section) => { this.images[resultKey] = section; }}    onClick={(e) => this.getBase64Image(resultKey)} src={result.smallImageUrl} />}   
-			<br/><br/>
-				{ isExpanded && <div><h3>Distribution Map</h3>
+				<br/><br/>
+				{ isExpanded &&  <div><h3>{this.showDistMap && <button className='btn btn-info' onClick={this.showDistMap}>+</button>} Distribution Map</h3>
+				    {this.state.showDistMap && <AlaDistributionMap species={scientificName} setMapRef={this.setMapRef} />}
+	
 				</div>}
 				<hr/>
 			</div>
@@ -607,8 +619,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 			return null;
 		}
 	}
-//				<AlaDistributionMap species={scientificName} setMapRef={this.setMapRef} />
-	
+//				
     
     
     /**
