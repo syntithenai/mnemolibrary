@@ -324,7 +324,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 	
 	// Code taken from MatthewCrumley (https://stackoverflow.com/a/934925/298479)
 	getBase64Image(imageRef) {
-		if (imageRef && this.images.hasOwnProperty(imageRef)) {
+		if (this.images.hasOwnProperty(imageRef)) {
 			let img = this.images[imageRef]  
 			// Create an empty canvas element
 			var canvas = document.createElement("canvas");
