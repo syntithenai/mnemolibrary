@@ -702,7 +702,6 @@ export default class SingleQuestion extends Component {
             
             //{!this.props.user && <Link to='/login' className="col-4 btn btn-outline btn-success" ><ArrowRight size={25} /><span className="d-none d-md-inline-block">&nbsp;Add to Review List&nbsp;</span></Link>}
 			let buttonStyle={height: '2.6em'}
-console.log([question.headlineFacts])
 			let headlineFacts = question.headlineFacts && Object.keys(question.headlineFacts).length > 0 ?  Object.keys(question.headlineFacts).map(function(factKey) {
 				let fact = question.headlineFacts[factKey];
 				console.log([factKey,fact])
@@ -759,6 +758,13 @@ console.log([question.headlineFacts])
                             {(target) && <a  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
                             }&nbsp;
                             
+                            {(target && question.link2 && question.link2Title) && <a  className='btn btn-primary' target={target} href={question.link2}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">{question.link2Title}</span></a>
+                            }&nbsp;
+                            
+                            
+                            
+                            
+                            
                             {<button  className='btn btn-primary' onClick={() => this.setVisible('tags')}><Tags size={26}  />&nbsp;<span className="d-none d-md-inline-block">Tags</span></button>
                             }
                     </div>}
@@ -794,6 +800,11 @@ console.log([question.headlineFacts])
                          }
                         {(target) && <a style={{float:'right',marginTop:'1em'}}  className='btn btn-primary' target={target} href={link}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">More Info</span></a>
                         }
+                        
+                         {(target && question.link2 && question.link2Title) && <a  className='btn btn-primary' target={target} href={question.link2}><ExternalLink size={26}  />&nbsp;<span className="d-none d-md-inline-block">{question.link2Title}</span></a>
+                            }&nbsp;
+                            
+                        
                         </span>}
 						    
 						
@@ -833,7 +844,12 @@ console.log([question.headlineFacts])
                     <div className="card-block">
                         <div ref={(section) => { this.scrollTo.answer = section; }} ></div>
                         
-                        {(this.isVisible('answer') || !showRecallButton) && showLongAnswer && <div  className='card-text'><div style={{marginBottom:'1em', border: '1px solid black',paddingLeft:'0.7em'}}>{headlineFacts}</div><span style={{fontSize:'1.4em'}}><pre>{this.state.answer}</pre></span></div>}
+                        {(this.isVisible('answer') || !showRecallButton) && showLongAnswer && <div  className='card-text'><div style={{marginBottom:'1em', border: '1px solid black',paddingLeft:'0.7em', marginRight:'1em'}}>{headlineFacts}</div><span style={{fontSize:'1.4em'}}><pre>{this.state.answer}</pre></span>
+							
+						{question.answerDetails && <div dangerouslySetInnerHTML={{__html:question.answerDetails}} ></div>}
+						</div>}
+                        
+                        
                          
                         <div  className='card-text' style={{fontSize:'0.85em'}}>
                         {(this.isVisible('answer') || !showRecallButton) && question.link && <b >From <a href={question.link} target='_new' >{shortLink}</a></b>}

@@ -50,13 +50,13 @@ initdb().then(function() {
 	router.post('/importquestion', (req, res) => {
 		
 		// min requirements
-		if (req.body.question && req.body.question.length > 0)
+		if (req.body.question && req.body.question.length > 0 && req.body.type && req.body.type.length > 0)
 		console.log('import question')
 		console.log(JSON.stringify(req.body));
 		let user = req.body.user;
 		function saveToReviewFeed(user,question) {
 			let ts = new Date().getTime()
-			db().collection('seen').insertOne({user:ObjectId(user),question:ObjectId(question._id),timestamp:ts}).then(function(inserted) {
+			db().collection('seen').insertOne({type:req.body.type,user:ObjectId(user),question:ObjectId(question._id),timestamp:ts}).then(function(inserted) {
 		       //console.log(['seen inserted']);
 				// collate tally of all seen, calculate success percentage to successScore
 				updateQuestionTallies(req.body.user,question._id);
@@ -67,7 +67,7 @@ initdb().then(function() {
 		}
 		
 		// try find the question by species id
-		db().collection('questions').findOne({question:{$eq:req.body.question}}).then(function (question) {
+		db().collection('questions').findOne({$and:[{type:{$eq:req.body.type}},question:{$eq:req.body.question}}]}).then(function (question) {
 			if (question) {
 				console.log('use existing question')
 				db().collection('questions').updateOne({_id:question._id},{$set:Object.assign(question,req.body)}).then(function() {

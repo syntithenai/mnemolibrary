@@ -99,7 +99,10 @@ export default class Navigation extends Component {
 			pageTitle = 'Newsletter Tool'
 		} else if (parts[0] === 'ala') {
 			pageTitle = 'Atlas of Living Australia'
+		} else if (parts[0] === 'musicbrainz') {
+			pageTitle = 'Search Musicians'
 		}
+        
         
         
         

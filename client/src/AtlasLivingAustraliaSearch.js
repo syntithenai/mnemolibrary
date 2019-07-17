@@ -115,9 +115,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 	}
 	
 	setMapRef(ref) {
-		console.log(['set map ref',ref])
 		this.setState({mapRef:ref});
-			
 	}
 	
 	/**
@@ -218,8 +216,6 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		this.setState({results:[],hasMore:true,moreIndex:0})
 		this.alaSearch().then(function(res) {
 			if (res && res.length === 1) {
-				console.log(['expand 0'])
-		
 				that.alaExpandData(0)
 			}
 		});
@@ -278,7 +274,6 @@ export default class AtlasLivingAustraliaSearch extends Component {
 				if (searchMode.length > 0) {
 					if (that.searchModes.hasOwnProperty(searchMode) && that.searchModes[searchMode] && that.searchModes[searchMode].filter) {
 						filter="&fq="+that.searchModes[searchMode].filter.join("&fq=");
-						console.log(['ALA SEARCH','https://bie-ws.ala.org.au/ws/search.json?pageSize=5&fq=idxtype:TAXON&sort=imageAvailable&dir=desc&q=favourite:iconic'+filter])
 						let start = skip > 0 ? (skip * 5) : 0;
 			
 						fetch('https://bie-ws.ala.org.au/ws/search.json?pageSize=5&fq=idxtype:TAXON&sort=imageAvailable&dir=desc&q=favourite:iconic'+filter+"&start="+start)
@@ -350,7 +345,6 @@ export default class AtlasLivingAustraliaSearch extends Component {
 			var dataURL = canvas.toDataURL("image/png");
 
 			//let a = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-			console.log(dataURL);
 			return dataURL;
 		}
 	}
@@ -384,26 +378,19 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		}
 
 		
-		console.log(['CANVAS RENDER',that.props.mapRef]);
-		//if (that.state.mapRef ) {
-			//html2canvas(that.state.mapRef, {
-				//useCORS: true,
-			//}).then(function(canvas) {
-				let mapImage = null //(canvas ? canvas.toDataURL('image/png'):null);
-				let link = that.getLink(result)
-				let headlineFacts = {Author: result.author, Kingdom: result.kingdom, Phylum: result.phylum,"Class": result["class"], Subclass: result.subclass, Superorder: result.superorder, Order:result.order, Family: result.family, Genus: result.genus, Species: result.species};
-				
-				fetch('/api/importquestion', {
-					  method: 'POST',
-					  headers: {
-						'Content-Type': 'application/json'
-					  },
-					  body: JSON.stringify(Object.assign({user:user,tags:tags,quiz:quiz,access:'public',interrogative:interrogative,question:that.getScientificName(result),difficulty:3,autoshow_image:"YES",image:that.getBase64Image(resultKey),image2:mapImage,answer:result.description,headlineFacts: headlineFacts,link:link},{}))
-					}).then(function() {
-						that.showMessage('Saved for review')
-					});
-			//})
-		//}
+		let mapImage = null //(canvas ? canvas.toDataURL('image/png'):null);
+		let link = that.getLink(result)
+		let headlineFacts = {Author: result.author, Kingdom: result.kingdom, Phylum: result.phylum,"Class": result["class"], Subclass: result.subclass, Superorder: result.superorder, Order:result.order, Family: result.family, Genus: result.genus, Species: result.species};
+		
+		fetch('/api/importquestion', {
+		  method: 'POST',
+		  headers: {
+			'Content-Type': 'application/json'
+		  },
+		  body: JSON.stringify(Object.assign({user:user,tags:tags,quiz:quiz,access:'public',interrogative:interrogative,question:that.getScientificName(result),difficulty:3,autoshow_image:"YES",image:that.getBase64Image(resultKey),image2:mapImage,answer:result.description,headlineFacts: headlineFacts,link:link,type:'species'},{}))
+		}).then(function() {
+			that.showMessage('Saved for review')
+		});
 		
 	}
 	
@@ -437,9 +424,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		
 		if (question && this.getScientificName(question).length > 0) {
              var url="https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles="+this.getScientificName(question)
-	 
-			console.log(['expand wiki data',url])
-		
+	 	
 		     fetch(url).then(function(response) {
                 return response.json();
             }).then(function(json) {
@@ -447,7 +432,6 @@ export default class AtlasLivingAustraliaSearch extends Component {
 				
 				let pages = json.query && json.query.pages ? json.query.pages : null;
 				let questionsLoaded = pages && Object.values(pages).length > 0 ? Object.values(pages) : null;
-				console.log(['expand results',questionsLoaded,json])
 				if (questionsLoaded && questionsLoaded[0] && questionsLoaded[0].pageid > 0) {
 					let questionLoaded = questionsLoaded[0];
 					questions[questionKey].description = questionLoaded.extract;
@@ -459,8 +443,6 @@ export default class AtlasLivingAustraliaSearch extends Component {
 				} else if (that.getName(question).length > 0)  {
 					var url="https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles="+that.getName(question)
 	 
-					console.log(['expand wikidata by common name',url])
-		
 		            fetch(url).then(function(response) {
 						return response.json();
 					}).then(function(json) {
@@ -468,7 +450,6 @@ export default class AtlasLivingAustraliaSearch extends Component {
 						
 						let pages = json.query && json.query.pages ? json.query.pages : null;
 						let questionsLoaded = pages && Object.values(pages).length > 0 ? Object.values(pages)  : null;
-						console.log(['expand results',questionsLoaded,json])
 						if (questionsLoaded && questionsLoaded[0] && questionsLoaded[0].pageid > 0) {
 							let questionLoaded = questionsLoaded[0];
 							questions[questionKey].description = questionLoaded.extract;
@@ -523,7 +504,6 @@ export default class AtlasLivingAustraliaSearch extends Component {
 				}
 			}
 			extra += '&fq=rank:species'
-			console.log(['ALA SEARCH with'])
 			fetch('https://biocache-ws.ala.org.au/ws/autocomplete/search?pageSize=300&q='+searchFor+extra)
 			  .then(function(response) {
 				return response.json()

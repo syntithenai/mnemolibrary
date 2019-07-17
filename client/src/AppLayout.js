@@ -37,7 +37,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import AdminNewsletterTool from './AdminNewsletterTool'
 import AtlasLivingAustraliaSearch from './AtlasLivingAustraliaSearch'
-//import MusicBrainzSearch from './MusicBrainzSearch'
+import MusicBrainzSearch from './MusicBrainzSearch'
 //import AtlasLivingAustraliaSingle from './AtlasLivingAustraliaSingle'
 
 import CommentReplyEditor from './CommentReplyEditor'
@@ -1259,7 +1259,7 @@ export default class AppLayout extends Component {
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/ala/search/:searchFor/mode/:searchMode/:index'  component={AtlasLivingAustraliaSearch}  />
 				
 				
-				{false && <div><PropsRoute exact={true} routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} path='/musicbrainz'  component={MusicBrainzSearch}  />
+				{<div><PropsRoute exact={true} routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} path='/musicbrainz'  component={MusicBrainzSearch}  />
 				<PropsRoute exact={true} routerBaseUrl="/musicbrainz"  analyticsEvent={this.analyticsEvent} user={this.state.user} path='/musicbrainz/:searchFor'  component={MusicBrainzSearch}  />
 				<PropsRoute exact={true} routerBaseUrl="/musicbrainz"  analyticsEvent={this.analyticsEvent} user={this.state.user}  path='/musicbrainz/:searchFor/mode/:searchMode'  component={MusicBrainzSearch}  />
 				<PropsRoute exact={true}  routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user}   path='/musicbrainz/mode/:searchMode'  component={MusicBrainzSearch}  />
