@@ -27,7 +27,7 @@ Utils.getQuestionTitle = function(question) {
         if (question.question && question.question.length > 0) parts.push(question.question.trim());
         let postfix = question.postfix ? question.postfix : '';
         if (postfix && postfix.length > 0) postfix = postfix.trim();
-        return parts.join(' ')+postfix;
+        return parts.join(' ')+' '+postfix;
     }
 }
 
