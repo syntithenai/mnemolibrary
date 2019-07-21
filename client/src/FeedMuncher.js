@@ -36,7 +36,7 @@ export default class FeedMuncher extends Component {
 		try {
 			this.setState({deleted: JSON.parse(localStorage.getItem('feedmuncher_blocked_guids'))});
 		} catch (e) {
-			this.setState({deleted:[]})
+			this.setState({deleted:{}})
 		}
 		this.updateUrl(null,this.state.feedUrl);
 	}
@@ -195,6 +195,8 @@ export default class FeedMuncher extends Component {
 		let tally = 0;
 		if (this.state.items) {
 			finalArticles = this.state.items.map(function(item,itemKey) {
+				console.log(['ITER',item.guid['#'],that.state.deleted])
+					
 				if (tally < 10 && that.state.deleted && !that.state.deleted.hasOwnProperty(item.guid['#'])) {
 					tally ++;
 					// render expanded lines with onclick
