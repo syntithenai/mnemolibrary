@@ -197,7 +197,7 @@ export default class FeedMuncher extends Component {
 			finalArticles = this.state.items.map(function(item,itemKey) {
 				console.log(['ITER',item.guid['#'],that.state.deleted])
 					
-				if (tally < 10 && that.state.deleted && !that.state.deleted.hasOwnProperty(item.guid['#'])) {
+				if (tally < 10 && (!that.state.deleted || (that.state.deleted && !that.state.deleted.hasOwnProperty(item.guid['#'])))) {
 					tally ++;
 					// render expanded lines with onclick
 					let renderedExpanded = null;
