@@ -191,7 +191,7 @@ export default class FeedMuncher extends Component {
 		let copyright = this.state.copyright ? this.state.copyright : '';
 		let title =  this.state.title  ? this.state.title : '';
 		let finalArticles = [];
-		//console.log(this.state.items)
+		console.log(this.state.items)
 		let tally = 0;
 		if (this.state.items) {
 			finalArticles = this.state.items.map(function(item,itemKey) {
@@ -199,7 +199,7 @@ export default class FeedMuncher extends Component {
 					tally ++;
 					// render expanded lines with onclick
 					let renderedExpanded = null;
-					//console.log(['ISDEL',item.guid['#'],that.state.deleted])
+					console.log(['ISDEL',item.guid['#'],that.state.deleted])
 					
 					if (that.state.expanded[item.guid['#']] && that.state.expanded[item.guid['#']].lines) {
 						let dlineKey = 0;
