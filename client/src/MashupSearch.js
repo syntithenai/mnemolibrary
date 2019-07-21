@@ -490,7 +490,7 @@ export default class MashupSearch extends Component {
 		let loader = this.state.hasMore ? <div className="loader" key={0}></div> : <div className="loader"></div>;
         return  (
         <div className="search"  style={{marginLeft:'0.5em'}}>
-			{this.state.loading && <div onClick={this.stopWaiting} style={{position:'fixed',top:0,left:0,height:'100%',width:'100%', zIndex:99999, backgroundColor: 'grey', opacity:0.2}} ><img src='/loading.gif' style={{height:'7em'}} /></div>}
+			{this.state.loading && <div onClick={this.stopLoading} style={{position:'fixed',top:0,left:0,height:'100%',width:'100%', zIndex:99999, backgroundColor: 'grey', opacity:0.2}} ><img src='/loading.gif' style={{height:'7em'}} /></div>}
 			<div  ref={(section) => { this.scrollTo.topofpage = section; }} ></div>
                
 			<h3>{searchLabel}</h3>

@@ -7,9 +7,11 @@ const Papa = require('papaparse')
 var ObjectId = require('mongodb').ObjectID;
 const get = require('simple-get');
 const mustache = require('mustache');
+var fetch = require('node-fetch');
 
 const MongoClient = require('mongodb').MongoClient
 let databaseConnection = null;
+var request = require('request')
 
 var initUtilsRoutes = require('./api_utils')
 var initCommentsRoutes = require('./api_comments')
@@ -31,6 +33,8 @@ function initdb() {
 	});
 }
 
+
+
 function db() {
 	// if not connected will throw exception and process dies
 	if (databaseConnection) return databaseConnection;
@@ -47,16 +51,89 @@ initdb().then(function() {
 	initMultipleChoiceQuestionsRoutes(router,db);
 	initNewsletterRoutes(router,db);
 	
+	// proxy feed request and convert xml to json
+	router.get('/feedproxy', (req, res) => {
+		if (req.query.url) {// && req.query.url.indexOf('abc.net.au' !== -1)) {
+			var expat = require('node-expat');
+			var Slicer = require('node-xml-slicer');
+			var parser = expat.createParser();
+			var rootSlicer = new Slicer(parser);
+			//var itemSlicer = new Slicer(parser, '/root/items/item');
+			fetch(req.query.url, {
+			  method: 'GET',
+			}).then(function(response) {
+				return response.text();
+			}).then(function(text) {
+				//console.log('========================================');
+				//console.log(text);
+				//console.log('========================================');
+				let parts = text.split("&#039;");
+				parser.write(parts.join(''))
+				res.send(rootSlicer.result)
+			})
+		} else {
+			res.send({})
+		}
+	})
+	
+	router.get('/pageproxy', (req, res) => {
+		if (req.query.url && req.query.url.indexOf('abc.net.au' !== -1)) {
+			var expat = require('node-expat');
+			var JSSoup = require('jssoup').default;
+			//var itemSlicer = new Slicer(parser, '/root/items/item');
+			fetch(req.query.url, {
+			  method: 'GET',
+			}).then(function(response) {
+				return response.text();
+			}).then(function(text) {
+				console.log('========================================');
+				var soup = new JSSoup(text);
+				let topLevelDivs = soup.findAll('div')
+				//console.log(topLevelDivs)
+				//console.log(soup)
+				
+				let found = [];
+				topLevelDivs.map(function (tld) {
+					if (tld.attrs.hasOwnProperty('class') && tld.attrs['class'].indexOf('article section') !== -1) {
+						let ps = tld.findAll('p')
+						ps.map(function(p) {
+							if (!p.attrs['class'] || (p.attrs['class'] && p.attrs['class'].indexOf('topic') !== -1 && p.attrs['class'].indexOf('published') !== -1))  {
+								if (p.getText().trim().length > 0) {
+									if (p.parent &&  p.parent.attrs['class'] && ((p.parent.attrs['class'].indexOf('author')) !== -1 || (p.parent.attrs['class'].indexOf('state') !== -1 ))) {
+										// ignore these
+									} else { 
+										found.push('<p>'+p.getText()+'</p>')
+									}
+								} else {
+									found.push('<br/>')
+								}
+							}
+						})
+					}
+					
+				})
+				
+				console.log(found);
+				//let parts = text.split("&#039;");
+				//parser.write(parts.join(''))
+				//console.log('========================================');
+				res.send(found)
+			})
+		} else {
+			res.send({})
+		}
+	})
+	
 	router.post('/importquestion', (req, res) => {
 		
 		// min requirements
-		if (req.body.question && req.body.question.length > 0 && req.body.type && req.body.type.length > 0)
+		if (req.body.question && req.body.question.length > 0 && req.body.importtype && req.body.importtype.length > 0)
 		console.log('import question')
-		console.log(JSON.stringify(req.body));
+		//console.log(JSON.stringify(req.body));
 		let user = req.body.user;
 		function saveToReviewFeed(user,question) {
 			let ts = new Date().getTime()
-			db().collection('seen').insertOne({type:req.body.type,user:ObjectId(user),question:ObjectId(question._id),timestamp:ts}).then(function(inserted) {
+			db().collection('seen').insertOne({user:ObjectId(user),question:ObjectId(question._id),timestamp:ts}).then(function(inserted) {
 		       //console.log(['seen inserted']);
 				// collate tally of all seen, calculate success percentage to successScore
 				updateQuestionTallies(req.body.user,question._id);
@@ -67,9 +144,23 @@ initdb().then(function() {
 		}
 		
 		// try find the question by species id
-		db().collection('questions').findOne({$and:[{type:{$eq:req.body.type}},question:{$eq:req.body.question}}]}).then(function (question) {
+		db().collection('questions').findOne({$and:[{importtype:{$eq:req.body.importtype}},{question:{$eq:req.body.question}}]}).then(function (question) {
 			if (question) {
-				console.log('use existing question')
+				//console.log('use existing question')
+				if (req.body.mcQuestions) {
+					//console.log(['GEN QUESTIONS update ',req.body.mcQuestions])
+					// cleanup then save again
+					db().collection('multiplechoicequestions').deleteMany({questionId:{$eq:ObjectId(question._id)}}).then(function() {
+						req.body.mcQuestions.map(function(mc) {
+						//	console.log(['save mc',mc]);
+							mc.questionId = question._id;
+							db().collection('multiplechoicequestions').insertOne(mc).then(function(mcres) {
+							//	console.log(['saved mc',mc,mcres]);
+							})
+						})
+					})
+				}
+				
 				db().collection('questions').updateOne({_id:question._id},{$set:Object.assign(question,req.body)}).then(function() {
 					saveToReviewFeed(req.body.user,question);
 				});
@@ -79,6 +170,19 @@ initdb().then(function() {
 				let question = req.body;
 				question._id = new ObjectId()
 				question.importId = "userimport"
+				//console.log(['GEN QUESTIONS',req.body.mcQuestions])
+					
+				if (req.body.mcQuestions) {
+					//console.log(['GEN QUESTIONS',req.body.mcQuestions])
+					req.body.mcQuestions.map(function(mc) {
+						console.log(['save mc',mc]);
+						mc.questionId = question._id;
+						db().collection('multiplechoicequestions').insertOne(mc).then(function(mcres) {
+						//	console.log(['saved mc',mc,mcres]);
+						})
+					})
+				}
+				
 				db().collection('questions').insertOne(question).then(function (result) {
 					saveToReviewFeed(req.body.user,question);
 				});

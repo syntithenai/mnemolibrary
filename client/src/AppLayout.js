@@ -47,6 +47,7 @@ import ReactGA from 'react-ga';
 //import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 //import SignIn from './SignIn';
 //import FindQuestions from './FindQuestions';
+import FeedMuncher from './FeedMuncher'
 
 import 'whatwg-fetch'
 import 'bootstrap';
@@ -1247,6 +1248,10 @@ export default class AppLayout extends Component {
 			<div style={{width:'100%'}} className="mnemo">
 				
 				{(this.state.waiting) && <div onClick={this.stopWaiting} style ={{position: 'fixed', top: 0, left: 0, width:'100%',height:'100%',backgroundColor:'grey',zIndex:9999999,opacity:0.3}}  ><img style={{height:'7em' }} src='/loading.gif' /></div>}
+				
+				
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/feedmuncher'  component={FeedMuncher}  />
+				
             	
             	<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/ala'  component={AtlasLivingAustraliaSearch}  />
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/ala/:searchFor'  component={AtlasLivingAustraliaSearch}  />
@@ -1300,15 +1305,15 @@ export default class AppLayout extends Component {
                 <PropsRoute exact={true} path='/multiplechoicetopics/:topicCollection'  topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics} user={this.state.user} newCommentReply={this.newCommentReply} />
                 <PropsRoute exact={true} path='/multiplechoicetopics'  user={this.state.user} topicCollections={this.state.topicCollections} user={this.state.user} component={MultipleChoiceTopics}   newCommentReply={this.newCommentReply} 	analyticsEvent={this.analyticsEvent}  />
                 
-                <PropsRoute exact={true} path='/multiplechoicequestions/:topic'   user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
+                <PropsRoute exact={true} path='/multiplechoicequestions/:topic'   user={this.state.user} isAdmin={this.isAdmin} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
 
-                <PropsRoute exact={true} path='/mymultiplechoicequestions' mode="myquestions"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
+                <PropsRoute exact={true} path='/mymultiplechoicequestions' mode="myquestions"  user={this.state.user}  isAdmin={this.isAdmin}  component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
 
-                <PropsRoute exact={true} path='/mymultiplechoicequestions/:topic' mode="myquestions"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
+                <PropsRoute exact={true} path='/mymultiplechoicequestions/:topic' mode="myquestions"  user={this.state.user}  isAdmin={this.isAdmin}  component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
 
-                <PropsRoute exact={true} path='/mymultiplechoicetopics' mode="mytopics"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
+                <PropsRoute exact={true} path='/mymultiplechoicetopics' mode="mytopics"  user={this.state.user}  isAdmin={this.isAdmin}  component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
 
-                <PropsRoute exact={true} path='/mymultiplechoicetopics/:topic' mode="mytopics"  user={this.state.user} component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
+                <PropsRoute exact={true} path='/mymultiplechoicetopics/:topic' mode="mytopics"  user={this.state.user}  isAdmin={this.isAdmin}  component={MultipleChoiceQuestions} sendAllQuestionsForReview={this.sendAllQuestionsForReview} 	analyticsEvent={this.analyticsEvent} />
                 
                 
                 

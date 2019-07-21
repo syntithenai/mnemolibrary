@@ -387,7 +387,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		  headers: {
 			'Content-Type': 'application/json'
 		  },
-		  body: JSON.stringify(Object.assign({user:user,tags:tags,quiz:quiz,access:'public',interrogative:interrogative,question:that.getScientificName(result),difficulty:3,autoshow_image:"YES",image:that.getBase64Image(resultKey),image2:mapImage,answer:result.description,headlineFacts: headlineFacts,link:link,type:'species'},{}))
+		  body: JSON.stringify(Object.assign({user:user,tags:tags,quiz:quiz,access:'public',interrogative:interrogative,question:that.getScientificName(result),difficulty:3,autoshow_image:"YES",image:that.getBase64Image(resultKey),image2:mapImage,answer:result.description,headlineFacts: headlineFacts,link:link,importtype:'species'},{}))
 		}).then(function() {
 			that.showMessage('Saved for review')
 		});

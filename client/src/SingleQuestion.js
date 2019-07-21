@@ -901,7 +901,7 @@ export default class SingleQuestion extends Component {
 					</div>}
 						
 					{<div style={((!showRecallButton || this.isVisible('questions'))  ? {display:'block'} : {display:'none'})} ref={(section) => { this.scrollTo.questions = section; }}  className="card-block">
-						<MultipleChoiceQuestions viewOnly={true} notifyQuestionsLoaded={this.notifyQuestionsLoaded}  question={this.props.question ? this.props.question._id : null} topic={this.props.question ? this.props.question.quiz : null} carousel={true}  analyticsEvent={this.props.analyticsEvent} />
+						<MultipleChoiceQuestions  isAdmin={this.props.isAdmin}  viewOnly={true} notifyQuestionsLoaded={this.notifyQuestionsLoaded}  question={this.props.question ? this.props.question._id : null} topic={this.props.question ? this.props.question.quiz : null} carousel={true}  analyticsEvent={this.props.analyticsEvent} />
 					</div>
 					} 
                 </div>

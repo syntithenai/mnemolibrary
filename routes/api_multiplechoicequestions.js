@@ -11,7 +11,7 @@ const mustache = require('mustache');
 
 let questionExists = {$and:[{question:{$exists:true,$ne: ""}} ]};
 let answerExists = {$and:[{answer:{$exists:true,$ne: ""}}]};
-let multiple_choiceExists = {$and:[{multiple_choices:{$exists:true,$ne: ""}} ]};
+let multiple_choiceExists = {$or:[{multiple_choices:{$exists:true,$ne: ""}}, {options_generator_collection:{$exists:true,$ne: ""}}  ]};
 let topicExists = {$and:[{topic:{$exists:true,$ne: ""}}]};
 
 let answerNotExists = {or:[{answer:{$exists:false}},{answer:{$in:[null, ""]}} ]};
@@ -99,10 +99,26 @@ function initRoutes(router,db) {
 		
 	});
 	
-	router.post('/deletemcquestion', (req, res) => {
-		if (req.body.user && req.body._id) {
+	router.post('/updatemcquestion', (req, res) => {
+		if (req.body.question && req.body._id) {
 			
-			let filter = {$and:[{_id:{$eq:ObjectId(req.body._id)}},{user:{$eq:ObjectId(req.body.user)}}]}
+			let filter = {$and:[{_id:{$eq:ObjectId(req.body._id)}},{question:{$eq:req.body.question}}]}
+			
+			db().collection('multiplechoicequestions').updateOne(filter,{$set:req.body}).then(function() {
+				//console.log(['deleted multiplechoicequestions',JSON.stringify(filter)]);
+					res.send({ok:true})
+				});
+		} else {
+			console.log('no delete invalid filter')
+			res.send({ok:false})
+		}
+	});
+	
+	
+	router.post('/deletemcquestion', (req, res) => {
+		if (req.body.question && req.body._id) {
+			
+			let filter = {$and:[{_id:{$eq:ObjectId(req.body._id)}},{question:{$eq:req.body.question}}]}
 			
 			db().collection('multiplechoicequestions').deleteOne(filter).then(function() {
 				//console.log(['deleted multiplechoicequestions',JSON.stringify(filter)]);
@@ -232,7 +248,7 @@ function initRoutes(router,db) {
 						
 						
 						//console.log(['FIND mc questions',JSON.stringify({$and:filter})])
-						db().collection('multiplechoicequestions').find({$and:filter}).sort({createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
+						db().collection('multiplechoicequestions').find({$and:filter}).sort({difficulty:1,createDate:-1,sort:1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
 						//	console.log(['FOUND mc questions',err,results])
 							let promises=[];
 							if (results) {
@@ -248,7 +264,7 @@ function initRoutes(router,db) {
 													resolve(mcQuestion)
 												} else {
 													//console.log([' MC FIND no find related',question])
-													resolve(mcQuestion)
+													resolve({})
 												}
 											})
 										}));
@@ -326,7 +342,7 @@ function initRoutes(router,db) {
 						
 						
 					//	console.log(['FIND mc questions',JSON.stringify({$and:filter})])
-						db().collection('multiplechoicequestions').find({$and:filter}).sort({createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
+						db().collection('multiplechoicequestions').find({$and:filter}).sort({difficulty:1,createDate:-1,sort:1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
 						//	console.log(['FOUND mc questions',err,results])
 							let promises=[];
 							if (results) {
@@ -342,7 +358,7 @@ function initRoutes(router,db) {
 													resolve(mcQuestion)
 												} else {
 													//console.log([' MC FIND no find related',question])
-													resolve(mcQuestion)
+													resolve({})
 												}
 											})
 										}));
@@ -411,8 +427,8 @@ function initRoutes(router,db) {
 		}
 		
 		//console.log(['FIND mc questions',JSON.stringify({$and:filter})])
-		db().collection('multiplechoicequestions').find({$and:filter}).sort({difficulty:1,sort:1,createDate:-1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
-			//console.log(['FOUND mc questions',err,results])
+		db().collection('multiplechoicequestions').find({$and:filter}).sort({difficulty:1,createDate:-1,sort:1}).limit(req.query.limit > 0 ? req.query.limit : 10).toArray(function(err,results) {
+			//console.log(['FOUND mc qcreateDateuestions',err,results])
 			let promises=[];
 			if (results) {
 				//console.log([' MC FIND',results])
@@ -424,10 +440,71 @@ function initRoutes(router,db) {
 								if (question) {
 									//console.log([' MC FINDhave related',question])
 									mcQuestion.relatedQuestion = question;
-									resolve(mcQuestion)
+									
+									if (mcQuestion.options_generator_collection && mcQuestion.options_generator_filter && mcQuestion.options_generator_field) {
+										//mcQuestion.options_generator_filter
+										//if (!mcQuestion.specific_question) mcQuestion.specific_question = mcQuestion.question;
+										//if (!mcQuestion.specific_answer) mcQuestion.specific_answer = mcQuestion.answer;
+										
+										let filter = null;
+										try {
+											filter = JSON.parse(mcQuestion.options_generator_filter)
+										} catch (e) {
+											
+										}
+										if (filter) {
+											db().collection(mcQuestion.options_generator_collection).find(filter).limit(100).toArray().then(function(options) {
+												
+												function deref(key,obj) {
+													console.log(['DEREF',key,obj])
+													if (key && obj) {
+														let res = key.split('.').reduce(function (obj,i) {return obj[i]}, obj)
+														// array value eg tags
+														//if (typeof res === 'array') return res.join(",")
+														return res;
+													}
+												}
+												
+												console.log(['OPTIONS FOUND',options ? options.length : 0,filter])
+												let multiple_choices = [];
+												if (options.length > 0) {
+													let option1Index = parseInt(Math.random()*options.length)
+													let option1 = options.splice(option1Index,1)
+													if (option1.length > 0) {
+														let a  = deref(mcQuestion.options_generator_field,option1[0])
+														if (a) multiple_choices.push(a)
+													}
+												}
+												if (options.length > 1) {
+													let option2Index = parseInt(Math.random()*options.length)
+													let option2 = options.splice(option2Index,1)
+													if (option2.length > 0) {
+														let a  = deref(mcQuestion.options_generator_field,option2[0])
+														if (a) multiple_choices.push(a)
+													}
+												}
+												if (options.length > 2) {
+													let option3Index = parseInt(Math.random()*options.length)
+													let option3 = options.splice(option3Index,1)
+													if (option3.length > 0) {
+														let a  = deref(mcQuestion.options_generator_field,option3[0])
+														if (a) multiple_choices.push(a)
+													}
+												}	
+												
+												console.log(['GENERATED OPTIONS',multiple_choices])
+												 
+												mcQuestion.multiple_choices= multiple_choices.join('|||');
+												resolve(mcQuestion)
+											})
+										} else {
+											resolve(mcQuestion)
+										}
+									} else {
+										resolve(mcQuestion)
+									}
 								} else {
-									//console.log([' MC FIND no find related',question])
-									resolve(mcQuestion)
+									resolve({})
 								}
 							})
 						}));

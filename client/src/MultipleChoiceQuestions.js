@@ -16,6 +16,11 @@ import MnemonicsList from './MnemonicsList';
 import "video-react/dist/video-react.css"; // import css
 import { Player } from 'video-react';
 
+
+//import Swipe from 'react-swipe-component';
+import Swipeable from 'react-swipeable'
+                      
+
 let resetIcon = <svg style={{marginTop:'0.2em',height:'1.1em'}} role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256.455 8c66.269.119 126.437 26.233 170.859 68.685l35.715-35.715C478.149 25.851 504 36.559 504 57.941V192c0 13.255-10.745 24-24 24H345.941c-21.382 0-32.09-25.851-16.971-40.971l41.75-41.75c-30.864-28.899-70.801-44.907-113.23-45.273-92.398-.798-170.283 73.977-169.484 169.442C88.764 348.009 162.184 424 256 424c41.127 0 79.997-14.678 110.629-41.556 4.743-4.161 11.906-3.908 16.368.553l39.662 39.662c4.872 4.872 4.631 12.815-.482 17.433C378.202 479.813 319.926 504 256 504 119.034 504 8.001 392.967 8 256.002 7.999 119.193 119.646 7.755 256.455 8z"></path></svg>
 
 let upIcon = <svg style={{marginTop:'0.2em',height:'1.1em'}} role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M313.553 119.669L209.587 7.666c-9.485-10.214-25.676-10.229-35.174 0L70.438 119.669C56.232 134.969 67.062 160 88.025 160H152v272H68.024a11.996 11.996 0 0 0-8.485 3.515l-56 56C-4.021 499.074 1.333 512 12.024 512H208c13.255 0 24-10.745 24-24V160h63.966c20.878 0 31.851-24.969 17.587-40.331z"></path></svg>
@@ -321,11 +326,12 @@ export default class MultipleChoiceQuestions extends Component {
 						return response.json()
 					}).then(function(json) {
 						console.log(['got mount json',json])
-						let filteredQuestions = json.map(function(question,key) {
+						let filteredQuestions = []
+						json.map(function(question,key) {
 							//let a = {}
 							that.questionsIndex[question._id] = key;
 							let possibleAnswers = question.multiple_choices ? question.multiple_choices.split("|||") : [];
-							if (question.answer && question.answer.trim().length > 0) possibleAnswers.push(question.answer.trim());
+							if (question.answer && String(question.answer).trim().length > 0) possibleAnswers.push(String(question.answer).trim());
 							// uniquify
 							possibleAnswers = [...new Set(possibleAnswers)];
 							possibleAnswers = shuffle(possibleAnswers);
@@ -335,6 +341,9 @@ export default class MultipleChoiceQuestions extends Component {
 								return null; 
 							});
 							question.possibleAnswers = finalPossible;
+							if (question && question.question && question.question.length > 0 && question.answer && question.answer.length > 0 && ((question.multiple_choices && question.multiple_choices.length > 0) || (question.options_generator_collection && question.options_generator_collection.length > 0))) {
+								filteredQuestions.push(question)
+							}
 							return question;
 						});
 						if (that.props.notifyQuestionsLoaded) that.props.notifyQuestionsLoaded(filteredQuestions.length)
@@ -666,6 +675,93 @@ export default class MultipleChoiceQuestions extends Component {
 		this.props.sendAllQuestionsForReview(questions) //[{_id:question.questionId}]
 	}
 	
+	deleteMultipleChoiceQuestion(question) {
+		let that = this
+		confirmAlert({
+		  title: 'Delete Question',
+		  message: 'Are you sure you want to delete the multiple choice question "'+question.question+'" ?',
+		  buttons: [
+			{
+			  label: 'Yes',
+			  onClick: () => {
+					var params={
+						'_id':question._id,
+						'question':question.question,
+					};
+					fetch('/api/deletemcquestion', {
+					  method: 'POST',
+					  headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					  },
+					  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+					})
+					.then(function(response) {
+						console.log(['deleted question'])
+					})
+			  }
+			},
+			{
+			  label: 'No',
+			  onClick: () => {}
+			}
+		  ]
+		})
+	}
+	
+	
+	updateMultipleChoiceQuestion(question,hideImage,hideOption) {
+		if (question && question._id) {
+			let that = this
+			let alertMessage = '';
+			let autoshow_image = question.autoshow_image
+			let multiple_choices = question.multiple_choices
+			
+			if (hideImage) {
+				alertMessage = 'Do you really want to hide the image for this question?'
+				autoshow_image="NO"
+			} else if (hideOption > 0) {
+				let parts = question.multiple_choices ? question.multiple_choices.split("|||") : [];
+				parts.splice(hideOption-1,1)
+				multiple_choices = parts.join("|||")
+				alertMessage = 'Do you really want to remove option '+hideOption+' from this question?';
+			}
+			
+			if (alertMessage) {
+				confirmAlert({
+				  title: 'Modify Question',
+				  message: alertMessage,
+				  buttons: [
+					{
+					  label: 'Yes',
+					  onClick: () => {
+							var params={
+								'_id':question._id,
+								'question':question.question,
+								'multiple_choices':question.multiple_choices,
+								'autoshow_image':question.autoshow_image
+							};
+							fetch('/api/updatemcquestion', {
+							  method: 'POST',
+							  headers: {
+								'Content-Type': 'application/x-www-form-urlencoded',
+							  },
+							  body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+							})
+							.then(function(response) {
+								console.log(['deleted question'])
+							})
+					  }
+					},
+					{
+					  label: 'No',
+					  onClick: () => {}
+					}
+				  ]
+				})
+			}
+		}
+	}
+	
 	ignore() {}
     
     render() { 
@@ -679,9 +775,11 @@ export default class MultipleChoiceQuestions extends Component {
 		//this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? false : true;
 		let topic = this.props.match && this.props.match.params && this.props.match.params.topic && this.props.match.params.topic.length > 0 ? this.props.match.params.topic : this.props.topic;
 		//if (topic && topic.length > 0) {
+		console.log(['RENDER MQ QQQQ',this.state.questions])
+		
 			if (this.state.questions && this.state.questions.length > 0) { 
 				questions = this.state.questions.map(function(question,questionKey) {
-					if (question && question.question && question.question.length > 0 && question.answer && question.answer.length > 0 && question.multiple_choices && question.multiple_choices.length > 0) { 
+					if (question && question.question && question.question.length > 0 && question.answer && question.answer.length > 0 && ((question.multiple_choices && question.multiple_choices.length > 0) || (question.options_generator_collection && question.options_generator_collection.length > 0))) { 
 						let answered = (question.seenBy && question.seenBy[userId] && question.seenBy[userId].length > 0) ? true : false;
 						let userAnswer = question.seenBy ? question.seenBy[userId] : null;
 						let userAnswerCorrect = question.answer === userAnswer ? true : false;
@@ -701,48 +799,58 @@ export default class MultipleChoiceQuestions extends Component {
 							//You  {userAnswerCorrect? ' correctly ' : ' incorrectly '} answered {userAnswer}. {!userAnswerCorrect ? ' The correct answer is '+question.answer+".":''}
 						//</div>}
 						let possibleAnswers = question.possibleAnswers;
-						
+
 						let answerButtons = possibleAnswers.map(function(sampleAnswer,key) {
+							let adminDeleteButton =null //that.props.isAdmin() ? <div style={{float:'right'}}><button className='btn btn-danger' onClick={(e) => that.updateMultipleChoiceQuestion(question,false,(key+1))}>Delete</button></div> : null;
 							// determine button color from answer status
 							let answerLetter=String.fromCharCode(key+65);
 							if (false && that.props.viewOnly) {
 								if (sampleAnswer === question.answer) {
-									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
+									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}{adminDeleteButton}</div>
 								} else {
-									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
+									return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}{adminDeleteButton}</div>
 								}
 							} else {
 								if (answered) {
 									// is this answer the user answer
 									if (sampleAnswer === userAnswer) {
 										if (userAnswerCorrect)  {
-											return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
+											return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green',d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}{adminDeleteButton}</div>
 										} else {
-											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#dc3545', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', textDecoration: 'line-through'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
+											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'red',d:'#dc3545', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', textDecoration: 'line-through'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}{adminDeleteButton}</div>
 										}
 									// is this button the correct answer
 									} else if (sampleAnswer === question.answer) {
-										return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green', d:'#28a745', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
+										return <div style={{fontWeight:'bold',border:'2px solid black'}} key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'green', d:'#28a745', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em', fontWeight:'bold', fontSize:'1.4em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}{adminDeleteButton}</div>
 									} else {
-											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
+											return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)} style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}{adminDeleteButton}</div>
 									}
 									
 								} else {
-									return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)}  style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}</div>
+									return <div key={key} onClick={() => that.clickAnswer(question._id,sampleAnswer)}  style={{color: 'white', backgroundColor:'blue', d:'#007bff', border: '1px solid black', borderRadius:'10px', padding: '0.3em', paddingLeft: '1em', paddingRight: '1em', marginBottom:'0.3em'}} ><span className='answerletter' >{answerLetter}</span>{sampleAnswer}{adminDeleteButton}</div>
 								}
 							}
 						})
-						let image = question && question.relatedQuestion && question.relatedQuestion.image_png ? question.relatedQuestion.image_png : (question && question.relatedQuestion && question.relatedQuestion.image ? question.relatedQuestion.image : '') 
-						if (!image) image = question  && question.image_png ? question.image_png : (question  && question.image ? question.image : '')  
+						let image = question  && question.image_png ? question.image_png : (question  && question.image ? question.image : '')  
+						
+				
+						//{that.props.isAdmin() && <div style={{float:'right'}}><button className='btn btn-danger' onClick={(e) => that.updateMultipleChoiceQuestion(question,true)}>Hide Image</button></div>}
+						
+
+						
+						// fallback to parent image
+						if (!image)  image = question && question.relatedQuestion && question.relatedQuestion.image_png ? question.relatedQuestion.image_png : (question && question.relatedQuestion && question.relatedQuestion.image ? question.relatedQuestion.image : '') 
+						
 						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
 						let mcByTopicLink = '/multiplechoicequestions/'+encodeURIComponent(question.topic);
 						let questionKeyId ='question_'+questionKey;
 						return <div ref={(section) => { that.scrollTo['question_'+(questionKey)] = section; }}   key={question._id} style={{minHeight:'300px' ,paddingLeft:'1em',width:'100%',borderTop:'1px solid black', marginBottom: '1em'}} > 
 						
-						
+										{that.props.isAdmin() && <div style={{float:'right'}}><button className='btn btn-danger' onClick={(e) => that.deleteMultipleChoiceQuestion(question)}>Delete</button></div>}
+				
 						<div style={{fontWeight:'bold',paddingTop: '1em'}}>{question.question}</div>
 						
-						{!answered && !that.props.viewOnly && question.relatedQuestion && (question.relatedQuestion.autoshow_image==="YES" || question.autoshow_image==="YES")  && <img src={image}  style={{ height:'200px'}} />}
+						{!answered && !that.props.viewOnly && question.relatedQuestion && ((question.autoshow_image==="YES" && question.relatedQuestion.autoshow_image==="YES") || question.autoshow_image==="YES")  && <span><img src={image}  style={{ height:'200px'}} />{question.imageattribution && <div>Image Attribution: {question.imageattribution}</div>}</span>}
 						
 
 						{!that.props.viewOnly && <div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> }
@@ -769,7 +877,10 @@ export default class MultipleChoiceQuestions extends Component {
 						
 						
  
-						{answered && !that.props.carousel && question.feedback && <div style={{paddingTop: '2em',}}>{question.feedback}</div>} 
+						{answered && !that.props.carousel && question.attribution && <div>Attribution: {question.attribution}</div>}	
+						
+						{answered && !that.props.carousel && question.feedback && <div style={{paddingTop: '2em',}}>
+						{question.feedback}</div>} 
 
 						{!that.props.viewOnly && !isQuestionPage && question.relatedQuestion && question.relatedQuestion.question && answered && <div>
 								<div style={{marginTop:'1em',marginBottom:'1em'}} ><b>Root Question</b> <a target="_blank" href={moreInfoLink} >{moreInfoIcon} <span >{question.relatedQuestion.interrogative} {question.relatedQuestion.question} ?</span></a></div> 
@@ -824,6 +935,7 @@ export default class MultipleChoiceQuestions extends Component {
 		<div  ref={(section) => { that.scrollTo.top = section; }}  className="row card-block" style={{width:'100%',marginBottom:'5em'}}>
 			  {!isQuestionPage && <div style={theStyle} >
 				{this.state.showQuizOptionsDialog && <div onClick={that.hideQuizOptionsDialog} style={{marginTop:'8em'}} className='modaldialog'  >
+				<Swipeable  onSwipedRight={() => this.nextQuestion()}   >  
 				<div className="modaldialog-content">
 					  <div className="modaldialog-header">
 						<span onClick={this.hideQuizOptionsDialog} className="modaldialog-close">&times;</span>
@@ -841,6 +953,7 @@ export default class MultipleChoiceQuestions extends Component {
 						<hr style={{height:'2px'}}/>
 					  </div>
 					</div>
+				</Swipeable>
 				</div>}
 				
 				<span>{totalMessage}</span>

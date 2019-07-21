@@ -101,6 +101,8 @@ export default class Navigation extends Component {
 			pageTitle = 'Atlas of Living Australia'
 		} else if (parts[0] === 'musicbrainz') {
 			pageTitle = 'Search Musicians'
+		} else if (parts[0] === 'feedmuncher') {
+			pageTitle = 'ABC News Mashup'
 		}
         
         
