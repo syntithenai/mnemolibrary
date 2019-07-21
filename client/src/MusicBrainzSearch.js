@@ -352,7 +352,7 @@ export default class MusicBrainzSearch extends MashupSearch {
 		  headers: {
 			'Content-Type': 'application/json'
 		  },
-		  body: JSON.stringify({user:user,access:'public',interrogative:'Who is the musical artist ',question:that.getCanonicalName(result) ,postfix:that.getName(result),difficulty:2,image:result.image,autoshow_image:"YES",answer:result.description,tags:result.extendedTags,importtype:'musician',type:result.type,sex:result.sex,wikipediaPageId:result.wikipediaPageId,link:result.link,link2:result.link2,link2Title:result.link2Title,quiz:result.quiz,albums:result.albums,answerDetails:that.discographyRef.innerHTML,headlineFacts:result.headlineFacts,mcQuestions:mcQuestions,date:result.headlineFacts.Begin,location:result.headlineFacts.Location,attribution:'musicbrainz',imageattribution:'wikipedia',mbid:result.id})
+		  body: JSON.stringify({user:user,access:'public',interrogative:'Who is the musical artist ',question:that.getCanonicalName(result)+' ' ,postfix:' '+that.getName(result),difficulty:2,image:result.image,autoshow_image:"YES",answer:result.description,tags:result.extendedTags,importtype:'musician',type:result.type,sex:result.sex,wikipediaPageId:result.wikipediaPageId,link:result.link,link2:result.link2,link2Title:result.link2Title,quiz:result.quiz,albums:result.albums,answerDetails:that.discographyRef.innerHTML,headlineFacts:result.headlineFacts,mcQuestions:mcQuestions,date:result.headlineFacts.Begin,location:result.headlineFacts.Location,attribution:'musicbrainz',imageattribution:'wikipedia',mbid:result.id})
 		}).then(function() {
 			that.showMessage('Saved for review')
 		});
