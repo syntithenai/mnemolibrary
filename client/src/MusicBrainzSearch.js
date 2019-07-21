@@ -532,11 +532,11 @@ export default class MusicBrainzSearch extends MashupSearch {
 				if (!isError) {
 					if (found) {
 						console.log('FOUND ',finalWikiPage,combined.google,combined.wikilong,combined.wikishort)
-						fetch('https:en.wikipedia.org//w/api.php?origin=*&redirects=true&action=query&prop=pageimages&format=json&piprop=original&titles='+finalWikiPage)
+						fetch('https://en.wikipedia.org//w/api.php?origin=*&redirects=true&action=query&prop=pageimages&format=json&piprop=original&titles='+finalWikiPage)
 						.then(function(response) {
 							return response.json()
 						}).then(function(imagejson) {
-							fetch('https:en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles='+finalWikiPage)
+							fetch('https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles='+finalWikiPage)
 							.then(function(response) {
 								return response.json()
 							}).then(function(extractsjson) {
