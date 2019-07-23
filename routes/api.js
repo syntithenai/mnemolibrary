@@ -53,22 +53,28 @@ initdb().then(function() {
 	
 	
 	router.get('/guid', (req, res) => {
+		console.log(['guid',req.query.guid]);
+				
 		if (req.query.guid && req.query.guid.length > 0) {
-			db().collection('questions').findOne(question) {
-				res.send(question);
+			db().collection('questions').findOne({guid:{$eq:req.query.guid}}).then(function(question) {
+				console.log(['guid res',question]);
+				res.send(question && question._id ? question : {});
 			});
 		} else {
-			res.send(null);
+			res.send({});
 		}
 	})
 	
 	router.get('/mcguid', (req, res) => {
+		console.log(['mcguid',req.query.guid]);
+		
 		if (req.query.guid && req.query.guid.length > 0) {
-			db().collection('multiplechoicequestions').findOne(question) {
-				res.send(question);
+			db().collection('multiplechoicequestions').find({guid:{$eq:req.query.guid}}).toArray().then(function(questions) {
+				console.log(['mcguid res',questions]);
+				res.send(questions ? questions : []);
 			});
 		} else {
-			res.send(null);
+			res.send({});
 		}
 	})
 		
@@ -107,7 +113,7 @@ initdb().then(function() {
 			}).then(function(response) {
 				return response.text();
 			}).then(function(text) {
-				console.log('========================================');
+			//	console.log('========================================');
 				var soup = new JSSoup(text);
 				let topLevelDivs = soup.findAll('div')
 				//console.log(topLevelDivs)
@@ -134,82 +140,96 @@ initdb().then(function() {
 					
 				})
 				
-				console.log(found);
+				//console.log(found);
 				//let parts = text.split("&#039;");
 				//parser.write(parts.join(''))
 				//console.log('========================================');
 				res.send(found)
 			})
 		} else {
-			res.send({})
+			res.send([])
 		}
 	})
 	
 	router.post('/importquestion', (req, res) => {
 		
 		// min requirements
-		if (req.body.question && req.body.question.length > 0 && req.body.importtype && req.body.importtype.length > 0)
-		console.log('import question')
-		//console.log(JSON.stringify(req.body));
-		let user = req.body.user;
-		function saveToReviewFeed(user,question) {
-			let ts = new Date().getTime()
-			db().collection('seen').insertOne({user:ObjectId(user),question:ObjectId(question._id),timestamp:ts}).then(function(inserted) {
-		       //console.log(['seen inserted']);
-				// collate tally of all seen, calculate success percentage to successScore
-				updateQuestionTallies(req.body.user,question._id);
-				res.send({message:'Sent question to review'});
-			}).catch(function(e) {
-				res.send({error:e});
-			});
-		}
-		
-		// try find the question by species id
-		db().collection('questions').findOne({$and:[{importtype:{$eq:req.body.importtype}},{question:{$eq:req.body.question}}]}).then(function (question) {
-			if (question) {
-				//console.log('use existing question')
-				if (req.body.mcQuestions) {
-					//console.log(['GEN QUESTIONS update ',req.body.mcQuestions])
-					// cleanup then save again
-					db().collection('multiplechoicequestions').deleteMany({questionId:{$eq:ObjectId(question._id)}}).then(function() {
+		if (req.body.question && req.body.question.length > 0 && req.body.importtype && req.body.importtype.length > 0) {
+			
+			console.log('import question')
+			//console.log(JSON.stringify(req.body));
+			let user = req.body.user;
+			function saveToReviewFeed(user,question) {
+				let ts = new Date().getTime()
+				db().collection('seen').insertOne({user:ObjectId(user),question:ObjectId(question._id),timestamp:ts}).then(function(inserted) {
+				   //console.log(['seen inserted']);
+					// collate tally of all seen, calculate success percentage to successScore
+					updateQuestionTallies(req.body.user,question._id);
+					res.send({message:'Sent question to review'});
+				}).catch(function(e) {
+					res.send({error:e});
+				});
+			}
+			
+			// try find the question by _id
+			let andPart = {_id:{$eq:req.body.question}}
+			// allow for find existing question by guid  
+			if (req.body.guid && req.body.guid.length > 0) {
+				andPart = {guid:{$eq:req.body.guid}}
+				console.log('find by guid')
+			} 							
+			
+			db().collection('questions').findOne({$and:[
+												{importtype:{$eq:req.body.importtype}},
+												andPart  
+										]}).then(function (question) {
+				if (question) {
+					//console.log('use existing question')
+					if (req.body.mcQuestions) {
+						//console.log(['GEN QUESTIONS update ',req.body.mcQuestions])
+						// cleanup then save again
+						db().collection('multiplechoicequestions').deleteMany({questionId:{$eq:ObjectId(question._id)}}).then(function() {
+							req.body.mcQuestions.map(function(mc) {
+							//	console.log(['save mc',mc]);
+								mc.questionId = question._id;
+								db().collection('multiplechoicequestions').insertOne(mc).then(function(mcres) {
+								//	console.log(['saved mc',mc,mcres]);
+								})
+							})
+						})
+					}
+					
+					db().collection('questions').updateOne({_id:question._id},{$set:Object.assign(question,req.body)}).then(function() {
+						saveToReviewFeed(req.body.user,question);
+					});
+				} else {
+					console.log('use new question')
+					// otherwise create the question
+					let question = req.body;
+					question._id = new ObjectId()
+					question.importId = "userimport"
+					//console.log(['GEN QUESTIONS',req.body.mcQuestions])
+						
+					if (req.body.mcQuestions) {
+						//console.log(['GEN QUESTIONS',req.body.mcQuestions])
 						req.body.mcQuestions.map(function(mc) {
-						//	console.log(['save mc',mc]);
+							console.log(['save mc',mc]);
 							mc.questionId = question._id;
 							db().collection('multiplechoicequestions').insertOne(mc).then(function(mcres) {
 							//	console.log(['saved mc',mc,mcres]);
 							})
 						})
-					})
-				}
-				
-				db().collection('questions').updateOne({_id:question._id},{$set:Object.assign(question,req.body)}).then(function() {
-					saveToReviewFeed(req.body.user,question);
-				});
-			} else {
-				console.log('use new question')
-				// otherwise create the question
-				let question = req.body;
-				question._id = new ObjectId()
-				question.importId = "userimport"
-				//console.log(['GEN QUESTIONS',req.body.mcQuestions])
+					}
 					
-				if (req.body.mcQuestions) {
-					//console.log(['GEN QUESTIONS',req.body.mcQuestions])
-					req.body.mcQuestions.map(function(mc) {
-						console.log(['save mc',mc]);
-						mc.questionId = question._id;
-						db().collection('multiplechoicequestions').insertOne(mc).then(function(mcres) {
-						//	console.log(['saved mc',mc,mcres]);
-						})
-					})
+					db().collection('questions').insertOne(question).then(function (result) {
+						saveToReviewFeed(req.body.user,question);
+					});
 				}
+			})
+		} else {
+				res.send({error:'Insufficient data'});
 				
-				db().collection('questions').insertOne(question).then(function (result) {
-					saveToReviewFeed(req.body.user,question);
-				});
-			}
-		})
-		
+		}	
 		
 		
 		
@@ -233,7 +253,7 @@ initdb().then(function() {
 				  });
 				  res.send({'blocked':true});
 			  } else {
-				  res.send({'noqtoblock':true});
+				  res.send({'noqtoblock':true});req.body.question
 			  }
 			})
 		}
