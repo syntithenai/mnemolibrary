@@ -23,6 +23,9 @@ kanji {
   letter-spacing: 0.3em;
   
 }
+#newssubmission label {
+  font-weight: bold;
+}
 .alasearch input {
   width: 300px;
 }

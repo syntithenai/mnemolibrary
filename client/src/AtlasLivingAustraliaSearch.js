@@ -25,7 +25,7 @@ import {BrowserRouter as Router,Route,Link,Switch,Redirect} from 'react-router-d
 import scrollToComponent from 'react-scroll-to-component';
 import Autocomplete from 'react-autocomplete'
 import InfiniteScroll from 'react-infinite-scroller';
-
+			
 import AlaDistributionMap from './AlaDistributionMap'
 
 

@@ -51,6 +51,27 @@ initdb().then(function() {
 	initMultipleChoiceQuestionsRoutes(router,db);
 	initNewsletterRoutes(router,db);
 	
+	
+	router.get('/guid', (req, res) => {
+		if (req.query.guid && req.query.guid.length > 0) {
+			db().collection('questions').findOne(question) {
+				res.send(question);
+			});
+		} else {
+			res.send(null);
+		}
+	})
+	
+	router.get('/mcguid', (req, res) => {
+		if (req.query.guid && req.query.guid.length > 0) {
+			db().collection('multiplechoicequestions').findOne(question) {
+				res.send(question);
+			});
+		} else {
+			res.send(null);
+		}
+	})
+		
 	// proxy feed request and convert xml to json
 	router.get('/feedproxy', (req, res) => {
 		if (req.query.url) {// && req.query.url.indexOf('abc.net.au' !== -1)) {
