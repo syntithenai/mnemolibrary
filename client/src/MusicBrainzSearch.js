@@ -737,7 +737,7 @@ export default class MusicBrainzSearch extends MashupSearch {
 						})
 					} else {
 						console.log('NO MATCH')
-						that.sendMessage('No Match Found')
+						that.showMessage('No Match Found')
 					}
 					
 				} else {
