@@ -31,7 +31,7 @@ export default class ShareDialog extends Component {
     
     render() {
 		this.props.analyticsEvent('share');
-		let encodedShareLink = encodeURIComponent(this.props.shareLink)
+		let encodedShareLink = encodeURIComponent(this.props.shareLink)   //.replace(/ /g,'_')
 		let mailToLink = "mailto:?subject=My%20comment%20on%20Mnemos%20Library&body="+encodeURIComponent(this.props.shareText)+"    \n\n"+encodedShareLink;
 	    return  (
             <div id="sharedialog" onClick={() => this.props.setShareDialog(false)} className="modaldialog" tabIndex="-1" role="dialog">
@@ -47,11 +47,12 @@ export default class ShareDialog extends Component {
 						<h5 className="modaldialog-title">{this.props.dialogTitle ? this.props.dialogTitle : 'Share using'}</h5>
 						
 					  </div>
-					  <div className="modaldialog-body">
-				
-						<div className='btn btn-info' ><a className=" twitter-share-button"
+				     <div className="modaldialog-body">
+						<div>{this.props.shareText}</div>
+						<div>{this.props.shareLink}</div>
+						<div className='btn btn-info' ><a className="twitter-share-button"
 						  target="_blank" 
-						  href={"https://twitter.com/intent/tweet?text="+this.props.shareText+"&url="+this.props.shareLink}
+						  href={"https://twitter.com/intent/tweet?text="+this.props.shareText+"&url="+encodedShareLink}
 						  data-size="large">
 						Tweet</a></div>
 						
