@@ -49,8 +49,16 @@ import ReactGA from 'react-ga';
 //import FindQuestions from './FindQuestions';
 import FeedMuncher from './FeedMuncher'
 import QuickMemo from './QuickMemo'
-import Helmet from 'react-helmet'
-
+//import Helmet from 'react-helmet'
+//<Helmet
+				  //meta={[
+					//{"property": "og:type", "content": "video.other"},
+					//{"property": "og:image", "content": "https://www.w3schools.com/css/trolltunga.jpg"},
+					//{"property": "og:title", "content": "My Title"},
+					//{"property": "og:url", "content": "https://www.afnity.com/video/155"},
+					//{"property": "og:description", "content": "some discription of the shared    content"}
+				  //]}
+				///>
 import 'whatwg-fetch'
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -1250,15 +1258,7 @@ export default class AppLayout extends Component {
         
         
 			<div style={{width:'100%'}} className="mnemo">
-				<Helmet
-				  meta={[
-					{"property": "og:type", "content": "video.other"},
-					{"property": "og:image", "content": "https://www.w3schools.com/css/trolltunga.jpg"},
-					{"property": "og:title", "content": "My Title"},
-					{"property": "og:url", "content": "https://www.afnity.com/video/155"},
-					{"property": "og:description", "content": "some discription of the shared    content"}
-				  ]}
-				/>
+				
 				{(this.state.waiting) && <div onClick={this.stopWaiting} style ={{position: 'fixed', top: 0, left: 0, width:'100%',height:'100%',backgroundColor:'grey',zIndex:9999999,opacity:0.3}}  ><img style={{height:'7em' }} src='/loading.gif' /></div>}
 				
 				
