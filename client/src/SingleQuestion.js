@@ -61,7 +61,11 @@ export default class SingleQuestion extends Component {
           this.player = element;
           if (this.player) this.player.subscribeToStateChange(this.handleStateChange.bind(this));
         };
-        this.state = {mcQuestionsLoaded:0,comments:[],showCommentDialog: false,swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:'',showShareDialog:false,imagesLoaded:{}}
+        this.state = {
+			showShareDialog:null,
+			shareLink:'',
+			shareText:''
+			,mcQuestionsLoaded:0,comments:[],showCommentDialog: false,swipeable:true,'visible':[],playerHeight:50,playerWidth:400,answer:'',image:'',imagesLoaded:{}}
         this.setVisible = this.setVisible.bind(this);
         this.toggleMedia = this.toggleMedia.bind(this);
         this.isVisible = this.isVisible.bind(this);
@@ -483,7 +487,12 @@ export default class SingleQuestion extends Component {
 		scrollToComponent(that.scrollTo['comments'],{align:'top',offset:-230});
 	}
 
-    setShareDialog(val) {
+     setShareDialog(val,question) {
+		if (question) {
+			let shareLink =  window.location.protocol+'//'+window.location.host+'/discover/topic/'+question.quiz+"/"+question._id;
+			let shareText = Utils.getQuestionTitle(question)
+			this.setState({shareLink:shareLink,shareText:shareText});
+		}
 		this.setState({showShareDialog:val});
 	}
     
@@ -743,7 +752,7 @@ export default class SingleQuestion extends Component {
                    
                     {showRecallButton && <div className="scrollbuttons col-sm-12" >
                           
-                         {question.access === "public" && <button style={{float:'right'}}  onClick={(e) => this.setShareDialog(true)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>}
+                         {question.access === "public" && <button style={{float:'right'}}  onClick={(e) => this.setShareDialog(true,question)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>}
                             &nbsp;
                            
                                       
@@ -797,7 +806,7 @@ export default class SingleQuestion extends Component {
                            
 	                   {!showRecallButton && <span> 
 						   
-                            {question.access === "public" && <button style={{marginTop:'1em',float:'right'}} onClick={(e) => this.setShareDialog(true)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>}
+                            {question.access === "public" && <button style={{marginTop:'1em',float:'right'}} onClick={(e) => this.setShareDialog(true,question)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>}
                        
                         &nbsp;
 						  {this.state.mcQuestionsLoaded > 0 && <button style={{marginTop:'1em',float:'right'}} className='btn btn-primary' onClick={() => this.setVisible('questions')}> <span className="badge badge-light">{this.state.mcQuestionsLoaded}</span>&nbsp;<span className="d-none d-md-inline-block"> Quiz</span></button>} 
@@ -918,8 +927,8 @@ export default class SingleQuestion extends Component {
 					} 
                 </div>
                 
-				{this.state.showShareDialog && <ShareDialog   analyticsEvent={this.props.analyticsEvent} setShareDialog={this.setShareDialog} url={shareLink} title={shareTitle} dialogTitle={'Share Question using'} />}
-			
+				{that.state.showShareDialog && <ShareDialog   analyticsEvent={that.props.analyticsEvent} setShareDialog={that.setShareDialog} shareLink={shareLink} shareText={shareTitle} dialogTitle={'Share Question using'} />}
+
                  <div ref={(section) => { this.scrollTo.end = section; }} ></div>
                        
             </div>

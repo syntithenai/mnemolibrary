@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 //import QuizList from './QuizList';
 //import QuizCollection from './QuizCollection';
-//import Utils from './Utils';
+import Utils from './Utils';
 //import FaClose from 'react-icons/lib/fa/close';
 //import CreateHelp from './CreateHelp';
 import Autocomplete from 'react-autocomplete';
@@ -43,7 +43,11 @@ export default class QuestionEditor extends Component {
               mediaProgress_ogg: null,
               mediaProgress_webm: null,
               mediaProgress_mp4: null,
-              showAnswerDetails: false
+              showAnswerDetails: false,
+              	showShareDialog:null,
+				shareLink:'',
+				shareText:''
+			
              // imageURL:this.props.question.image
             
             //question : {
@@ -129,7 +133,12 @@ export default class QuestionEditor extends Component {
     }
    
 	
-	setShareDialog(val) {
+	setShareDialog(val,question) {
+		if (question) {
+			let shareLink =  window.location.protocol+'//'+window.location.host+'/discover/topic/'+question.quiz+"/"+question._id;
+			let shareText = Utils.getQuestionTitle(question)
+			this.setState({shareLink:shareLink,shareText:shareText});
+		}
 		this.setState({showShareDialog:val});
 	}
    
@@ -391,6 +400,7 @@ export default class QuestionEditor extends Component {
     };
     
     render() {
+       let that = this;
        // //console.log(['QE REN',this.props]);
         if (this.props.question) {
             let currentMedia={};
@@ -437,7 +447,7 @@ export default class QuestionEditor extends Component {
                          <a  style={{float:'right'}}  href={'https://www.google.com.au/search?q='+this.props.question.question} target="_new"  className='btn btn-info'   ><Google size={28} /><span className="d-none d-sm-inline" >Google</span></a>
                          { String(this.props._id).length > 0 && this.props.questions.length >0 && <button  className='btn btn-warning'  style={{float:'right'}}  onClick={() => this.props.previewTopic(this.props._id,this.props.currentQuestion)} ><Camera size={28}/>&nbsp;<span className="d-none d-sm-inline" >Preview</span></button>}
                         
-                        {this.props.published===true && this.props.question.isPreview !==true &&  <button style={{float:'right'}} onClick={(e) => this.setShareDialog(true)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>}
+                        {this.props.published===true && this.props.question.isPreview !==true &&  <button style={{float:'right'}} onClick={(e) => this.setShareDialog(true,this.props.question)} className='btn btn-primary'  ><ShareAlt size={26}  />&nbsp;<span className="d-none d-md-inline-block">Share</span></button>}
 							
                               
                         <br/><br/><div className='form-inline'>
@@ -620,6 +630,8 @@ export default class QuestionEditor extends Component {
                     </div>
                      
                     <br/>
+                    {that.state.showShareDialog && <ShareDialog   analyticsEvent={that.props.analyticsEvent} setShareDialog={that.setShareDialog} shareLink={that.state.shareLink} shareText={that.state.shareText} dialogTitle={'Share Question using'} />}
+
             </div>
             )
         } else return '';

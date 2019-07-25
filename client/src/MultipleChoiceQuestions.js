@@ -58,7 +58,9 @@ export default class MultipleChoiceQuestions extends Component {
 		this.state={
 			questions : [],
 			currentQuestion : null,
-			showShareDialog : false,
+			showShareDialog:null,
+			shareLink:'',
+			shareText:'',		
 			showQuizOptionsDialog: false,
 		}
 		this.questionsIndex = {};
@@ -197,7 +199,13 @@ export default class MultipleChoiceQuestions extends Component {
 		console.log('REFS',this.playerRefs);
 	}
         
-    setShareDialog(val) {
+     setShareDialog(val,topic) {
+		 console.log(['SETSHAREDIALOG',val,topic])
+		if (topic) {
+			let shareLink =  window.location.protocol+'//'+window.location.host+'/multiplechoicequestions/'+topic;
+			let shareText = topic
+			this.setState({shareLink:shareLink,shareText:shareText});
+		}
 		this.setState({showShareDialog:val});
 	}
 	
@@ -845,9 +853,10 @@ export default class MultipleChoiceQuestions extends Component {
 						if (!image)  {
 							image = question && question.relatedQuestion && question.relatedQuestion.image_png ? question.relatedQuestion.image_png : (question && question.relatedQuestion && question.relatedQuestion.image ? question.relatedQuestion.image : '') 
 							
-							if (!imageattribution)  imageattribution = question && question.relatedQuestion && question.relatedQuestion.imageattribution ? question.relatedQuestion.imageattribution : imageattribution;
-							autoshowimage = question.relatedQuestion.autoshow_image==="YES" ? true : false;	
+						
 						}
+						if (!imageattribution)  imageattribution = question && question.relatedQuestion && question.relatedQuestion.imageattribution ? question.relatedQuestion.imageattribution : imageattribution;
+							autoshowimage = question.relatedQuestion.autoshow_image==="YES" ? true : false;	
 						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
 						let mcByTopicLink = '/multiplechoicequestions/'+encodeURIComponent(question.topic);
 						let questionKeyId ='question_'+questionKey;
@@ -897,7 +906,7 @@ export default class MultipleChoiceQuestions extends Component {
 							
 							<pre style={{fontSize:'1.1em'}}> {question.relatedQuestion.mnemonic}</pre></div>}
 
-						{(answered || autoshowimage) && !that.props.viewOnly && image  && <span><img src={image}  style={{maxHeight:'400px',marginTop:'1em',marginBottom:'1em'}} />{imageattribution && <div>Image Attribution: {imageattribution}</div>}</span>}
+						{answered && !that.props.viewOnly && image  && <span><img src={image}  style={{maxHeight:'400px',marginTop:'1em',marginBottom:'1em'}} />{imageattribution && <div>Image Attribution: {imageattribution}</div>}</span>}
 
 
 						{(that.props.mode==='myquestions' ||that.props.mode==='mytopics') && answered && question.relatedQuestion && question.relatedQuestion.quiz && question.relatedQuestion.quiz.length > 0 && <div id='relatedtopic' style={{marginTop:'1em'}}><b>Topic</b> <a className='btn btn-info' target='_blank' href={mcByTopicLink} > {question.relatedQuestion.quiz}</a></div>}
@@ -952,7 +961,7 @@ export default class MultipleChoiceQuestions extends Component {
 					  
 					  <div className="modaldialog-body">
 							<div>
-								<button  onClick={(e) => that.setShareDialog(!that.state.showShareDialog)} className='btn btn-info' ><ShareIcon size={26} /> <span  className="d-none d-sm-inline" >Share Quiz</span></button>
+								{that.props.match && that.props.match.params && that.props.match.params.topic && <button  onClick={(e) => that.setShareDialog(!that.state.showShareDialog,that.props.match.params.topic)} className='btn btn-info' ><ShareIcon size={26} /> <span  className="d-none d-sm-inline" >Share Quiz</span></button>}
 								<button style={{}} onClick={that.clickResetQuiz} className='btn btn-danger' >{resetIcon} <span className="d-none d-sm-inline" >Reset Answers</span></button>
 								
 							</div>
@@ -979,7 +988,8 @@ export default class MultipleChoiceQuestions extends Component {
 			</div>}
 			
 			<div style={{border: '1px solid black',width:'100%',marginTop:'1.4em'}}>
-			{this.state.showShareDialog && <ShareDialog analyticsEvent={this.props.analyticsEvent} setShareDialog={this.setShareDialog} dialogTitle={'Share Quiz using'} />}
+			
+			{this.state.showShareDialog && <ShareDialog analyticsEvent={this.props.analyticsEvent} shareLink={that.state.shareLink} shareText={that.state.shareText}  setShareDialog={this.setShareDialog} dialogTitle={'Share Quiz using'} />}
 			{questions}
 			</div>
 		</div>
