@@ -581,13 +581,13 @@ export default class SingleQuestion extends Component {
                      link = question.link  + '?printable=yes'
                  }
              // is full link    
-             } else if (question.link.indexOf('http://') > 0 || question.link.indexOf('https://') > 0  ) {
+             } else if (question.link.indexOf('http://') !==  -1 || question.link.indexOf('https://') !==  -1  ) {
                  link = question.link;
 				target='_new';
         
              } else {
 				 // missing http:// ?
-				let parts = question.link.split(".")
+				let parts = question.link.split("")
 				if (parts.length > 1) {
 					link="http://"+question.link
 				// fallback to google search question
