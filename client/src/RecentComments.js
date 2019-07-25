@@ -28,13 +28,14 @@ export default class RecentComments extends Component {
     
     componentDidMount() {
         this.loadComments(null,null,50,null,1)
-        if (this.props.match && this.props.match.param && this.props.match.param.comment) this.scrollToComment(this.props.match.param.comment)
+        //if (this.props.match && this.props.match.param && this.props.match.param.comment) this.scrollToComment(this.props.match.param.comment)
     }
     
     componentDidUpdate(props,state) {
 		if (this.state.filter != state.filter) {
 			this.loadComments(null,null,50,this.state.filter,500)
         }
+        //if (this.props.match && this.props.match.param && this.props.match.param.comment) this.scrollToComment(this.props.match.param.comment)
     }
     
     loadComments(a,b,c,d,timeout) {
@@ -66,7 +67,7 @@ export default class RecentComments extends Component {
 		return <div id='recentcomments'>
 		 <input className="form-control" type="text" value={this.state.filter} onChange={this.setFilter}  placeholder="Search" aria-label="Search" />
 				  
-		<CommentList analyticsEvent={this.props.analyticsEvent} comments={this.props.comments} isAdmin={this.props.isAdmin} newCommentReply={this.props.newCommentReply}   editComment={this.props.editComment}  deleteComment={this.props.deleteComment} user={this.props.user} /></div>
+		<CommentList match={this.props.match} analyticsEvent={this.props.analyticsEvent} comments={this.props.comments} isAdmin={this.props.isAdmin} newCommentReply={this.props.newCommentReply}   editComment={this.props.editComment}  deleteComment={this.props.deleteComment} user={this.props.user} /></div>
 		
 		//let that = this;
 		//if (this.props.comments && this.props.comments.length > 0) {

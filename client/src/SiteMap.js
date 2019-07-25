@@ -113,7 +113,11 @@ export default class SiteMap extends Component {
 				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/recentcomments"  >Recent Comments</Link></div>
 				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/leaderboard"  >Leader Board</Link></div>
 				  <div className="col"><Link style={buttonStyle} className='btn btn-success'  to="/create"  >Create</Link></div>
+				  <div className="col"><Link style={buttonStyle} className='btn btn-success'  to="/quickmemo"  >Quick Memo</Link></div>
+				  
 				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/help"  >Help</Link></div>
+					
+					
 					</div>
 					
 					
@@ -124,15 +128,17 @@ export default class SiteMap extends Component {
 				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/review"  >Review</Link></div>
 			  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/search/tags"  >Search Tags</Link></div>
 				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/search/questions"  >Search Questions</Link></div>
-				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/ala"  >Search Australian Flora and Fauna</Link></div>
-				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/musicbrainz"  >Search Musicians</Link></div>
-				  {this.props.isAdmin() && <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/feedmuncher"  >ABC News</Link></div>}
+			
 
 				  
 				</div>
-
-				
-				
+			
+				<div className="row" style={blockStyle}>
+				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/ala"  >Search Australian Flora and Fauna</Link></div>
+				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/musicbrainz"  >Search Musicians</Link></div>
+				  {this.props.isAdmin() && <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/feedmuncher"  >ABC News</Link></div>}	
+				</div>
+			
 				  
 			</div>
 			)

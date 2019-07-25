@@ -510,42 +510,57 @@ function initRoutes(router,db) {
 								record.hasMnemonic = false;
 							}
 							
+							function reallySaveRecord(record,resolve,reject,mnemonics,recordIndex) {
+								db().collection('questions').save(record).then(function(resy) {
+								   // console.log(['UPDATE']);
+									//let newRecord={_id:record._id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
+									if (record.hasMnemonic) {
+										let newMnemonic = {user:'default',question:record._id,mnemonic:record.mnemonic,questionText:record.question,technique:record.mnemonic_technique,importId:importId};
+										mnemonics.push(newMnemonic);
+									}
+									if (record.quiz && record.quiz.length > 0
+										&& record.specific_question && record.specific_question.length > 0
+										&& record.specific_answer && record.specific_answer.length > 0
+										&& record.multiple_choices && record.multiple_choices.length > 0
+									) {
+										let newQuestion ={topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image,sort:record.sort,difficulty:record.difficulty}
+										console.log('NEWQ',JSON.stringify(newQuestion))
+										
+										try {
+											newQuestion._id=(record.mcQuestionId && record.mcQuestionId.length > 0 ? ObjectId(record.mcQuestionId) : ObjectId())
+										} catch (e) {}
+										newQuestion.questionId = record._id; //(record._id && record._id.length > 0 ? ObjectId(record._id) : ObjectId())
+										
+										if (record.autoplay_media==="YES" && record.media) newQuestion.media = record.media;
+										
+										mcQuestions.push(newQuestion)
+									}
+									//console.log(['SAVED QUESTION',record._id,record])
+									recordIndex[record._id] = record;
+						
+									resolve(record._id);
+									
+								}).catch(function(e) {
+									console.log(['import error saving question',e]);
+									reject();
+								});
+							}
+							
 							function saveQuestion() {
 								//console.log('SAVE QUESTION')
 								thePromise = new Promise(function(resolve,reject) {
-									db().collection('questions').save(record).then(function(resy) {
-									   // console.log(['UPDATE']);
-										//let newRecord={_id:record._id,discoverable:record.discoverable,admin_score : record.admin_score,mnemonic_technique:record.mnemonic_technique,tags:record.tags,quiz:record.quiz,access:record.access,interrogative:record.interrogative,prefix:record.prefix,question:record.question,postfix:record.postfix,mnemonic:record.mnemonic,answer:record.answer,link:record.link,image:record.image,homepage:record.homepage}
-										if (record.hasMnemonic) {
-											let newMnemonic = {user:'default',question:record._id,mnemonic:record.mnemonic,questionText:record.question,technique:record.mnemonic_technique,importId:importId};
-											mnemonics.push(newMnemonic);
-										}
-										if (record.quiz && record.quiz.length > 0
-											&& record.specific_question && record.specific_question.length > 0
-											&& record.specific_answer && record.specific_answer.length > 0
-											&& record.multiple_choices && record.multiple_choices.length > 0
-										) {
-											let newQuestion ={topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image,sort:record.sort,difficulty:record.difficulty}
-											console.log('NEWQ',JSON.stringify(newQuestion))
-											
-											try {
-												newQuestion._id=(record.mcQuestionId && record.mcQuestionId.length > 0 ? ObjectId(record.mcQuestionId) : ObjectId())
-											} catch (e) {}
-											newQuestion.questionId = record._id; //(record._id && record._id.length > 0 ? ObjectId(record._id) : ObjectId())
-											
-											if (record.autoplay_media==="YES" && record.media) newQuestion.media = record.media;
-											
-											mcQuestions.push(newQuestion)
-										}
-										//console.log(['SAVED QUESTION',record._id,record])
-										recordIndex[record._id] = record;
-							
-										resolve(record._id);
-										
-									}).catch(function(e) {
-										console.log(['import error saving question',e]);
-										reject();
-									});
+									if (recordExists) {
+										db().collection('questions').findOne({_id:{$eq:record._id}}).then(function(resy) {
+											// save existing mnemonic
+											if (resy && resy._id && resy.mnemonic && resy.mnemonic.length > 0) {
+												record.mnemonic = resy.mnemonic;
+												record.hasMnemonic = true;
+											}
+											reallySaveRecord(record,resolve,reject,mnemonics,recordIndex);
+										})
+									} else {
+										reallySaveRecord(record,resolve,reject,mnemonics,recordIndex);
+									}
 									
 								})   
 								promises.push(thePromise);

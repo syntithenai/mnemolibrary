@@ -49,7 +49,7 @@ export default class QuestionList extends Component {
                 return '';
             })
             return (
-              <div className="questions list-group">
+              <div style={{fontSize:'1.2em'}} className="questions list-group">
                   {
                     questions
                   }

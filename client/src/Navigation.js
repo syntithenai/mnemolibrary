@@ -103,6 +103,8 @@ export default class Navigation extends Component {
 			pageTitle = 'Search Musicians'
 		} else if (parts[0] === 'feedmuncher') {
 			pageTitle = 'ABC News Mashup'
+		} else if (parts[0] === 'quickmemo') {
+			pageTitle = 'Quick Memo'
 		}
         
         

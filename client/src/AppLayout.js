@@ -48,6 +48,8 @@ import ReactGA from 'react-ga';
 //import SignIn from './SignIn';
 //import FindQuestions from './FindQuestions';
 import FeedMuncher from './FeedMuncher'
+import QuickMemo from './QuickMemo'
+
 
 import 'whatwg-fetch'
 import 'bootstrap';
@@ -1251,6 +1253,7 @@ export default class AppLayout extends Component {
 				
 				
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/feedmuncher'  component={FeedMuncher}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/quickmemo'  component={QuickMemo}  />
 				
             	
             	<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/ala'  component={AtlasLivingAustraliaSearch}  />

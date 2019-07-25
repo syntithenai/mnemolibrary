@@ -161,7 +161,7 @@ export default class FeedMuncher extends Component {
 						expanded[guid] = saveForReview;
 						
 						
-						that.setState({saveForReview:saveForReview,expanded:expanded})
+						that.setState({expanded:expanded})
 						console.log(['DONE OVERRIDE',that.state.saveForReview])
 					}
 					if (question && question._id) {
@@ -319,9 +319,13 @@ export default class FeedMuncher extends Component {
 			if (record.mnemonic && record.mnemonic.length > 0) {
 				let mcQuestions=[];
 				let options = record.multiple_choices.split("|||")
-				mcQuestions.push({difficulty:record.difficulty,topic:record.topic,autoshow_image:"YES",image:record.image,question:record.specific_question,answer:record.specific_answer,multiple_choices:shuffle(options).join("|||"),feedback:record.feedback,sort:Math.random(),importtype:'abcnews',guid:record.guid})
-				
-				
+				if (record.specific_question && record.specific_question.length > 0) { 
+					if (record.specific_question && record.specific_question.length > 0 && record.specific_answer && record.specific_answer.length > 0 && options.length > 0) { 
+						mcQuestions.push({difficulty:record.difficulty,topic:record.topic,autoshow_image:"YES",image:record.image,question:record.specific_question,answer:record.specific_answer,multiple_choices:shuffle(options).join("|||"),feedback:record.feedback,sort:Math.random(),importtype:'abcnews',guid:record.guid})
+					} else {
+						that.showMessage('You must provide more information for your multiple choice question')
+					}	
+				}
 				console.log(['sendmnem'])
 				fetch('/api/importquestion', {
 				  method: 'POST',

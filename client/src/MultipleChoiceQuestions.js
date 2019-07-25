@@ -415,25 +415,32 @@ export default class MultipleChoiceQuestions extends Component {
     finishQuiz() {
 		let that = this
 		this.stopAllPlayers();
-		confirmAlert({
-		  title: 'Quiz Complete',
-		  message: 'What next ?',
-		  buttons: [
-			{
+		let buttons=[];
+		buttons.push({
 			  label: 'Try a different quiz',
 			  onClick: () => this.goto('/multiplechoicetopics')
-			},
-			{
+		})
+		if (this.props.user && this.props.user._id) {
+			buttons.push({
 			  label: 'Load more questions',
 			  onClick: () => this.loadQuestions().then(function() {
 					that.nextQuestion()
 				})
-			},
-			{
+			})
+		} else {
+			buttons.push({
+			  label: 'Login to see more questions',
+			  onClick: () => this.goto('/login')
+			})
+		}
+		buttons.push({
 			  label: 'Cancel',
 			  onClick: () => {}
-			}
-		  ]
+			})
+		confirmAlert({
+		  title: 'Quiz Complete',
+		  message: 'What next ?',
+		  buttons: buttons
 		})
 
 	}
@@ -791,7 +798,7 @@ export default class MultipleChoiceQuestions extends Component {
 						if (question.relatedQuestion && question.relatedQuestion.tags && question.relatedQuestion.tags.length > 0 ) {
 							tagsRendered = question.relatedQuestion.tags.map(function(tag,key) {
 								let linkTo="/discover/tag/"+tag
-								return <Link to={linkTo} className='btn btn-info' key={key} style={{marginRight:'0.8em'}}>{tag}</Link>
+								return <a target='_blank' href={linkTo} className='btn btn-info' key={key} style={{marginRight:'0.8em'}}>{tag}</a>
 							});
 						}
 
@@ -832,15 +839,15 @@ export default class MultipleChoiceQuestions extends Component {
 							}
 						})
 						let image = question  && question.image_png ? question.image_png : (question  && question.image ? question.image : '')  
-						
-				
-						//{that.props.isAdmin() && <div style={{float:'right'}}><button className='btn btn-danger' onClick={(e) => that.updateMultipleChoiceQuestion(question,true)}>Hide Image</button></div>}
-						
-
-						
+						let imageattribution = question.imageattribution;
+						let autoshowimage = question.autoshow_image==="YES" ? true : false; 
 						// fallback to parent image
-						if (!image)  image = question && question.relatedQuestion && question.relatedQuestion.image_png ? question.relatedQuestion.image_png : (question && question.relatedQuestion && question.relatedQuestion.image ? question.relatedQuestion.image : '') 
-						
+						if (!image)  {
+							image = question && question.relatedQuestion && question.relatedQuestion.image_png ? question.relatedQuestion.image_png : (question && question.relatedQuestion && question.relatedQuestion.image ? question.relatedQuestion.image : '') 
+							
+							imageattribution = question && question.relatedQuestion && question.relatedQuestion.imageattribution ? question.relatedQuestion.imageattribution : imageattribution;
+							autoshowimage = question.relatedQuestion.autoshow_image==="YES" ? true : false;	
+						}
 						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
 						let mcByTopicLink = '/multiplechoicequestions/'+encodeURIComponent(question.topic);
 						let questionKeyId ='question_'+questionKey;
@@ -850,7 +857,7 @@ export default class MultipleChoiceQuestions extends Component {
 				
 						<div style={{fontWeight:'bold',paddingTop: '1em'}}>{question.question}</div>
 						
-						{!answered && !that.props.viewOnly && question.relatedQuestion && ((question.autoshow_image==="YES" && question.relatedQuestion.autoshow_image==="YES") || question.autoshow_image==="YES")  && <span><img src={image}  style={{ height:'200px'}} />{question.imageattribution && <div>Image Attribution: {question.imageattribution}</div>}</span>}
+						{!answered && !that.props.viewOnly && image && autoshowimage  && <span><img src={image}  style={{ height:'200px'}} />{imageattribution && <div>Image Attribution: {imageattribution}</div>}</span>}
 						
 
 						{!that.props.viewOnly && <div style={{color: 'red', fontWeight:'bold', paddingTop: '1em',}}>{question.error}</div> }
@@ -888,11 +895,12 @@ export default class MultipleChoiceQuestions extends Component {
 
 						{answered && !that.props.viewOnly && question.relatedQuestion && question.relatedQuestion.mnemonic && question.relatedQuestion.mnemonic.length > 0 && <div id='relatedmnemonic' style={{marginTop:'1em',marginBottom:'1em'}} ><b>Memory Aid</b>
 							
-							<pre> {question.relatedQuestion.mnemonic}</pre></div>}
+							<pre style={{fontSize:'1.1em'}}> {question.relatedQuestion.mnemonic}</pre></div>}
 
-						{answered && !that.props.viewOnly && image && <img src={image}  style={{maxHeight:'400px',marginTop:'1em',marginBottom:'1em'}} />}
+						{answered && !that.props.viewOnly && image && autoshowimage  && <span><img src={image}  style={{maxHeight:'400px',marginTop:'1em',marginBottom:'1em'}} />{imageattribution && <div>Image Attribution: {imageattribution}</div>}</span>}
 
-						{(that.props.mode==='myquestions' ||that.props.mode==='mytopics') && answered && question.relatedQuestion && question.relatedQuestion.quiz && question.relatedQuestion.quiz.length > 0 && <div id='relatedtopic' style={{marginTop:'1em'}}><b>Topic</b> <Link className='btn btn-info' to={mcByTopicLink} > {question.relatedQuestion.quiz}</Link></div>}
+
+						{(that.props.mode==='myquestions' ||that.props.mode==='mytopics') && answered && question.relatedQuestion && question.relatedQuestion.quiz && question.relatedQuestion.quiz.length > 0 && <div id='relatedtopic' style={{marginTop:'1em'}}><b>Topic</b> <a className='btn btn-info' target='_blank' href={mcByTopicLink} > {question.relatedQuestion.quiz}</a></div>}
 					
 						{!that.props.viewOnly && answered && question.relatedQuestion && question.relatedQuestion.tags && question.relatedQuestion.tags.length > 0 && <div id='relatedtags' style={{marginTop:'1em'}}><b>Tags</b> {tagsRendered}</div>}
 						

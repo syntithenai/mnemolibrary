@@ -1055,7 +1055,7 @@ initdb().then(function() {
 		}
 		
 		function theRest() {
-			//console.log(['THEREST']);
+			console.log(['THEREST',req.query.search,JSON.stringify(criteria)]);
 		   // //console.log(['questions request',req.query.search,req.query.technique]);
 			if (req.query.search && req.query.search.trim().length > 0) {
 				// SEARCH BY technique and text query
@@ -1088,11 +1088,10 @@ initdb().then(function() {
 							criteria.push({ hasMnemonic:{$ne:true}});
 							criteria.push({quiz:{$eq:topic}});
 						   // criteria.push({'_id': {$nin: existingMnemonicIds}});
-							//console.log(['search by missing mnem have toic',criteria]);
 							
 							db().collection('questions').find({$and:criteria}).limit(limit).skip(skip).sort({sort:1}).toArray(function(err, results) {
-								//console.log(['search by missing mnem',results]);
-							  res.send({'questions':results});
+						//		console.log(['search by topic RES',results]);
+								res.send({'questions':results});
 							})
 						}
 					//})
@@ -1100,11 +1099,13 @@ initdb().then(function() {
 					////console.log(['topic search',req.query.topic,{'quiz': {$eq:req.query.topic}}]);
 					let topic = req.query.topic.trim(); //.toLowerCase(); 
 					criteria.push({'quiz': {$eq:topic}});
-				  //  //console.log(['topic search C    ',criteria]);
+					console.log(['topic search C    ',JSON.stringify(criteria)]);
 					//if (req.query.missingMnemonicsOnly > 0) {
 						//criteria.push({ $where: "this.hasMnemonic !== true"});
 					//} 
 					db().collection('questions').find({$and:criteria}).limit(limit*40).sort({sort:1}).toArray(function(err, results) {
+						console.log(['topic search res    ',results]);
+					
 					  res.send({'questions':results});
 					})
 				// SEARCH BY tag
@@ -1142,9 +1143,9 @@ initdb().then(function() {
 		// tags and topics
 		let criteria=[];
 		if (req.query.user) {
-			//console.log(['user',req.query.user]);
+			console.log(['user',req.query.user]);
 			let user = req.query.user ? req.query.user : null;
-			db().collection('users').find({_id:ObjectId(user)}).toArray().then(function(users) {
+			db().collection('users').find({_id:{$eq:ObjectId(user)}}).toArray().then(function(users) {
 				if (users.length > 0) {
 					let fullUser=users[0];
 					//console.log(['loaded user',fullUser]);
@@ -1161,7 +1162,8 @@ initdb().then(function() {
 						andParts.push({$or:allowedTopicCriteria})
 					}
 					let orParts = [
-						{access:{$eq:ObjectId(req.body.user)}},
+						{access:{$eq:req.query.user}},
+						{access:{$eq:ObjectId(req.query.user)}},
 						{access :{$eq:'public'}},
 					];
 					if (allowedTopicCriteria.length > 0) {
@@ -1170,7 +1172,7 @@ initdb().then(function() {
 				    criteria.push({
 						$or:orParts
 					})
-					//console.log(['criteria',JSON.stringify(criteria)]);
+					console.log(['USER criteria',JSON.stringify(criteria)]);
 					
 					theRest()
 			

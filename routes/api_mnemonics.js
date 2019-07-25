@@ -79,11 +79,24 @@ function initRoutes(router,db) {
 		   // console.log(['save mnem',toSave]);
 			db().collection('mnemonics').save(toSave).then(function(updated) {
 				//console.log(['saved mnem']);
-				db().collection('questions').update({_id:ObjectId(req.body.question)},{$set:{hasMnemonic:true}}).then(function() {
-					//console.log(['updated question',req.body.question]);
-					//res.send('updated question '+req.body.question);
-				});
-				res.send('updated question '+req.body.question);
+				db().collection('questions').findOne({_id:ObjectId(req.body.question)}).then(function(questionRec) {
+					if (questionRec && questionRec._id) {
+						let mnemonic = questionRec.mnemonic;
+						if (questionRec.mnemonic && questionRec.mnemonic.length > 0) {
+							// good
+						} else {
+							// use submitted mnemonic to update main q
+							mnemonic = req.body.mnemonic;
+						}
+						db().collection('questions').update({_id:ObjectId(req.body.question)},{$set:{hasMnemonic:true, mnemonic:mnemonic}}).then(function() {
+							//console.log(['updated question',req.body.question]);
+							//res.send('updated question '+req.body.question);
+						});
+						res.send({message: 'updated question '+req.body.question});
+					} else {
+						res.send({message:'Invalid request wrong question'});
+					}
+				})
 			}).catch(function(e) {
 				res.send('error on update');
 			});

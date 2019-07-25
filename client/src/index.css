@@ -23,7 +23,7 @@ kanji {
   letter-spacing: 0.3em;
   
 }
-#newssubmission label {
+#quickmemo label, #newssubmission label {
   font-weight: bold;
 }
 .alasearch input {
@@ -450,14 +450,17 @@ h4.graphTitle::before {
 .modaldialog-close {
   color: #aaa;
   float: right;
-  font-size: 28px;
+  font-size: 22px;
   font-weight: bold;
 }
 
 
 /* Modal Header */
+.modaldialog-header h2 {
+  font-size:1.5em;
+}
 .modaldialog-header {
-  padding: 2px 16px;
+  padding: 1px 16px;
   background-color: black;
   color: white;
 }
@@ -474,7 +477,7 @@ h4.graphTitle::before {
 /* Modal Content/Box */
 .modaldialog-content {
   background-color: #fefefe;
-  margin: 5% auto; /* 15% from the top and centered */
+  margin: 0% auto; /* 15% from the top and centered */
   padding: 0.2em;
   border: 1px solid #888;
   width: 90%; /* Could be more or less, depending on screen size */
