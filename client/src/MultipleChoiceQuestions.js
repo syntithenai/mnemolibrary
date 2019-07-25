@@ -845,7 +845,7 @@ export default class MultipleChoiceQuestions extends Component {
 						if (!image)  {
 							image = question && question.relatedQuestion && question.relatedQuestion.image_png ? question.relatedQuestion.image_png : (question && question.relatedQuestion && question.relatedQuestion.image ? question.relatedQuestion.image : '') 
 							
-							if (!imageattribution)  {imageattribution = question && question.relatedQuestion && question.relatedQuestion.imageattribution ? question.relatedQuestion.imageattribution : imageattribution;
+							if (!image)  imageattribution = question && question.relatedQuestion && question.relatedQuestion.imageattribution ? question.relatedQuestion.imageattribution : imageattribution;
 							autoshowimage = question.relatedQuestion.autoshow_image==="YES" ? true : false;	
 						}
 						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
