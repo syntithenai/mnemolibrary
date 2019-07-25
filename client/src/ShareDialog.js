@@ -49,10 +49,18 @@ export default class ShareDialog extends Component {
 					  </div>
 				     <div className="modaldialog-body">
 						<div>{this.props.shareText}</div>
-						<div>{this.props.shareLink}</div>
+						<div style={{marginBottom: '2em'}}>{this.props.shareLink}</div>
+						
+						
+						<li><a href="https://www.facebook.com/sharer.php?u=https%3A%2F%2Fmnemolibrary.com%2Fdiscover">Share on Facebook</a></li>
+<li><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fmnemolibrary.com%2Fdiscover">Share on Twitter</a></li>
+<li><a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmnemolibrary.com%2Fdiscover%2Ftopic%2FWorld%20News%20Key%20Points%20July%202019%2F5d37bfdfcbea2d002f03701c">Share on LinkedIn</a></li>
+						
+						
+						
 						<div className='btn btn-info' ><a className="twitter-share-button"
 						  target="_blank" 
-						  href={"https://twitter.com/intent/tweet?text="+this.props.shareText+"&url="+encodedShareLink}
+						  href={"https://twitter.com/intent/tweet?text="+this.props.shareText+" "+this.props.shareLink}
 						  data-size="large">
 						Tweet</a></div>
 						
