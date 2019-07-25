@@ -43,6 +43,8 @@ export default class FeedMuncher extends Component {
 		this.reallySendToReview = this.reallySendToReview.bind(this)
 		this.change = this.change.bind(this)
 		this.changeFilter = this.changeFilter.bind(this)
+		this.changeFeedUrl = this.changeFeedUrl.bind(this)
+		
 		this.deleteTag = this.deleteTag.bind(this)
 		this.addTag = this.addTag.bind(this)
 		this.addMemoryAid = this.addMemoryAid.bind(this)
@@ -185,9 +187,12 @@ export default class FeedMuncher extends Component {
 		if (this.updateTimeout) clearTimeout(this.updateTimeout)
 		this.updateTimeout = setTimeout(function() {
 			if (that.state.feedUrl) {
+				if (that.props.startWaiting) that.props.startWaiting()
 				fetch('/api/feedproxy?url='+that.state.feedUrl.trim()).then(response => {
 					return response.json()
 				}).then(function(json) {
+					if (that.props.stopWaiting) that.props.stopWaiting()
+		
 					that.setState({items:json.rss.channel.item,title:json.rss.channel.title,copyright:json.rss.channel.copyright})
 				})
 			}
@@ -361,6 +366,13 @@ export default class FeedMuncher extends Component {
         let state = this.state;
         var key = e.target.name;
         state[key] =  e.target.value;
+        this.setState(state);
+        return false;
+    };
+    changeFeedUrl(e) {
+        //console.log(e.target.name,e.target.value);
+        let state = this.state;
+        state.feedUrl =  e.target.value;
         this.setState(state);
         return false;
     };
@@ -622,7 +634,7 @@ export default class FeedMuncher extends Component {
 		let copyright = this.state.copyright ? this.state.copyright : '';
 		let title =  this.state.title  ? this.state.title : '';
 		let finalArticles = [];
-		console.log(this.state.items)
+		//console.log(this.state.items)
 		let tally = 0;
 		if (this.state.items) {
 			finalArticles = this.state.items.map(function(item,itemKey) {
@@ -730,7 +742,7 @@ export default class FeedMuncher extends Component {
 			
 			<b>Enter an ABC NEWS RSS URL:</b> 
         
-			<input style={{width:'50em'}} value={this.state.feedUrl} onChange={this.updateUrl}  />
+			<input style={{width:'50em'}} value={this.state.feedUrl} name='feedurl' onChange={this.changeFeedUrl}  /><button className='btn btn-info' onClick={this.updateUrl} >Update</button>
         
 					
 			<h3>News</h3>

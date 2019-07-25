@@ -441,6 +441,13 @@ export default class MultipleChoiceQuestions extends Component {
 			  onClick: () => this.goto('/login')
 			})
 		}
+		if (that.props.match && that.props.match.params && that.props.match.params.topic) { 
+			buttons.push({
+				  label: 'Share Quiz',
+				  onClick: () => that.setShareDialog(!that.state.showShareDialog,that.props.match.params.topic)
+				})
+		}
+		
 		buttons.push({
 			  label: 'Cancel',
 			  onClick: () => {}
@@ -962,6 +969,7 @@ export default class MultipleChoiceQuestions extends Component {
 					  <div className="modaldialog-body">
 							<div>
 								{that.props.match && that.props.match.params && that.props.match.params.topic && <button  onClick={(e) => that.setShareDialog(!that.state.showShareDialog,that.props.match.params.topic)} className='btn btn-info' ><ShareIcon size={26} /> <span  className="d-none d-sm-inline" >Share Quiz</span></button>}
+
 								<button style={{}} onClick={that.clickResetQuiz} className='btn btn-danger' >{resetIcon} <span className="d-none d-sm-inline" >Reset Answers</span></button>
 								
 							</div>
@@ -983,6 +991,7 @@ export default class MultipleChoiceQuestions extends Component {
 					 
 					<div onClick={this.finishQuiz}   className='btn btn-success' style={{marginRight:'1em',float:'right'}} ><CompleteIcon size={26} /><span className="d-none d-sm-inline" > Quiz Complete</span></div>
 
+					
 					</div>}
 				
 			</div>}

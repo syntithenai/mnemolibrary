@@ -139,6 +139,7 @@ export default class AppLayout extends Component {
 		this.saveComment = this.saveComment.bind(this);
 		this.reallyDeleteComment = this.reallyDeleteComment.bind(this);
 		this.stopWaiting = this.stopWaiting.bind(this);
+		this.startWaiting = this.startWaiting.bind(this);
 		
 		   
 		this.editCommentReply = this.editCommentReply.bind(this);
@@ -377,6 +378,9 @@ export default class AppLayout extends Component {
 		
 	}
 	
+	startWaiting() {
+		this.setState({waiting: true})
+	}
 	stopWaiting() {
 		this.setState({waiting: false})
 	}
@@ -1262,7 +1266,7 @@ export default class AppLayout extends Component {
 				{(this.state.waiting) && <div onClick={this.stopWaiting} style ={{position: 'fixed', top: 0, left: 0, width:'100%',height:'100%',backgroundColor:'grey',zIndex:9999999,opacity:0.3}}  ><img style={{height:'7em' }} src='/loading.gif' /></div>}
 				
 				
-				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/feedmuncher'  component={FeedMuncher}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/feedmuncher' startWaiting={this.startWaiting} stopWaiting={this.stopWaiting}  component={FeedMuncher}  />
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/quickmemo'  component={QuickMemo}  />
 				
             	
