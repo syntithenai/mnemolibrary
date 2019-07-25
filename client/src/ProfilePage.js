@@ -248,7 +248,7 @@ export default class ProfilePage extends Component {
         let auth =JSON.parse(authRequest);
         if (!auth) auth={};
 
-        if (oauth==="alexa") {
+        if (false && oauth==="alexa") {
             return (
             <div className='row'>
             <div className='col-12'><h4>Allow Alexa to integrate with Mnemo's Library ?</h4></div>

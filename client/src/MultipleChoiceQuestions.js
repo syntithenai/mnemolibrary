@@ -897,7 +897,7 @@ export default class MultipleChoiceQuestions extends Component {
 							
 							<pre style={{fontSize:'1.1em'}}> {question.relatedQuestion.mnemonic}</pre></div>}
 
-						{answered && !that.props.viewOnly && image && autoshowimage  && <span><img src={image}  style={{maxHeight:'400px',marginTop:'1em',marginBottom:'1em'}} />{imageattribution && <div>Image Attribution: {imageattribution}</div>}</span>}
+						{(answered || autoshowimage) && !that.props.viewOnly && image  && <span><img src={image}  style={{maxHeight:'400px',marginTop:'1em',marginBottom:'1em'}} />{imageattribution && <div>Image Attribution: {imageattribution}</div>}</span>}
 
 
 						{(that.props.mode==='myquestions' ||that.props.mode==='mytopics') && answered && question.relatedQuestion && question.relatedQuestion.quiz && question.relatedQuestion.quiz.length > 0 && <div id='relatedtopic' style={{marginTop:'1em'}}><b>Topic</b> <a className='btn btn-info' target='_blank' href={mcByTopicLink} > {question.relatedQuestion.quiz}</a></div>}

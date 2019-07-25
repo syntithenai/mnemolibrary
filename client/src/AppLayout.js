@@ -592,8 +592,7 @@ export default class AppLayout extends Component {
   shout(action,params) {
       //console.log('shout');
     try {
-       let messageO={'from':this.mqttClientId,action:action,params:params}; 
-        
+       let messageO={'from':this.mqttClientId,action:action,params:params};         
        let message = new Paho.MQTT.Message(JSON.stringify(messageO));
         message.destinationName = "presence";
        this.mqttClient.send(message) 
