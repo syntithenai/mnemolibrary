@@ -24,7 +24,8 @@ export default class CommentList extends Component {
         super(props);
         this.state= {
 			showShareDialog:null,
-			shareLink:''
+			shareLink:'',
+			shareText:''
 		}
 		this.scrollTo = {}
         //let question = this.props.question ? this.props.question : {};
@@ -41,8 +42,10 @@ export default class CommentList extends Component {
       
     setShareDialog(val,comment) {
 		if (comment) {
-			let shareLink = window.location.protocol+'//'+window.location.host+"/recentcomments/"+comment._id;  
-			this.setState({shareLink:shareLink});
+			//let shareLink = window.location.protocol+'//'+window.location.host+"/recentcomments/"+comment._id;  
+			//let shareLink =  window.location.protocol+'//'+window.location.host+'/discover/topic/'+comment.questionTopic+"/"+comment.question;
+			let shareLink =  window.location.protocol+'//'+window.location.host+'/discover/topic/'+comment.questionTopic+"/"+comment.question;
+			this.setState({shareLink:shareLink,shareText:comment.comment});
 		}
 		this.setState({showShareDialog:val});
 		
@@ -271,7 +274,7 @@ Questions</b></div>}
 				<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 				
 				
-				{that.state.showShareDialog && <ShareDialog   analyticsEvent={that.props.analyticsEvent} setShareDialog={that.setShareDialog} url={that.state.shareLink} title={''} dialogTitle={'Share Comment using'} />}
+				{that.state.showShareDialog && <ShareDialog   analyticsEvent={that.props.analyticsEvent} setShareDialog={that.setShareDialog} shareLink={that.state.shareLink} shareText={that.state.shareText} dialogTitle={'Share Comment using'} />}
 
 			</div>
 			

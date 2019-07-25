@@ -25,7 +25,7 @@ export default class QuickMemo extends Component {
 		if (record && this.props.user && this.props.user._id) {
 			let quiz = 'QuickMemo'
 			let d = new Date();
-			let interrogative = 'QuickMemo '+ (d.getDay() > 9 ? '' : '0') + d.getDay()+"/"+(d.getMonth() > 9 ? '' : '0')+d.getMonth()+'/'+d.getUTCFullYear();
+			let interrogative = 'QuickMemo '+ (d.getDate() > 9 ? '' : '0') + d.getDate()+"/"+(d.getMonth() > 8 ? '' : '0')+(d.getMonth()+1)+'/'+d.getUTCFullYear();
 			let headlineFacts = {};
 			if (record && record.question && record.question.length > 0 && record.answer && record.answer.length > 0) {
 				console.log(['send review',that.state.saveForReview])
