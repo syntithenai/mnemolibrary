@@ -330,7 +330,7 @@ let databaseFunctions = {
                                 criteria.push({$and:[{ok_for_alexa :{$eq:true}},{specific_question :{$ne:null}},{specific_question :{$ne:''}},{specific_answer :{$ne:null}},{specific_answer :{$ne:''}}]});
 
                               console.log(['REVItEW',successAndDateOrderedIds]);
-                                db.collection('questions').find({$and:[{_id:{$in:successAndDateOrderedIds}}, alexaCriteria]).limit(limit).toArray(function(err,results) {
+                                db.collection('questions').find({$and:[{_id:{$in:successAndDateOrderedIds}}, alexaCriteria]}).limit(limit).toArray(function(err,results) {
                                    // //console.log([err,results]);
                                     let questionIndex={};
                                     results.forEach(function(question) {
