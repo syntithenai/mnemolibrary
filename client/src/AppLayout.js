@@ -1327,7 +1327,7 @@ export default class AppLayout extends Component {
     if (this.state.user && this.state.user._id && this.state.user._id.length > 0 && oauth==="alexa" && authRequest && authRequest.length > 0) {
         //console.log([authRequest,this.props.token,this.props.user]);
         if (!auth) auth={};
-
+console.log(auth,this.state.user)
         return (
             
            
@@ -1353,7 +1353,7 @@ export default class AppLayout extends Component {
             <input type='hidden' name='redirect_uri'  value={auth.redirect_uri} />
             <input type='hidden' name='scope'  value={auth.scope}/>
             <input type='hidden' name='state'  value={auth.state}/>
-            <input type='hidden' name='access_token'  value={this.props.token ? this.props.token.access_token : null}/>
+            <input type='hidden' name='access_token'  value={this.state.token ? this.state.token.access_token : null}/>
             <button type='submit' className='btn btn-info' onClick={() => this.allowAlexa.bind(this)(false)} >Yes</button>
             </form></div>
             <div className='col-2'><a className='btn btn-info' href='/' onClick={() => this.allowAlexa.bind(this)(false)} >No</a></div>
