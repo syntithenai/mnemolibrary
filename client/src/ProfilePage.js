@@ -248,7 +248,7 @@ export default class ProfilePage extends Component {
         let auth =JSON.parse(authRequest);
         if (!auth) auth={};
 
-        if (false && oauth==="alexa") {
+        if (oauth==="alexa") {
             return (
             <div className='row'>
             <div className='col-12'><h4>Allow Alexa to integrate with Mnemo's Library ?</h4></div>
@@ -261,7 +261,7 @@ export default class ProfilePage extends Component {
             <input type='hidden' name='redirect_uri'  value={auth.redirect_uri} />
             <input type='hidden' name='scope'  value={auth.scope}/>
             <input type='hidden' name='state'  value={auth.state}/>
-            <input type='hidden' name='access_token'  value={this.props.token.access_token}/>
+            <input type='hidden' name='access_token'  value={this.props.token ? this.props.token.access_token : null}/>
             <button type='submit' className='btn btn-info' onClick={() => this.allowAlexa.bind(this)(false)} >Yes</button>
             </form></div>
             <div className='col-2'><a className='btn btn-info' href='/' onClick={() => this.allowAlexa.bind(this)(false)} >No</a></div>

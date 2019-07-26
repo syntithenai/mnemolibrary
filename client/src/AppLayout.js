@@ -1,6 +1,7 @@
 /* eslint-disable */ 
 /* global gapi */
 /* global Paho */
+/* global document */
 import React, { Component } from 'react';
 //import AdSense from 'react-adsense';
 //let Paho = require('paho-mqtt')
@@ -599,6 +600,7 @@ export default class AppLayout extends Component {
       this.setCurrentPage('login');
       localStorage.setItem('oauth',service);
       localStorage.setItem('oauth_request',JSON.stringify(authRequest));
+      document.location='/profile'
   };
 
   shout(action,params) {
