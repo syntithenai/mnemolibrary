@@ -284,7 +284,7 @@ let databaseFunctions = {
                          criteria.push({user:ObjectId(user._id)});
                         // sort by successTally and then most recently seen first
                          //console.log(JSON.stringify(criteria));
-                        db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(limit).toArray().then(function(questions,error) {
+                        db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(1000).toArray().then(function(questions,error) {
                             if (questions) {
                                //console.log(questions);
                                 let questionKeys = [];
