@@ -203,7 +203,7 @@ export default class MultipleChoiceQuestions extends Component {
 		 console.log(['SETSHAREDIALOG',val,topic])
 		if (topic) {
 			let shareLink =  window.location.protocol+'//'+window.location.host+'/multiplechoicequestions/'+topic;
-			let shareText = topic
+			let shareText = topic + " Quiz "
 			this.setState({shareLink:shareLink,shareText:shareText});
 		}
 		this.setState({showShareDialog:val});

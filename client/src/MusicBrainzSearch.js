@@ -30,8 +30,7 @@ import Fakerator from 'fakerator'
 
 var nlp = require('compromise') // (or window.nlp)
 		
-				
-
+		
 export default class MusicBrainzSearch extends MashupSearch {   
 	constructor(props) {
 		super(props);
@@ -61,7 +60,246 @@ export default class MusicBrainzSearch extends MashupSearch {
 		this.discographyRef = null;
 		
 	}
-	
+
+
+	/**
+	 * Lookup additional information about this entity 
+	 * Use a combination of wikipedia full text, wikipedia title and google knowledge graph to identify a wikipedia page to scrape
+	 */
+	expandData(questionKey) {
+		let that=this;
+		// disable
+		//let expanded = {};
+		//expanded[questionKey] = true;
+		//that.setState({expanded:expanded});
+		//return
+		that.startLoading()
+		
+		let question = this.state.results && this.state.results.length > questionKey ? this.state.results[questionKey] : null;
+		let questions = this.state.results;
+		let isError = false;
+		let mbid = that.getMBID(question)
+			
+		if (question && mbid.length > 0) {
+			//let shortSearchKeyGoogle = that.getCanonicalName(question)
+			//let longSearchKeyWikipedia = '"'+that.getCanonicalName(question) +'" ' + that.getName(question)
+			//let shortSearchKeyWikipedia = '"' + that.getCanonicalName(question) + '"'
+			// LOAD ARTIST DETAILS
+			fetch('https://musicbrainz.org/ws/2/artist/'+mbid+'?inc=genres+tags+annotation+ratings+url-rels&fmt=json')
+			.then(function(response) {
+				return response.json()
+			}).then(function(artistjson) {
+				console.log(['LOADed artist details',artistjson])
+				
+				// LOAD ALBUMS
+				fetch('https://musicbrainz.org/ws/2/release/?artist='+mbid+'&inc=release-groups+genres+tags+annotation&type=album|ep&limit=300&fmt=json')
+				//'https://musicbrainz.org/ws/2/release?artist='+that.getMBID(question)+'&inc=release-groups&limit=1000&fmt=json')
+				.then(function(response) {
+					return response.json()
+				}).then(function(releasejson) {	
+					console.log(['LOADed artist details',releasejson])
+
+					// COLLATE AND ASSIGN ALBUMS
+					// TODO COLLATE BY RELEASE-GROUP ID RATHER THAN NAME
+					let finalRelease = [];
+					let albumIndex = {}
+					let titles = {}
+					//console.log(['RELEASE DATA grp',releasejson])
+						
+					let releasesSeen={}	
+					if (releasejson && releasejson['releases']) {
+						// first filter and flatten releases(albums) by title
+						releasejson['releases'].map(function(release) {
+							// just first version of album title
+							let cleanTitle = release && release.title ? release.title.trim() : ''
+							cleanTitle = cleanTitle.replace(/[^a-z0-9+]+/gi, '+');
+							if (!releasesSeen[cleanTitle]) {
+								releasesSeen[cleanTitle] = true;
+									let image = '';
+									if (release['cover-art-archive'] && release['cover-art-archive'].artwork) {
+										image = 'https://coverartarchive.org/release/'+release.id+'/front'
+									} 
+									
+									let tracks = release.media && release.media.length > 0 && release.media[0].tracks ? release.media[0].tracks.map(function(track) {
+										//console.log('tr',track)
+										return {sort:track.position, title:track.title}
+									}): []
+									tracks.sort(function(a,b) {
+										if (a.sort < b.sort) return -1 
+										else return 1
+									})
+									albumIndex[release.title] = {
+										id:release.id,
+										image:image,
+										date:release['date'],
+										title:release['title'],
+										tracks:tracks
+									};
+									titles[release.title] = true;
+							}
+						})
+					}
+					finalRelease = Object.values(albumIndex)
+					finalRelease.sort(function(a,b) {
+						if (a.date < b.date) return -1 
+						else return 1
+					})
+					questions[questionKey].albums = finalRelease;
+				
+
+
+
+					// FIND WIKIDATA ID
+					let wikidataLink = '';
+					if (artistjson) {
+						artistjson.relations.map(function(relation) {
+							if (relation.type === 'wikidata') wikidataLink = relation && relation.url ? relation.url.resource : '';
+						})
+					}
+					if (wikidataLink) {
+						let parts = wikidataLink.split('/')
+						let pageId = parts.length > 0 ? parts[parts.length-1] : null;
+						console.log([wikidataLink,parts,pageId])
+						// LOAD WIKIDATA TO FIND WIKIPEDIA PAGE
+						if (pageId && pageId.length > 0) { 
+							fetch('https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&sitefilter=enwiki&origin=*&props=sitelinks&ids='+pageId)
+							.then(function(response) {
+								return response.json()
+							}).then(function(wikidatajson) {
+								console.log(['wikidatajson',wikidatajson])
+								let wikipediaPageTitle = wikidatajson.entities[pageId].sitelinks.enwiki.title;
+								console.log(['wikipediaPageTitle',wikipediaPageTitle])
+								if (wikipediaPageTitle && wikipediaPageTitle.length > 0) {
+									// LOAD WIKIPEDIA DATA
+									fetch('https://en.wikipedia.org/w/api.php?format=json&origin=*&redirects=true&action=query&origin=*&prop=extracts|image&exintro=&explaintext=&titles='+wikipediaPageTitle)
+									.then(function(response) {
+										return response.json()
+									}).then(function(wikipediajson) {
+										console.log(['wikipediajson',wikipediajson])
+										fetch('https://en.wikipedia.org//w/api.php?origin=*&redirects=true&action=query&prop=pageimages&format=json&piprop=original&titles='+wikipediaPageTitle)
+										.then(function(response) {
+											return response.json()
+										}).then(function(imagejson) {
+											
+											// SAVE WIKI DATA TO RECORD
+											let wdata = wikipediajson.query.pages;
+											if (wdata) {
+												Object.keys(wdata).map(function(wikipediaPageId) {
+													let page = wdata[wikipediaPageId];
+													questions[questionKey].description = page.extract
+													questions[questionKey].link = 'http://en.wikipedia.org/wiki/'+wikipediaPageTitle;
+													questions[questionKey].wikipediaPageId = wikipediaPageId;
+												})
+											} 
+											
+											// image
+											let wikiimagedata = imagejson && imagejson.query && imagejson.query.pages && Object.values(imagejson.query.pages).length > 0 ? Object.values(imagejson.query.pages)[0] : null;
+											
+											if (wikiimagedata && wikiimagedata.original && wikiimagedata.original.source) questions[questionKey].image = wikiimagedata.original.source;
+											
+											
+											// headline facts
+											questions[questionKey].headlineFacts={};
+											//questions[questionKey].headlineFacts.Albums = Object.keys(titles).join(',');
+											//if (questions[questionKey].works) questions[questionKey].headlineFacts["Total Works"] = questions[questionKey].works.length;
+											let tags = []
+											let extendedTags=['musician']
+											if (question.tags) {
+												question.tags.map(function(tag) {
+													if (tag.name && tag.name.trim().length > 0) {
+														tags.push(tag.name);
+														extendedTags.push(tag.name);
+													}
+													
+												})
+												questions[questionKey].headlineFacts.Tags = tags.join(",");
+											}
+											question.extendedTags = extendedTags;
+											
+											let decade=0;
+											if (question['life-span'] && question['life-span'].begin) {
+												let year = parseInt(question['life-span'].begin,10);
+												question.year = year;
+												questions[questionKey].headlineFacts.Begin = year;
+												if (year > 0) decade = parseInt(year/10)*10;
+												if (decade < 1900) decade = parseInt(year/100)*100;
+											}
+											question.decade = decade;
+											 //else {
+												//questions[questionKey].headlineFacts.Begin = '';
+											//}
+											//
+											
+											if (question.country) {
+												question.country = that.findCountryByCode(question.country);
+												questions[questionKey].headlineFacts.Location = question.country;
+												if (question['begin-area'] && question['begin-area'].name) questions[questionKey].headlineFacts.Location =  question['begin-area'].name +  ', ' + question.country;
+											}
+											// set quiz by decade or fallback to country (or finally just Musicians)
+											let whenTitle = question.country && question.country.trim().length > 0 ? "Musicians of "+question.country : 'Musicians';
+											let whereTitle = question.decade && question.decade > 0 ? 'Musicians of the ' + question.decade+"'s" : 'Musicians';
+											if (question && question.decade  && question.decade > 0) {
+												question.quiz = whereTitle;
+											} else {
+												question.quiz = whenTitle;
+											}
+											
+											// NLU processing extract band people
+											var doc = nlp(questions[questionKey].description)
+											function onlyUnique(value, index, self) { 
+												return self.indexOf(value) === index;
+											}
+											 function toTitleCase(str) {
+												return str.replace(
+													/\w\S*/g,
+													function(txt) {
+														return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+													}
+												);
+											}	
+											let people = doc.people().toTitleCase().match('#FirstName #LastName').out('array').filter(onlyUnique)
+											if (people && people.length > 0) question.headlineFacts.People = people.map(function(person) {
+													return toTitleCase(person)
+												}).join(",")
+											
+											
+											//let decade = 0;
+											//if (question.headlineFacts.Begin.length > 0) {
+												//question.quiz = 'Musicians of the '+((parseInt(question.headlineFacts.Begin,10)%100)*10)+"'s"
+											//}  
+											question.link2 = 'https://www.youtube.com/results?search_query='+that.getCanonicalName(question);
+											question.link2Title = 'YouTube'
+
+											console.log(['ALL DONE',question])
+											
+											that.stopLoading()
+											that.setState({results:questions})
+										})
+									})
+								} else {
+									that.stopLoading()
+									that.setState({results:questions})
+								}
+								that.stopLoading()
+								that.setState({results:questions})
+							})
+						} else {
+							that.stopLoading()
+							that.setState({results:questions})
+						}
+					} else {
+						that.stopLoading()
+						that.setState({results:questions})
+					}
+				})
+			})
+        } else {
+				that.stopLoading()
+				that.setState({results:[]})
+		}
+	}				
+						
+
 	findCountryByCode(findCode) {
 		let ret = findCode
 		if (countryCodes) {
@@ -93,7 +331,7 @@ export default class MusicBrainzSearch extends MashupSearch {
 	}
 	
 	getMBID(result) {
-		return result.id;
+		return result ? result.id : '';
 	}
 	
 	
@@ -360,529 +598,7 @@ export default class MusicBrainzSearch extends MashupSearch {
 	}
 	
 	
-	/**
-	 * Lookup additional information about this entity 
-	 * Use a combination of wikipedia full text, wikipedia title and google knowledge graph to identify a wikipedia page to scrape
-	 */
-	expandData(questionKey) {
-		let that=this;
-		// disable
-		//let expanded = {};
-		//expanded[questionKey] = true;
-		//that.setState({expanded:expanded});
-		//return
-		that.startLoading()
-		
-		let question = this.state.results[questionKey];
-		let isError = false;
-		if (question && this.getMBID(question).length > 0) {
-			let shortSearchKeyGoogle = that.getCanonicalName(question)
-			let longSearchKeyWikipedia = '"'+that.getCanonicalName(question) +'" ' + that.getName(question)
-			let shortSearchKeyWikipedia = '"' + that.getCanonicalName(question) + '"'
-			
-			
-			let initialPromises = [];
-			
-			
-			//
-			// first, see what google has to say about the canonical name
-			initialPromises.push(new Promise(function(resolve,reject) {
-				fetch('https://kgsearch.googleapis.com/v1/entities:search?limit=100&types=MusicGroup&types=Person&key=AIzaSyDj5IgbuLmaoSrcNwBadk7ayEw2kfrNWaA&query='+shortSearchKeyGoogle)
-				.then(function(response) {
-					return response.json()
-				}).then(function(json) {
-					if (json.error) {
-						isError = true
-					}
-					console.log(json)
-					if (json && json && json.itemListElement && json.itemListElement.length > 0) {
-						resolve({key:'google',value:json.itemListElement})
-					} else {
-						resolve({key:'google',value:null})
-					}
-				})
-			}))
-			
-			
-			initialPromises.push(new Promise(function(resolve,reject) {
-				// now a wikipedia full text search including disambiguation
-				fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&srwhat=text&srlimit=100&list=search&origin=*&srsearch='+longSearchKeyWikipedia)
-				.then(function(response) {
-					return response.json()
-				}).then(function(json) {
-					console.log(json)
-					if (json && json.query && json.query.search && json.query.search.length > 0 && json.query.search[0]) {
-						resolve({key:'wikilong',value:json.query.search})
-					} else {
-						resolve({key:'wikilong',value:null})
-					}
-				})
-			}))
-			initialPromises.push(new Promise(function(resolve,reject) {
-				// now try wikipedia title search with the canonical name
-				fetch('https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts|images&exintro=&explaintext=&titles='+shortSearchKeyWikipedia)
-				.then(function(response) {
-					return response.json()
-				}).then(function(json) {
-					console.log(json)
-					if (json && json.query && json.query.search && json.query.search.length > 0) {
-						resolve({key:'wikishort',value:json.query.pages})
-					} else {
-						resolve({key:'wikishort',value:null})
-					}
-				})
-			}))
-					
-				
-			Promise.all(initialPromises).then(function(lookupResults) {
-				let combined = {}
-				if (lookupResults) {
-					lookupResults.map(function(result) {
-						combined[result.key] = result.value
-					})
-				}
-				
-				// extract wiki page from google
-				// && combined.google.result.detailedDescription.url.length > 0 && combined.google.result.detailedDescription.url.indexOf('wikipedia.org') !== -1
-				console.log(['TEST'])
-				console.log([combined,JSON.stringify(combined.google),JSON.stringify(combined.wikilong),JSON.stringify(combined.wikishort)])
-				
-				// final step is to setState results
-				
-				
-				let found = false;
-				let finalWikiPage = null;
-				let finalWikiRecord = null
-				if (combined.google) {
-					console.log(['WIKILONG']);
-					// && combined.wikilong.title && wikiPage === combined.wikilong.title) {
-					for (var g in combined.google) {
-						if (!found) {
-							let wikiPage = null;
-							if (combined.google[g] && combined.google[g].result && combined.google[g].result.detailedDescription && combined.google[g].result.detailedDescription.url) {
-								let parts = combined.google[g].result.detailedDescription.url.split("/");
-								wikiPage = parts.length > 1 ? parts[parts.length - 1] : null;
-								if (wikiPage && wikiPage.length > 0) {
-									wikiPage =  wikiPage.replace(/_/g,' ');
-								}
-							}
-							
-							if (wikiPage) {	
-								for (var a in combined.wikilong) {
-									let wikiRes = combined.wikilong[a] ? combined.wikilong[a].title : ''
-									//console.log([wikiPage,wikiRes,combined.wikilong[a]]);
-							
-									if (wikiRes === wikiPage) {
-										console.log(['YAY',g,a,wikiPage,wikiRes])
-										finalWikiPage = wikiPage
-										finalWikiRecord = combined.wikilong[a];
-										found = true;
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-				
-				if (!found && combined.wikishort && combined.wikishort.title && wikiPage === combined.wikishort.title) {
-					console.log(['try WIKISHORT']);
-					for (var g in combined.google) {
-						let wikiPage = null;
-				
-						if (combined.google[g] && combined.google[g].result && combined.google[g].result.detailedDescription && combined.google[g].result.detailedDescription.url) {
-							let parts = combined.google[g].result.detailedDescription.url.split("/");
-							wikiPage = parts.length > 1 ? parts[parts.length - 1] : null;
-							if (wikiPage && wikiPage.length > 0) {
-								wikiPage =  wikiPage.replace(/_/g,' ');
-							}
-						}
-						//console.log([wikiPage]);
-						
-						for (var a in combined.wikishort) {
-							let wikiRes = combined.wikishort[a] ? combined.wikishort[a].title : ''
-							if (wikiRes === wikiPage) {
-								console.log(['YAYshort',a,wikiPage,wikiRes])
-								finalWikiPage = wikiPage
-								finalWikiRecord = combined.wikilong[a];
-								found = true;
-								break;
-							}
-						}
-					}
-				}
-						
-				//if (!found && combined.wikilong && combined.wikilong.title &&  combined.wikishort && combined.wikishort.title && combined.wikilong.title === combined.wikishort.title) {
-					//console.log(['TRY WIKIS']);
-					//for (var a in combined.wikilong) {
-						//let wikiRes = combined.wikilong[a] ? combined.wikilong[a].title : ''
-						//console.log([wikiRes]);
-						
-						//for (var b in combined.wikishort) {
-							//let wikiRes2 = combined.wikishort[a] ? combined.wikishort[a].title : ''
-							//if (wikiRes === wikiRes2) {
-								//console.log(['YAYwikis',wikiRes,wikiRes2])
-								//break;
-							//}
-						//}
-					//}
-					
-				//}
-				
-				if (!isError) {
-					if (found) {
-						console.log('FOUND ',finalWikiPage,combined.google,combined.wikilong,combined.wikishort)
-						fetch('https://en.wikipedia.org//w/api.php?origin=*&redirects=true&action=query&prop=pageimages&format=json&piprop=original&titles='+finalWikiPage)
-						.then(function(response) {
-							return response.json()
-						}).then(function(imagejson) {
-							fetch('https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles='+finalWikiPage)
-							.then(function(response) {
-								return response.json()
-							}).then(function(extractsjson) {
-							
-								
-									
-								fetch('https://musicbrainz.org/ws/2/release/?artist='+that.getMBID(question)+'&inc=recordings&type=album|ep&limit=300&fmt=json')
-								.then(function(response) {
-									return response.json()
-								}).then(function(releasejson) {
-									console.log(['LOADed releases'])
-									fetch('https://musicbrainz.org/ws/2/release?artist='+that.getMBID(question)+'&inc=release-groups&limit=1000&fmt=json')
-									.then(function(response) {
-										return response.json()
-									}).then(function(worksjson) {	
-										//console.log(['SONGS /albs LOADed ',worksjson])
-										// find the list results array
-										let final = []
-										let questions = that.state.results;
-										//console.log(['CHECK',questionKey,questions,questions[questionKey]])
 
-										
-										if (questions && questions[questionKey]) {
-												
-											// description and link
-											//let wikidatabase = combined.wikilong ? combined.wikilong : combined.wikishort;
-											//let wikidata = finalWikiRecord;
-											//imagejson && imagejson.query && imagejson.query.pages && Object.values(imagejson.query.pages).length > 0 ? Object.values(imagejson.query.pages)[0] : null;
-											let wikidata = extractsjson && extractsjson.query && extractsjson.query.pages && Object.values(extractsjson.query.pages).length > 0 ? Object.values(extractsjson.query.pages)[0] : null;
-											console.log(wikidata)
-											
-											if (wikidata && wikidata.extract) questions[questionKey].description = wikidata.extract;
-											//  fallback description to google
-											let googleResult = combined.google
-											if (!questions[questionKey].description) {
-												console.log(['DESC OVERRIDE',googleResult,questions[questionKey].image,googleResult && googleResult.image ? googleResult.image.contentUrl : null])
-												if (!questions[questionKey].image && googleResult && googleResult.detailedDescription && googleResult.detailedDescription.articleBody) {
-													questions[questionKey].description = googleResult.detailedDescription.articleBody;
-												}
-											}
-											
-											if (wikidata && wikidata.pageid) {
-												questions[questionKey].wikipediaPageId = wikidata.pageid;
-												questions[questionKey].link = 'http://en.wikipedia.org/?curid='+wikidata.pageid;
-											}
-											// image
-											let wikiimagedata = imagejson && imagejson.query && imagejson.query.pages && Object.values(imagejson.query.pages).length > 0 ? Object.values(imagejson.query.pages)[0] : null;
-											
-											if (wikiimagedata && wikiimagedata.original && wikiimagedata.original.source) questions[questionKey].image = wikiimagedata.original.source;
-											// fallback to image from google
-											console.log(['IMAGE OVERRIDE',googleResult,questions[questionKey].image,googleResult && googleResult.image ? googleResult.image.contentUrl : null])
-											if (!questions[questionKey].image && googleResult && googleResult.image && googleResult.image.contentUrl) {
-												questions[questionKey].image = googleResult.image.contentUrl;
-											}
-											//console.log(['RELEASE DATA',releasejson])
-											//let releasedata = releasejson && releasejson.query && releasejson.query.pages && Object.values(releasejson.query.pages).length > 0 ? Object.values(releasejson.query.pages)[0] : null;
-											
-											// filter albums and collate works
-											let finalRelease = [];
-											let albumIndex = {}
-											let titles = {}
-											//console.log(['RELEASE DATA grp',releasejson])
-												
-											let releasesSeen={}	
-											if (releasejson && releasejson['releases']) {
-												// first filter and flatten releases(albums) by title
-												releasejson['releases'].map(function(release) {
-													// just first version of album title
-													let cleanTitle = release && release.title ? release.title.trim() : ''
-													cleanTitle = cleanTitle.replace(/[^a-z0-9+]+/gi, '+');
-													if (!releasesSeen[cleanTitle]) {
-														releasesSeen[cleanTitle] = true;
-														//if (!release['secondary-types'] || release['secondary-types'].length == 0) { 
-															//if (!albumIndex.hasOwnProperty(release.title)) {
-																//console.log('rel',release['cover-art-archive'])
-																let image = '';
-																if (release['cover-art-archive'] && release['cover-art-archive'].artwork) {
-																	image = 'https://coverartarchive.org/release/'+release.id+'/front'
-																} 
-																
-																let tracks = release.media && release.media.length > 0 && release.media[0].tracks ? release.media[0].tracks.map(function(track) {
-																	//console.log('tr',track)
-																	return {sort:track.position, title:track.title}
-																}): []
-																tracks.sort(function(a,b) {
-																	if (a.sort < b.sort) return -1 
-																	else return 1
-																})
-																albumIndex[release.title] = {
-																	id:release.id,
-																	image:image,
-																	date:release['date'],
-																	title:release['title'],
-																	tracks:tracks
-																};
-																titles[release.title] = true;
-														//} 
-														//else {
-															//albumIndex[release.title].tracks = tracks;
-														//}
-													}
-												})
-											}
-											finalRelease = Object.values(albumIndex)
-											finalRelease.sort(function(a,b) {
-												if (a.date < b.date) return -1 
-												else return 1
-											})
-											
-											//finalRelease.sort(function(a,b) {
-												//if (a.date < b.date) return -1
-												//return 1;
-											//})
-											questions[questionKey].albums = finalRelease;
-										
-											
-											// headline facts
-											questions[questionKey].headlineFacts={};
-											//questions[questionKey].headlineFacts.Albums = Object.keys(titles).join(',');
-											//if (questions[questionKey].works) questions[questionKey].headlineFacts["Total Works"] = questions[questionKey].works.length;
-											let tags = []
-											let extendedTags=['musician']
-											if (question.tags) {
-												question.tags.map(function(tag) {
-													if (tag.name && tag.name.trim().length > 0) {
-														tags.push(tag.name);
-														extendedTags.push(tag.name);
-													}
-													
-												})
-												questions[questionKey].headlineFacts.Tags = tags.join(",");
-											}
-											question.extendedTags = extendedTags;
-											
-											let decade=0;
-											if (question['life-span'] && question['life-span'].begin) {
-												let year = parseInt(question['life-span'].begin,10);
-												question.year = year;
-												questions[questionKey].headlineFacts.Begin = year;
-												if (year > 0) decade = parseInt(year/10)*10;
-												if (decade < 1900) decade = parseInt(year/100)*100;
-											}
-											question.decade = decade;
-											 //else {
-												//questions[questionKey].headlineFacts.Begin = '';
-											//}
-											//
-											
-											if (question.country) {
-												question.country = that.findCountryByCode(question.country);
-												questions[questionKey].headlineFacts.Location = question.country;
-												if (question['begin-area'] && question['begin-area'].name) questions[questionKey].headlineFacts.Location =  question['begin-area'].name +  ', ' + question.country;
-											}
-											// set quiz by decade or fallback to country (or finally just Musicians)
-											let whenTitle = question.country && question.country.trim().length > 0 ? "Musicians of "+question.country : 'Musicians';
-											let whereTitle = question.decade && question.decade > 0 ? 'Musicians of the ' + question.decade+"'s" : 'Musicians';
-											if (question && question.decade  && question.decade > 0) {
-												question.quiz = whereTitle;
-											} else {
-												question.quiz = whenTitle;
-											}
-											
-											// NLU processing extract band people
-											var doc = nlp(questions[questionKey].description)
-											function onlyUnique(value, index, self) { 
-												return self.indexOf(value) === index;
-											}
-											 function toTitleCase(str) {
-												return str.replace(
-													/\w\S*/g,
-													function(txt) {
-														return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-													}
-												);
-											}	
-											let people = doc.people().toTitleCase().match('#FirstName #LastName').out('array').filter(onlyUnique)
-											if (people && people.length > 0) question.headlineFacts.People = people.map(function(person) {
-													return toTitleCase(person)
-												}).join(",")
-											
-											
-											//let decade = 0;
-											//if (question.headlineFacts.Begin.length > 0) {
-												//question.quiz = 'Musicians of the '+((parseInt(question.headlineFacts.Begin,10)%100)*10)+"'s"
-											//}  
-											question.link2 = 'https://www.youtube.com/results?search_query='+that.getCanonicalName(question);
-											question.link2Title = 'YouTube'
-											that.stopLoading()
-											that.setState({results:questions})
-										} else {
-												that.stopLoading()
-												that.setState({results:[]})
-										}
-									
-									})
-								})
-							})
-						})
-					} else {
-						console.log('NO MATCH')
-						that.showMessage('No Match Found')
-					}
-					
-				} else {
-					that.showMessage('Google Knowledge service is not responding. Please try again in a few moments.')
-				}
-				
-				
-			}) 		
-						
-							//let googleResultObject = knowledgejson && knowledgejson.itemListElement && knowledgejson.itemListElement.length > 0 ? knowledgejson.itemListElement[0] : null;
-							//let googleResult= googleResultObject ? googleResultObject.result : null;
-							//console.log(googleResult)
-							
-							//// first cut at image and description from google
-							//let finalImport = {}
-							//finalImport.description = googleResult.description;
-							//finalImport.image = '';
-							//finalImport.link3 = 'WWW'
-							//finalImport.attribution = '';
-							//finalImport.imageattribution = '';
-							
-							//if (googleResult.detailedDescription && googleResult.detailedDescription.articleBody && googleResult.detailedDescription.articleBody.length > 0) {
-								//finalImport.description = googleResult.detailedDescription.articleBody;
-								//finalImport.attribution = googleResult.detailedDescription.license
-							//}
-							//if (googleResult.image && googleResult.image.contentUrl && googleResult.image.contentUrl.length > 0) {
-								//finalImport.image = googleResult.image.contentUrl;
-								//finalImport.imageattribution = googleResult.image.url
-							//}
-							
-						//})
-					// TODO if wikipedia result is ok, use that, otherwise try again with search word from google description link
-					//if (googleResult && googleResult.detailedDescription  && googleResult.detailedDescription.url  && googleResult.detailedDescription.url.length > 0 && googleResult.detailedDescription.url.indexOf('wikipedia.org')!== -1) {
-						//let parts= googleResult.detailedDescription.url.split("/");
-						//wikiSearchKey=parts[parts.length - 1]
-						//console.log('FORCE WIKI KEY FROM GOOGLE',wikiSearchKey )
-					//}
-					
-					//// now that we have decided on a wiki key, lookup wiki description
-				
-				
-					//// https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles="+this.getCanonicalName(question)
-					//let url = 'https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles='+wikiSearchKey
-					////console.log(['LOAD  wikipedia desc',url])
-					
-					//fetch(url)
-					//.then(function(response) {
-						//return response.json()
-					//}).then(function(wikijson) {
-						//console.log(['LOADed wikidesc'])
-							
-						
-					//})
-			//	})
-			//})
-             //var url="https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles="+this.getCanonicalName(question)
-	 
-			//console.log(['expand wiki data',url])
-		
-		     //fetch(url).then(function(response) {
-                //return response.json();
-            //}).then(function(json) {
-				//let questions = that.state.results;
-				
-				//let pages = json.query && json.query.pages ? json.query.pages : null;
-				//let questionsLoaded = pages && Object.values(pages).length > 0 ? Object.values(pages) : null;
-				//console.log(['expand results',questionsLoaded,json])
-				//if (questionsLoaded && questionsLoaded[0] && questionsLoaded[0].pageid > 0) {
-					//let questionLoaded = questionsLoaded[0];
-					//questions[questionKey].description = questionLoaded.extract;
-					//questions[questionKey].wikipediaPageId = questionLoaded.pageid;
-					//let expanded = {};
-					//expanded[questionKey] = true;
-					//that.setState({results:questions,expanded:expanded});
-				//// try again with common name
-				//} else if (that.getName(question).length > 0)  {
-					//var url="https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles="+that.getName(question)
-	 
-					//console.log(['expand wikidata by common name',url])
-		
-		            //fetch(url).then(function(response) {
-						//return response.json();
-					//}).then(function(json) {
-						//let questions = that.state.results;
-						
-						//let pages = json.query && json.query.pages ? json.query.pages : null;
-						//let questionsLoaded = pages && Object.values(pages).length > 0 ? Object.values(pages)  : null;
-						//console.log(['expand results',questionsLoaded,json])
-						//if (questionsLoaded && questionsLoaded[0] && questionsLoaded[0].pageid > 0) {
-							//let questionLoaded = questionsLoaded[0];
-							//questions[questionKey].description = questionLoaded.extract;
-							//questions[questionKey].wikipediaPageId = questionLoaded.pageid;
-							//let expanded = {};
-							//expanded[questionKey] = true;
-							//that.setState({results:questions,expanded:expanded});
-						//}
-					//})
-				//}
-            //})
-            //.catch(function(err) {
-                //console.log(['ERR loading wiki results',err]);
-            //});
-            
-            
-            
-            						//console.log(['RELEASE DATA',titles,albumIndex])
-												
-												// now index works so they can be crossed off and uncategorised works listed at end
-												//let worksIndex=[]
-												//let otherWorks = []
-												////console.log(['WWWWORRR',realworksjson])
-														
-												//if (realworksjson && realworksjson.works) {
-													//realworksjson.works.map(function(work) {
-													////	console.log(['wwwwwwrork',work])
-														//worksIndex.push(work.title);
-														////let id = release.hasOwnProperty('release-group') ?  release['release-group'].id : null;
-													//})
-												//}
-												//console.log(['ME RELEASE works',albumIndex,releasejson,worksjson,worksjson.works,realworksjson])
-												// now iterate works, assigning to release group
-												//if (worksjson && worksjson.releases) {
-													//worksjson.releases.map(function(release) {
-														//let id = release.hasOwnProperty('release-group') ?  release['release-group'].id : null;
-														//if (id) {
-															//console.log(['REL',release])
-															//// did we collate this album (no secondary types)
-															//if (albumIndex.hasOwnProperty(id)) {
-																//if (!albumIndex[id].works) albumIndex[id].works = [];
-																//albumIndex[id].works.push({date:release.date,title:release.title}); 
-															//} else {
-																//otherWorks.push({date:release.date, title:release.title})
-															//} 
-															
-														//} 
-														////console.log(['work',release])
-													//})
-												//}
-												//albumIndex['Other Works'] = {date:'',title:'Other Works',works:otherWorks};
-						
-            
-            
-            
-        }
-	}
 	
 	
 	/**
@@ -1079,3 +795,528 @@ export default class MusicBrainzSearch extends MashupSearch {
         //)
     //}
 }
+
+
+
+	///**
+	 //* Lookup additional information about this entity 
+	 //* Use a combination of wikipedia full text, wikipedia title and google knowledge graph to identify a wikipedia page to scrape
+	 //*/
+	//expandData(questionKey) {
+		//let that=this;
+		//// disable
+		////let expanded = {};
+		////expanded[questionKey] = true;
+		////that.setState({expanded:expanded});
+		////return
+		//that.startLoading()
+		
+		//let question = this.state.results[questionKey];
+		//let isError = false;
+		//if (question && this.getMBID(question).length > 0) {
+			//let shortSearchKeyGoogle = that.getCanonicalName(question)
+			//let longSearchKeyWikipedia = '"'+that.getCanonicalName(question) +'" ' + that.getName(question)
+			//let shortSearchKeyWikipedia = '"' + that.getCanonicalName(question) + '"'
+			
+			
+			//let initialPromises = [];
+			
+			
+			//// first, see what google has to say about the canonical name
+			//initialPromises.push(new Promise(function(resolve,reject) {
+				//fetch('https://kgsearch.googleapis.com/v1/entities:search?limit=100&types=MusicGroup&types=Person&key=AIzaSyDj5IgbuLmaoSrcNwBadk7ayEw2kfrNWaA&query='+shortSearchKeyGoogle)
+				//.then(function(response) {
+					//return response.json()
+				//}).then(function(json) {
+					//if (json.error) {
+						//isError = true
+					//}
+					//console.log(json)
+					//if (json && json && json.itemListElement && json.itemListElement.length > 0) {
+						//resolve({key:'google',value:json.itemListElement})
+					//} else {
+						//resolve({key:'google',value:null})
+					//}
+				//})
+			//}))
+			
+			
+			//initialPromises.push(new Promise(function(resolve,reject) {
+				//// now a wikipedia full text search including disambiguation
+				//fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&srwhat=text&srlimit=100&list=search&origin=*&srsearch='+longSearchKeyWikipedia)
+				//.then(function(response) {
+					//return response.json()
+				//}).then(function(json) {
+					//console.log(json)
+					//if (json && json.query && json.query.search && json.query.search.length > 0 && json.query.search[0]) {
+						//resolve({key:'wikilong',value:json.query.search})
+					//} else {
+						//resolve({key:'wikilong',value:null})
+					//}
+				//})
+			//}))
+			//initialPromises.push(new Promise(function(resolve,reject) {
+				//// now try wikipedia title search with the canonical name
+				//fetch('https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts|images&exintro=&explaintext=&titles='+shortSearchKeyWikipedia)
+				//.then(function(response) {
+					//return response.json()
+				//}).then(function(json) {
+					//console.log(json)
+					//if (json && json.query && json.query.search && json.query.search.length > 0) {
+						//resolve({key:'wikishort',value:json.query.pages})
+					//} else {
+						//resolve({key:'wikishort',value:null})
+					//}
+				//})
+			//}))
+					
+				
+			//Promise.all(initialPromises).then(function(lookupResults) {
+				//let combined = {}
+				//if (lookupResults) {
+					//lookupResults.map(function(result) {
+						//combined[result.key] = result.value
+					//})
+				//}
+				
+				//// extract wiki page from google
+				//// && combined.google.result.detailedDescription.url.length > 0 && combined.google.result.detailedDescription.url.indexOf('wikipedia.org') !== -1
+				//console.log(['TEST'])
+				//console.log([combined,JSON.stringify(combined.google),JSON.stringify(combined.wikilong),JSON.stringify(combined.wikishort)])
+				
+				//// final step is to setState results
+				
+				
+				//let found = false;
+				//let finalWikiPage = null;
+				//let finalWikiRecord = null
+				//if (combined.google) {
+					//console.log(['WIKILONG']);
+					//// && combined.wikilong.title && wikiPage === combined.wikilong.title) {
+					//for (var g in combined.google) {
+						//if (!found) {
+							//let wikiPage = null;
+							//if (combined.google[g] && combined.google[g].result && combined.google[g].result.detailedDescription && combined.google[g].result.detailedDescription.url) {
+								//let parts = combined.google[g].result.detailedDescription.url.split("/");
+								//wikiPage = parts.length > 1 ? parts[parts.length - 1] : null;
+								//if (wikiPage && wikiPage.length > 0) {
+									//wikiPage =  wikiPage.replace(/_/g,' ');
+								//}
+							//}
+							
+							//if (wikiPage) {	
+								//for (var a in combined.wikilong) {
+									//let wikiRes = combined.wikilong[a] ? combined.wikilong[a].title : ''
+									////console.log([wikiPage,wikiRes,combined.wikilong[a]]);
+							
+									//if (wikiRes === wikiPage) {
+										//console.log(['YAY',g,a,wikiPage,wikiRes])
+										//finalWikiPage = wikiPage
+										//finalWikiRecord = combined.wikilong[a];
+										//found = true;
+										//break;
+									//}
+								//}
+							//}
+						//}
+					//}
+				//}
+				
+				//if (!found && combined.wikishort && combined.wikishort.title && wikiPage === combined.wikishort.title) {
+					//console.log(['try WIKISHORT']);
+					//for (var g in combined.google) {
+						//let wikiPage = null;
+				
+						//if (combined.google[g] && combined.google[g].result && combined.google[g].result.detailedDescription && combined.google[g].result.detailedDescription.url) {
+							//let parts = combined.google[g].result.detailedDescription.url.split("/");
+							//wikiPage = parts.length > 1 ? parts[parts.length - 1] : null;
+							//if (wikiPage && wikiPage.length > 0) {
+								//wikiPage =  wikiPage.replace(/_/g,' ');
+							//}
+						//}
+						////console.log([wikiPage]);
+						
+						//for (var a in combined.wikishort) {
+							//let wikiRes = combined.wikishort[a] ? combined.wikishort[a].title : ''
+							//if (wikiRes === wikiPage) {
+								//console.log(['YAYshort',a,wikiPage,wikiRes])
+								//finalWikiPage = wikiPage
+								//finalWikiRecord = combined.wikilong[a];
+								//found = true;
+								//break;
+							//}
+						//}
+					//}
+				//}
+						
+				////if (!found && combined.wikilong && combined.wikilong.title &&  combined.wikishort && combined.wikishort.title && combined.wikilong.title === combined.wikishort.title) {
+					////console.log(['TRY WIKIS']);
+					////for (var a in combined.wikilong) {
+						////let wikiRes = combined.wikilong[a] ? combined.wikilong[a].title : ''
+						////console.log([wikiRes]);
+						
+						////for (var b in combined.wikishort) {
+							////let wikiRes2 = combined.wikishort[a] ? combined.wikishort[a].title : ''
+							////if (wikiRes === wikiRes2) {
+								////console.log(['YAYwikis',wikiRes,wikiRes2])
+								////break;
+							////}
+						////}
+					////}
+					
+				////}
+				
+				//if (!isError) {
+					//if (found) {
+						//console.log('FOUND ',finalWikiPage,combined.google,combined.wikilong,combined.wikishort)
+						//fetch('https://en.wikipedia.org//w/api.php?origin=*&redirects=true&action=query&prop=pageimages&format=json&piprop=original&titles='+finalWikiPage)
+						//.then(function(response) {
+							//return response.json()
+						//}).then(function(imagejson) {
+							//fetch('https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles='+finalWikiPage)
+							//.then(function(response) {
+								//return response.json()
+							//}).then(function(extractsjson) {
+							
+								
+									
+								//fetch('https://musicbrainz.org/ws/2/release/?artist='+that.getMBID(question)+'&inc=recordings+rel-links&type=album|ep&limit=300&fmt=json')
+								//.then(function(response) {
+									//return response.json()
+								//}).then(function(releasejson) {
+									//console.log(['LOADed releases'])
+									//fetch('https://musicbrainz.org/ws/2/release?artist='+that.getMBID(question)+'&inc=release-groups&limit=1000&fmt=json')
+									//.then(function(response) {
+										//return response.json()
+									//}).then(function(worksjson) {	
+										////console.log(['SONGS /albs LOADed ',worksjson])
+										//// find the list results array
+										//let final = []
+										//let questions = that.state.results;
+										////console.log(['CHECK',questionKey,questions,questions[questionKey]])
+
+										
+										//if (questions && questions[questionKey]) {
+												
+											//// description and link
+											////let wikidatabase = combined.wikilong ? combined.wikilong : combined.wikishort;
+											////let wikidata = finalWikiRecord;
+											////imagejson && imagejson.query && imagejson.query.pages && Object.values(imagejson.query.pages).length > 0 ? Object.values(imagejson.query.pages)[0] : null;
+											//let wikidata = extractsjson && extractsjson.query && extractsjson.query.pages && Object.values(extractsjson.query.pages).length > 0 ? Object.values(extractsjson.query.pages)[0] : null;
+											//console.log(wikidata)
+											
+											//if (wikidata && wikidata.extract) questions[questionKey].description = wikidata.extract;
+											////  fallback description to google
+											//let googleResult = combined.google
+											//if (!questions[questionKey].description) {
+												//console.log(['DESC OVERRIDE',googleResult,questions[questionKey].image,googleResult && googleResult.image ? googleResult.image.contentUrl : null])
+												//if (!questions[questionKey].image && googleResult && googleResult.detailedDescription && googleResult.detailedDescription.articleBody) {
+													//questions[questionKey].description = googleResult.detailedDescription.articleBody;
+												//}
+											//}
+											
+											//if (wikidata && wikidata.pageid) {
+												//questions[questionKey].wikipediaPageId = wikidata.pageid;
+												//questions[questionKey].link = 'http://en.wikipedia.org/?curid='+wikidata.pageid;
+											//}
+											//// image
+											//let wikiimagedata = imagejson && imagejson.query && imagejson.query.pages && Object.values(imagejson.query.pages).length > 0 ? Object.values(imagejson.query.pages)[0] : null;
+											
+											//if (wikiimagedata && wikiimagedata.original && wikiimagedata.original.source) questions[questionKey].image = wikiimagedata.original.source;
+											//// fallback to image from google
+											//console.log(['IMAGE OVERRIDE',googleResult,questions[questionKey].image,googleResult && googleResult.image ? googleResult.image.contentUrl : null])
+											//if (!questions[questionKey].image && googleResult && googleResult.image && googleResult.image.contentUrl) {
+												//questions[questionKey].image = googleResult.image.contentUrl;
+											//}
+											////console.log(['RELEASE DATA',releasejson])
+											////let releasedata = releasejson && releasejson.query && releasejson.query.pages && Object.values(releasejson.query.pages).length > 0 ? Object.values(releasejson.query.pages)[0] : null;
+											
+											//// filter albums and collate works
+											//let finalRelease = [];
+											//let albumIndex = {}
+											//let titles = {}
+											////console.log(['RELEASE DATA grp',releasejson])
+												
+											//let releasesSeen={}	
+											//if (releasejson && releasejson['releases']) {
+												//// first filter and flatten releases(albums) by title
+												//releasejson['releases'].map(function(release) {
+													//// just first version of album title
+													//let cleanTitle = release && release.title ? release.title.trim() : ''
+													//cleanTitle = cleanTitle.replace(/[^a-z0-9+]+/gi, '+');
+													//if (!releasesSeen[cleanTitle]) {
+														//releasesSeen[cleanTitle] = true;
+														////if (!release['secondary-types'] || release['secondary-types'].length == 0) { 
+															////if (!albumIndex.hasOwnProperty(release.title)) {
+																////console.log('rel',release['cover-art-archive'])
+																//let image = '';
+																//if (release['cover-art-archive'] && release['cover-art-archive'].artwork) {
+																	//image = 'https://coverartarchive.org/release/'+release.id+'/front'
+																//} 
+																
+																//let tracks = release.media && release.media.length > 0 && release.media[0].tracks ? release.media[0].tracks.map(function(track) {
+																	////console.log('tr',track)
+																	//return {sort:track.position, title:track.title}
+																//}): []
+																//tracks.sort(function(a,b) {
+																	//if (a.sort < b.sort) return -1 
+																	//else return 1
+																//})
+																//albumIndex[release.title] = {
+																	//id:release.id,
+																	//image:image,
+																	//date:release['date'],
+																	//title:release['title'],
+																	//tracks:tracks
+																//};
+																//titles[release.title] = true;
+														////} 
+														////else {
+															////albumIndex[release.title].tracks = tracks;
+														////}
+													//}
+												//})
+											//}
+											//finalRelease = Object.values(albumIndex)
+											//finalRelease.sort(function(a,b) {
+												//if (a.date < b.date) return -1 
+												//else return 1
+											//})
+											
+											////finalRelease.sort(function(a,b) {
+												////if (a.date < b.date) return -1
+												////return 1;
+											////})
+											//questions[questionKey].albums = finalRelease;
+										
+											
+											//// headline facts
+											//questions[questionKey].headlineFacts={};
+											////questions[questionKey].headlineFacts.Albums = Object.keys(titles).join(',');
+											////if (questions[questionKey].works) questions[questionKey].headlineFacts["Total Works"] = questions[questionKey].works.length;
+											//let tags = []
+											//let extendedTags=['musician']
+											//if (question.tags) {
+												//question.tags.map(function(tag) {
+													//if (tag.name && tag.name.trim().length > 0) {
+														//tags.push(tag.name);
+														//extendedTags.push(tag.name);
+													//}
+													
+												//})
+												//questions[questionKey].headlineFacts.Tags = tags.join(",");
+											//}
+											//question.extendedTags = extendedTags;
+											
+											//let decade=0;
+											//if (question['life-span'] && question['life-span'].begin) {
+												//let year = parseInt(question['life-span'].begin,10);
+												//question.year = year;
+												//questions[questionKey].headlineFacts.Begin = year;
+												//if (year > 0) decade = parseInt(year/10)*10;
+												//if (decade < 1900) decade = parseInt(year/100)*100;
+											//}
+											//question.decade = decade;
+											 ////else {
+												////questions[questionKey].headlineFacts.Begin = '';
+											////}
+											////
+											
+											//if (question.country) {
+												//question.country = that.findCountryByCode(question.country);
+												//questions[questionKey].headlineFacts.Location = question.country;
+												//if (question['begin-area'] && question['begin-area'].name) questions[questionKey].headlineFacts.Location =  question['begin-area'].name +  ', ' + question.country;
+											//}
+											//// set quiz by decade or fallback to country (or finally just Musicians)
+											//let whenTitle = question.country && question.country.trim().length > 0 ? "Musicians of "+question.country : 'Musicians';
+											//let whereTitle = question.decade && question.decade > 0 ? 'Musicians of the ' + question.decade+"'s" : 'Musicians';
+											//if (question && question.decade  && question.decade > 0) {
+												//question.quiz = whereTitle;
+											//} else {
+												//question.quiz = whenTitle;
+											//}
+											
+											//// NLU processing extract band people
+											//var doc = nlp(questions[questionKey].description)
+											//function onlyUnique(value, index, self) { 
+												//return self.indexOf(value) === index;
+											//}
+											 //function toTitleCase(str) {
+												//return str.replace(
+													///\w\S*/g,
+													//function(txt) {
+														//return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+													//}
+												//);
+											//}	
+											//let people = doc.people().toTitleCase().match('#FirstName #LastName').out('array').filter(onlyUnique)
+											//if (people && people.length > 0) question.headlineFacts.People = people.map(function(person) {
+													//return toTitleCase(person)
+												//}).join(",")
+											
+											
+											////let decade = 0;
+											////if (question.headlineFacts.Begin.length > 0) {
+												////question.quiz = 'Musicians of the '+((parseInt(question.headlineFacts.Begin,10)%100)*10)+"'s"
+											////}  
+											//question.link2 = 'https://www.youtube.com/results?search_query='+that.getCanonicalName(question);
+											//question.link2Title = 'YouTube'
+											//that.stopLoading()
+											//that.setState({results:questions})
+										//} else {
+												//that.stopLoading()
+												//that.setState({results:[]})
+										//}
+									
+									//})
+								//})
+							//})
+						//})
+					//} else {
+						//console.log('NO MATCH')
+						//that.showMessage('No Match Found')
+					//}
+					
+				//} else {
+					//that.showMessage('Google Knowledge service is not responding. Please try again in a few moments.')
+				//}
+				
+				
+			//}) 		
+						
+							////let googleResultObject = knowledgejson && knowledgejson.itemListElement && knowledgejson.itemListElement.length > 0 ? knowledgejson.itemListElement[0] : null;
+							////let googleResult= googleResultObject ? googleResultObject.result : null;
+							////console.log(googleResult)
+							
+							////// first cut at image and description from google
+							////let finalImport = {}
+							////finalImport.description = googleResult.description;
+							////finalImport.image = '';
+							////finalImport.link3 = 'WWW'
+							////finalImport.attribution = '';
+							////finalImport.imageattribution = '';
+							
+							////if (googleResult.detailedDescription && googleResult.detailedDescription.articleBody && googleResult.detailedDescription.articleBody.length > 0) {
+								////finalImport.description = googleResult.detailedDescription.articleBody;
+								////finalImport.attribution = googleResult.detailedDescription.license
+							////}
+							////if (googleResult.image && googleResult.image.contentUrl && googleResult.image.contentUrl.length > 0) {
+								////finalImport.image = googleResult.image.contentUrl;
+								////finalImport.imageattribution = googleResult.image.url
+							////}
+							
+						////})
+					//// TODO if wikipedia result is ok, use that, otherwise try again with search word from google description link
+					////if (googleResult && googleResult.detailedDescription  && googleResult.detailedDescription.url  && googleResult.detailedDescription.url.length > 0 && googleResult.detailedDescription.url.indexOf('wikipedia.org')!== -1) {
+						////let parts= googleResult.detailedDescription.url.split("/");
+						////wikiSearchKey=parts[parts.length - 1]
+						////console.log('FORCE WIKI KEY FROM GOOGLE',wikiSearchKey )
+					////}
+					
+					////// now that we have decided on a wiki key, lookup wiki description
+				
+				
+					////// https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles="+this.getCanonicalName(question)
+					////let url = 'https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles='+wikiSearchKey
+					//////console.log(['LOAD  wikipedia desc',url])
+					
+					////fetch(url)
+					////.then(function(response) {
+						////return response.json()
+					////}).then(function(wikijson) {
+						////console.log(['LOADed wikidesc'])
+							
+						
+					////})
+			////	})
+			////})
+             ////var url="https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles="+this.getCanonicalName(question)
+	 
+			////console.log(['expand wiki data',url])
+		
+		     ////fetch(url).then(function(response) {
+                ////return response.json();
+            ////}).then(function(json) {
+				////let questions = that.state.results;
+				
+				////let pages = json.query && json.query.pages ? json.query.pages : null;
+				////let questionsLoaded = pages && Object.values(pages).length > 0 ? Object.values(pages) : null;
+				////console.log(['expand results',questionsLoaded,json])
+				////if (questionsLoaded && questionsLoaded[0] && questionsLoaded[0].pageid > 0) {
+					////let questionLoaded = questionsLoaded[0];
+					////questions[questionKey].description = questionLoaded.extract;
+					////questions[questionKey].wikipediaPageId = questionLoaded.pageid;
+					////let expanded = {};
+					////expanded[questionKey] = true;
+					////that.setState({results:questions,expanded:expanded});
+				////// try again with common name
+				////} else if (that.getName(question).length > 0)  {
+					////var url="https://en.wikipedia.org/w/api.php?format=json&redirects=true&action=query&origin=*&prop=extracts&exintro=&explaintext=&titles="+that.getName(question)
+	 
+					////console.log(['expand wikidata by common name',url])
+		
+		            ////fetch(url).then(function(response) {
+						////return response.json();
+					////}).then(function(json) {
+						////let questions = that.state.results;
+						
+						////let pages = json.query && json.query.pages ? json.query.pages : null;
+						////let questionsLoaded = pages && Object.values(pages).length > 0 ? Object.values(pages)  : null;
+						////console.log(['expand results',questionsLoaded,json])
+						////if (questionsLoaded && questionsLoaded[0] && questionsLoaded[0].pageid > 0) {
+							////let questionLoaded = questionsLoaded[0];
+							////questions[questionKey].description = questionLoaded.extract;
+							////questions[questionKey].wikipediaPageId = questionLoaded.pageid;
+							////let expanded = {};
+							////expanded[questionKey] = true;
+							////that.setState({results:questions,expanded:expanded});
+						////}
+					////})
+				////}
+            ////})
+            ////.catch(function(err) {
+                ////console.log(['ERR loading wiki results',err]);
+            ////});
+            
+            
+            
+            						////console.log(['RELEASE DATA',titles,albumIndex])
+												
+												//// now index works so they can be crossed off and uncategorised works listed at end
+												////let worksIndex=[]
+												////let otherWorks = []
+												//////console.log(['WWWWORRR',realworksjson])
+														
+												////if (realworksjson && realworksjson.works) {
+													////realworksjson.works.map(function(work) {
+													//////	console.log(['wwwwwwrork',work])
+														////worksIndex.push(work.title);
+														//////let id = release.hasOwnProperty('release-group') ?  release['release-group'].id : null;
+													////})
+												////}
+												////console.log(['ME RELEASE works',albumIndex,releasejson,worksjson,worksjson.works,realworksjson])
+												//// now iterate works, assigning to release group
+												////if (worksjson && worksjson.releases) {
+													////worksjson.releases.map(function(release) {
+														////let id = release.hasOwnProperty('release-group') ?  release['release-group'].id : null;
+														////if (id) {
+															////console.log(['REL',release])
+															////// did we collate this album (no secondary types)
+															////if (albumIndex.hasOwnProperty(id)) {
+																////if (!albumIndex[id].works) albumIndex[id].works = [];
+																////albumIndex[id].works.push({date:release.date,title:release.title}); 
+															////} else {
+																////otherWorks.push({date:release.date, title:release.title})
+															////} 
+															
+														////} 
+														//////console.log(['work',release])
+													////})
+												////}
+												////albumIndex['Other Works'] = {date:'',title:'Other Works',works:otherWorks};
+						
+            
+            
+            
+        //}
+	//}

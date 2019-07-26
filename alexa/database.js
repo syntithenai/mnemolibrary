@@ -125,7 +125,7 @@ var ObjectId = require('mongodb').ObjectID;
 
 let databaseFunctions = {
     nextDiscoveryQuestion: function (db,database,request,response) {
-        //console.log('nextDiscoveryQuestion');
+        console.log('nextDiscoveryQuestion');
         //return new Promise(function(resolve,reject) {resolve()});
         let orderBy = request.slots['orderBy'] ? request.slots['orderBy'].value : 'successRate';
         let sortFilter={};
@@ -232,7 +232,7 @@ let databaseFunctions = {
     },
 
     getReviewQuestions: function (db,database,request,response) {
-         ////console.log('review');
+         console.log('review');
          let session = request.getSession();
                     
          let limit=10;
@@ -243,7 +243,7 @@ let databaseFunctions = {
          //console.log('review');
          return new Promise(function(resolve,reject) {
             databaseFunctions.getUser(db,database,request,response).then(function(user) {
-           //     //console.log('review gotuser');
+                console.log('review gotuser');
                 if (user) {
                      //if (req.query.band && req.query.band.length > 0) {
                          //if (parseInt(req.query.band,10) > 0) {
@@ -281,10 +281,10 @@ let databaseFunctions = {
                     if (user && String(user._id).length > 0) {
                          criteria.push({user:ObjectId(user._id)});
                         // sort by successTally and then most recently seen first
-                     //    //console.log(JSON.stringify(criteria));
+                         //console.log(JSON.stringify(criteria));
                         db.collection('userquestionprogress').find({$and:criteria}).sort({'successTally':1,'seen':1}).limit(limit).toArray().then(function(questions,error) {
                             if (questions) {
-                               // //console.log(questions);
+                               //console.log(questions);
                                 let questionKeys = [];
                                 let indexedQuestions = {};
                                 let successAndDateKeyed={};
@@ -324,7 +324,7 @@ let databaseFunctions = {
                                         });
                                     }); 
                                 });
-                              //  //console.log(['REVItEW',successAndDateOrderedIds]);
+                              console.log(['REVItEW',successAndDateOrderedIds]);
                                 db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).limit(limit).toArray(function(err,results) {
                                    // //console.log([err,results]);
                                     let questionIndex={};
@@ -338,7 +338,7 @@ let databaseFunctions = {
                                             orderedResults.push(questionIndex[question]);   
                                         }
                                     });
-                                  //  //console.log(['RESOLVE',orderedResults[0]]);
+                                  console.log(['RESOLVE',orderedResults[0]]);
                                     resolve(orderedResults);
                                 })
                             } else {

@@ -53,7 +53,7 @@ export default class ShareDialog extends Component {
 						
 						<div className='btn btn-info' ><a className="twitter-share-button"
 						  target="_blank" 
-						  href={"https://twitter.com/intent/tweet?text="+this.props.shareText+" "+this.props.shareLink}
+						  href={"https://twitter.com/intent/tweet?text="+this.props.shareText+"%20"+encodedShareLink}
 						  data-size="large">
 						Tweet</a></div>
 						
