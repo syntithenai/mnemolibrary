@@ -456,10 +456,10 @@ function initRoutes(router,db) {
 						if (json.questions[a] && json.questions[a].question && json.questions[a].question.length > 0 && json.questions[a].quiz && json.questions[a].quiz.length > 0) {
 							let record =  json.questions[a];
 							if (!record.successRate) record.successRate = Math.random()/100; // randomisation to get started
-							if (record.ok_for_alexa && record.ok_for_alexa==="no") {
-								record.ok_for_alexa=false  
+							if (record.ok_for_alexa && record.ok_for_alexa==="TRUE") {
+								record.ok_for_alexa=true  
 							} else {
-								record.ok_for_alexa=true
+								record.ok_for_alexa=false
 							}
 							record.importId = importId;
 							//console.log(['import ',record]);
