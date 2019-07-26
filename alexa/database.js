@@ -1,6 +1,6 @@
 var ObjectId = require('mongodb').ObjectID;
 
-
+let alexaCriteria = {$and:[{ok_for_alexa :{$eq:true}},{specific_question :{$ne:null}},{specific_question :{$ne:''}},{specific_answer :{$ne:null}},{specific_answer :{$ne:''}}]};
 
 /*
  * 
@@ -170,7 +170,8 @@ let databaseFunctions = {
                 }
                 
                // //console.log(['filter',tagFilter,topicFilter]);
-                criteria.push({ok_for_alexa :{$eq:true}});
+                criteria.push(alexaCriteria);
+
                 sortFilter[orderBy]=-1;
                 sortFilter['successRate']=-1;
                 
@@ -207,7 +208,8 @@ let databaseFunctions = {
 
                 } else {
                     console.log('PUBLIC DISCOVER')
-                    criteria.push({ok_for_alexa :{$eq:true}});
+                    criteria.push(alexaCriteria);
+
                     criteria.push({access :{$eq:'public'}});
                     // NO USER, SHOW BY POPULAR
                      //db.collection('questions').find({$and:criteria}).limit(limit).toArray().then(function(results) {
@@ -324,8 +326,11 @@ let databaseFunctions = {
                                         });
                                     }); 
                                 });
+                                //criteria.push();
+                                criteria.push({$and:[{ok_for_alexa :{$eq:true}},{specific_question :{$ne:null}},{specific_question :{$ne:''}},{specific_answer :{$ne:null}},{specific_answer :{$ne:''}}]});
+
                               console.log(['REVItEW',successAndDateOrderedIds]);
-                                db.collection('questions').find({_id:{$in:successAndDateOrderedIds}}).limit(limit).toArray(function(err,results) {
+                                db.collection('questions').find({$and:[_id:{$in:successAndDateOrderedIds}}, alexaCriteria]).limit(limit).toArray(function(err,results) {
                                    // //console.log([err,results]);
                                     let questionIndex={};
                                     results.forEach(function(question) {
