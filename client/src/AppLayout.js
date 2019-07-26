@@ -289,14 +289,28 @@ export default class AppLayout extends Component {
               if (iParts[0]==="oauth") {
                   that.openAuth(iParts[1]);
               } else if (iParts[0]==="confirm") {
-                  that.loginByConfirm(window.location.search.slice(9));
+                  that.loginByConfirm(window.location.search.slice(9)).then(function() {
+							console.log('loginbyconfirm')
+					  });
               } else if (iParts[0]==="recovery") {
-                  that.loginByRecovery(window.location.search.slice(10));
+					that.loginByRecovery(window.location.search.slice(10)).then(function() {
+						console.log('loginbyreco ery')
+					});
               } else if (iParts[0]==="code") {
-                  that.loginByToken(window.location.search.slice(6));
+					that.loginByToken(window.location.search.slice(6)).then(function() {
+					  console.log('loginbycode')
+					    //let oauth = localStorage.getItem('oauth')
+						//let oauthR = localStorage.getItem('oauth_request')
+						//if (oauth && oauth.length > 0 && oauthR && oauthR.length > 0 && window.pathname !== '/profile') {
+							//that.setState({"exitRedirect":"/profile"})  
+						//}
+					});
               }
           });
     } 
+    
+  
+	//console.log(window.location)
    // //console.log([this.state.user,this.state.token]);
     // try login from localstorage
     let token = JSON.parse(localStorage.getItem('token'));
@@ -591,16 +605,19 @@ export default class AppLayout extends Component {
       ////console.log(['oauth '+service]);
       let authRequest={redirect_uri:this.getQueryStringValue('redirect_uri'),response_type:this.getQueryStringValue('response_type'),scope:this.getQueryStringValue('scope'),state:this.getQueryStringValue('state')}
       // force logout
-      localStorage.setItem('token','{}');
-      localStorage.setItem('user','{}');
-      this.setState({'token':'{}','user':'{}'});
-      //    this.GoogleAuth.disconnect();
-      
-      // CURRENTPAGE TODO
-      this.setCurrentPage('login');
-      localStorage.setItem('oauth',service);
-      localStorage.setItem('oauth_request',JSON.stringify(authRequest));
-      document.location='/profile'
+      let code = this.state.token ? this.state.token.access_token : '';
+     // if (code) {
+		  localStorage.setItem('token','{}');
+		  localStorage.setItem('user','{}');
+		  this.setState({'token':'{}','user':'{}'});
+		  //    this.GoogleAuth.disconnect();
+		  
+		  // CURRENTPAGE TODO
+		  this.setCurrentPage('login');
+		  localStorage.setItem('oauth',service);
+		  localStorage.setItem('oauth_request',JSON.stringify(authRequest));
+		  document.location='/profile?code='+code
+		//}
   };
 
   shout(action,params) {
@@ -860,7 +877,8 @@ export default class AppLayout extends Component {
       let state = {token: token};
       let that = this;
       localStorage.setItem('currentTopic',null)
-      fetch('/login/me?code='+token, {
+      return new Promise(function(resolve,reject) {
+		fetch('/login/me?code='+token, {
           method: 'GET',
         }).then(function(response) {
             return response.json();
@@ -878,45 +896,53 @@ export default class AppLayout extends Component {
           //      //console.log('toke ref tok');
                 that.refreshLogin(state.user)
             },(parseInt(that.state.token.expires_in,10)-1)*1000);
+			resolve()
         })
         .catch(function(err) {
             console.log(['ERR',err]);
+			reject()
         });
+      })
   };
   
     loginByConfirm(token) {
       //  console.log(['LOGIN confirm',token]);
       let state = {token: token};
       let that = this;
-      localStorage.setItem('currentTopic',null)
-      fetch('/login/doconfirm?code='+token, {
-          method: 'GET',
-        }).then(function(response) {
-            return response.json();
-            
-        }).then(function(res) {
-        //    //console.log(['ddtoken response',res]);
-            state.user = res.user;
-            state.token = res.token;
-            localStorage.setItem('token',JSON.stringify(res.token));
-            localStorage.setItem('user',JSON.stringify(res.user));
-            that.setState(state);
-            that.startMqtt(state.user)
-            setInterval(function() {
-            //    //console.log('toke ref tok');
-                that.refreshLogin(state.user)
-            },(parseInt(this.state.token.expires_in,10)-1)*1000);
-        })
-        .catch(function(err) {
-            //console.log(['ERR',err]);
-        });
+      return new Promise(function(resolve,reject) {
+		  localStorage.setItem('currentTopic',null)
+		  fetch('/login/doconfirm?code='+token, {
+			  method: 'GET',
+			}).then(function(response) {
+				return response.json();
+				
+			}).then(function(res) {
+			//    //console.log(['ddtoken response',res]);
+				state.user = res.user;
+				state.token = res.token;
+				localStorage.setItem('token',JSON.stringify(res.token));
+				localStorage.setItem('user',JSON.stringify(res.user));
+				that.setState(state);
+				that.startMqtt(state.user)
+				setInterval(function() {
+				//    //console.log('toke ref tok');
+					that.refreshLogin(state.user)
+				},(parseInt(this.state.token.expires_in,10)-1)*1000);
+				resolve()
+			})
+			.catch(function(err) {
+				reject()
+				//console.log(['ERR',err]);
+			});
+		})
   };
   
     loginByRecovery(token) {
        // console.log(['LOGIN by recovery',token]);
       let state = {token: token};
       let that = this;
-      fetch('/login/dorecover?code='+token, {
+      return new Promise(function(resolve,reject) {
+		fetch('/login/dorecover?code='+token, {
           method: 'GET',
         }).then(function(response) {
             return response.json();
@@ -933,10 +959,13 @@ export default class AppLayout extends Component {
               //  //console.log('toke ref tok');
                 that.refreshLogin(state.user)
             },(parseInt(this.state.token.expires_in,10)-1)*1000);
+			resolve()
         })
         .catch(function(err) {
+            reject()
             //console.log(['ERR',err]);
         });
+       })
   };
   
   logout() {
@@ -1224,6 +1253,62 @@ export default class AppLayout extends Component {
 		}
 	}
  
+     
+    allowAlexa(allow) {
+        if (allow) {
+            //console.log('allow');
+            // redirect with auth code
+           // this.getCode();
+            
+        } else {
+            //console.log('deny');
+        }
+        localStorage.setItem('oauth',null);
+        localStorage.setItem('oauth_request',null);
+        return true;
+    }
+    
+    
+    
+    //getCode() {
+        ////console.log('get code');
+        //let authRequest = localStorage.getItem('oauth_request');
+        ////console.log([authRequest,this.props.token,this.props.user]);
+        //if (this.props.token && this.props.user && authRequest) {
+            //let auth =JSON.parse(authRequest);
+            //if (!auth) auth={};
+            //var params={
+                //'response_type':'code',
+                //'client_id':config.clientId,
+                //'client_secret':config.clientSecret,
+                //'redirect_uri':auth.redirect_uri,
+                //'scope':auth.scope,
+                //'state':auth.state
+              //};
+              ////console.log(['pars',params]);
+            //fetch('/oauth/authorize', {
+              //method: 'POST',
+              //headers: {
+                //'Content-Type': 'application/x-www-form-urlencoded',
+                //'Authorization': 'Bearer '+this.props.token.access_token
+                ////Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
+              //},
+              //body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
+            //}).then(function(response) {
+                ////console.log('HEADERS',response.headers.location);
+                
+                //return response.json();
+                
+            //}).then(function(res) {
+                ////console.log(['getcode response',res]);
+              
+            //})
+            //.catch(function(err) {
+                ////console.log(['ERR',err]);
+            //});
+        //}
+  //}
+    
     
   render() {
     const progress = this.state.users.default;
@@ -1234,7 +1319,49 @@ export default class AppLayout extends Component {
     let title=decodeURIComponent(this.state.title);
    // let question = this.getCurrentQuestion()
     //console.log(['APPLAYOUT',question])
-    if (this.state.exitRedirect && this.state.exitRedirect.length > 0) {
+     let oauth=localStorage.getItem('oauth');
+//console.log(['oauth ? ',oauth,this.state.user])
+    let authRequest = localStorage.getItem('oauth_request');
+     let auth =JSON.parse(authRequest);
+        
+    if (this.state.user && this.state.user._id && this.state.user._id.length > 0 && oauth==="alexa" && authRequest && authRequest.length > 0) {
+        //console.log([authRequest,this.props.token,this.props.user]);
+        if (!auth) auth={};
+
+        return (
+            
+           
+          
+            <div className='row'>
+				<div className="navbar-dark fixed-top bg-dark" >
+				
+					<nav className="navbar navbar-expand-md" >
+						<div className="navbar-brand" >
+							<a  to="/" onClick={this.goHome}><img alt="Mnemos' Library" src="/mnemoicon-100.png"  data-toggle="collapse" data-target="#navbarCollapse" style={{float:'left',clear:'right' ,height:'4em'}}  /></a>
+						</div>
+					</nav>
+				</div>
+			
+        
+            <div className='col-12'><h4>Allow Alexa to integrate with Mnemo's Library ?</h4></div>
+            
+            <div className='col-4'>&nbsp;</div>
+            <div className='col-2'><form action={config.authorizeUrl} method="POST">
+            <input type='hidden' name='response_type'  value='code' />
+            <input type='hidden' name='client_id'  value={config.clientId}/>
+            <input type='hidden' name='client_secret'  value={config.clientSecret}/>
+            <input type='hidden' name='redirect_uri'  value={auth.redirect_uri} />
+            <input type='hidden' name='scope'  value={auth.scope}/>
+            <input type='hidden' name='state'  value={auth.state}/>
+            <input type='hidden' name='access_token'  value={this.props.token ? this.props.token.access_token : null}/>
+            <button type='submit' className='btn btn-info' onClick={() => this.allowAlexa.bind(this)(false)} >Yes</button>
+            </form></div>
+            <div className='col-2'><a className='btn btn-info' href='/' onClick={() => this.allowAlexa.bind(this)(false)} >No</a></div>
+            <div className='col-4'>&nbsp;</div>
+            </div>
+            
+            );
+    } else if (this.state.exitRedirect && this.state.exitRedirect.length > 0) {
 		return <Router><Redirect to={this.state.exitRedirect} /></Router>
     } else if (this.isCurrentPage('disabled')) {
         return (<div>DISABLED!!</div>);
@@ -1267,7 +1394,11 @@ export default class AppLayout extends Component {
 				
 				{(this.state.waiting) && <div onClick={this.stopWaiting} style ={{position: 'fixed', top: 0, left: 0, width:'100%',height:'100%',backgroundColor:'grey',zIndex:9999999,opacity:0.3}}  ><img style={{height:'7em' }} src='/loading.gif' /></div>}
 				
-				
+				  
+                <PropsRoute  path="/" component={Navigation}  setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection} newCommentReply={this.newCommentReply} 	analyticsEvent={this.analyticsEvent}  />
+                
+                <PropsRoute  exact={true} path="/sitemap" component={SiteMap} isAdmin={this.isAdmin} isLoggedIn={this.isLoggedIn} logout={this.logout} import={this.import} importMultipleChoice={this.importMultipleChoice} 	analyticsEvent={this.analyticsEvent}  />
+             
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/feedmuncher' startWaiting={this.startWaiting} stopWaiting={this.stopWaiting}  component={FeedMuncher}  />
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/quickmemo'  component={QuickMemo}  />
 				
@@ -1305,11 +1436,7 @@ export default class AppLayout extends Component {
                  {this.state.comment && this.state.editCommentReply && <CommentReplyEditor  comment={this.state.comment} commentReplyIndex={this.state.commentReplyIndex} commentReply={this.state.commentReply} cancelCommentReply={this.cancelCommentReply}  saveCommentReply={this.saveCommentReply} getCurrentQuestion={this.getCurrentQuestion} user={this.state.user} 	analyticsEvent={this.analyticsEvent} />}
              
                 {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
-                
-                <PropsRoute  path="/" component={Navigation}  setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection} newCommentReply={this.newCommentReply} 	analyticsEvent={this.analyticsEvent}  />
-                
-                <PropsRoute  exact={true} path="/sitemap" component={SiteMap} isAdmin={this.isAdmin} isLoggedIn={this.isLoggedIn} logout={this.logout} import={this.import} importMultipleChoice={this.importMultipleChoice} 	analyticsEvent={this.analyticsEvent}  />
-                
+                 
                 <PropsRoute  exact={true} path="/help" component={AboutPage} analyticsEvent={this.analyticsEvent}  />
                 <PropsRoute  path="/help/about" component={AboutPage} analyticsEvent={this.analyticsEvent} />
                 <PropsRoute  path="/help/intro" component={IntroPage} analyticsEvent={this.analyticsEvent}/>

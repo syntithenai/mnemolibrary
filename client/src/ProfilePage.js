@@ -180,60 +180,7 @@ export default class ProfilePage extends Component {
     };
     
    
-    
-    allowAlexa(allow) {
-        if (allow) {
-            //console.log('allow');
-            // redirect with auth code
-            this.getCode();
-            
-        } else {
-            //console.log('deny');
-        }
-        localStorage.setItem('oauth',null);
-        localStorage.setItem('oauth_request',null);
-        return true;
-    };
-    
-    
-    getCode() {
-        //console.log('get code');
-        let authRequest = localStorage.getItem('oauth_request');
-        //console.log([authRequest,this.props.token,this.props.user]);
-        if (this.props.token && this.props.user && authRequest) {
-            let auth =JSON.parse(authRequest);
-            if (!auth) auth={};
-            var params={
-                'response_type':'code',
-                'client_id':config.clientId,
-                'client_secret':config.clientSecret,
-                'redirect_uri':auth.redirect_uri,
-                'scope':auth.scope,
-                'state':auth.state
-              };
-              //console.log(['pars',params]);
-            fetch('/oauth/authorize', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Bearer '+this.props.token.access_token
-                //Authorization: 'Basic '+btoa(config.clientId+":"+config.clientSecret) 
-              },
-              body: Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&')
-            }).then(function(response) {
-                //console.log('HEADERS',response.headers.location);
-                
-                return response.json();
-                
-            }).then(function(res) {
-                //console.log(['getcode response',res]);
-              
-            })
-            .catch(function(err) {
-                //console.log(['ERR',err]);
-            });
-        }
-  }
+   
 //            <a className='btn btn-info' onClick={() => this.allowAlexa.bind(this)(true)} >Yes</a>
     
     refreshindexes() {
@@ -248,7 +195,7 @@ export default class ProfilePage extends Component {
         let auth =JSON.parse(authRequest);
         if (!auth) auth={};
 
-        if (oauth==="alexa") {
+        if (this.props.user && this.props.user._id && this.props.user._id.length > 0 && oauth==="alexa") {
             return (
             <div className='row'>
             <div className='col-12'><h4>Allow Alexa to integrate with Mnemo's Library ?</h4></div>
