@@ -105,21 +105,25 @@ export default class SiteMap extends Component {
 					
 				</div>
 				  }
+				
 				  
 				  <div className="row" style={blockStyle}>
 				 {this.props.isLoggedIn() && <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/profile"  >Profile</Link><Link style={buttonStyle} className='btn btn-info'  to="/settings"  >Settings</Link></div>}
 				  {this.props.isLoggedIn() && <div className="col"><div onClick={this.props.logout} style={buttonStyle} className='btn btn-danger'  to="/profile"  >Logout</div></div>}
 				  {!this.props.isLoggedIn() && <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/login"  >Login</Link></div>}
-				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/recentcomments"  >Recent Comments</Link></div>
-				  {this.props.isLoggedIn() && <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/leaderboard"  >Leader Board</Link></div>}
 				  <div className="col"><Link style={buttonStyle} className='btn btn-success'  to="/create"  >Create</Link></div>
 				  <div className="col"><Link style={buttonStyle} className='btn btn-success'  to="/quickmemo"  >Quick Memo</Link></div>
 				  
 				  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/help"  >Help</Link></div>
-					
+				 	
 					
 					</div>
 					
+				<div className="row" style={blockStyle}>
+					  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/recentcomments"  >Recent Comments</Link></div>
+					  <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/recentnotes"  >Recent Notes</Link></div>
+					{this.props.isLoggedIn() && <div className="col"><Link style={buttonStyle} className='btn btn-info'  to="/leaderboard"  >Leader Board</Link></div>}
+				</div>
 					
 
 				<div className="row" style={blockStyle}>

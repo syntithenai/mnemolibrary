@@ -198,6 +198,14 @@ initdb().then(function() {
 							})
 						})
 					}
+					if (question.mnemonic && question.mnemonic.length> 0) {
+						 console.log('sdel mnem '+question.mnemonic);
+						 db().collection('mnemonics').remove({$and:[{user:'default'},{importId:'userimport'},{importtype:'abcnews'},{question:question._id}]}).then(function(dresults) {
+						   console.log('sdel mnem deleted0')
+						   console.log(dresults);
+						   db().collection('mnemonics').insert({user:'default',question:question._id,mnemonic:question.mnemonic,questionText:question.question,technique:question.mnemonic_technique,importId:'userimport',importype:'abcnews'});
+						})	
+					}
 					
 					db().collection('questions').updateOne({_id:question._id},{$set:Object.assign(question,req.body)}).then(function() {
 						saveToReviewFeed(req.body.user,question);

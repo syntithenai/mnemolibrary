@@ -93,6 +93,8 @@ export default class Navigation extends Component {
 			pageTitle = 'My Topics Quiz '+ (parts[1] ? ' - '+decodeURI(parts[1]) : '')
 		} else if (parts[0] === 'recentcomments') {
 			pageTitle = 'Recent Comments'
+		} else if (parts[0] === 'recentnotes') {
+			pageTitle = 'Recent Notes'
 		} else if (parts[0] === 'sitemap') {
 			pageTitle = 'Site Map'
 		} else if (parts[0] === 'newslettertool') {

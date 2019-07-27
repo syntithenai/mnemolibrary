@@ -33,6 +33,8 @@ import QuizCollection from './QuizCollection';
 import MultipleChoiceTopics from './MultipleChoiceTopics';
 import MultipleChoiceQuestions from './MultipleChoiceQuestions';
 import RecentComments from './RecentComments'
+import RecentNotes from './RecentNotes'
+
 import CommentEditor from './CommentEditor'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
@@ -133,6 +135,7 @@ export default class AppLayout extends Component {
         //this.setQuiz = this.setQuiz.bind(this);
 		this.setComment = this.setComment.bind(this);
 		this.loadComments = this.loadComments.bind(this);
+		this.loadNotes = this.loadNotes.bind(this);
 		this.toggleCommentDialog = this.toggleCommentDialog.bind(this);
 		this.editComment = this.editComment.bind(this);
 		this.newComment = this.newComment.bind(this);
@@ -363,6 +366,35 @@ export default class AppLayout extends Component {
   
 	setComment(comment) {
 		this.setState({comment:comment});
+	}
+  
+	loadNotes(question,user,limitP,filter) {
+		console.log(['notes',question,user,limitP,filter])
+		let that=this;
+		let query='';
+		//let currentQuestion = this.getCurrentQuestion()
+		if (question) {
+			query='&question='+question
+		}
+		if (user) {
+			query+='&user='+user
+		}
+		if (filter) {
+			query+='&filter='+filter
+		}
+				
+		
+		let limit = limitP > 0 ? '?limit='+limitP : '?limit=50'; 
+		  fetch('/api/notes'+limit+query)
+		  .then(function(response) {
+			return response.json()
+		  }).then(function(json) {
+			console.log(['loaded comments', json])
+			that.setState({comments:json});
+		  }).catch(function(ex) {
+			console.log(['error loading comments', ex])
+		  })
+		
 	}
   
     loadComments(question,user,limitP,filter) {
@@ -1390,7 +1422,7 @@ console.log(auth,this.state.user)
 			
         
         
-			<div style={{width:'100%'}} className="mnemo">
+			<div style={{width:'100%', marginLeft:'1em'}} className="mnemo">
 				
 				{(this.state.waiting) && <div onClick={this.stopWaiting} style ={{position: 'fixed', top: 0, left: 0, width:'100%',height:'100%',backgroundColor:'grey',zIndex:9999999,opacity:0.3}}  ><img style={{height:'7em' }} src='/loading.gif' /></div>}
 				
@@ -1430,6 +1462,10 @@ console.log(auth,this.state.user)
 			    <PropsRoute exact={true} path='/recentcomments/:comment'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user} analyticsEvent={this.analyticsEvent} />
                 
                 <PropsRoute exact={true} path='/recentcomments'  component={RecentComments} loadComments={this.loadComments} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user}  	analyticsEvent={this.analyticsEvent} />
+                
+                
+                <PropsRoute exact={true} path='/recentnotes'  component={RecentNotes} loadNotes={this.loadNotes} editComment={this.editComment} deleteComment={this.deleteComment} newComment={this.newComment} comments={this.state.comments} isAdmin={this.isAdmin} newCommentReply={this.newCommentReply}  editComment={this.editComment}  deleteComment={this.deleteComment} user={this.state.user}  	analyticsEvent={this.analyticsEvent} />
+                
                 
                  {this.state.comment && !this.state.editCommentReply && <CommentEditor comment={this.state.comment} setComment={this.setComment} user={this.state.user} saveComment={this.saveComment}  getCurrentQuestion={this.getCurrentQuestion} 	analyticsEvent={this.analyticsEvent} />}
 

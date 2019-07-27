@@ -26,6 +26,11 @@ export default class FeedMuncher extends Component {
 			showTagSelector: false,
 			showMemoryAidSelector: false,
 			lineSearch:'',
+			lineSearch1:'',
+			lineSearch2:'',
+			lineSearch3:'',
+			lineSearch4:'',
+			
 			message:null,
 			filterFeed:''
 		}
@@ -44,10 +49,12 @@ export default class FeedMuncher extends Component {
 		this.change = this.change.bind(this)
 		this.changeFilter = this.changeFilter.bind(this)
 		this.changeFeedUrl = this.changeFeedUrl.bind(this)
+		this.swipeRight = this.swipeRight.bind(this)
 		
 		this.deleteTag = this.deleteTag.bind(this)
 		this.addTag = this.addTag.bind(this)
 		this.addMemoryAid = this.addMemoryAid.bind(this)
+		this.hideMemoryAid = this.hideMemoryAid.bind(this)
 		this.showTagSelector = this.showTagSelector.bind(this)
 		this.saveMemoryAid = this.saveMemoryAid.bind(this)
 		this.showMessage = this.showMessage.bind(this)
@@ -56,12 +63,19 @@ export default class FeedMuncher extends Component {
 	}
 	
 	componentDidMount() {
+		let that = this;
 		try {
 			this.setState({deleted: JSON.parse(localStorage.getItem('feedmuncher_blocked_guids'))});
 		} catch (e) {
 			this.setState({deleted:{}})
 		}
 		this.updateUrl(null,this.state.feedUrl);
+		
+		fetch('/api/topics?title=%20').then(function(response) {
+			return response.json()
+		}).then(function(topics) {
+			that.setState({topics:Object.keys(topics)})
+		})
 	}
     
     
@@ -282,17 +296,18 @@ export default class FeedMuncher extends Component {
 				saveForReview:Object.assign(item,{
 						
 						guid:item.guid ? (item.guid['#'] ? item.guid['#'] : item.guid)  : '',
-						answer:that.html2Text(item.title),
+						answer:'', //that.html2Text(item.title),
 						question:'',difficulty:2,
-						image:item && item['media:group'] ? item['media:group']['media:thumbnail'].url : '',
+						image:item && item['media:group'] && item['media:group']['media:content'] && item['media:group']['media:content'].length > 0 ? item['media:group']['media:content'][0].url : '',
 						link:item.link,
 						mnemonic:'',
-						specific_question:that.html2Text(sentence).length > 0 ? that.html2Text(sentence) : '',
+						specific_question:'', //that.html2Text(sentence).length > 0 ? that.html2Text(sentence) : '',
 						specific_answer:'',
 						multiple_choices:'',
-						feedback:that.html2Text(item.description),
+						feedback:'', //that.html2Text(item.description),
 						atags:tags,
-						topic:'World News'
+						topic:'World News',
+						newtag :''
 					})
 				})
 			console.log(['DID SET review',this.state.saveForReview,item])
@@ -326,7 +341,7 @@ export default class FeedMuncher extends Component {
 				let options = record.multiple_choices.split("|||")
 				if (record.specific_question && record.specific_question.length > 0) { 
 					if (record.specific_question && record.specific_question.length > 0 && record.specific_answer && record.specific_answer.length > 0 && options.length > 0) { 
-						mcQuestions.push({difficulty:record.difficulty,topic:record.topic,autoshow_image:"YES",image:record.image,question:record.specific_question,answer:record.specific_answer,multiple_choices:shuffle(options).join("|||"),feedback:record.feedback,sort:Math.random(),importtype:'abcnews',guid:record.guid})
+						mcQuestions.push({difficulty:record.difficulty,topic:record.topic,autoshow_image:"NO",image:record.image,question:record.specific_question,answer:record.specific_answer,multiple_choices:shuffle(options).join("|||"),feedback:record.feedback,sort:Math.random(),importtype:'abcnews',guid:record.guid})
 					} else {
 						that.showMessage('You must provide more information for your multiple choice question')
 					}	
@@ -337,10 +352,10 @@ export default class FeedMuncher extends Component {
 				  headers: {
 					'Content-Type': 'application/json'
 				  },
-				  body: JSON.stringify(Object.assign({tags:record.tags,multiple_choices:record.multiple_choices,quiz:record.topic,topic:record.topic,user:this.props.user ? this.props.user._id : null,tags:record.atags,access:'public',interrogative:record.interrogative,question:record.question,answer:record.answer,mnemonic:record.mnemonic,autoshow_image:"YES",image:record.image,headlineFacts: headlineFacts,link:record.link,importtype:'abcnews',guid:record.guid ? (record.guid['#'] ? record.guid['#'] : record.guid) : '', attribution:'http://abc.net.au', imageattribution:'http://abc.net.au',specific_question:record.specific_question,specific_answer:record.specific_answer,difficulty:record.difficulty,feedback:record.feedback,mcQuestions:mcQuestions},{}))
+				  body: JSON.stringify(Object.assign({tags:record.tags,multiple_choices:record.multiple_choices,quiz:record.topic,topic:record.topic,user:this.props.user ? this.props.user._id : null,tags:record.atags,access:'public',interrogative:record.interrogative,question:record.question,answer:record.answer,hasMnemonic:true,mnemonic:record.mnemonic,autoshow_image:"NO",image:record.image,headlineFacts: headlineFacts,link:record.link,importtype:'abcnews',guid:record.guid ? (record.guid['#'] ? record.guid['#'] : record.guid) : '', attribution:(record['dc:creator'] ? record['dc:creator'] + '  ' : '')+'http://abc.net.au', imageattribution:'http://abc.net.au',specific_question:record.specific_question,specific_answer:record.specific_answer,difficulty:record.difficulty,feedback:record.feedback,mcQuestions:mcQuestions},{}))
 				}).then(function() {
 					that.showMessage('Saved for review')
-					
+					that.setState({saveForReview:null})
 				});
 			} else {
 				console.log(['sendmnem mis'])
@@ -386,6 +401,8 @@ export default class FeedMuncher extends Component {
 	}
 	
 	addTag(tag) {
+		let that = this;
+		if (!tag || tag.length === 0) tag = this.state.saveForReview.newtag;
 		console.log(['ADD TAG',tag])
 		let saveForReview = this.state.saveForReview
 		if (saveForReview) {
@@ -396,13 +413,19 @@ export default class FeedMuncher extends Component {
 			saveForReview.atags = saveForReview.atags ? saveForReview.atags : []
 			saveForReview.atags.push(newTag)
 			saveForReview.newtag = '';
+			console.log(saveForReview.atags)
 			this.setState({saveForReview:saveForReview,showTagSelector:null,})
-		}
+		}that.state.saveForReview.newtag
 	}
 	
 	
 	addMemoryAid() {
 		this.setState({showMemoryAidSelector:true});
+		//console.log(['SHOW MEM SEL'])
+	}
+	
+	hideMemoryAid() {
+		this.setState({showMemoryAidSelector:false});
 		//console.log(['SHOW MEM SEL'])
 	}
 	
@@ -419,8 +442,6 @@ export default class FeedMuncher extends Component {
 		saveForReview.mnemonic = memoryAid;
 		this.setState({showMemoryAidSelector: null,showTagSelector:null,tagWords:{}});
 		this.setState({saveForReview:saveForReview});
-		
-		//console.log(['saveMemoryAid',this.state.saveForReview])
 	}
 	
 	mcFromWord(word) {
@@ -429,14 +450,14 @@ export default class FeedMuncher extends Component {
 			let q = saveForReview.specific_question;
 			//var doc = nlp(q)
 			saveForReview.specific_question = q.replace(new RegExp(word, "ig"), '[______]')
-			
 			saveForReview.specific_answer = word;
 			this.setState({saveForReview:saveForReview})
 		}
 	}
 	
-	swipeRight() {
+	swipeRight(key) {
 		console.log('sw ri')
+		this.deleteItem(key)
 	}
     
     render() {
@@ -448,7 +469,6 @@ export default class FeedMuncher extends Component {
 			var doc = nlp(this.html2Text(reviewItem.specific_question))
 			var questionWords = doc.nouns().out('array')	
 			return <div style={{marginLeft:'1em'}} id="newssubmission" >
-			{this.state.message && <b style={{position:'fixed',top:'7em',left:'50%',backgroundColor:'pink',border:'1px solid black',color:'black',padding:'0.8em'}}>{this.state.message}</b>}
 			<div style={{float:'right'}} >
 				<button onClick={this.reallySendToReview} className='btn btn-success'>Save</button>
 				<button onClick={(e) => this.sendToReview(null)} className='btn btn-danger' >Cancel</button>
@@ -456,25 +476,188 @@ export default class FeedMuncher extends Component {
 			<h3>Save for review</h3>
 			<b>* Required</b>
 				<div className="form-group row">
-					<label  className="col-12" >Topic <input onChange={this.change} name="topic" className="form-control form-control-lg" type='text' value={this.state.saveForReview.topic} /></label>
+					<label  className="col-12" >Topic 
+					&nbsp;&nbsp;{<Autocomplete
+						 className="form-control form-control-lg"
+						getItemValue={(item) => item  }
+						items={that.state.topics}
+						renderItem={(item, isHighlighted) => {
+							  let text = item
+							  if (that.state.reviewItem && text) {
+								if ((!that.state.reviewItem.topic || that.state.reviewItem.topic.trim().length === 0 || text.toLowerCase().indexOf(that.state.reviewItem.topic.toLowerCase()) !== -1)) {
+									return <div style={{borderBottom:'1px solid black'}}>{text}</div>
+								} else {
+									return <div></div>;
+								}
+							  } else {
+								  return <div></div>;
+							  }
+						}}
+						value={(that.state.reviewItem ? that.state.reviewItem.topic : '')}
+						
+						onSelect={(value, item) => {
+							//console.log(['SELECT',value,item])
+							let reviewItem = that.state.saveForReview
+							reviewItem.topic = value
+							that.setState({reviewItem:reviewItem});
+			
+							//that.setState({ lineSearch:this.html2Text(value)})
+							//that.submitFormOnSelect();
+						}}
+						onChange={(event, value) => {
+							console.log(['CHANGE',value])
+							if (value != null && value != undefined) {
+								let reviewItem = that.state.saveForReview
+								reviewItem.topic = value
+								that.setState({reviewItem:reviewItem});
+							}
+							//if (that.suggestTimeout) clearTimeout(that.suggestTimeout)
+							//that.suggestTimeout = setTimeout(function() {that.loadSuggestions(value)},500)
+						}}
+						
+					  renderMenu={children => (
+						<div  style={{ width:'100%', padding:'0.5em', margin:'0.5em', backgroundColor:'lightgrey', border:'1px solid black'}}>
+						  {children}
+						</div>
+					  )}
+					/>}
+					</label>
 				</div>
 				<div className="form-group row">
 					<label  className="col-12" >Interrogative <input onChange={this.change} name="interrogative" className="form-control form-control-lg" type='text' value={this.state.saveForReview.interrogative} /></label>
 				</div>
 				<div className="form-group row">
-					<label  className="col-12" >Question * <input onChange={this.change} name="question" className="form-control form-control-lg" type='text' value={this.state.saveForReview.question} /></label>
+					<label  className="col-12" >Question * 
+					&nbsp;&nbsp;{that.state.expanded && that.state.expanded[reviewItem.guid] && that.state.expanded[reviewItem.guid].lines && <Autocomplete
+						getItemValue={(item) => item  }
+						items={that.state.expanded[reviewItem.guid].lines}
+						renderItem={(item, isHighlighted) => {
+							  let text = this.html2Text(item)
+							  if (text && text.toLowerCase().indexOf(that.state.lineSearch1.toLowerCase()) !== -1) {
+								return <div style={{borderBottom:'1px solid black'}}>{text}</div>
+							  } else {
+								  return <div></div>;
+							  }
+						}}
+						value={that.state.lineSearch1}
+						
+						onSelect={(value, item) => {
+							//console.log(['SELECT',value,item])
+							let reviewItem = that.state.saveForReview
+							reviewItem.question = that.html2Text(value)
+							that.setState({reviewItem:reviewItem});
+			
+							//that.setState({ lineSearch:this.html2Text(value)})
+							//that.submitFormOnSelect();
+						}}
+						onChange={(event, value) => {
+							console.log(['CHANGE',value])
+							if (value != null && value != undefined) {
+								that.setState({ lineSearch1:this.html2Text(value)})
+							}
+							//if (that.suggestTimeout) clearTimeout(that.suggestTimeout)
+							//that.suggestTimeout = setTimeout(function() {that.loadSuggestions(value)},500)
+						}}
+						
+					  renderMenu={children => (
+						<div  style={{ width:'100%', padding:'0.5em', margin:'0.5em', backgroundColor:'lightgrey', border:'1px solid black'}}>
+						  {children}
+						</div>
+					  )}
+					/>}
+					<input onChange={this.change} name="question" className="form-control form-control-lg" type='text' value={this.state.saveForReview.question} /></label>
 				</div>
 				<div className="form-group row">
-					<label  className="col-12" >Answer <textarea style={taStyle} onChange={this.change} name="answer"  type='text' className="form-control form-control-lg" value={this.state.saveForReview.answer}></textarea></label>
+					<label  className="col-12" >Answer 
+					&nbsp;&nbsp;{that.state.expanded && that.state.expanded[reviewItem.guid] && that.state.expanded[reviewItem.guid].lines && <Autocomplete
+						getItemValue={(item) => item  }
+						items={that.state.expanded[reviewItem.guid].lines}
+						renderItem={(item, isHighlighted) => {
+							  let text = this.html2Text(item)
+							  if (text && text.toLowerCase().indexOf(that.state.lineSearch2.toLowerCase()) !== -1) {
+								return <div style={{borderBottom:'1px solid black'}}>{text}</div>
+							  } else {
+								  return <div></div>;
+							  }
+						}}
+						value={that.state.lineSearch2}
+						
+						onSelect={(value, item) => {
+							//console.log(['SELECT',value,item])
+							let reviewItem = that.state.saveForReview
+							reviewItem.answer = reviewItem.answer + "\n\n" + that.html2Text(value)
+							that.setState({reviewItem:reviewItem});
+			
+							//that.setState({ lineSearch:this.html2Text(value)})
+							//that.submitFormOnSelect();
+						}}
+						onChange={(event, value) => {
+							console.log(['CHANGE',value])
+							if (value != null && value != undefined) {
+								that.setState({ lineSearch2:this.html2Text(value)})
+							}
+							//if (that.suggestTimeout) clearTimeout(that.suggestTimeout)
+							//that.suggestTimeout = setTimeout(function() {that.loadSuggestions(value)},500)
+						}}
+						
+					  renderMenu={children => (
+						<div  style={{ width:'100%', padding:'0.5em', margin:'0.5em', backgroundColor:'lightgrey', border:'1px solid black'}}>
+						  {children}
+						</div>
+					  )}
+					/>}
+					
+					<textarea style={taStyle} onChange={this.change} name="answer"  type='text' className="form-control form-control-lg" value={this.state.saveForReview.answer}></textarea></label>
 				</div>
 					
 				<div className="form-group row">
 					<button onClick={this.addMemoryAid} className="btn btn-info" >+</button>
 					 <label  className="col-12" >
 					 &nbsp;&nbsp;&nbsp; Memory Aid  *
+					 &nbsp;&nbsp;
+					 {that.state.expanded && that.state.expanded[reviewItem.guid] && that.state.expanded[reviewItem.guid].lines && <Autocomplete
+						getItemValue={(item) => item  }
+						items={that.state.expanded[reviewItem.guid].lines}
+						renderItem={(item, isHighlighted) => {
+							  let text = this.html2Text(item)
+							  if (text && text.toLowerCase().indexOf(that.state.lineSearch3.toLowerCase()) !== -1) {
+								return <div style={{borderBottom:'1px solid black'}}>{text}</div>
+							  } else {
+								  return <div></div>;
+							  }
+						}}
+						value={that.state.lineSearch3}
+						
+						onSelect={(value, item) => {
+							//console.log(['SELECT',value,item])
+							let reviewItem = that.state.saveForReview
+							reviewItem.mnemonic += "\n\n" +that.html2Text(value)
+							that.setState({reviewItem:reviewItem});
+			
+							//that.setState({ lineSearch:this.html2Text(value)})
+							//that.submitFormOnSelect();
+						}}
+						onChange={(event, value) => {
+							console.log(['CHANGE',value])
+							if (value != null && value != undefined) {
+								that.setState({ lineSearch3:this.html2Text(value)})
+							}
+							//if (that.suggestTimeout) clearTimeout(that.suggestTimeout)
+							//that.suggestTimeout = setTimeout(function() {that.loadSuggestions(value)},500)
+						}}
+						
+					  renderMenu={children => (
+						<div  style={{ width:'100%', padding:'0.5em', margin:'0.5em', backgroundColor:'lightgrey', border:'1px solid black'}}>
+						  {children}
+						</div>
+					  )}
+					/>}
+					 
 					 {that.state.showMemoryAidSelector === true &&  that.state.expanded.hasOwnProperty(reviewItem.guid) && <div style={{padding:'0.5em',border: '1px solid black', backgroundColor: 'lightgrey'}} >
 							
 							<button style={{float:'right'}} className='btn btn-success' onClick={(e) => this.saveMemoryAid(Object.keys(this.state.tagWords).join(","))}>Save</button>
+							
+							<button style={{float:'right'}} className='btn btn-danger' onClick={(e) => this.saveMemoryAid(Object.keys(this.state.tagWords).join(","))}>Cancel</button>
 							
 							{ that.state.expanded.hasOwnProperty(reviewItem.guid) && <div>
 								{that.state.expanded[reviewItem.guid].nouns && that.state.expanded[reviewItem.guid].nouns.length > 0 &&  <div><b>Topics</b> {that.state.expanded[reviewItem.guid].nouns.map(function(record,recordKey) {
@@ -512,7 +695,7 @@ export default class FeedMuncher extends Component {
 				</div>
 				<div className="form-group row">
 					<label>Difficulty  *
-					<select  onChange={this.change} name="difficulty"  value={this.state.saveForReview.difficulty} className="form-control form-control-lg" ><option value="1" >1</option><option value="2"   >2</option><option value="3" >3</option><option value="4" >4</option><option value="5" >5</option></select></label>
+					&nbsp;&nbsp;<select  onChange={this.change} name="difficulty"  value={this.state.saveForReview.difficulty} className="form-control form-control-lg" ><option value="1" >1</option><option value="2"   >2</option><option value="3" >3</option><option value="4" >4</option><option value="5" >5</option></select></label>
 				</div>
 				<div className="form-group row">
 					<label>Tags </label>  
@@ -523,7 +706,7 @@ export default class FeedMuncher extends Component {
 						<div>
 							<button className='btn btn-info' onClick={this.showTagSelector}>+</button>
 					
-							<form onSubmit={this.addTag} >
+							<form onSubmit={(e) => {that.addTag(); e.preventDefault(); return false;}} >
 							<input value={that.state.saveForReview.newtag}  name="newtag" onChange={this.change} />
 							</form>
 						</div>	
@@ -558,24 +741,25 @@ export default class FeedMuncher extends Component {
 				<hr/>
 				<h5>Multiple Choice Question </h5>
 				<div className="form-group row">
-					<label className="col-12" >Question&nbsp;&nbsp;  
+					<label className="col-12" >Question
+					&nbsp;&nbsp;  
 					  {that.state.expanded && that.state.expanded[reviewItem.guid] && that.state.expanded[reviewItem.guid].lines && <Autocomplete
 						getItemValue={(item) => item  }
 						items={that.state.expanded[reviewItem.guid].lines}
 						renderItem={(item, isHighlighted) => {
 							  let text = this.html2Text(item)
-							  if (text && text.toLowerCase().indexOf(that.state.lineSearch.toLowerCase()) !== -1) {
+							  if (text && text.toLowerCase().indexOf(that.state.lineSearch4.toLowerCase()) !== -1) {
 								return <div style={{borderBottom:'1px solid black'}}>{text}</div>
 							  } else {
 								  return <div></div>;
 							  }
 						}}
-						value={that.state.lineSearch}
+						value={that.state.lineSearch4}
 						
 						onSelect={(value, item) => {
 							//console.log(['SELECT',value,item])
 							let reviewItem = that.state.saveForReview
-							reviewItem.specific_question = that.html2Text(value)
+							reviewItem.specific_question += "\n\n" + that.html2Text(value)
 							that.setState({reviewItem:reviewItem});
 			
 							//that.setState({ lineSearch:this.html2Text(value)})
@@ -584,7 +768,7 @@ export default class FeedMuncher extends Component {
 						onChange={(event, value) => {
 							console.log(['CHANGE',value])
 							if (value != null && value != undefined) {
-								that.setState({ lineSearch:this.html2Text(value)})
+								that.setState({ lineSearch4:this.html2Text(value)})
 							}
 							//if (that.suggestTimeout) clearTimeout(that.suggestTimeout)
 							//that.suggestTimeout = setTimeout(function() {that.loadSuggestions(value)},500)
@@ -609,13 +793,56 @@ export default class FeedMuncher extends Component {
 					<textarea   style={taStyle} onChange={this.change} name="specific_question"  type='text'  className="form-control form-control-lg" value={this.state.saveForReview.specific_question}></textarea></label>
 				</div>
 				<div className="form-group row">
-					<label className="col-12" >Answer  <input  onChange={this.change} name="specific_answer"  type='text' className="form-control form-control-lg" value={this.state.saveForReview.specific_answer} /></label>
+					<label className="col-12" >Answer  
+					 &nbsp;&nbsp;
+					<input  onChange={this.change} name="specific_answer"  type='text' className="form-control form-control-lg" value={this.state.saveForReview.specific_answer} /></label>
 				</div>
 				<div className="form-group row">
-					<label className="col-12">Incorrect Choices (split by |||)  <input type='text' onChange={this.change} name="multiple_choices"   className="form-control form-control-lg" value={this.state.saveForReview.multiple_choices} /></label>
+					<label className="col-12">Incorrect Choices (split by |||) &nbsp;&nbsp; <input type='text' onChange={this.change} name="multiple_choices"   className="form-control form-control-lg" value={this.state.saveForReview.multiple_choices} /></label>
 				</div>
 				<div className="form-group row">
-					<label className="col-12">Feedback (optional)<textarea  style={taStyle}  onChange={this.change} name="feedback"  type='text'  className="form-control form-control-lg"  value={this.state.saveForReview.feedback}></textarea></label>
+				 
+					<label className="col-12">Feedback (optional)
+					&nbsp;&nbsp;
+					{that.state.expanded && that.state.expanded[reviewItem.guid] && that.state.expanded[reviewItem.guid].lines && <Autocomplete
+						getItemValue={(item) => item  }
+						items={that.state.expanded[reviewItem.guid].lines}
+						renderItem={(item, isHighlighted) => {
+							  let text = this.html2Text(item)
+							  if (text && text.toLowerCase().indexOf(that.state.lineSearch.toLowerCase()) !== -1) {
+								return <div style={{borderBottom:'1px solid black'}}>{text}</div>
+							  } else {
+								  return <div></div>;
+							  }
+						}}
+						value={that.state.lineSearch}
+						
+						onSelect={(value, item) => {
+							//console.log(['SELECT',value,item])
+							let reviewItem = that.state.saveForReview
+							reviewItem.feedback += "\n\n" + that.html2Text(value)
+							that.setState({reviewItem:reviewItem});
+			
+							//that.setState({ lineSearch:this.html2Text(value)})
+							//that.submitFormOnSelect();
+						}}
+						onChange={(event, value) => {
+							console.log(['CHANGE',value])
+							if (value != null && value != undefined) {
+								that.setState({ lineSearch:this.html2Text(value)})
+							}
+							//if (that.suggestTimeout) clearTimeout(that.suggestTimeout)
+							//that.suggestTimeout = setTimeout(function() {that.loadSuggestions(value)},500)
+						}}
+						
+					  renderMenu={children => (
+						<div  style={{ width:'100%', padding:'0.5em', margin:'0.5em', backgroundColor:'lightgrey', border:'1px solid black'}}>
+						  {children}
+						</div>
+					  )}
+					/>}
+					
+					<textarea  style={taStyle}  onChange={this.change} name="feedback"  type='text'  className="form-control form-control-lg"  value={this.state.saveForReview.feedback}></textarea></label>
 				</div>
 				
 				
@@ -680,7 +907,7 @@ export default class FeedMuncher extends Component {
 					let tags = item.category;
 					if (typeof tags === 'object') tags = Object.values(item.category).join(",")
 					
-					return <Swipeable key={itemKey}  onSwipedRight={that.swipeRight} ><div style={{marginLeft:'1em',borderBottom:'2px solid black', marginBottom:'1em', padding:'0.5em'}}>
+					return <Swipeable key={itemKey}  onSwipedRight={(e) =>that.swipeRight(itemKey)} ><div style={{marginLeft:'1em',borderBottom:'2px solid black', marginBottom:'1em', padding:'0.5em'}}>
 						
 						<div style={{float:'right', marginLeft:'1em'}}>
 							{!that.state.expanded.hasOwnProperty(guid) &&   <button className='btn btn-info'  style={{display:'block'}} onClick={(e) => that.setExpanded(itemKey)}  >Expand</button>}
@@ -736,7 +963,8 @@ export default class FeedMuncher extends Component {
 			//this.state.message && 	
         return  (
         <div className="feedmuncher" >
-			
+				{this.state.message && <b style={{position:'fixed',top:'7em',left:'50%',backgroundColor:'pink',border:'1px solid black',color:'black',padding:'0.8em'}}>{this.state.message}</b>}
+		
 	
 			<button style={{float:'right'}} className='btn btn-danger' onClick={(e) => {localStorage.setItem('feedmuncher_blocked_guids',{}); that.setState({deleted:{}})} }>Reset Deleted</button>
 			

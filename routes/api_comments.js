@@ -137,16 +137,26 @@ function initRoutes(router,db) {
 	
 	
 	router.get('/notes', (req, res) => {
-		//console.log(['FIND COMMENTS',req.query])
+		console.log(['FIND NOTES',req.query])
 			
 		let filter = []
+		if (req.query.filter && req.query.filter.length > 0) {
+			let filterParts = req.query.filter.trim().split(' ');
+			let innerFilter=[]
+			filterParts.map(function(token) {
+				innerFilter.push({$or:[{comment:{$regex:token}},{userAvatar:{$regex:token}},{questionTopic:{$regex:token}},{questionText:{$regex:token}}]})
+			})
+			filter.push({$and:innerFilter})
+		}
 		// filter by question
-		if (req.query.question && req.query.user) {
+		if (req.query.question) {
 			filter.push({question : {$eq: ObjectId(req.query.question)}});
+		} 
+		if (req.query.user) {
 			filter.push({$and:[{type:{$eq:'note'}},{user:{$eq:ObjectId(req.query.user)}}]});
-			//console.log(['FIND COMMENTS',JSON.stringify({$and:filter})])
+			console.log(['FIND COMMENTS note',JSON.stringify({$and:filter})])
 			db().collection('comments').find({$and:filter}).sort({createDate:-1}).toArray(function(err,results) {
-				//console.log(['FOUND COMMENTS',err,results])
+				console.log(['FOUND COMMENTSnote',err,results])
 				res.send(results)
 			});
 		// recent comments

@@ -294,7 +294,7 @@ export default class MnemonicsList extends Component {
                 <div className='card-text'>
                     {this.props.isLoggedIn() && <button  className='btn btn-success '  style={{float:'right'}} data-toggle="modal" data-target="#suggestdialog" onClick={this.createSuggestion} ><Plus size={26}  style={{float: 'left'}} /><span className="d-none d-md-inline-block">&nbsp;Suggest a Memory Aid&nbsp;</span></button>}
                     <b>Memory Aids</b>
-                    {this.state.isEditing && <div id="suggestdialog" style={{zIndex:99999,position:'fixed',top:'4em',width:'80%',textAlign:'center'}}>
+                    {this.state.isEditing && <div id="suggestdialog" style={{zIndex:99999,position:'fixed',top:'0.02em',width:'95%'}}>
                       <div className="modal-dialog" role="document">
                         <div className="modal-content">
                           <div className="modal-header">
@@ -316,8 +316,8 @@ export default class MnemonicsList extends Component {
                             </div>
                             <div className='form-group'>    
                             <br/>
-                                  <button onClick={() => this.saveSuggestion()} className='btn btn-info'>&nbsp;Submit&nbsp;</button>    
-                                  <button onClick={this.stopEditing}  className='btn btn-info'>&nbsp;Cancel&nbsp;</button>    
+                                  <button onClick={() => this.saveSuggestion()} className='btn btn-success'>&nbsp;Submit&nbsp;</button>    
+                                  <button onClick={this.stopEditing}  className='btn btn-danger'>&nbsp;Cancel&nbsp;</button>    
                                   
                             </div>
                           </div>
