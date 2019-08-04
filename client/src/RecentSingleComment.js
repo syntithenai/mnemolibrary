@@ -64,7 +64,7 @@ export default class RecentSingleComment extends Component {
 				let shortComment = comment.comment.split(' ').slice(0,10).join(' ')
 				let replyLink  = '/recentcomments/'+comment.question;
 				let joinWord = comment.type==="question" ? 'asks' : 'says'
-				return  <span key={comment._id}>{comment.userAvatar} {joinWord} <i>"{shortComment}"</i>&nbsp;&nbsp;&nbsp;{that.props.user && <div onClick={(e) => that.props.newCommentReply(comment)} className='btn btn-success'>{replyIcon}</div>}&nbsp;<Link to='/recentcomments' className='btn btn-info'>...</Link></span>
+				return  <span key={comment._id}>{comment.userAvatar} {joinWord} <i>"{shortComment}"</i>&nbsp;&nbsp;&nbsp;{that.props.user && <div onClick={(e) => that.props.newCommentReply(comment)} className='btn btn-success'>{replyIcon}</div>}&nbsp;<Link to={'/recentcomments/'+comment._id} className='btn btn-info'>...</Link></span>
 			});
 			
 			return <div style={{backgroundColor:'#eee',paddingLeft:'0.8em'}}>				

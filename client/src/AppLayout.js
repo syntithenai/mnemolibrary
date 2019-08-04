@@ -40,6 +40,8 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import AdminNewsletterTool from './AdminNewsletterTool'
 import AtlasLivingAustraliaSearch from './AtlasLivingAustraliaSearch'
+import LifeSearch from './LifeSearch'
+
 import MusicBrainzSearch from './MusicBrainzSearch'
 //import AtlasLivingAustraliaSingle from './AtlasLivingAustraliaSingle'
 
@@ -1269,6 +1271,7 @@ export default class AppLayout extends Component {
 				return response.json();
 			}).then(function(res) {
 				console.log('done add all to review')
+				that.setMessage('Added '+ids.length+' question'+(ids.length > 1 ? 's' : '') +' to your review list')
 				//confirmAlert({
 				  //title: 'Questions Added For Review',
 				  //message: 'Added '+ids.length+' question'+(ids.length > 1 ? 's' : '') +' to your review list',
@@ -1422,10 +1425,14 @@ console.log(auth,this.state.user)
 			
         
         
-			<div style={{width:'100%', marginLeft:'1em'}} className="mnemo">
+			<div style={{width:'100%'}} className="mnemo">
 				
 				{(this.state.waiting) && <div onClick={this.stopWaiting} style ={{position: 'fixed', top: 0, left: 0, width:'100%',height:'100%',backgroundColor:'grey',zIndex:9999999,opacity:0.3}}  ><img style={{height:'7em' }} src='/loading.gif' /></div>}
 				
+				{this.state.message && <b style={{position:'fixed',top:'7em',left:'50%',backgroundColor:'pink',border:'1px solid black',color:'black',padding:'0.8em'}}>{this.state.message}</b>}
+				
+				{false && this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
+             
 				  
                 <PropsRoute  path="/" component={Navigation}  setCurrentTopic={this.setCurrentTopic} shout={this.shout} user={this.state.user} isLoggedIn={this.isLoggedIn} setCurrentPage={this.setCurrentPage} login={this.login} setQuizFromDiscovery={this.setQuizFromDiscovery} title={this.state.title} hideCollection={this.hideCollection} newCommentReply={this.newCommentReply} 	analyticsEvent={this.analyticsEvent}  />
                 
@@ -1444,6 +1451,19 @@ console.log(auth,this.state.user)
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/ala/search/:searchFor/mode/:searchMode'  component={AtlasLivingAustraliaSearch}  />
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/ala/search/:searchFor/:index'  component={AtlasLivingAustraliaSearch}  />
 				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/ala/search/:searchFor/mode/:searchMode/:index'  component={AtlasLivingAustraliaSearch}  />
+				
+				
+				
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/life'  component={LifeSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} path='/life/:searchFor'  component={LifeSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user}  path='/life/:searchFor/mode/:searchMode'  component={LifeSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user}   path='/life/mode/:searchMode'  component={LifeSearch}  />
+				
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/life/search/:searchFor'  component={LifeSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/life/search/:searchFor/mode/:searchMode'  component={LifeSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/life/search/:searchFor/:index'  component={LifeSearch}  />
+				<PropsRoute exact={true} analyticsEvent={this.analyticsEvent} user={this.state.user} rawSearch={true} path='/life/search/:searchFor/mode/:searchMode/:index'  component={LifeSearch}  />
+				
 				
 				
 				{<div><PropsRoute exact={true} routerBaseUrl="/musicbrainz" analyticsEvent={this.analyticsEvent} user={this.state.user} path='/musicbrainz'  component={MusicBrainzSearch}  />
@@ -1471,7 +1491,6 @@ console.log(auth,this.state.user)
 
                  {this.state.comment && this.state.editCommentReply && <CommentReplyEditor  comment={this.state.comment} commentReplyIndex={this.state.commentReplyIndex} commentReply={this.state.commentReply} cancelCommentReply={this.cancelCommentReply}  saveCommentReply={this.saveCommentReply} getCurrentQuestion={this.getCurrentQuestion} user={this.state.user} 	analyticsEvent={this.analyticsEvent} />}
              
-                {this.state.message && <div className='page-message' ><b>{this.state.message}</b></div>}
                  
                 <PropsRoute  exact={true} path="/help" component={AboutPage} analyticsEvent={this.analyticsEvent}  />
                 <PropsRoute  path="/help/about" component={AboutPage} analyticsEvent={this.analyticsEvent} />

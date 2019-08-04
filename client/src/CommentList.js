@@ -270,8 +270,8 @@ Questions</b></div>}
 				{publicComments.length > 0 && <div style={{marginTop:'0.5em',marginBottom:'0.5em'}}	><b className='commentsubheader'>Comments</b></div>}
 				{publicComments}	
 				
-				<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-				<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+				{!this.props.isSingleView && <div><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+				<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/></div>}
 				
 				
 				{that.state.showShareDialog && <ShareDialog   analyticsEvent={that.props.analyticsEvent} setShareDialog={that.setShareDialog} shareLink={that.state.shareLink} shareText={that.state.shareText} dialogTitle={'Share Comment using'} />}

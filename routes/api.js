@@ -80,6 +80,7 @@ initdb().then(function() {
 		
 	// proxy feed request and convert xml to json
 	router.get('/feedproxy', (req, res) => {
+		console.log(['FEEDPROXY',req.query.url])
 		if (req.query.url) {// && req.query.url.indexOf('abc.net.au' !== -1)) {
 			var expat = require('node-expat');
 			var Slicer = require('node-xml-slicer');
@@ -91,12 +92,14 @@ initdb().then(function() {
 			}).then(function(response) {
 				return response.text();
 			}).then(function(text) {
-				//console.log('========================================');
+				console.log('got data');
 				//console.log(text);
 				//console.log('========================================');
 				let parts = text.split("&#039;");
 				parser.write(parts.join(''))
 				res.send(rootSlicer.result)
+			}).catch(function(e) {
+				console.log(e);
 			})
 		} else {
 			res.send({})

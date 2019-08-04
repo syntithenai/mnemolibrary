@@ -32,7 +32,7 @@ export default class ShareDialog extends Component {
     render() {
 		if (this.props.analyticsEvent) this.props.analyticsEvent('share');
 		let encodedShareLink = encodeURIComponent(this.props.shareLink)   //.replace(/ /g,'_')
-		let mailToLink = "mailto:?subject=My%20comment%20on%20Mnemos%20Library&body="+encodeURIComponent(this.props.shareText)+"    \n\n"+encodedShareLink;
+		let mailToLink = "mailto:?subject="+encodeURIComponent(this.props.shareText)+"&body="+encodedShareLink;
 	    return  (
             <div id="sharedialog" onClick={() => this.props.setShareDialog(false)} className="modaldialog" tabIndex="-1" role="dialog">
 				<div id="fb-root"></div>

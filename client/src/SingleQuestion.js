@@ -596,18 +596,18 @@ export default class SingleQuestion extends Component {
         
              } else {
 				 // missing http:// ?
-				let parts = question.link.split("")
+				let parts = question.link.split(".")
 				if (parts.length > 1) {
 					link="http://"+question.link
 				// fallback to google search question
 				} else {
-					link = 'https://www.google.com.au/search?q='+question.question;
+					link = 'https://www.google.com.au/search?q='+header;
                 }
                 target='_new';
         
              }
           } else {
-              link = 'https://www.google.com.au/search?q='+question.question;
+              link = 'https://www.google.com.au/search?q='+header;
               target='_new';
           }
        
