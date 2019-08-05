@@ -92,6 +92,7 @@ export default class AppLayout extends Component {
       this.GoogleAuth = null; // Google Auth object.
       this.mqttClient = null;
       this.mqttClientId = null;
+      this.messageTimeout = null;
       
       let userString = localStorage.getItem('users');
       if (userString) {
@@ -1103,7 +1104,13 @@ export default class AppLayout extends Component {
   }; 
  
   setMessage(message) {
+      let that = this;
       this.setState({'message':message});
+      if (this.messageTimeout) clearTimeout(this.messageTimeout);
+      this.messageTimeout = setTimeout(function() {
+		  that.setState({message:null})
+	  },3000)
+      
   };
 
     saveSuggestion(id,question,mnemonic,technique) {
