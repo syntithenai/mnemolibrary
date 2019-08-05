@@ -534,7 +534,7 @@ function initRoutes(router,db) {
 										&& record.specific_answer && record.specific_answer.length > 0
 										&& (record.multiple_choices && record.multiple_choices.length > 0 || hasGenerator)
 									) {
-										let newQuestion ={topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image,sort:record.sort,difficulty:record.difficulty,options_generator_collection:question.options_generator_collection,options_generator_filter:question.options_generator_filter,options_generator_field:question.options_generator_field}
+										let newQuestion ={topic:record.quiz,question:record.specific_question,answer:record.specific_answer,multiple_choices:record.multiple_choices,feedback:record.feedback,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image,sort:record.sort,difficulty:record.difficulty,options_generator_collection:record.options_generator_collection,options_generator_filter:record.options_generator_filter,options_generator_field:record.options_generator_field}
 										console.log('NEWQ',JSON.stringify(newQuestion))
 										
 										try {
@@ -552,7 +552,7 @@ function initRoutes(router,db) {
 										&& record.specific_answer2 && record.specific_answer2.length > 0
 										&& (record.multiple_choices2 && record.multiple_choices2.length > 0 || hasGenerator2)
 									) {
-										let newQuestion ={topic:record.quiz,question:record.specific_question2,answer:record.specific_answer2,multiple_choices:record.multiple_choices2,feedback:record.feedback2,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image,sort:record.sort,difficulty:record.difficulty,options_generator_collection:question.options_generator_collection2,options_generator_filter:question.options_generator_filter2,options_generator_field:question.options_generator_field2}
+										let newQuestion ={topic:record.quiz,question:record.specific_question2,answer:record.specific_answer2,multiple_choices:record.multiple_choices2,feedback:record.feedback2,importId:'QQ-'+importId,user:'default',image:record.image,autoshow_image:record.autoshow_image,sort:record.sort,difficulty:record.difficulty,options_generator_collection:record.options_generator_collection2,options_generator_filter:record.options_generator_filter2,options_generator_field:record.options_generator_field2}
 										console.log('NEWQ',JSON.stringify(newQuestion))
 										
 										try {
