@@ -3,6 +3,11 @@ import React, { Component } from 'react';
         
 import {InlineShareButtons} from 'sharethis-reactjs';
 
+import {
+  FacebookShareButton
+} from 'react-share';
+
+
 //import Email from 'react-icons/lib/fa/envelope-o';
 //import Twitter from 'react-icons/lib/fa/twitter';
 //import Facebook from 'react-icons/lib/fa/facebook';
@@ -51,6 +56,8 @@ export default class ShareDialog extends Component {
 						<div>{this.props.shareText}</div>
 						<div style={{marginBottom: '2em'}}>{this.props.shareLink}</div>
 						
+					<FacebookShareButton url={this.props.shareLink} quote={this.props.shareText} hashtag={'MnemosLibrary'} >Share</FacebookShareButton>
+
 						<div className='btn btn-info' ><a className="twitter-share-button"
 						  target="_blank" 
 						  href={"https://twitter.com/intent/tweet?text="+this.props.shareText+"%20"+encodedShareLink}
@@ -66,6 +73,8 @@ export default class ShareDialog extends Component {
 						<a style={{marginLeft:'1em'}} className="btn btn-info"
 						  target="_blank" 
 						  href={mailToLink} >Email</a>
+					
+					
 					
 					  </div>
 					</div>

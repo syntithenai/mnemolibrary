@@ -856,6 +856,8 @@ export default class MultipleChoiceQuestions extends Component {
 						let image = question  && question.image_png ? question.image_png : (question  && question.image ? question.image : '')  
 						let imageattribution = question.imageattribution;
 						let autoshowimage = question.autoshow_image==="YES" ? true : false; 
+						if (!question.hasOwnProperty('autoshow_image')) autoshowimage = question.relatedQuestion.autoshow_image==="YES" ? true : false;	
+
 						// fallback to parent image
 						if (!image)  {
 							image = question && question.relatedQuestion && question.relatedQuestion.image_png ? question.relatedQuestion.image_png : (question && question.relatedQuestion && question.relatedQuestion.image ? question.relatedQuestion.image : '') 
@@ -863,7 +865,7 @@ export default class MultipleChoiceQuestions extends Component {
 						
 						}
 						if (!imageattribution)  imageattribution = question && question.relatedQuestion && question.relatedQuestion.imageattribution ? question.relatedQuestion.imageattribution : imageattribution;
-							autoshowimage = question.relatedQuestion.autoshow_image==="YES" ? true : false;	
+						
 						let moreInfoLink = '/discover/topic/'+question.topic+'/'+question.questionId;
 						let mcByTopicLink = '/multiplechoicequestions/'+encodeURIComponent(question.topic);
 						let questionKeyId ='question_'+questionKey;

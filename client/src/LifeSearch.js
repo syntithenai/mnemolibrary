@@ -180,13 +180,13 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		let modeKey = this.getSearchMode()
 		if (searchFor && searchFor.length > 0) { 	
 			if (modeKey && modeKey.length > 0) {
-				this.props.history.push("/ala/"+(this.state.rawSearch ? 'search/' : '')+encodeURIComponent(searchFor)+"/mode/"+encodeURIComponent(modeKey)); 
+				this.props.history.push("/life/"+(this.state.rawSearch ? 'search/' : '')+encodeURIComponent(searchFor)+"/mode/"+encodeURIComponent(modeKey)); 
 			} else {
-				this.props.history.push("/ala/"+(this.state.rawSearch ? 'search/' : '')+encodeURIComponent(searchFor)); 
+				this.props.history.push("/life/"+(this.state.rawSearch ? 'search/' : '')+encodeURIComponent(searchFor)); 
 			}
 		} else {
 			if (modeKey && modeKey.length > 0) {
-				this.props.history.push("/ala/mode/"+encodeURIComponent(modeKey)); 
+				this.props.history.push("/life/mode/"+encodeURIComponent(modeKey)); 
 			}
 		}
 	}
@@ -676,7 +676,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 			let alaGalleryLink = alaLink + "#gallery"
 			let wikipediaLink = 'http://en.wikipedia.org/?curid='+result.wikipediaPageId;
 						
-			let expandedLink = that.getScientificName(result).length > 0 ? "/ala/"+encodeURIComponent(that.getScientificName(result))	: null;		
+			let expandedLink = that.getScientificName(result).length > 0 ? "/life/"+encodeURIComponent(that.getScientificName(result))	: null;		
 			let isExpanded = that.state.expanded[resultKey] ? true : false;
 			let commonName = that.getName(result).length > 0 ? that.getName(result) : <br/>;
 			let scientificName = that.getScientificName(result)			
@@ -771,7 +771,7 @@ export default class AtlasLivingAustraliaSearch extends Component {
 		let searchLabel = that.searchModes[selectedMode].searchLabel
 		let searchModes = Object.keys(that.searchModes).map(function(modeKey) {
 			let mode = that.searchModes[modeKey]
-			let modeLink = '/ala/mode/'+encodeURIComponent(modeKey)
+			let modeLink = '/life/mode/'+encodeURIComponent(modeKey)
 			let style={}
 			if (selectedMode === modeKey) {
 				style={fontWeight:'bold',border:'2px solid black'}
@@ -789,15 +789,15 @@ export default class AtlasLivingAustraliaSearch extends Component {
 	  
 			<div style={{padding:'0.5em',backgroundColor:'grey',border:'1px solid black',marginBottom:'1em'}}>
 			
-			<a  className='btn btn-warning' target="_blank" href="https://auth.ala.org.au/cas/login?service=https://mnemolibrary.com/ala" style={{float:'right',marginLeft:'1em'}}>No Images?</a>
-			
+			<a  className='btn btn-warning' target="_blank" href="https://auth.ala.org.au/cas/login?service=https://mnemolibrary.com/life" style={{float:'right',marginLeft:'1em'}}>No Images?</a>
+			 
 			
 			<div style={{marginTop:'0.5em',marginBottom:'0.5em'}}>
 			{searchModes}
 			</div>
 			
 			<div style={{float:'right'}}>
-			<a  className='btn btn-info' target="_blank" href="https://biocache.ala.org.au/search#tab_simpleSearch" style={{marginLeft:'1em'}}>Advanced Search</a><Link to="/ala" className="btn btn-danger">Reset</Link>
+			<a  className='btn btn-info' target="_blank" href="https://biocache.ala.org.au/search#tab_simpleSearch" style={{marginLeft:'1em'}}>Advanced Search</a><Link to="/life" className="btn btn-danger">Reset</Link>
 			</div>
 			
 			<form onSubmit={(e) => this.submitForm(e)}>

@@ -30,6 +30,8 @@ import Fakerator from 'fakerator'
 
 var nlp = require('compromise') // (or window.nlp)
 		
+var genreslist = ["2-step","4-beat","acid","acousmatic","adult","african","afro","afrobeat","afro-cuban","afropop","against","age","aggrotech","aka","al","alboreás","alegrías","allemande","alternative","ambient","american","americana","anarcho","and","anti-folk","apala","arab","arabic","aria","art","asian","at-tanbura","australian","austropop","avant-garde","axé","bachata","background","bagatelle","baila","baithak","bakersfield","balearic","ballad","ballade","ballata","ballet","baltimore","band","banda","bap","baroque","bass","bassline","bassoon","baul","beat","beautiful","bebop","benga","bhangra","bhangragga","bhawaiya","big","bikutsi","bitpop","black","black-doom","blackened","blue-eyed","bluegrass","blues","body","bolero","bollywood","bongo","boogie","boogie-woogie","boom","boomba","bop","bossa","bouncy","bouyon","brasileira","brazilian","breakbeat","breakcore","breaks","breakstep","brega","brill","british","britpop","broken","brostep","bubblegum","buffa","building","bulerías","bullerengue","burlesque","cabaret","cadence-lypso","cajun","calypso","campursari","canadian","canción","canon","cantata","canterbury","cantes","cantopop","cantus","canzona","canzone","cape","caprice","caracoles","carceleras","carioca","carnatic","carol","carribean","cello","celtic","cha-cha-chá","chaconne","chalga","chamber","chanson","chant","chap","chicago","chicha","chill-out","chillwave","chimurenga","chinese","chiptune","chopper","choral","choro","christian","chromatic","chutney","city","clarinet","classic","classical","close","cloud","club","coast","coldwave","comedy","comique","communism","compas","complextro","concert","concertante","concerto","concrète","congolese","conscious","contemporary","continental","cool","cosmic","(cote","country","coupé-décalé","courante","cowboy","cowboy/western","cowpunk","c-pop","criolla","crossover","crunk","crunkcore","crust","crustgrind","cubano","cumbia","cybergrind","cyclic","dance","dancehall","dance-pop","dance-punk","dance-rock","dangdut","dansband","dark","darkcore","darkstep","d-beat","de","death","deathcore","death-doom","deathgrind","deathrock","debla","deep","delta","desert","detroit","deutsche","digital","dirt","disco","diva","divertimento","d'ivoire)","dixieland","djent","doom","double","downtempo","dream","drill","drone","drum","drumstep","dub","dubstep","dubstyle","dubtronica","dunedin","dutch","east","edm","electric","electro","electroacoustic","electroclash","electro-industrial","electronic","electronica","electronicore","electronics","electropop","electropunk","elevator","emo","en","english","enka","epic","español","estampie","ethereal","ethnic","ethno","étude","euro","eurobeat","eurodance","european","europop","euro-trance","experimental","extratone","fado","fandangos","fann","fantasia","female","fiddle","fidget","fijiri","filk","film","filmi","firmus","flava","florida","flute","folk","folktronica","footwork","for","form","forró","freak","freakbeat","free","freestyle","french","frevo","fugue","fuji","full","funeral","funk","funkstep","funktronica","funky","furniture","fusion","future","futurepop","gabber","galliard","game","gana","garage","gavotte","genge","g-funk","ghetto","ghettotech","gigue","glam","glitch","goa","go-go","golden","goregrind","gospel","gothic","gqom","gregorian","grime","grindcore","grindie","groove","grosso","grrrl","grunge","grupera","guajira","guitar","gypsy","hall","happy","hard","hardbag","hardbass","hardcore","hardstep","hardstyle","hardtechno","hardvapour","harmony","härte","heavy","hellbilly","highlife","hill","hindi","hindustani","hi-nrg","hip","hiplife","hokkien","hokum","hong","honky","hop","horror","horrorcore","house","huayno","hyphy","ida","idm","igbo","illbient","impromptu","improvisation","in","indian","indie","indietronica","indo","industrial","instrumental","intermedio","intermezzo","iranian","isicathamiya","italo","jack","jangle","japanese","japanoise","jazz","jazz-funk","jeel","jerkin'","jersey","jit","j-pop","j-rap","jùjú","juke","jump","jumpstyle","jump-up","jungle","kadongo","kamu","kansas","kapuka","kawaii","kayōkyoku","kei","kenge","keroncong","khaliji","kidandali","kizomba","kong","korean","k-pop","k-rap","krautrock","krung","kuduro","kwaito","kwassa","kwela","laïkó","lam","lambada","laptronica","latin","laude","lavani","lento","lied","liquid","litany","livetronica","liwa","lo-fi","louis","louisiana","lounge","lovers","low","luk","lyrical","madrigal","madrigale","mainstream","mákina","makossa","malaysian","maloya","mambo","mandopop","manila","marabi","maracatu","march","mariachi","marrabenta","martinetes","mass","math","mathcore","mazurka","mbalax","mbaqanga","m-base","mbube","medieval","melodic","memphis","merengue","merenrap","méringue","metal","metalcore","metalstep","mexican","miami","microhouse","middle","minimal","minuet","mirabrás","modal","modular","moment","moombahcore","moombahton","mor","morlam","morna","motet","motet-chanson","motswako","movement","mozambique","mumble","music","música","musical","musique","'n'","nagoya","nashville","national","nazi","ndombolo","nederpop","neo","neo-bop","neoclassical","neofolk","neon","neo-psychedelia","neo-swing","neotraditional","nerdcore","neue","neurofunk","neurohop","new","new-age","nightcore","nintendocore","nitzhonot","no","nocturne","noise","noisegrind","nortec","norteño","northern","nova","novelty","nu","nu-disco","nueva","nu-funk","nu-gaze","oboe","of","ohangla","oi!","old","on","onkyokei","opera","opéra","operatic","operetta","opposition","oratorio","orchestra","orchestral","organum","original","orutu","outlaw","overture","pagan","pagode","paisley","pakistani","palm-wine","parang","paraphrase","parody","partita","pasifika","passacaglia","passepied","pavane","pbr&b","peteneras","p-funk","piano","pichakaree","piedmont","pilipino","pinoy","pirate","poem","poetry","political","polo","polonaise","pop","pop)","popular","pornogrind","porro","post-bop","post-britpop","post-disco","post-grunge","post-hardcore","post-metal","post-punk","post-rock","power","powerviolence","prelude","prog","program","progressive","protest","psybient","psychedelic","psychobilly","psychobilly/punkabilly","punk","punta","quartet","quintet","raga","ragga","raggacore","ragini","ragtime","raï","ranchera","rap","rapcore","rara","rasin","rave","r&b","reactionary","rebetiko","red","reggae","reggaestep","reggaeton","regional","requiem","revival","revolutionary","rhapsody","rhythm","ricercar","riot","road","rock","rockabilly","rockjazz","rocksteady","roll","romantic","romántica","romantic[edit]","rondo","room","rumba","russian","sadcore","saetas","sakara","salsa","saltarello","samba","sambass","sarabande","sawt","scene","scherzo","schlager","school","score","screamo","sega","seggae","seguiriyas","semba","sequence","serenade","seria","sertaneja","sertanejo","shangaan","shibuya-kei","shoegaze","shouter","sinfonia","singer-songwriter","singspiel","ska","skate","skiffle","skool","skweee","slowcore","sludge","smooth","snap","soca","socialist","soft","soleás","solo","son","sonata","song","songo","sophisti-pop","soukous","soul","sound","soundtrack","southern","space","speed","speedcore","spirituale","splittercore","stoner","straight-ahead","stream","street","stride","string","sufi","suite","sunda","sung","sunshine","suomisaundi","surf","swamp","swing","symphonic","symphony","synthpop","taarab","taiwanese","tangos","tech","techdombe","technical","techno","techstep","tecnobrega","teen","tejano","texas","thai","the","theatre","third","thrash","thrashcore","thung","tiento","timba","toccata","toná","tonás","tone","t'ong","tonk","trad","traditional","trance","trap","trecento","tribal","trillas","trio","trip","tropical","tropicalia","tropipop","trot","truck-driving","trumpet","tunes","turkish","twoubadou","uk","unblack","underground","uplifting","urban","vallenato","vaporwave","vaudeville","video","vietnamese","viking","viola","violento","violin","vispop","visual","vocal","vomitstep","v-pop","vuelta","waltz","war","wave","west","western","witch","wonky","world","worldbeat","wrock","zarzuela","zouglou","zouk","zouk-lambada","zydeco"]	
+		
 		
 export default class MusicBrainzSearch extends MashupSearch {   
 	constructor(props) {
@@ -92,7 +94,7 @@ export default class MusicBrainzSearch extends MashupSearch {
 				console.log(['LOADed artist details',artistjson])
 				
 				// LOAD ALBUMS
-				fetch('https://musicbrainz.org/ws/2/release/?artist='+mbid+'&inc=release-groups+genres+tags+annotation&type=album|ep&limit=300&fmt=json')
+				fetch('https://musicbrainz.org/ws/2/release/?artist='+mbid+'&inc=release-groups+genres+tags+annotation+recordings&type=album|ep&limit=300&fmt=json')
 				//'https://musicbrainz.org/ws/2/release?artist='+that.getMBID(question)+'&inc=release-groups&limit=1000&fmt=json')
 				.then(function(response) {
 					return response.json()
@@ -128,6 +130,8 @@ export default class MusicBrainzSearch extends MashupSearch {
 										if (a.sort < b.sort) return -1 
 										else return 1
 									})
+									console.log('tr',tracks)
+										
 									albumIndex[release.title] = {
 										id:release.id,
 										image:image,
@@ -207,8 +211,11 @@ export default class MusicBrainzSearch extends MashupSearch {
 											if (question.tags) {
 												question.tags.map(function(tag) {
 													if (tag.name && tag.name.trim().length > 0) {
-														tags.push(tag.name);
-														extendedTags.push(tag.name);
+														// only allowed genres
+														if (genreslist.indexOf(tag.name.trim()) !== -1) {
+															tags.push(tag.name);
+															extendedTags.push(tag.name);
+														}
 													}
 													
 												})
@@ -497,11 +504,12 @@ export default class MusicBrainzSearch extends MashupSearch {
 		let that = this;
 		let mcQuestions=[]
 		// generate MC questions
-		let whenTitle = result.country && result.country.trim().length > 0 ? "Musicians of "+result.country : 'Musicians';
-		let whereTitle = result.decade && result.decade > 0 ? 'Musicians of the ' + result.decade+"'s" : 'Musicians';
+		let whenTitle = 'Musicians' //result.country && result.country.trim().length > 0 ? "Musicians of "+result.country : 'Musicians';
+		let whereTitle = 'Musicians' // result.decade && result.decade > 0 ? 'Musicians of the ' + result.decade+"'s" : 'Musicians';
 		 
 		let whenPre = 'When did the band ';
 		let whenPost = ' form ';
+		let whenPosted = ' formed ';
 		let wherePre = 'Where did the band ';
 		let wherePost = ' come from ';
 		let noun = 'band'
@@ -509,54 +517,63 @@ export default class MusicBrainzSearch extends MashupSearch {
 			noun = 'musical artist' 
 			whenPre = 'When was the musician ';
 			whenPost = ' born ';
+			whenPosted = ' born ';
 			wherePre = 'Where was the musician ';
 			wherePost = ' born ';
 		} 
 		
 		let baseQuestion = {importid:'userimport',importtype:'musician',attribution:'musicbrainz',imageattribution:'wikipedia',topic:whenTitle,image:result.image, autoshow_image:true,question:'When did the band '+that.getName(result)+' form',answer:result.headlineFacts.Begin,options_generator_collection:'questions',options_generator_filter:JSON.stringify({importtype:{"$eq":'musician'}}),options_generator_field:'date'}
 		// when born
+		var questionParts= [];
 		if (result.headlineFacts && result.headlineFacts.Begin && parseInt(result.headlineFacts.Begin,10) > 0) {
-			mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:2,topic:whenTitle,autoshow_image:"YES",question:whenPre+that.getCanonicalName(result)+whenPost,answer:String(result.headlineFacts.Begin),options_generator_field:'date',sort:Math.random()}))
+			questionParts.push('I was '+whenPosted+' '+parseInt(result.headlineFacts.Begin,10))	//mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:2,topic:whenTitle,autoshow_image:"YES",question:whenPre+that.getCanonicalName(result)+whenPost,answer:String(result.headlineFacts.Begin),options_generator_field:'date',sort:Math.random()}))
+			
 		}
 		// where born
 		if (result.headlineFacts && result.headlineFacts.Location && result.headlineFacts.Location.length > 0) {
-			mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:2,topic:whereTitle,autoshow_image:"YES",question:wherePre+that.getCanonicalName(result)+wherePost,answer:result.headlineFacts.Location,options_generator_field:'location',sort:Math.random()}))
+			questionParts.push(' and I am from '+result.headlineFacts.Location)	//mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:2,topic:whereTitle,autoshow_image:"YES",question:wherePre+that.getCanonicalName(result)+wherePost,answer:result.headlineFacts.Location,options_generator_field:'location',sort:Math.random()}))
 		}
+		questionParts.push('.\n')
 		// who is by image		
 		if (result.image && result.image.length > 0) {
-			mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:1,topic:whereTitle,autoshow_image:"YES",question:'Who is this '+noun+' ',answer:that.getCanonicalName(result),options_generator_field:'question',sort:Math.random()}))
+			//mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:1,topic:whereTitle,autoshow_image:"YES",question:'Who is this '+noun+' ',answer:that.getCanonicalName(result),options_generator_field:'question',sort:Math.random()}))
 		}
 		// tags		
 		if (result.tags && result.tags.length > 0) {
-			mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:1,topic:'Musicians by Genre',autoshow_image:"YES",question:'Which set of genres best describes the '+noun+' '+that.getCanonicalName(result)+' '+that.getName(result),answer:result.headlineFacts.Tags,options_generator_field:'headlineFacts.Tags',sort:Math.random()}))
+			questionParts.push('I perform '+result.headlineFacts.Tags+' music.')
+			mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:1,topic:'Musicians',autoshow_image:true,question:'Which set of genres best describes the '+noun+' '+that.getCanonicalName(result)+' '+that.getName(result),answer:result.headlineFacts.Tags,options_generator_field:'headlineFacts.Tags',sort:Math.random()}))
+		}
+		if (questionParts.length > 2) {
+			mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:1,topic:'Musicians',autoshow_image:false,question:'Who am I? '+questionParts.join(''),answer:that.getCanonicalName(result),options_generator_field:'question',sort:Math.random()}))
 		}
 		
-		if (result.albums && result.albums.length > 0) {
-			// first album
-			let firstAlbum = result.albums[0]
-			console.log(['CH',result.name,firstAlbum.title,(firstAlbum.date ? 'YES' :'NO' ),(firstAlbum.title ? 'YES' :'NO' ),(result.name ? 'YES' :'NO' ),(firstAlbum.title.indexOf(result.name) === -1 ? 'YES' :'NO' ),(firstAlbum.title.indexOf('Greatest Hits') === -1 ? 'YES' :'NO' )] )
-			let year = parseInt(firstAlbum.date,10)
-			if (firstAlbum.date && result.name && firstAlbum.title && firstAlbum.title.indexOf(result.name) === -1&& firstAlbum.title.indexOf('Greatest Hits') === -1) mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:3,topic:whereTitle,autoshow_image:'YES',image:firstAlbum.image,question:'Who created the album "'+firstAlbum.title+'" in '+year,answer:result.name,options_generator_field:'question',sort:Math.random(),imageattribution:'https://coverartarchive.org/'}))
+		
+		//if (result.albums && result.albums.length > 0) {
+			//// first album
+			//let firstAlbum = result.albums[0]
+			//console.log(['CH',result.name,firstAlbum.title,(firstAlbum.date ? 'YES' :'NO' ),(firstAlbum.title ? 'YES' :'NO' ),(result.name ? 'YES' :'NO' ),(firstAlbum.title.indexOf(result.name) === -1 ? 'YES' :'NO' ),(firstAlbum.title.indexOf('Greatest Hits') === -1 ? 'YES' :'NO' )] )
+			//let year = parseInt(firstAlbum.date,10)
+			//if (firstAlbum.date && result.name && firstAlbum.title && firstAlbum.title.indexOf(result.name) === -1&& firstAlbum.title.indexOf('Greatest Hits') === -1) mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:3,topic:whereTitle,autoshow_image:'YES',image:firstAlbum.image,question:'Who created the album "'+firstAlbum.title+'" in '+year,answer:result.name,options_generator_field:'question',sort:Math.random(),imageattribution:'https://coverartarchive.org/'}))
 			
-			if (result.albums.length > 2) {
-				// second album
-				firstAlbum = result.albums[2]
-				year = parseInt(firstAlbum.date,10)
-				console.log(['CH2',result.name,firstAlbum.title,(firstAlbum.date && result.name && firstAlbum.title && firstAlbum.title.indexOf(result.name) === -1 ? 'YES' :'NO' )])
-				if (firstAlbum.date && result.name && firstAlbum.title && firstAlbum.title.indexOf(result.name) === -1) mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:3,topic:whereTitle,autoshow_image:'YES',image:firstAlbum.image,question:'Who created the album "'+firstAlbum.title+'" in '+year,answer:result.name,options_generator_field:'question',sort:Math.random(),imageattribution:'https://coverartarchive.org/'}))
-			}
-			if (result.albums.length > 3) {
-				// other recent album
-				let max = result.albums.length > 5 ? 5 : result.albums.length
-				let selected = parseInt(Math.random() * (max),10)
-				let album = result.albums[(result.albums.length - selected + 2)%result.albums.length];
-				year = parseInt(album.date,10)
-				console.log(['CH ALB',result.name,album.title,result.albums])
-				if (album  && result.name && album.title && album.title.indexOf(result.name) === -1 ){
-					if (album.date) mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:3,topic:whereTitle,autoshow_image:'YES',image:album.image,question:'Who created the album "'+album.title+'" in '+year,answer:result.name,options_generator_field:'question',sort:Math.random(),imageattribution:'https://coverartarchive.org/'}))
-				}
-			}
-		} 
+			//if (result.albums.length > 2) {
+				//// second album
+				//firstAlbum = result.albums[2]
+				//year = parseInt(firstAlbum.date,10)
+				//console.log(['CH2',result.name,firstAlbum.title,(firstAlbum.date && result.name && firstAlbum.title && firstAlbum.title.indexOf(result.name) === -1 ? 'YES' :'NO' )])
+				//if (firstAlbum.date && result.name && firstAlbum.title && firstAlbum.title.indexOf(result.name) === -1) mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:3,topic:whereTitle,autoshow_image:'YES',image:firstAlbum.image,question:'Who created the album "'+firstAlbum.title+'" in '+year,answer:result.name,options_generator_field:'question',sort:Math.random(),imageattribution:'https://coverartarchive.org/'}))
+			//}
+			//if (result.albums.length > 3) {
+				//// other recent album
+				//let max = result.albums.length > 5 ? 5 : result.albums.length
+				//let selected = parseInt(Math.random() * (max),10)
+				//let album = result.albums[(result.albums.length - selected + 2)%result.albums.length];
+				//year = parseInt(album.date,10)
+				//console.log(['CH ALB',result.name,album.title,result.albums])
+				//if (album  && result.name && album.title && album.title.indexOf(result.name) === -1 ){
+					//if (album.date) mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:3,topic:whereTitle,autoshow_image:'YES',image:album.image,question:'Who created the album "'+album.title+'" in '+year,answer:result.name,options_generator_field:'question',sort:Math.random(),imageattribution:'https://coverartarchive.org/'}))
+				//}
+			//}
+		//} 
 		function shuffle(a) {
 			var j, x, i;
 			for (i = a.length - 1; i > 0; i--) {
@@ -577,7 +594,7 @@ export default class MusicBrainzSearch extends MashupSearch {
 			let options = result.headlineFacts.People.split(",").slice(0,3);
 			options.push(fakeName);
 			console.log(['options',options])
-			mcQuestions.push(Object.assign({},{difficulty:3,topic:'Band Members',autoshow_image:"YES",question:'Who is not a member of '+that.getCanonicalName(result),answer:fakeName,multiple_choices:shuffle(options).join("|||"),sort:Math.random()}))
+			mcQuestions.push(Object.assign({},{difficulty:3,topic:'Musicians',autoshow_image:true,question:'Who is not a member of '+that.getCanonicalName(result),answer:fakeName,multiple_choices:shuffle(options).join("|||"),sort:Math.random()}))
 		}
 		console.log(['MC RES',mcQuestions])
 				
@@ -590,7 +607,7 @@ export default class MusicBrainzSearch extends MashupSearch {
 		  headers: {
 			'Content-Type': 'application/json'
 		  },
-		  body: JSON.stringify({user:user,access:'public',interrogative:'Who is the musical artist ',question:that.getCanonicalName(result),guid:that.getCanonicalName(result) ,postfix:' '+that.getName(result),difficulty:2,image:result.image,autoshow_image:"YES",answer:result.description,tags:result.extendedTags,importtype:'musician',importId:'userimport',type:result.type,sex:result.sex,wikipediaPageId:result.wikipediaPageId,link:result.link,link2:result.link2,link2Title:result.link2Title,quiz:result.quiz,albums:result.albums,answerDetails:that.discographyRef.innerHTML,headlineFacts:result.headlineFacts,mcQuestions:mcQuestions,date:result.headlineFacts.Begin,location:result.headlineFacts.Location,attribution:'musicbrainz',imageattribution:'wikipedia',mbid:result.id})
+		  body: JSON.stringify({user:user,access:'public',interrogative:'Who is the musical artist ',question:that.getCanonicalName(result),guid:that.getCanonicalName(result) ,postfix:' '+that.getName(result),difficulty:2,image:result.image,autoshow_image:"YES",answer:result.description,tags:result.extendedTags,importtype:'musician',importId:'userimport',type:result.type,sex:result.sex,wikipediaPageId:result.wikipediaPageId,link:result.link,link2:result.link2,link2Title:result.link2Title,quiz:'Musicians',albums:result.albums,answerDetails:that.discographyRef.innerHTML,headlineFacts:result.headlineFacts,mcQuestions:mcQuestions,date:result.headlineFacts.Begin,location:result.headlineFacts.Location,attribution:'musicbrainz',imageattribution:'wikipedia',mbid:result.id})
 		}).then(function() {
 			that.showMessage('Saved for review')
 		});
