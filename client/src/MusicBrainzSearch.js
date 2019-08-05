@@ -81,7 +81,10 @@ export default class MusicBrainzSearch extends MashupSearch {
 		let questions = this.state.results;
 		let isError = false;
 		let mbid = that.getMBID(question)
-			
+		
+		// headline facts
+		questions[questionKey].headlineFacts={};
+											
 		if (question && mbid.length > 0) {
 			//let shortSearchKeyGoogle = that.getCanonicalName(question)
 			//let longSearchKeyWikipedia = '"'+that.getCanonicalName(question) +'" ' + that.getName(question)
@@ -202,8 +205,6 @@ export default class MusicBrainzSearch extends MashupSearch {
 											if (wikiimagedata && wikiimagedata.original && wikiimagedata.original.source) questions[questionKey].image = wikiimagedata.original.source;
 											
 											
-											// headline facts
-											questions[questionKey].headlineFacts={};
 											//questions[questionKey].headlineFacts.Albums = Object.keys(titles).join(',');
 											//if (questions[questionKey].works) questions[questionKey].headlineFacts["Total Works"] = questions[questionKey].works.length;
 											let tags = []
