@@ -542,10 +542,10 @@ export default class MusicBrainzSearch extends MashupSearch {
 		// tags		
 		if (result.tags && result.tags.length > 0) {
 			questionParts.push('I perform '+result.headlineFacts.Tags+' music.')
-			mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:1,topic:'Musicians',autoshow_image:true,question:'Which set of genres best describes the '+noun+' '+that.getCanonicalName(result)+' '+that.getName(result),answer:result.headlineFacts.Tags,options_generator_field:'headlineFacts.Tags',sort:Math.random()}))
+			mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:1,topic:'Musicians',autoshow_image:true,question:'Which set of genres best describes the '+noun+' '+that.getCanonicalName(result)+' '+that.getName(result),answer:result.headlineFacts.Tags,options_generator_field:'headlineFacts.Tags',sort:Math.random(),feedback:result.description}))
 		}
 		if (questionParts.length > 2) {
-			mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:1,topic:'Musicians',autoshow_image:false,question:'Who am I? '+questionParts.join(''),answer:that.getCanonicalName(result),options_generator_field:'question',sort:Math.random()}))
+			mcQuestions.push(Object.assign(Object.assign({},baseQuestion),{difficulty:1,topic:'Musicians',autoshow_image:false,question:'Who am I? '+questionParts.join(''),answer:that.getCanonicalName(result),options_generator_field:'question',sort:Math.random(),feedback:result.description}))
 		}
 		
 		
