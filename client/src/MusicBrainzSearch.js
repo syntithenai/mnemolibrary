@@ -522,7 +522,7 @@ export default class MusicBrainzSearch extends MashupSearch {
 			wherePost = ' born ';
 		} 
 		
-		let baseQuestion = {importid:'userimport',importtype:'musician',attribution:'musicbrainz',imageattribution:'wikipedia',topic:whenTitle,image:result.image, autoshow_image:true,question:'When did the band '+that.getName(result)+' form',answer:result.headlineFacts.Begin,options_generator_collection:'questions',options_generator_filter:JSON.stringify({importtype:{"$eq":'musician'}}),options_generator_field:'date'}
+		let baseQuestion = {importid:'userimport',importtype:'musician',attribution:'musicbrainz',imageattribution:'wikipedia',topic:whenTitle,image:result.image, autoshow_image:true,question:'When did the band '+that.getName(result)+' form',answer:'',options_generator_collection:'questions',options_generator_filter:JSON.stringify({importtype:{"$eq":'musician'}}),options_generator_field:'date'}
 		// when born
 		var questionParts= [];
 		if (result.headlineFacts && result.headlineFacts.Begin && parseInt(result.headlineFacts.Begin,10) > 0) {
